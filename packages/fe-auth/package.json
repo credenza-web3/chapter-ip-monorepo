@@ -1,0 +1,16 @@
+{
+  "name": "@repo/fe-auth",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@repo/trpc": "workspace:*"
+  },
+  "peerDependencies": {
+    "svelte": "^5.39.5"
+  }
+}

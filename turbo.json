@@ -1,0 +1,22 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "ui": "tui",
+  "globalEnv": ["PORT", "NODE_ENV", "ACCOUNTS_URL"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "env": ["PORT", "NODE_ENV", "ACCOUNTS_URL"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"]
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "check-types": {
+      "dependsOn": ["^check-types"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}
