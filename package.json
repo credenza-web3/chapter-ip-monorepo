@@ -1,5 +1,5 @@
 {
-  "name": "nibs",
+  "name": "chapter-ip-monorepo",
   "private": true,
   "scripts": {
     "build": "turbo run build",
