@@ -41,5 +41,11 @@
     "vitest": "^3.2.4",
     "vitest-browser-svelte": "^1.1.0",
     "yaml": "^2.8.1"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.17",
+    "@zerodevx/svelte-toast": "^0.9.6",
+    "daisyui": "^5.5.5",
+    "tailwindcss": "^4.1.17"
   }
 }
