@@ -2,11 +2,13 @@
   import Header from '$lib/components/Header.svelte'
   import { SvelteToast } from '@zerodevx/svelte-toast'
   import '../app.css'
+  import favicon from '$lib/assets/credenza.png'
 
   let { children } = $props()
 </script>
 
 <svelte:head>
+  <link rel="icon" href={favicon} />
   <title>chapter ip</title>
 </svelte:head>
 <SvelteToast />
