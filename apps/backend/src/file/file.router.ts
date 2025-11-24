@@ -43,6 +43,7 @@ export class FileRouter {
       sub: ctx.authTokenPayload.sub,
       key,
       bucket,
+      tokenId: input.tokenId,
     })
     return {
       _id: String(file._id),
@@ -69,17 +70,14 @@ export class FileRouter {
       throw new TRPCError({ message: 'File is not found', code: 'NOT_FOUND' })
     }
 
+    // TODO: Implement file access control logic
+    // throw new TRPCError({ message: 'You do not have access to this file', code: 'FORBIDDEN' })
+
     const url = await this.fileService.getFileUrl({
       Bucket: file.bucket,
       Key: file.key,
     })
 
-    const responseData = { url }
-
-    return responseData
-
-    // TODO: Implement file access control logic
-    // if (file.sub === ctx.authTokenPayload.sub) return responseData
-    // throw new TRPCError({ message: 'You do not have access to this file', code: 'FORBIDDEN' })
+    return { url }
   }
 }

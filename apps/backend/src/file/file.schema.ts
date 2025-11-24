@@ -19,6 +19,9 @@ export class File extends Document {
 
   @Prop({ required: true })
   key: string
+
+  @Prop({ required: true })
+  tokenId: string
 }
 
 export const FileSchema = SchemaFactory.createForClass(File)
