@@ -23,4 +23,4 @@ export class File extends Document {
 
 export const FileSchema = SchemaFactory.createForClass(File)
 FileSchema.index({ sub: 1 })
-FileSchema.index({ key: 1 })
+FileSchema.index({ key: 1 }, { unique: true })
