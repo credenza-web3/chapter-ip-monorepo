@@ -45,7 +45,6 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",
-    "@zerodevx/svelte-toast": "^0.9.6",
     "daisyui": "^5.5.5",
     "tailwindcss": "^4.1.17"
   }

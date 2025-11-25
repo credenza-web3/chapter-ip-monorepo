@@ -11,6 +11,9 @@
       "svelte": "./index.ts"
     }
   },
+  "dependencies": {
+    "@zerodevx/svelte-toast": "^0.9.6"
+  },
   "peerDependencies": {
     "svelte": "^5.39.5"
   }

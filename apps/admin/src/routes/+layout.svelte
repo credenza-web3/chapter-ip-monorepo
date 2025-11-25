@@ -1,12 +1,9 @@
 <script lang="ts">
   import Header from '$lib/components/Header.svelte'
-<<<<<<< Updated upstream
-  import { SvelteToast } from '@zerodevx/svelte-toast'
   import '../app.css'
   import favicon from '$lib/assets/credenza.png'
-=======
-  import { Test } from '@repo/ui-components'
->>>>>>> Stashed changes
+  import { Test, Toast } from '@repo/ui-components'
+  import { onMount } from 'svelte'
 
   let { children } = $props()
 </script>
@@ -15,7 +12,7 @@
   <link rel="icon" href={favicon} />
   <title>chapter ip</title>
 </svelte:head>
-<SvelteToast />
+<Toast />
 <div class="min-h-screen overflow-x-hidden flex flex-col">
   <Test />
   <Header />
