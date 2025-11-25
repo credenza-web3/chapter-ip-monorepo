@@ -7,6 +7,7 @@ import type { Request, Response, NextFunction } from 'express'
 
 import { CommonModule } from './common/common.module'
 import { AuthModule } from './auth/auth.module'
+import { FileModule } from './file/file.module'
 
 import { TrpcPanelController } from './trpc-ui.controller'
 import { AppRouter } from './app.router'
@@ -32,6 +33,7 @@ import { AppContext } from './app.context'
       autoSchemaFile: process.env.NODE_ENV === 'local' ? '../../packages/trpc/src/server' : undefined,
     }),
     AuthModule,
+    FileModule,
   ],
   controllers: [TrpcPanelController],
   providers: [AppContext, AppRouter],

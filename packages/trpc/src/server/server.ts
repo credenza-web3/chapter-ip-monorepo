@@ -31,6 +31,48 @@ const appRouter = t.router({
       refreshToken: z.string().optional(),
       idToken: z.string().optional(),
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
+  }),
+  files: t.router({
+    upload: publicProcedure.input(z.object({
+      file: z.object({
+        filename: z.string(),
+        mimetype: z.string(),
+        data: z.array(z.number()),
+      }),
+      tokenId: z.string(),
+    })).output(z.object({
+      _id: z.string(),
+      key: z.string(),
+      bucket: z.string(),
+    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    getFileLink: publicProcedure.input(z
+      .object({
+        key: z.string().optional(),
+        _id: z.string().optional(),
+      })
+      .refine((data) => Boolean(data._id || data.key), {
+        message: 'Either `_id` or `key` must be provided.',
+        path: ['key'],
+      })).output(z.object({
+        url: z.string(),
+      })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    getFileUploadUrl: publicProcedure.input(z.object({
+      filename: z.string(),
+      mimetype: z.string().optional(),
+    })).output(z.object({
+      url: z.string(),
+      key: z.string(),
+      bucket: z.string(),
+    })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    registerUploadedFile: publicProcedure.input(z.object({
+      key: z.string(),
+      bucket: z.string(),
+      tokenId: z.string(),
+    })).output(z.object({
+      _id: z.string(),
+      key: z.string(),
+      bucket: z.string(),
+    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
   })
 });
 export type AppRouter = typeof appRouter;
