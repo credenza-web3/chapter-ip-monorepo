@@ -1,0 +1,20 @@
+{
+  "name": "@repo/ui-components",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "module": "./index.ts",
+  "main": "./index.ts",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "svelte": "./index.ts"
+    }
+  },
+  "dependencies": {
+    "@zerodevx/svelte-toast": "^0.9.6"
+  },
+  "peerDependencies": {
+    "svelte": "^5.39.5"
+  }
+}
