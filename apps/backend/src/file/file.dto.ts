@@ -35,3 +35,23 @@ export const getFileLinkOutputSchema = z.object({
   url: z.string(),
 })
 export type TGetFileLinkOutput = z.infer<typeof getFileLinkOutputSchema>
+
+export const createFileUploadUrlInputSchema = z.object({
+  filename: z.string(),
+  mimetype: z.string().optional(),
+})
+export type TCreateFileUploadUrlInput = z.infer<typeof createFileUploadUrlInputSchema>
+
+export const createFileUploadUrlOutputSchema = z.object({
+  url: z.string(),
+  key: z.string(),
+  bucket: z.string(),
+})
+export type TCreateFileUploadUrlOutput = z.infer<typeof createFileUploadUrlOutputSchema>
+
+export const registerUploadedFileInputSchema = z.object({
+  key: z.string(),
+  bucket: z.string(),
+  tokenId: z.string(),
+})
+export type TRegisterUploadedFileInput = z.infer<typeof registerUploadedFileInputSchema>

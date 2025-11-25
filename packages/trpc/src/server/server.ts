@@ -55,7 +55,24 @@ const appRouter = t.router({
         path: ['key'],
       })).output(z.object({
         url: z.string(),
-      })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
+      })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    getFileUploadUrl: publicProcedure.input(z.object({
+      filename: z.string(),
+      mimetype: z.string().optional(),
+    })).output(z.object({
+      url: z.string(),
+      key: z.string(),
+      bucket: z.string(),
+    })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    registerUploadedFile: publicProcedure.input(z.object({
+      key: z.string(),
+      bucket: z.string(),
+      tokenId: z.string(),
+    })).output(z.object({
+      _id: z.string(),
+      key: z.string(),
+      bucket: z.string(),
+    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
   })
 });
 export type AppRouter = typeof appRouter;

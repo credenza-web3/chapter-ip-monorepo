@@ -1,7 +1,6 @@
 import { Logger } from '@nestjs/common'
 import { Router, Mutation, Query, Input, Ctx, UseMiddlewares } from 'nestjs-trpc'
 import { TRPCError } from '@trpc/server'
-import { randomUUID } from 'crypto'
 
 import { AuthMiddleware, AdminAuthMiddleware } from '../common/auth/auth.middleware'
 import type { TAppContextWithTokenPayload } from '../common/auth/auth.types'
@@ -16,6 +15,12 @@ import {
   getFileLinkOutputSchema,
   type TGetFileLinkInput,
   type TGetFileLinkOutput,
+  createFileUploadUrlInputSchema,
+  createFileUploadUrlOutputSchema,
+  type TCreateFileUploadUrlInput,
+  type TCreateFileUploadUrlOutput,
+  registerUploadedFileInputSchema,
+  type TRegisterUploadedFileInput,
 } from './file.dto'
 
 @Router({ alias: 'files' })
@@ -30,8 +35,7 @@ export class FileRouter {
     output: uploadFileOutputSchema,
   })
   async upload(@Ctx() ctx: TAppContextWithTokenPayload, @Input() input: TUploadFileInput): Promise<TUploadFileOutput> {
-    const date = new Date().toISOString().slice(0, 10)
-    const key = `${date}/${randomUUID()}_${input.file.filename.replace(' ', '')}`
+    const key = this.fileService.createKey(input.file.filename)
     const bucket = this.fileService.getBucketName()
     await this.fileService.uploadFile({
       Body: Buffer.from(input.file.data),
@@ -79,5 +83,50 @@ export class FileRouter {
     })
 
     return { url }
+  }
+
+  @UseMiddlewares(AuthMiddleware)
+  @Query({
+    input: createFileUploadUrlInputSchema,
+    output: createFileUploadUrlOutputSchema,
+  })
+  async getFileUploadUrl(@Input() input: TCreateFileUploadUrlInput): Promise<TCreateFileUploadUrlOutput> {
+    const key = this.fileService.createKey(input.filename)
+    const bucket = this.fileService.getBucketName()
+    const url = await this.fileService.createUploadUrl({
+      Bucket: this.fileService.getBucketName(),
+      Key: key,
+      ContentType: input.mimetype,
+    })
+    return { url, key, bucket }
+  }
+
+  @UseMiddlewares(AuthMiddleware)
+  @Mutation({
+    input: registerUploadedFileInputSchema,
+    output: uploadFileOutputSchema,
+  })
+  async registerUploadedFile(
+    @Ctx() ctx: TAppContextWithTokenPayload,
+    @Input() input: TRegisterUploadedFileInput,
+  ): Promise<TUploadFileOutput> {
+    const isFileExists = await this.fileService.checkFileExists({
+      Bucket: input.bucket,
+      Key: input.key,
+    })
+    if (!isFileExists) {
+      throw new TRPCError({ message: 'File is not found', code: 'NOT_FOUND' })
+    }
+    const file = await this.fileService.getModel().create({
+      sub: ctx.authTokenPayload.sub,
+      key: input.key,
+      bucket: input.bucket,
+      tokenId: input.tokenId,
+    })
+    return {
+      _id: String(file._id),
+      key: input.key,
+      bucket: input.bucket,
+    }
   }
 }

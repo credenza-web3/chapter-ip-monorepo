@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { ConfigService } from '@nestjs/config'
+import { randomUUID } from 'crypto'
 import {
   S3Client,
   PutObjectCommandInput,
@@ -10,6 +11,14 @@ import {
   GetObjectCommand,
   GetObjectCommandInput,
   PutObjectCommand,
+  HeadObjectCommandInput,
+  HeadObjectCommand,
+  CreateMultipartUploadCommand,
+  CreateMultipartUploadCommandInput,
+  UploadPartCommand,
+  UploadPartCommandInput,
+  CompleteMultipartUploadCommand,
+  CompleteMultipartUploadCommandInput,
 } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
@@ -46,6 +55,11 @@ export class FileService extends CommonModelService<File> {
     return `${process.env.NODE_ENV}-${BUCKET_NAME}`
   }
 
+  createKey(filename: string) {
+    const date = new Date().toISOString().slice(0, 10)
+    return `${date}/${randomUUID()}_${filename.replace(' ', '')}`
+  }
+
   async removeFile(data: DeleteObjectCommandInput) {
     const delete_file_command = new DeleteObjectCommand(data)
     return await this.r2.send(delete_file_command)
@@ -69,6 +83,55 @@ export class FileService extends CommonModelService<File> {
       Key: data.Key,
       Body: data.Body,
       ContentType: data.ContentType,
+    })
+    return await this.r2.send(command)
+  }
+
+  async createUploadUrl(opts: PutObjectCommandInput) {
+    const command = new PutObjectCommand({
+      Bucket: opts.Bucket,
+      Key: opts.Key,
+      ...(opts.ContentType && { ContentType: opts.ContentType }),
+    })
+    return await getSignedUrl(this.r2, command, { expiresIn: 60 * 5 })
+  }
+
+  async checkFileExists(data: HeadObjectCommandInput) {
+    const command = new HeadObjectCommand(data)
+    try {
+      await this.r2.send(command)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  async startMultipartUpload(opts: CreateMultipartUploadCommandInput) {
+    const command = new CreateMultipartUploadCommand({
+      Bucket: opts.Bucket,
+      Key: opts.Key,
+      ContentType: opts.ContentType,
+    })
+    return await this.r2.send(command)
+  }
+
+  async getPartUploadUrl(opts: UploadPartCommandInput) {
+    const command = new UploadPartCommand({
+      Bucket: opts.Bucket,
+      Key: opts.Key,
+      UploadId: opts.UploadId,
+      PartNumber: opts.PartNumber,
+    })
+
+    return await getSignedUrl(this.r2, command, { expiresIn: 600 })
+  }
+
+  async completeMultipartUpload(opts: CompleteMultipartUploadCommandInput) {
+    const command = new CompleteMultipartUploadCommand({
+      Bucket: opts.Bucket,
+      Key: opts.Key,
+      UploadId: opts.UploadId,
+      MultipartUpload: { Parts: opts.MultipartUpload?.Parts },
     })
     return await this.r2.send(command)
   }
