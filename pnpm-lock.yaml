@@ -51,6 +51,9 @@ importers:
       '@repo/fe-auth':
         specifier: workspace:*
         version: link:../../packages/fe-auth
+      '@repo/ui-components':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@sveltejs/adapter-static':
         specifier: ^3.0.9
         version: 3.0.10(@sveltejs/kit@2.46.4(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.39.11)(vite@7.1.9(@types/node@22.18.8)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(yaml@2.8.1)))(svelte@5.39.11)(vite@7.1.9(@types/node@22.18.8)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(yaml@2.8.1)))
@@ -399,6 +402,12 @@ importers:
       zod:
         specifier: ^4
         version: 4.1.12
+
+  packages/ui:
+    dependencies:
+      svelte:
+        specifier: ^5.39.5
+        version: 5.39.11
 
 packages:
 

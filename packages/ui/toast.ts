@@ -1,5 +1,11 @@
 import { toast } from '@zerodevx/svelte-toast'
-import type { ToastType } from './common'
+
+export enum ToastType {
+  FAIL = 'failure',
+  SUCCESS = 'success',
+  WARN = 'warning',
+  INFO = 'info',
+}
 
 const themes = {
   success: {
@@ -17,9 +23,7 @@ const themes = {
   info: { '--toastBackground': '#007BFF', '--toastBarBackground': '#339FFF' },
 }
 
-const notify = (message: string, type: ToastType) =>
+export const notify = (message: string, type: ToastType) =>
   toast.push(message, {
     theme: themes[type],
   })
-
-export default notify

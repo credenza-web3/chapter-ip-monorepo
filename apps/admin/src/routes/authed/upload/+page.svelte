@@ -1,7 +1,6 @@
 <script lang="ts">
   import { afterNavigate, beforeNavigate } from '$app/navigation'
-  import { ToastType } from '$lib/common'
-  import notify from '$lib/toast'
+  import { notify, ToastType } from '@repo/ui-components'
 
   let isOver = $state(false)
   let loading = $state(false)
