@@ -1,0 +1,17 @@
+{
+  "name": "@repo/ui-components",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "module": "./index.ts",
+  "main": "./index.ts",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "svelte": "./index.ts"
+    }
+  },
+  "peerDependencies": {
+    "svelte": "^5.39.5"
+  }
+}
