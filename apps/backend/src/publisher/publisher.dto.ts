@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
 export const setPublisherInputSchema = z.object({
-  sub: z.string(),
   title: z.string(),
   avatarUrl: z.string().optional(),
 })

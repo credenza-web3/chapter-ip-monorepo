@@ -76,7 +76,6 @@ const appRouter = t.router({
   }),
   publisher: t.router({
     setPublisher: publicProcedure.input(z.object({
-      sub: z.string(),
       title: z.string(),
       avatarUrl: z.string().optional(),
     })).output(z.object({

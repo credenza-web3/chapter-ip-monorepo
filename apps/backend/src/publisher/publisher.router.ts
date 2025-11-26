@@ -33,7 +33,7 @@ export class PublisherRouter {
     @Input() input: TSetPublisherInput,
   ): Promise<TSetPublisherOutput> {
     const publisher = await this.publisherService.getModel().findOneAndUpdate(
-      { sub: input.sub },
+      { sub: ctx.authTokenPayload.sub },
       {
         title: input.title,
         ...(input.avatarUrl && { avatarUrl: input.avatarUrl }),
