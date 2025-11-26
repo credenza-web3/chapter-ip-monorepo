@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { ConfigService } from '@nestjs/config'
 import { randomUUID } from 'crypto'
+import type { TBuiltPaginationOptions } from '../common/model/model.dto'
 import {
   S3Client,
   PutObjectCommandInput,
@@ -26,6 +27,7 @@ import { CommonModelService } from '../common/model/model.service'
 
 import { File } from './file.schema'
 import { BUCKET_NAME } from './file.constants'
+import type { TGetAllFilesInput } from './file.dto'
 
 @Injectable()
 export class FileService extends CommonModelService<File> {
@@ -49,6 +51,20 @@ export class FileService extends CommonModelService<File> {
       },
       forcePathStyle: false, // important for R2
     })
+  }
+
+  buildPaginationOptions(opts: TGetAllFilesInput): TBuiltPaginationOptions {
+    const result = super.buildPaginationOptions(opts)
+    if (opts.sub) {
+      result.query.sub = opts.sub
+    }
+    if (opts.tokenId) {
+      result.query.tokenId = opts.tokenId
+    }
+    if (opts.key) {
+      result.query.key = opts.key
+    }
+    return result
   }
 
   getBucketName(): string {

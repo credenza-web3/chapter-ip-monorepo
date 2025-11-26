@@ -21,6 +21,10 @@ import {
   type TCreateFileUploadUrlOutput,
   registerUploadedFileInputSchema,
   type TRegisterUploadedFileInput,
+  getAllFilesInputSchema,
+  type TGetAllFilesInput,
+  getAllFilesOutputSchema,
+  type TGetAllFilesOutput,
 } from './file.dto'
 
 @Router({ alias: 'files' })
@@ -49,11 +53,7 @@ export class FileRouter {
       bucket,
       tokenId: input.tokenId,
     })
-    return {
-      _id: String(file._id),
-      key,
-      bucket,
-    }
+    return Object.assign(file.toJSON(), { _id: String(file._id) })
   }
 
   @UseMiddlewares(AuthMiddleware)
@@ -123,10 +123,15 @@ export class FileRouter {
       bucket: input.bucket,
       tokenId: input.tokenId,
     })
-    return {
-      _id: String(file._id),
-      key: input.key,
-      bucket: input.bucket,
-    }
+    return Object.assign(file.toJSON(), { _id: String(file._id) })
+  }
+
+  @Query({
+    input: getAllFilesInputSchema,
+    output: getAllFilesOutputSchema,
+  })
+  async findFiles(@Input() input: TGetAllFilesInput): Promise<TGetAllFilesOutput> {
+    const paginationOptions = this.fileService.buildPaginationOptions(input)
+    return await this.fileService.paginate<TGetAllFilesOutput['items'][0]>(paginationOptions)
   }
 }

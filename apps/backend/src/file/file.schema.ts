@@ -22,8 +22,12 @@ export class File extends Document {
 
   @Prop({ required: true })
   tokenId: string
+
+  createdAt: Date
+  updatedAt: Date
 }
 
 export const FileSchema = SchemaFactory.createForClass(File)
 FileSchema.index({ sub: 1 })
+FileSchema.index({ tokenId: 1 }, { unique: true })
 FileSchema.index({ key: 1 }, { unique: true })
