@@ -1,12 +1,13 @@
 <script lang="ts">
   import '../app.css'
   import favicon from '$lib/assets/credenza.png'
-  import { Toast, Header } from '@repo/ui-components'
+  import { Toast, Header, Footer } from '@repo/ui-components'
   import { authStore } from '$lib'
 
   let { children } = $props()
   const menuItems = [
-    { label: 'Files', href: '/authed/files' }
+    { label: 'Files', href: '/authed/files' },
+    { label: 'Upload', href: '/authed/upload' },
   ]
 </script>
 
@@ -15,9 +16,10 @@
   <title>chapter ip</title>
 </svelte:head>
 <Toast />
-<Header {authStore} {menuItems}/>
 <div class="min-h-screen overflow-x-hidden flex flex-col">
+  <Header {authStore} {menuItems} />
   <main class="space-y-0 flex-1">
     {@render children?.()}
   </main>
+  <Footer />
 </div>
