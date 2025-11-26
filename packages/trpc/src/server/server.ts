@@ -73,6 +73,30 @@ const appRouter = t.router({
       key: z.string(),
       bucket: z.string(),
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
+  }),
+  publisher: t.router({
+    setPublisher: publicProcedure.input(z.object({
+      sub: z.string(),
+      title: z.string(),
+      avatarUrl: z.string().optional(),
+    })).output(z.object({
+      _id: z.string(),
+      sub: z.string(),
+      title: z.string(),
+      avatarUrl: z.string().optional(),
+      createdAt: z.date(),
+      updatedAt: z.date(),
+    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    getPublisherData: publicProcedure.input(z.object({
+      sub: z.string(),
+    })).output(z.object({
+      _id: z.string(),
+      sub: z.string(),
+      title: z.string(),
+      avatarUrl: z.string().optional(),
+      createdAt: z.date(),
+      updatedAt: z.date(),
+    })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
   })
 });
 export type AppRouter = typeof appRouter;

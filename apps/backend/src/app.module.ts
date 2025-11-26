@@ -8,6 +8,7 @@ import type { Request, Response, NextFunction } from 'express'
 import { CommonModule } from './common/common.module'
 import { AuthModule } from './auth/auth.module'
 import { FileModule } from './file/file.module'
+import { PublisherModule } from './publisher/publisher.module'
 
 import { TrpcPanelController } from './trpc-ui.controller'
 import { AppRouter } from './app.router'
@@ -34,6 +35,7 @@ import { AppContext } from './app.context'
     }),
     AuthModule,
     FileModule,
+    PublisherModule,
   ],
   controllers: [TrpcPanelController],
   providers: [AppContext, AppRouter],
