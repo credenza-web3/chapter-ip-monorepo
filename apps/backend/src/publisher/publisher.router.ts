@@ -40,7 +40,7 @@ export class PublisherRouter {
       { sub: ctx.authTokenPayload.sub },
       {
         title: input.title,
-        ...(input.avatarUrl && { avatarUrl: input.avatarUrl }),
+        ...(input.avatarUrl !== undefined && { avatarUrl: input.avatarUrl }),
       },
       { new: true, upsert: true },
     )
