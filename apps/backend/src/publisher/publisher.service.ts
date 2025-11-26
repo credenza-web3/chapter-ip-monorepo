@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 
 import { CommonModelService } from '../common/model/model.service'
-import type { BuiltPaginationOptionsDto } from '../common/model/model.dto'
+import type { TBuiltPaginationOptions } from '../common/model/model.dto'
 
 import { Publisher } from './publisher.schema'
 import type { TGetAllPublishersInput } from './publisher.dto'
@@ -14,15 +14,11 @@ export class PublisherService extends CommonModelService<Publisher> {
     super(publisherModel)
   }
 
-  buildPaginationOptions(opts: TGetAllPublishersInput): BuiltPaginationOptionsDto {
+  buildPaginationOptions(opts: TGetAllPublishersInput): TBuiltPaginationOptions {
     const result = super.buildPaginationOptions(opts)
 
     if (opts.title) {
-      result.query.title = { $regex: new RegExp(opts.title, 'i') }
-    }
-
-    if (opts.sub) {
-      result.query.sub = opts.sub
+      result.query.title = { $regex: opts.title, $options: 'i' }
     }
 
     return result

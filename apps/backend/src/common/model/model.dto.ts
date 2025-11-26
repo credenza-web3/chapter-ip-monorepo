@@ -4,7 +4,7 @@ export const paginatedResponseCursorSchema = z.object({
   next: z.string().nullable(),
   current: z.string().nullable(),
 })
-export type PaginatedResponseCursor = z.infer<typeof paginatedResponseCursorSchema>
+export type TPaginatedResponseCursor = z.infer<typeof paginatedResponseCursorSchema>
 
 export const paginatedRequestWithCursorSchema = z.object({
   id: z.string().optional(),
@@ -17,7 +17,7 @@ export const paginatedRequestWithCursorSchema = z.object({
   startUpdatedAt: z.string().optional(),
   endUpdatedAt: z.string().optional(),
 })
-export type PaginatedRequestWithCursor = z.infer<typeof paginatedRequestWithCursorSchema>
+export type TPaginatedRequestWithCursor = z.infer<typeof paginatedRequestWithCursorSchema>
 
 export const createPaginatedResponseSchema = <T extends z.ZodType>(itemSchema: T) =>
   z.object({
@@ -25,12 +25,12 @@ export const createPaginatedResponseSchema = <T extends z.ZodType>(itemSchema: T
     cursor: paginatedResponseCursorSchema,
   })
 
-export type PaginatedResponseWithCursor<T> = {
+export type TPaginatedResponseWithCursor<T> = {
   items: T[]
-  cursor: PaginatedResponseCursor
+  cursor: TPaginatedResponseCursor
 }
 
-export type BuiltPaginationOptionsDto = {
+export type TBuiltPaginationOptions = {
   currentCursor: string | null
   sort: Record<string, 1 | -1>
   limit: number

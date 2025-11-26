@@ -5,4 +5,4 @@ export const healthOutputSchema = z.object({
   timestamp: z.string(),
   requestId: z.string(),
 })
-export type HealthOutput = z.infer<typeof healthOutputSchema>
+export type THealthOutput = z.infer<typeof healthOutputSchema>
