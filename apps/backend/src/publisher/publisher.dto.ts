@@ -39,11 +39,11 @@ export const getPublisherDataOutputSchema = z.object({
 })
 export type TGetPublisherDataOutput = z.infer<typeof getPublisherDataOutputSchema>
 
-export const getAllPublishersInputSchema = paginatedRequestWithCursorSchema.extend({
+export const findPublishersInputSchema = paginatedRequestWithCursorSchema.extend({
   title: z.string().optional(),
   sub: z.string().optional(),
 })
-export type TGetAllPublishersInput = z.infer<typeof getAllPublishersInputSchema>
+export type TFindPublishersInput = z.infer<typeof findPublishersInputSchema>
 
 export const publisherItemSchema = z.object({
   _id: z.string(),
@@ -54,5 +54,5 @@ export const publisherItemSchema = z.object({
   updatedAt: z.date(),
 })
 
-export const getAllPublishersOutputSchema = createPaginatedResponseSchema(publisherItemSchema)
-export type TGetAllPublishersOutput = z.infer<typeof getAllPublishersOutputSchema>
+export const findPublishersOutputSchema = createPaginatedResponseSchema(publisherItemSchema)
+export type TFindPublishersOutput = z.infer<typeof findPublishersOutputSchema>

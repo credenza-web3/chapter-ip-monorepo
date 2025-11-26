@@ -15,10 +15,10 @@ import {
   type TGetPublisherDataInput,
   getPublisherDataOutputSchema,
   type TGetPublisherDataOutput,
-  getAllPublishersInputSchema,
-  type TGetAllPublishersInput,
-  getAllPublishersOutputSchema,
-  type TGetAllPublishersOutput,
+  findPublishersInputSchema,
+  type TFindPublishersInput,
+  findPublishersOutputSchema,
+  type TFindPublishersOutput,
 } from './publisher.dto'
 
 @Router({ alias: 'publisher' })
@@ -85,11 +85,11 @@ export class PublisherRouter {
   }
 
   @Query({
-    input: getAllPublishersInputSchema,
-    output: getAllPublishersOutputSchema,
+    input: findPublishersInputSchema,
+    output: findPublishersOutputSchema,
   })
-  async findPublishers(@Input() input: TGetAllPublishersInput): Promise<TGetAllPublishersOutput> {
+  async findPublishers(@Input() input: TFindPublishersInput): Promise<TFindPublishersOutput> {
     const paginationOptions = this.publisherService.buildPaginationOptions(input)
-    return await this.publisherService.paginate<TGetAllPublishersOutput['items'][0]>(paginationOptions)
+    return await this.publisherService.paginate<TFindPublishersOutput['items'][0]>(paginationOptions)
   }
 }

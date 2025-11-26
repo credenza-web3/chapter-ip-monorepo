@@ -27,7 +27,7 @@ import { CommonModelService } from '../common/model/model.service'
 
 import { File } from './file.schema'
 import { BUCKET_NAME } from './file.constants'
-import type { TGetAllFilesInput } from './file.dto'
+import type { TFindFilesInput } from './file.dto'
 
 @Injectable()
 export class FileService extends CommonModelService<File> {
@@ -53,16 +53,13 @@ export class FileService extends CommonModelService<File> {
     })
   }
 
-  buildPaginationOptions(opts: TGetAllFilesInput): TBuiltPaginationOptions {
+  buildPaginationOptions(opts: TFindFilesInput): TBuiltPaginationOptions {
     const result = super.buildPaginationOptions(opts)
-    if (opts.sub) {
-      result.query.sub = opts.sub
-    }
-    if (opts.tokenId) {
-      result.query.tokenId = opts.tokenId
-    }
-    if (opts.key) {
-      result.query.key = opts.key
+    result.query = {
+      ...result.query,
+      ...(opts.sub && { sub: opts.sub }),
+      ...(opts.key && { key: opts.key }),
+      ...(opts.tokenId && { tokenId: opts.tokenId }),
     }
     return result
   }

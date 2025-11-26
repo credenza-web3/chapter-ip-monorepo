@@ -6,7 +6,7 @@ import { CommonModelService } from '../common/model/model.service'
 import type { TBuiltPaginationOptions } from '../common/model/model.dto'
 
 import { Publisher } from './publisher.schema'
-import type { TGetAllPublishersInput } from './publisher.dto'
+import type { TFindPublishersInput } from './publisher.dto'
 
 @Injectable()
 export class PublisherService extends CommonModelService<Publisher> {
@@ -14,17 +14,13 @@ export class PublisherService extends CommonModelService<Publisher> {
     super(publisherModel)
   }
 
-  buildPaginationOptions(opts: TGetAllPublishersInput): TBuiltPaginationOptions {
+  buildPaginationOptions(opts: TFindPublishersInput): TBuiltPaginationOptions {
     const result = super.buildPaginationOptions(opts)
-
-    if (opts.title) {
-      result.query.title = { $regex: opts.title, $options: 'i' }
+    result.query = {
+      ...result.query,
+      ...(opts.title && { title: { $regex: opts.title, $options: 'i' } }),
+      ...(opts.sub && { sub: opts.sub }),
     }
-
-    if (opts.sub) {
-      result.query.sub = opts.sub
-    }
-
     return result
   }
 }

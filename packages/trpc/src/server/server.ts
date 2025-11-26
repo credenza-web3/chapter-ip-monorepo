@@ -45,42 +45,29 @@ const appRouter = t.router({
     })).output(z.object({
       _id: z.string(),
       sub: z.string(),
-      key: z.string(),
       bucket: z.string(),
+      key: z.string(),
       tokenId: z.string(),
       createdAt: z.date(),
       updatedAt: z.date(),
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
-    getFileLink: publicProcedure.input(z
-      .object({
-        key: z.string().optional(),
-        _id: z.string().optional(),
-      })
-      .refine((data) => Boolean(data._id || data.key), {
-        message: 'Either `_id` or `key` must be provided.',
-        path: ['key'],
-      })).output(z.object({
-        url: z.string(),
-      })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
-    getFileUploadUrl: publicProcedure.input(z.object({
+    createFileUploadUrl: publicProcedure.input(z.object({
       filename: z.string(),
       mimetype: z.string().optional(),
     })).output(z.object({
       url: z.string(),
       key: z.string(),
       bucket: z.string(),
-    })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     registerUploadedFile: publicProcedure.input(z.object({
       key: z.string(),
       bucket: z.string(),
       tokenId: z.string(),
-      createdAt: z.date(),
-      updatedAt: z.date(),
     })).output(z.object({
       _id: z.string(),
       sub: z.string(),
-      key: z.string(),
       bucket: z.string(),
+      key: z.string(),
       tokenId: z.string(),
       createdAt: z.date(),
       updatedAt: z.date(),
@@ -102,12 +89,23 @@ const appRouter = t.router({
     })).output(createPaginatedResponseSchema(z.object({
       _id: z.string(),
       sub: z.string(),
-      key: z.string(),
       bucket: z.string(),
+      key: z.string(),
       tokenId: z.string(),
       createdAt: z.date(),
       updatedAt: z.date(),
-    }))).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
+    }))).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    getFileLink: publicProcedure.input(z
+      .object({
+        key: z.string().optional(),
+        _id: z.string().optional(),
+      })
+      .refine((data) => Boolean(data._id || data.key), {
+        message: 'Either `_id` or `key` must be provided.',
+        path: ['key'],
+      })).output(z.object({
+        url: z.string(),
+      })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
   }),
   publisher: t.router({
     setPublisher: publicProcedure.input(z.object({
