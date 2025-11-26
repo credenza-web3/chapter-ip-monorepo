@@ -1,5 +1,6 @@
 import { initTRPC } from "@trpc/server";
 import { z } from "zod";
+import { createPaginatedResponseSchema } from "../../../../apps/backend/src/common/model/model.dto";
 
 const t = initTRPC.create();
 const publicProcedure = t.procedure;
@@ -95,7 +96,28 @@ const appRouter = t.router({
       avatarUrl: z.string().optional(),
       createdAt: z.date(),
       updatedAt: z.date(),
-    })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
+    })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    getAllPublishers: publicProcedure.input(z.object({
+      id: z.string().optional(),
+      limit: z.string().optional(),
+      cursor: z.string().optional(),
+      sort: z.string().optional(),
+      order: z.enum(['asc', 'desc']).optional().default('desc'),
+      startCreatedAt: z.string().optional(),
+      endCreatedAt: z.string().optional(),
+      startUpdatedAt: z.string().optional(),
+      endUpdatedAt: z.string().optional(),
+    }).extend({
+      title: z.string().optional(),
+      sub: z.string().optional(),
+    })).output(createPaginatedResponseSchema(z.object({
+      _id: z.string(),
+      sub: z.string(),
+      title: z.string(),
+      avatarUrl: z.string().optional(),
+      createdAt: z.date(),
+      updatedAt: z.date(),
+    }))).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
   })
 });
 export type AppRouter = typeof appRouter;

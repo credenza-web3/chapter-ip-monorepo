@@ -1,7 +1,7 @@
 import type { Model } from 'mongoose'
 import { BadRequestException } from '@nestjs/common'
 
-import { PaginatedRequestWithCursor, PaginatedResponseWithCursor, BuiltPaginationOptionsDto } from './model.dto'
+import type { PaginatedRequestWithCursor, PaginatedResponseWithCursor, BuiltPaginationOptionsDto } from './model.dto'
 
 export class CommonModelService<T> {
   constructor(protected model: Model<T>) {}

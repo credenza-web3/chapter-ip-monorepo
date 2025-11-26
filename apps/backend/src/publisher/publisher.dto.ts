@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { paginatedRequestWithCursorSchema, createPaginatedResponseSchema } from '../common/model/model.dto'
+
 export const setPublisherInputSchema = z.object({
   title: z.string(),
   avatarUrl: z.string().optional(),
@@ -30,3 +32,21 @@ export const getPublisherDataOutputSchema = z.object({
   updatedAt: z.date(),
 })
 export type TGetPublisherDataOutput = z.infer<typeof getPublisherDataOutputSchema>
+
+export const getAllPublishersInputSchema = paginatedRequestWithCursorSchema.extend({
+  title: z.string().optional(),
+  sub: z.string().optional(),
+})
+export type TGetAllPublishersInput = z.infer<typeof getAllPublishersInputSchema>
+
+export const publisherItemSchema = z.object({
+  _id: z.string(),
+  sub: z.string(),
+  title: z.string(),
+  avatarUrl: z.string().optional(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+})
+
+export const getAllPublishersOutputSchema = createPaginatedResponseSchema(publisherItemSchema)
+export type TGetAllPublishersOutput = z.infer<typeof getAllPublishersOutputSchema>

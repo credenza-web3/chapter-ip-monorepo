@@ -15,6 +15,10 @@ import {
   type TGetPublisherDataInput,
   getPublisherDataOutputSchema,
   type TGetPublisherDataOutput,
+  getAllPublishersInputSchema,
+  type TGetAllPublishersInput,
+  getAllPublishersOutputSchema,
+  type TGetAllPublishersOutput,
 } from './publisher.dto'
 
 @Router({ alias: 'publisher' })
@@ -73,6 +77,26 @@ export class PublisherRouter {
       avatarUrl: publisher.avatarUrl,
       createdAt: publisher.createdAt,
       updatedAt: publisher.updatedAt,
+    }
+  }
+
+  @Query({
+    input: getAllPublishersInputSchema,
+    output: getAllPublishersOutputSchema,
+  })
+  async getAllPublishers(@Input() input: TGetAllPublishersInput): Promise<TGetAllPublishersOutput> {
+    const paginationOptions = this.publisherService.buildPaginationOptions(input)
+    const result = await this.publisherService.paginate<TGetAllPublishersOutput['items'][0]>(paginationOptions)
+    return {
+      items: result.items.map((publisher) => ({
+        _id: String(publisher._id),
+        sub: publisher.sub,
+        title: publisher.title,
+        avatarUrl: publisher.avatarUrl,
+        createdAt: publisher.createdAt,
+        updatedAt: publisher.updatedAt,
+      })),
+      cursor: result.cursor,
     }
   }
 }

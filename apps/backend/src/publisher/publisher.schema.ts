@@ -26,3 +26,6 @@ export class Publisher extends Document {
 
 export const PublisherSchema = SchemaFactory.createForClass(Publisher)
 PublisherSchema.index({ sub: 1 }, { unique: true })
+PublisherSchema.index({ createdAt: 1 })
+PublisherSchema.index({ updatedAt: 1 })
+PublisherSchema.index({ title: 1 })
