@@ -39,7 +39,7 @@ export class CommonModelService<T> {
       .find(opts.query)
       .sort(opts.sort)
       .limit(opts.limit + 1)
-      .exec()
+      .lean()
     const hasNextPage = items.length > opts.limit
     const results = hasNextPage ? items.slice(0, -1) : items
     const lastItem = results[results.length - 1]

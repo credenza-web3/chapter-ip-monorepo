@@ -63,7 +63,7 @@ export class PublisherRouter {
     input: getPublisherDataInputSchema,
     output: getPublisherDataOutputSchema,
   })
-  async getPublisherData(@Input() input: TGetPublisherDataInput): Promise<TGetPublisherDataOutput> {
+  async getPublisher(@Input() input: TGetPublisherDataInput): Promise<TGetPublisherDataOutput> {
     const query = {
       ...(input.sub ? { sub: input.sub } : {}),
       ...(input._id ? { _id: input._id } : {}),
@@ -88,19 +88,10 @@ export class PublisherRouter {
     input: getAllPublishersInputSchema,
     output: getAllPublishersOutputSchema,
   })
-  async getAllPublishers(@Input() input: TGetAllPublishersInput): Promise<TGetAllPublishersOutput> {
+  async findPublishers(@Input() input: TGetAllPublishersInput): Promise<TGetAllPublishersOutput> {
     const paginationOptions = this.publisherService.buildPaginationOptions(input)
     const result = await this.publisherService.paginate<TGetAllPublishersOutput['items'][0]>(paginationOptions)
-    return {
-      items: result.items.map((publisher) => ({
-        _id: String(publisher._id),
-        sub: publisher.sub,
-        title: publisher.title,
-        avatarUrl: publisher.avatarUrl,
-        createdAt: publisher.createdAt,
-        updatedAt: publisher.updatedAt,
-      })),
-      cursor: result.cursor,
-    }
+    result.items.forEach((item) => (item._id = item._id.toString()))
+    return result
   }
 }
