@@ -42,6 +42,7 @@ export class CommonModelService<T> {
       .lean()
     const hasNextPage = items.length > opts.limit
     const results = hasNextPage ? items.slice(0, -1) : items
+    results.forEach((item) => (item._id = String(item._id)))
     const lastItem = results[results.length - 1]
 
     const cursorField = opts.sort ? Object.keys(opts.sort)[0] : '_id'

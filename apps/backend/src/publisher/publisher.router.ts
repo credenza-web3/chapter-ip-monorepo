@@ -90,8 +90,6 @@ export class PublisherRouter {
   })
   async findPublishers(@Input() input: TGetAllPublishersInput): Promise<TGetAllPublishersOutput> {
     const paginationOptions = this.publisherService.buildPaginationOptions(input)
-    const result = await this.publisherService.paginate<TGetAllPublishersOutput['items'][0]>(paginationOptions)
-    result.items.forEach((item) => (item._id = item._id.toString()))
-    return result
+    return await this.publisherService.paginate<TGetAllPublishersOutput['items'][0]>(paginationOptions)
   }
 }
