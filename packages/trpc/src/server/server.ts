@@ -87,16 +87,22 @@ const appRouter = t.router({
       createdAt: z.date(),
       updatedAt: z.date(),
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
-    getPublisherData: publicProcedure.input(z.object({
-      sub: z.string(),
-    })).output(z.object({
-      _id: z.string(),
-      sub: z.string(),
-      title: z.string(),
-      avatarUrl: z.string().optional(),
-      createdAt: z.date(),
-      updatedAt: z.date(),
-    })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    getPublisherData: publicProcedure.input(z
+      .object({
+        sub: z.string().optional(),
+        _id: z.string().optional(),
+      })
+      .refine((data) => Boolean(data._id || data.sub), {
+        message: 'Either `_id` or `sub` must be provided.',
+        path: ['sub'],
+      })).output(z.object({
+        _id: z.string(),
+        sub: z.string(),
+        title: z.string(),
+        avatarUrl: z.string().optional(),
+        createdAt: z.date(),
+        updatedAt: z.date(),
+      })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     getAllPublishers: publicProcedure.input(z.object({
       id: z.string().optional(),
       limit: z.string().optional(),

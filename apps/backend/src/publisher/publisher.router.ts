@@ -64,7 +64,11 @@ export class PublisherRouter {
     output: getPublisherDataOutputSchema,
   })
   async getPublisherData(@Input() input: TGetPublisherDataInput): Promise<TGetPublisherDataOutput> {
-    const publisher = await this.publisherService.getModel().findOne({ sub: input.sub })
+    const query = {
+      ...(input.sub ? { sub: input.sub } : {}),
+      ...(input._id ? { _id: input._id } : {}),
+    }
+    const publisher = await this.publisherService.getModel().findOne(query)
 
     if (!publisher) {
       throw new TRPCError({ message: 'Publisher not found', code: 'NOT_FOUND' })

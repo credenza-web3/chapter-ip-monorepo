@@ -21,6 +21,10 @@ export class PublisherService extends CommonModelService<Publisher> {
       result.query.title = { $regex: opts.title, $options: 'i' }
     }
 
+    if (opts.sub) {
+      result.query.sub = opts.sub
+    }
+
     return result
   }
 }
