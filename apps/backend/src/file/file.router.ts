@@ -9,8 +9,8 @@ import { FileService } from './file.service'
 import {
   uploadFileInputSchema,
   type TUploadFileInput,
-  uploadFileOutputSchema,
-  type TUploadFileOutput,
+  fileItemSchema,
+  type TFileItemOutput,
   getFileLinkInputSchema,
   getFileLinkOutputSchema,
   type TGetFileLinkInput,
@@ -21,6 +21,10 @@ import {
   type TCreateFileUploadUrlOutput,
   registerUploadedFileInputSchema,
   type TRegisterUploadedFileInput,
+  findFilesInputSchema,
+  type TFindFilesInput,
+  findFilesOutputSchema,
+  type TFindFilesOutput,
 } from './file.dto'
 
 @Router({ alias: 'files' })
@@ -32,9 +36,9 @@ export class FileRouter {
   @UseMiddlewares(AuthMiddleware, AdminAuthMiddleware)
   @Mutation({
     input: uploadFileInputSchema,
-    output: uploadFileOutputSchema,
+    output: fileItemSchema,
   })
-  async upload(@Ctx() ctx: TAppContextWithTokenPayload, @Input() input: TUploadFileInput): Promise<TUploadFileOutput> {
+  async upload(@Ctx() ctx: TAppContextWithTokenPayload, @Input() input: TUploadFileInput): Promise<TFileItemOutput> {
     const key = this.fileService.createKey(input.file.filename)
     const bucket = this.fileService.getBucketName()
     await this.fileService.uploadFile({
@@ -49,11 +53,57 @@ export class FileRouter {
       bucket,
       tokenId: input.tokenId,
     })
-    return {
-      _id: String(file._id),
-      key,
-      bucket,
+    return Object.assign(file.toJSON(), { _id: String(file._id) })
+  }
+
+  @UseMiddlewares(AuthMiddleware)
+  @Mutation({
+    input: createFileUploadUrlInputSchema,
+    output: createFileUploadUrlOutputSchema,
+  })
+  async createFileUploadUrl(@Input() input: TCreateFileUploadUrlInput): Promise<TCreateFileUploadUrlOutput> {
+    const key = this.fileService.createKey(input.filename)
+    const bucket = this.fileService.getBucketName()
+    const url = await this.fileService.createUploadUrl({
+      Bucket: this.fileService.getBucketName(),
+      Key: key,
+      ContentType: input.mimetype,
+    })
+    return { url, key, bucket }
+  }
+
+  @UseMiddlewares(AuthMiddleware)
+  @Mutation({
+    input: registerUploadedFileInputSchema,
+    output: fileItemSchema,
+  })
+  async registerUploadedFile(
+    @Ctx() ctx: TAppContextWithTokenPayload,
+    @Input() input: TRegisterUploadedFileInput,
+  ): Promise<TFileItemOutput> {
+    const isFileExists = await this.fileService.checkFileExists({
+      Bucket: input.bucket,
+      Key: input.key,
+    })
+    if (!isFileExists) {
+      throw new TRPCError({ message: 'File is not found', code: 'NOT_FOUND' })
     }
+    const file = await this.fileService.getModel().create({
+      sub: ctx.authTokenPayload.sub,
+      key: input.key,
+      bucket: input.bucket,
+      tokenId: input.tokenId,
+    })
+    return Object.assign(file.toJSON(), { _id: String(file._id) })
+  }
+
+  @Query({
+    input: findFilesInputSchema,
+    output: findFilesOutputSchema,
+  })
+  async findFiles(@Input() input: TFindFilesInput): Promise<TFindFilesOutput> {
+    const paginationOptions = this.fileService.buildPaginationOptions(input)
+    return await this.fileService.paginate<TFindFilesOutput['items'][0]>(paginationOptions)
   }
 
   @UseMiddlewares(AuthMiddleware)
@@ -83,50 +133,5 @@ export class FileRouter {
     })
 
     return { url }
-  }
-
-  @UseMiddlewares(AuthMiddleware)
-  @Query({
-    input: createFileUploadUrlInputSchema,
-    output: createFileUploadUrlOutputSchema,
-  })
-  async getFileUploadUrl(@Input() input: TCreateFileUploadUrlInput): Promise<TCreateFileUploadUrlOutput> {
-    const key = this.fileService.createKey(input.filename)
-    const bucket = this.fileService.getBucketName()
-    const url = await this.fileService.createUploadUrl({
-      Bucket: this.fileService.getBucketName(),
-      Key: key,
-      ContentType: input.mimetype,
-    })
-    return { url, key, bucket }
-  }
-
-  @UseMiddlewares(AuthMiddleware)
-  @Mutation({
-    input: registerUploadedFileInputSchema,
-    output: uploadFileOutputSchema,
-  })
-  async registerUploadedFile(
-    @Ctx() ctx: TAppContextWithTokenPayload,
-    @Input() input: TRegisterUploadedFileInput,
-  ): Promise<TUploadFileOutput> {
-    const isFileExists = await this.fileService.checkFileExists({
-      Bucket: input.bucket,
-      Key: input.key,
-    })
-    if (!isFileExists) {
-      throw new TRPCError({ message: 'File is not found', code: 'NOT_FOUND' })
-    }
-    const file = await this.fileService.getModel().create({
-      sub: ctx.authTokenPayload.sub,
-      key: input.key,
-      bucket: input.bucket,
-      tokenId: input.tokenId,
-    })
-    return {
-      _id: String(file._id),
-      key: input.key,
-      bucket: input.bucket,
-    }
   }
 }

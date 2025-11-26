@@ -1,7 +1,7 @@
 import type { Model } from 'mongoose'
 import { BadRequestException } from '@nestjs/common'
 
-import { PaginatedRequestWithCursor, PaginatedResponseWithCursor, BuiltPaginationOptionsDto } from './model.dto'
+import type { TPaginatedRequestWithCursor, TPaginatedResponseWithCursor, TBuiltPaginationOptions } from './model.dto'
 
 export class CommonModelService<T> {
   constructor(protected model: Model<T>) {}
@@ -10,7 +10,7 @@ export class CommonModelService<T> {
     return this.model
   }
 
-  buildPaginationOptions(opts: PaginatedRequestWithCursor): BuiltPaginationOptionsDto {
+  buildPaginationOptions(opts: TPaginatedRequestWithCursor): TBuiltPaginationOptions {
     const limit = opts.limit ? parseInt(opts.limit) : 50
     if (limit > 100) {
       throw new BadRequestException('Limit must be less than 100')
@@ -23,7 +23,7 @@ export class CommonModelService<T> {
       currentCursor: opts.cursor || null,
       sort: { [sortBy]: sortOrder },
       limit,
-      query: <BuiltPaginationOptionsDto['query']>{
+      query: <TBuiltPaginationOptions['query']>{
         ...(opts.cursor && { [sortBy]: { [cursorDirection]: Buffer.from(opts.cursor, 'hex').toString('utf8') } }),
         ...(opts.id && { _id: opts.id }),
         ...(opts.startCreatedAt && { createdAt: { $gte: opts.startCreatedAt } }),
@@ -34,14 +34,15 @@ export class CommonModelService<T> {
     }
   }
 
-  async paginate<T>(opts: BuiltPaginationOptionsDto): Promise<PaginatedResponseWithCursor<T>> {
+  async paginate<T>(opts: TBuiltPaginationOptions): Promise<TPaginatedResponseWithCursor<T>> {
     const items = await this.model
       .find(opts.query)
       .sort(opts.sort)
       .limit(opts.limit + 1)
-      .exec()
+      .lean()
     const hasNextPage = items.length > opts.limit
     const results = hasNextPage ? items.slice(0, -1) : items
+    results.forEach((item) => (item._id = String(item._id)))
     const lastItem = results[results.length - 1]
 
     const cursorField = opts.sort ? Object.keys(opts.sort)[0] : '_id'
