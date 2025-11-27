@@ -1,9 +1,31 @@
 <script lang="ts">
-  let publisherName = $state('')
+  import { goto } from '$app/navigation'
+  import { authStore } from '$lib'
+  import { createClient } from '@repo/trpc/client'
+  import { notify, ToastType } from '@repo/ui-components'
 
-  function handleSubmit(e: Event) {
-    e.preventDefault()
-    console.log('Creating publisher:', publisherName)
+  let publisherName = $state('')
+  let loading = $state(false)
+
+  async function handleSubmit() {
+    try {
+      loading = true
+      const trpcClient = createClient({
+        trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
+        getAccessTokenFn: () => authStore.state.accessToken!,
+      })
+
+      await trpcClient.publisher.setPublisher.mutate({
+        title: publisherName,
+      })
+
+      goto('/authed')
+    } catch (error) {
+      console.error(error)
+      notify('Failed to create publisher', ToastType.FAIL)
+    } finally {
+      loading = false
+    }
   }
 </script>
 
@@ -28,11 +50,16 @@
       </div>
 
       <button
-        type="submit"
-        disabled={!publisherName}
+        type="button"
+        disabled={!publisherName || loading}
+        onclick={handleSubmit}
         class="w-full py-3 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
       >
-        Create
+        {#if loading}
+          <div class="loading loading-dots"></div>
+        {:else}
+          Create
+        {/if}
       </button>
     </form>
   </div>
