@@ -49,14 +49,7 @@ export class PublisherRouter {
       throw new TRPCError({ message: 'Failed to set publisher data', code: 'INTERNAL_SERVER_ERROR' })
     }
 
-    return {
-      _id: String(publisher._id),
-      sub: publisher.sub,
-      title: publisher.title,
-      avatarUrl: publisher.avatarUrl,
-      createdAt: publisher.createdAt,
-      updatedAt: publisher.updatedAt,
-    }
+    return Object.assign(publisher, { _id: String(publisher._id) })
   }
 
   @Query({
@@ -74,14 +67,7 @@ export class PublisherRouter {
       throw new TRPCError({ message: 'Publisher not found', code: 'NOT_FOUND' })
     }
 
-    return {
-      _id: String(publisher._id),
-      sub: publisher.sub,
-      title: publisher.title,
-      avatarUrl: publisher.avatarUrl,
-      createdAt: publisher.createdAt,
-      updatedAt: publisher.updatedAt,
-    }
+    return Object.assign(publisher, { _id: String(publisher._id) })
   }
 
   @Query({
