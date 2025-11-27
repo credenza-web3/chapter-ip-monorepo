@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { ConfigService } from '@nestjs/config'
-import { randomUUID } from 'crypto'
 import type { TBuiltPaginationOptions } from '../common/model/model.dto'
 import {
   S3Client,
@@ -26,8 +25,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { CommonModelService } from '../common/model/model.service'
 
 import { File } from './file.schema'
-import { BUCKET_NAME } from './file.constants'
-import type { TFindFilesInput } from './file.dto'
+import type { TFindContentInput } from './file.dto'
 
 @Injectable()
 export class FileService extends CommonModelService<File> {
@@ -53,7 +51,7 @@ export class FileService extends CommonModelService<File> {
     })
   }
 
-  buildPaginationOptions(opts: TFindFilesInput): TBuiltPaginationOptions {
+  buildPaginationOptions(opts: TFindContentInput): TBuiltPaginationOptions {
     const result = super.buildPaginationOptions(opts)
     result.query = {
       ...result.query,
@@ -64,13 +62,13 @@ export class FileService extends CommonModelService<File> {
     return result
   }
 
-  getBucketName(): string {
-    return `${process.env.NODE_ENV}-${BUCKET_NAME}`
-  }
-
-  createKey(filename: string) {
-    const date = new Date().toISOString().slice(0, 10)
-    return `${date}/${randomUUID()}_${filename.replace(' ', '')}`
+  getBucketName(type: 'metadata' | 'content') {
+    let bucketName = `chapter-ip-${type}`
+    const env = this.configService.get<string>('NODE_ENV')
+    if (env !== 'prod') {
+      bucketName += `-test`
+    }
+    return bucketName
   }
 
   async removeFile(data: DeleteObjectCommandInput) {

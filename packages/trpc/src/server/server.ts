@@ -35,33 +35,22 @@ const appRouter = t.router({
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
   }),
   files: t.router({
-    upload: publicProcedure.input(z.object({
-      file: z.object({
-        filename: z.string(),
-        mimetype: z.string(),
-        data: z.array(z.number()),
-      }),
+    uploadMetadata: publicProcedure.input(z.object({
       tokenId: z.string(),
+      metadata: z.object({}).catchall(z.any()),
     })).output(z.object({
-      _id: z.string(),
-      sub: z.string(),
-      bucket: z.string(),
-      key: z.string(),
-      tokenId: z.string(),
-      createdAt: z.date(),
-      updatedAt: z.date(),
+      url: z.string(),
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
-    createFileUploadUrl: publicProcedure.input(z.object({
-      filename: z.string(),
-      mimetype: z.string().optional(),
+    createContentUploadUrl: publicProcedure.input(z.object({
+      tokenId: z.string(),
+      mimetype: z.string(),
+      extension: z.string().optional(),
     })).output(z.object({
       url: z.string(),
       key: z.string(),
-      bucket: z.string(),
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
-    registerUploadedFile: publicProcedure.input(z.object({
+    registerContent: publicProcedure.input(z.object({
       key: z.string(),
-      bucket: z.string(),
       tokenId: z.string(),
     })).output(z.object({
       _id: z.string(),
@@ -72,7 +61,7 @@ const appRouter = t.router({
       createdAt: z.date(),
       updatedAt: z.date(),
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
-    findFiles: publicProcedure.input(z.object({
+    findContent: publicProcedure.input(z.object({
       id: z.string().optional(),
       limit: z.string().optional(),
       cursor: z.string().optional(),
@@ -95,7 +84,7 @@ const appRouter = t.router({
       createdAt: z.date(),
       updatedAt: z.date(),
     }))).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
-    getFileLink: publicProcedure.input(z
+    getContentLink: publicProcedure.input(z
       .object({
         key: z.string().optional(),
         _id: z.string().optional(),
