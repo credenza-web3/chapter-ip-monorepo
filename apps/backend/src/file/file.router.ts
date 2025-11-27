@@ -82,7 +82,7 @@ export class FileRouter {
       bucket,
       tokenId: input.tokenId,
     })
-    return Object.assign(file.toJSON(), { _id: String(file._id) })
+    return file.toJSON()
   }
 
   @Query({
@@ -105,7 +105,7 @@ export class FileRouter {
   ): Promise<TGetContentLinkOutput> {
     const fileQuery = {
       ...(input.key ? { key: input.key } : {}),
-      ...(input._id ? { _id: input._id } : {}),
+      ...(input.id ? { _id: input.id } : {}),
     }
     const file = await this.fileService.getModel().findOne(fileQuery)
     if (!file) {
@@ -122,7 +122,7 @@ export class FileRouter {
 
     return { url }
   }
-  
+
   @UseMiddlewares(AuthMiddleware)
   @Mutation({
     input: uploadMetadataInputSchema,

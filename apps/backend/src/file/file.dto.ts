@@ -38,7 +38,7 @@ export const registerContentInputSchema = z.object({
 export type TRegisterContentInput = z.infer<typeof registerContentInputSchema>
 
 export const registerContentOutputSchema = z.object({
-  _id: z.string(),
+  id: z.string(),
   sub: z.string(),
   bucket: z.string(),
   key: z.string(),
@@ -61,10 +61,10 @@ export type TFindContentOutput = z.infer<typeof findContentOutputSchema>
 export const getContentLinkInputSchema = z
   .object({
     key: z.string().optional(),
-    _id: z.string().optional(),
+    id: z.string().optional(),
   })
-  .refine((data) => Boolean(data._id || data.key), {
-    message: 'Either `_id` or `key` must be provided.',
+  .refine((data) => Boolean(data.id || data.key), {
+    message: 'Either `id` or `key` must be provided.',
     path: ['key'],
   })
 export type TGetContentLinkInput = z.infer<typeof getContentLinkInputSchema>

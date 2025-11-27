@@ -45,11 +45,13 @@ export class PublisherRouter {
       { new: true, upsert: true },
     )
 
+    console.log(publisher.toJSON())
+
     if (!publisher) {
       throw new TRPCError({ message: 'Failed to set publisher data', code: 'INTERNAL_SERVER_ERROR' })
     }
 
-    return Object.assign(publisher, { _id: String(publisher._id) })
+    return publisher.toJSON()
   }
 
   @Query({
@@ -59,7 +61,7 @@ export class PublisherRouter {
   async getPublisher(@Input() input: TGetPublisherDataInput): Promise<TGetPublisherDataOutput> {
     const query = {
       ...(input.sub ? { sub: input.sub } : {}),
-      ...(input._id ? { _id: input._id } : {}),
+      ...(input.id ? { _id: input.id } : {}),
     }
     const publisher = await this.publisherService.getModel().findOne(query)
 
@@ -67,7 +69,7 @@ export class PublisherRouter {
       throw new TRPCError({ message: 'Publisher not found', code: 'NOT_FOUND' })
     }
 
-    return Object.assign(publisher, { _id: String(publisher._id) })
+    return publisher.toJSON()
   }
 
   @Query({

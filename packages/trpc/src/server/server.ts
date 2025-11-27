@@ -47,7 +47,7 @@ const appRouter = t.router({
       key: z.string(),
       tokenId: z.string(),
     })).output(z.object({
-      _id: z.string(),
+      id: z.string(),
       sub: z.string(),
       bucket: z.string(),
       key: z.string(),
@@ -70,7 +70,7 @@ const appRouter = t.router({
       tokenId: z.string().optional(),
       key: z.string().optional(),
     })).output(createPaginatedResponseSchema(z.object({
-      _id: z.string(),
+      id: z.string(),
       sub: z.string(),
       bucket: z.string(),
       key: z.string(),
@@ -81,10 +81,10 @@ const appRouter = t.router({
     getContentLink: publicProcedure.input(z
       .object({
         key: z.string().optional(),
-        _id: z.string().optional(),
+        id: z.string().optional(),
       })
-      .refine((data) => Boolean(data._id || data.key), {
-        message: 'Either `_id` or `key` must be provided.',
+      .refine((data) => Boolean(data.id || data.key), {
+        message: 'Either `id` or `key` must be provided.',
         path: ['key'],
       })).output(z.object({
         url: z.string(),
@@ -106,7 +106,7 @@ const appRouter = t.router({
       title: z.string(),
       avatarUrl: z.string().optional(),
     })).output(z.object({
-      _id: z.string(),
+      id: z.string(),
       sub: z.string(),
       title: z.string(),
       avatarUrl: z.string().optional(),
@@ -116,13 +116,13 @@ const appRouter = t.router({
     getPublisher: publicProcedure.input(z
       .object({
         sub: z.string().optional(),
-        _id: z.string().optional(),
+        id: z.string().optional(),
       })
-      .refine((data) => Boolean(data._id || data.sub), {
+      .refine((data) => Boolean(data.id || data.sub), {
         message: 'Either `_id` or `sub` must be provided.',
         path: ['sub'],
       })).output(z.object({
-        _id: z.string(),
+        id: z.string(),
         sub: z.string(),
         title: z.string(),
         avatarUrl: z.string().optional(),
@@ -143,7 +143,7 @@ const appRouter = t.router({
       title: z.string().optional(),
       sub: z.string().optional(),
     })).output(createPaginatedResponseSchema(z.object({
-      _id: z.string(),
+      id: z.string(),
       sub: z.string(),
       title: z.string(),
       avatarUrl: z.string().optional(),
