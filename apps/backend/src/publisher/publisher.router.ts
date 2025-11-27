@@ -21,7 +21,7 @@ import {
   type TFindPublishersOutput,
 } from './publisher.dto'
 
-@Router({ alias: 'publisher' })
+@Router({ alias: 'publishers' })
 export class PublisherRouter {
   private logger = new Logger(this.constructor.name)
 

@@ -96,7 +96,7 @@ const appRouter = t.router({
         url: z.string(),
       })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
   }),
-  publisher: t.router({
+  publishers: t.router({
     setPublisher: publicProcedure.input(z.object({
       title: z.string(),
       avatarUrl: z.string().optional(),
