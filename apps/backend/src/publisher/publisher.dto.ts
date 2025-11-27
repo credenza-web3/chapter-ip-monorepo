@@ -9,7 +9,7 @@ export const setPublisherInputSchema = z.object({
 export type TSetPublisherInput = z.infer<typeof setPublisherInputSchema>
 
 export const setPublisherOutputSchema = z.object({
-  _id: z.string(),
+  id: z.string(),
   sub: z.string(),
   title: z.string(),
   avatarUrl: z.string().optional(),
@@ -21,16 +21,16 @@ export type TSetPublisherOutput = z.infer<typeof setPublisherOutputSchema>
 export const getPublisherDataInputSchema = z
   .object({
     sub: z.string().optional(),
-    _id: z.string().optional(),
+    id: z.string().optional(),
   })
-  .refine((data) => Boolean(data._id || data.sub), {
+  .refine((data) => Boolean(data.id || data.sub), {
     message: 'Either `_id` or `sub` must be provided.',
     path: ['sub'],
   })
 export type TGetPublisherDataInput = z.infer<typeof getPublisherDataInputSchema>
 
 export const getPublisherDataOutputSchema = z.object({
-  _id: z.string(),
+  id: z.string(),
   sub: z.string(),
   title: z.string(),
   avatarUrl: z.string().optional(),
@@ -46,7 +46,7 @@ export const findPublishersInputSchema = paginatedRequestWithCursorSchema.extend
 export type TFindPublishersInput = z.infer<typeof findPublishersInputSchema>
 
 export const publisherItemSchema = z.object({
-  _id: z.string(),
+  id: z.string(),
   sub: z.string(),
   title: z.string(),
   avatarUrl: z.string().optional(),

@@ -42,14 +42,13 @@ export class CommonModelService<T> {
       .lean()
     const hasNextPage = items.length > opts.limit
     const results = hasNextPage ? items.slice(0, -1) : items
-    results.forEach((item) => (item._id = String(item._id)))
     const lastItem = results[results.length - 1]
 
     const cursorField = opts.sort ? Object.keys(opts.sort)[0] : '_id'
     const nextCursor = hasNextPage ? Buffer.from(String(lastItem[cursorField])).toString('hex') : null
 
     return {
-      items: results as T[],
+      items: results.map((item) => ({ ...item, id: String(item._id) })) as T[],
       cursor: {
         current: opts.currentCursor,
         next: nextCursor,

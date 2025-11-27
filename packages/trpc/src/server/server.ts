@@ -35,36 +35,19 @@ const appRouter = t.router({
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
   }),
   files: t.router({
-    upload: publicProcedure.input(z.object({
-      file: z.object({
-        filename: z.string(),
-        mimetype: z.string(),
-        data: z.array(z.number()),
-      }),
+    createContentUploadUrl: publicProcedure.input(z.object({
       tokenId: z.string(),
-    })).output(z.object({
-      _id: z.string(),
-      sub: z.string(),
-      bucket: z.string(),
-      key: z.string(),
-      tokenId: z.string(),
-      createdAt: z.date(),
-      updatedAt: z.date(),
-    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
-    createFileUploadUrl: publicProcedure.input(z.object({
-      filename: z.string(),
-      mimetype: z.string().optional(),
+      mimetype: z.string(),
+      extension: z.string().optional(),
     })).output(z.object({
       url: z.string(),
       key: z.string(),
-      bucket: z.string(),
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
-    registerUploadedFile: publicProcedure.input(z.object({
+    registerContent: publicProcedure.input(z.object({
       key: z.string(),
-      bucket: z.string(),
       tokenId: z.string(),
     })).output(z.object({
-      _id: z.string(),
+      id: z.string(),
       sub: z.string(),
       bucket: z.string(),
       key: z.string(),
@@ -72,7 +55,7 @@ const appRouter = t.router({
       createdAt: z.date(),
       updatedAt: z.date(),
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
-    findFiles: publicProcedure.input(z.object({
+    findContent: publicProcedure.input(z.object({
       id: z.string().optional(),
       limit: z.string().optional(),
       cursor: z.string().optional(),
@@ -87,7 +70,7 @@ const appRouter = t.router({
       tokenId: z.string().optional(),
       key: z.string().optional(),
     })).output(createPaginatedResponseSchema(z.object({
-      _id: z.string(),
+      id: z.string(),
       sub: z.string(),
       bucket: z.string(),
       key: z.string(),
@@ -95,24 +78,35 @@ const appRouter = t.router({
       createdAt: z.date(),
       updatedAt: z.date(),
     }))).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
-    getFileLink: publicProcedure.input(z
+    getContentLink: publicProcedure.input(z
       .object({
         key: z.string().optional(),
-        _id: z.string().optional(),
+        id: z.string().optional(),
       })
-      .refine((data) => Boolean(data._id || data.key), {
-        message: 'Either `_id` or `key` must be provided.',
+      .refine((data) => Boolean(data.id || data.key), {
+        message: 'Either `id` or `key` must be provided.',
         path: ['key'],
       })).output(z.object({
         url: z.string(),
-      })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
+      })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    uploadMetadata: publicProcedure.input(z.object({
+      tokenId: z.string(),
+      metadata: z
+        .object({})
+        .catchall(z.any())
+        .refine((obj) => Object.keys(obj).length > 0, {
+          message: `'metadata' object cannot be empty`,
+        }),
+    })).output(z.object({
+      url: z.string(),
+    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
   }),
-  publisher: t.router({
+  publishers: t.router({
     setPublisher: publicProcedure.input(z.object({
       title: z.string(),
       avatarUrl: z.string().optional(),
     })).output(z.object({
-      _id: z.string(),
+      id: z.string(),
       sub: z.string(),
       title: z.string(),
       avatarUrl: z.string().optional(),
@@ -122,13 +116,13 @@ const appRouter = t.router({
     getPublisher: publicProcedure.input(z
       .object({
         sub: z.string().optional(),
-        _id: z.string().optional(),
+        id: z.string().optional(),
       })
-      .refine((data) => Boolean(data._id || data.sub), {
+      .refine((data) => Boolean(data.id || data.sub), {
         message: 'Either `_id` or `sub` must be provided.',
         path: ['sub'],
       })).output(z.object({
-        _id: z.string(),
+        id: z.string(),
         sub: z.string(),
         title: z.string(),
         avatarUrl: z.string().optional(),
@@ -149,7 +143,7 @@ const appRouter = t.router({
       title: z.string().optional(),
       sub: z.string().optional(),
     })).output(createPaginatedResponseSchema(z.object({
-      _id: z.string(),
+      id: z.string(),
       sub: z.string(),
       title: z.string(),
       avatarUrl: z.string().optional(),

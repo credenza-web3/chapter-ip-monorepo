@@ -9,8 +9,16 @@ export type TPublisherDocument = HydratedDocument<Publisher>
     updatedAt: 'updatedAt',
   },
   collection: 'publishers',
+  toJSON: {
+    virtuals: true,
+  },
+  toObject: {
+    virtuals: true,
+  },
 })
 export class Publisher extends Document<ObjectId> {
+  declare id: string
+
   @Prop({ required: true })
   sub: string
 

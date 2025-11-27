@@ -1,88 +1,76 @@
 import { Logger } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { Router, Mutation, Query, Input, Ctx, UseMiddlewares } from 'nestjs-trpc'
 import { TRPCError } from '@trpc/server'
+import { extension } from 'mime-types'
 
-import { AuthMiddleware, AdminAuthMiddleware } from '../common/auth/auth.middleware'
+import { AuthMiddleware } from '../common/auth/auth.middleware'
 import type { TAppContextWithTokenPayload } from '../common/auth/auth.types'
 
 import { FileService } from './file.service'
 import {
-  uploadFileInputSchema,
-  type TUploadFileInput,
-  fileItemSchema,
-  type TFileItemOutput,
-  getFileLinkInputSchema,
-  getFileLinkOutputSchema,
-  type TGetFileLinkInput,
-  type TGetFileLinkOutput,
-  createFileUploadUrlInputSchema,
-  createFileUploadUrlOutputSchema,
-  type TCreateFileUploadUrlInput,
-  type TCreateFileUploadUrlOutput,
-  registerUploadedFileInputSchema,
-  type TRegisterUploadedFileInput,
-  findFilesInputSchema,
-  type TFindFilesInput,
-  findFilesOutputSchema,
-  type TFindFilesOutput,
+  uploadMetadataInputSchema,
+  uploadMetadataOutputSchema,
+  type TUploadMetadataInput,
+  type TUploadMetadataOutput,
+  createContentUploadUrlInputSchema,
+  createContentUploadUrlOutputSchema,
+  type TCreateContentUploadUrlInput,
+  type TCreateContentUploadUrlOutput,
+  registerContentInputSchema,
+  registerContentOutputSchema,
+  type TRegisterContentInput,
+  type TRegisterContentOutput,
+  findContentInputSchema,
+  type TFindContentInput,
+  findContentOutputSchema,
+  type TFindContentOutput,
+  getContentLinkInputSchema,
+  getContentLinkOutputSchema,
+  type TGetContentLinkInput,
+  type TGetContentLinkOutput,
 } from './file.dto'
 
 @Router({ alias: 'files' })
 export class FileRouter {
   private logger = new Logger(this.constructor.name)
 
-  constructor(private readonly fileService: FileService) {}
-
-  @UseMiddlewares(AuthMiddleware, AdminAuthMiddleware)
-  @Mutation({
-    input: uploadFileInputSchema,
-    output: fileItemSchema,
-  })
-  async upload(@Ctx() ctx: TAppContextWithTokenPayload, @Input() input: TUploadFileInput): Promise<TFileItemOutput> {
-    const key = this.fileService.createKey(input.file.filename)
-    const bucket = this.fileService.getBucketName()
-    await this.fileService.uploadFile({
-      Body: Buffer.from(input.file.data),
-      ContentType: input.file.mimetype,
-      Bucket: bucket,
-      Key: key,
-    })
-    const file = await this.fileService.getModel().create({
-      sub: ctx.authTokenPayload.sub,
-      key,
-      bucket,
-      tokenId: input.tokenId,
-    })
-    return Object.assign(file.toJSON(), { _id: String(file._id) })
-  }
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly fileService: FileService,
+  ) {}
 
   @UseMiddlewares(AuthMiddleware)
   @Mutation({
-    input: createFileUploadUrlInputSchema,
-    output: createFileUploadUrlOutputSchema,
+    input: createContentUploadUrlInputSchema,
+    output: createContentUploadUrlOutputSchema,
   })
-  async createFileUploadUrl(@Input() input: TCreateFileUploadUrlInput): Promise<TCreateFileUploadUrlOutput> {
-    const key = this.fileService.createKey(input.filename)
-    const bucket = this.fileService.getBucketName()
+  async createContentUploadUrl(@Input() input: TCreateContentUploadUrlInput): Promise<TCreateContentUploadUrlOutput> {
+    const ext = input.extension ? input.extension.replaceAll('.', '') : extension(input.mimetype)
+    if (!ext) {
+      throw new Error('Invalid mimetype')
+    }
+    const key = [input.tokenId, ext].join('.')
     const url = await this.fileService.createUploadUrl({
-      Bucket: this.fileService.getBucketName(),
+      Bucket: this.fileService.getBucketName('content'),
       Key: key,
       ContentType: input.mimetype,
     })
-    return { url, key, bucket }
+    return { url, key }
   }
 
   @UseMiddlewares(AuthMiddleware)
   @Mutation({
-    input: registerUploadedFileInputSchema,
-    output: fileItemSchema,
+    input: registerContentInputSchema,
+    output: registerContentOutputSchema,
   })
-  async registerUploadedFile(
+  async registerContent(
     @Ctx() ctx: TAppContextWithTokenPayload,
-    @Input() input: TRegisterUploadedFileInput,
-  ): Promise<TFileItemOutput> {
+    @Input() input: TRegisterContentInput,
+  ): Promise<TRegisterContentOutput> {
+    const bucket = this.fileService.getBucketName('content')
     const isFileExists = await this.fileService.checkFileExists({
-      Bucket: input.bucket,
+      Bucket: bucket,
       Key: input.key,
     })
     if (!isFileExists) {
@@ -91,33 +79,33 @@ export class FileRouter {
     const file = await this.fileService.getModel().create({
       sub: ctx.authTokenPayload.sub,
       key: input.key,
-      bucket: input.bucket,
+      bucket,
       tokenId: input.tokenId,
     })
-    return Object.assign(file.toJSON(), { _id: String(file._id) })
+    return file.toJSON()
   }
 
   @Query({
-    input: findFilesInputSchema,
-    output: findFilesOutputSchema,
+    input: findContentInputSchema,
+    output: findContentOutputSchema,
   })
-  async findFiles(@Input() input: TFindFilesInput): Promise<TFindFilesOutput> {
+  async findContent(@Input() input: TFindContentInput): Promise<TFindContentOutput> {
     const paginationOptions = this.fileService.buildPaginationOptions(input)
-    return await this.fileService.paginate<TFindFilesOutput['items'][0]>(paginationOptions)
+    return await this.fileService.paginate<TFindContentOutput['items'][0]>(paginationOptions)
   }
 
   @UseMiddlewares(AuthMiddleware)
   @Query({
-    input: getFileLinkInputSchema,
-    output: getFileLinkOutputSchema,
+    input: getContentLinkInputSchema,
+    output: getContentLinkOutputSchema,
   })
-  async getFileLink(
+  async getContentLink(
     @Ctx() ctx: TAppContextWithTokenPayload,
-    @Input() input: TGetFileLinkInput,
-  ): Promise<TGetFileLinkOutput> {
+    @Input() input: TGetContentLinkInput,
+  ): Promise<TGetContentLinkOutput> {
     const fileQuery = {
       ...(input.key ? { key: input.key } : {}),
-      ...(input._id ? { _id: input._id } : {}),
+      ...(input.id ? { _id: input.id } : {}),
     }
     const file = await this.fileService.getModel().findOne(fileQuery)
     if (!file) {
@@ -133,6 +121,35 @@ export class FileRouter {
     })
 
     return { url }
+  }
+
+  @UseMiddlewares(AuthMiddleware)
+  @Mutation({
+    input: uploadMetadataInputSchema,
+    output: uploadMetadataOutputSchema,
+  })
+  async uploadMetadata(
+    @Ctx() ctx: TAppContextWithTokenPayload,
+    @Input() input: TUploadMetadataInput,
+  ): Promise<TUploadMetadataOutput> {
+    const file = await this.fileService
+      .getModel()
+      .findOne({ tokenId: input.tokenId, sub: ctx.authTokenPayload.sub })
+      .lean()
+    if (!file) {
+      throw new TRPCError({ message: 'Content is not found or is not yours', code: 'NOT_FOUND' })
+    }
+
+    const metadataKey = `${input.tokenId}.json`
+    await this.fileService.uploadFile({
+      Body: JSON.stringify(input.metadata, null, 2),
+      ContentType: 'application/json',
+      Bucket: this.fileService.getBucketName('metadata'),
+      Key: metadataKey,
+    })
+
+    const metadataBucketHost = this.configService.get<string>('R2_METADATA_BUCKET_HOST')
+    return { url: `${metadataBucketHost}/${metadataKey}` }
   }
 }
 

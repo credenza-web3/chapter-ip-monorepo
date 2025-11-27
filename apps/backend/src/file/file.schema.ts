@@ -9,8 +9,16 @@ export type TFileDocument = HydratedDocument<File>
     updatedAt: 'updatedAt',
   },
   collection: 'files',
+  toJSON: {
+    virtuals: true,
+  },
+  toObject: {
+    virtuals: true,
+  },
 })
 export class File extends Document<ObjectId> {
+  declare id: string
+
   @Prop({ required: true })
   sub: string
 
