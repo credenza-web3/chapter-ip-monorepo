@@ -1,11 +1,19 @@
 <script lang="ts">
+	import { authStore } from '$lib';
   import { afterNavigate, beforeNavigate } from '$app/navigation'
+  import { createClient } from '@repo/trpc/client'
   import { notify, ToastType } from '@repo/ui-components'
 
   let isOver = $state(false)
   let loading = $state(false)
   let fileInput: HTMLInputElement | null = $state(null)
   let uploaded: File | null = $state(null)
+  let prevHash = $state('')
+
+
+  $effect(() => {
+    console.log('uploaded', uploaded)
+  })
 
   beforeNavigate(() => {
     loading = true
@@ -15,7 +23,7 @@
     loading = false
   })
 
-  const maximumSize = 100 * 1024 * 1024 // 5MB
+  const maximumSize = 100 * 1024 * 1024 // 100MB
 
   function handleDrop(event: DragEvent) {
     event.preventDefault()
@@ -47,6 +55,7 @@
     uploaded = null
     if (fileInput) fileInput.value = ''
   }
+
   const onSubmitClick = async () => {
     if (!uploaded) {
       notify('No file selected', ToastType.FAIL)
@@ -57,7 +66,25 @@
       loading = true
       const arrayBuffer = await uploaded?.arrayBuffer()
       const uint8Array = new Uint8Array(arrayBuffer)
-      notify('File uploaded successfully', ToastType.SUCCESS)
+      const trpcClient = createClient({
+        trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
+        getAccessTokenFn: () => authStore.state.accessToken!,
+      })
+      
+      // const file = await trpcClient.files.upload.mutate({
+      //   file: {
+      //     filename: uploaded.name,
+      //     mimetype: uploaded.type,
+      //     data: Array.from(uint8Array), // or base64 string
+      //   },
+      //   tokenId
+      // })
+
+
+
+      // await uploadFile(file.hash, signers, readers, prevHash)
+      // notify('File uploaded successfully', ToastType.SUCCESS)
+
       onClear()
     } catch (error) {
       console.error('Error uploading file:', error)
@@ -71,7 +98,6 @@
     }
   }
 
-  let prevHash = $state('')
 </script>
 
 <div class="mx-10">
