@@ -35,12 +35,6 @@ const appRouter = t.router({
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
   }),
   files: t.router({
-    uploadMetadata: publicProcedure.input(z.object({
-      tokenId: z.string(),
-      metadata: z.object({}).catchall(z.any()),
-    })).output(z.object({
-      url: z.string(),
-    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     createContentUploadUrl: publicProcedure.input(z.object({
       tokenId: z.string(),
       mimetype: z.string(),
@@ -94,7 +88,18 @@ const appRouter = t.router({
         path: ['key'],
       })).output(z.object({
         url: z.string(),
-      })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
+      })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    uploadMetadata: publicProcedure.input(z.object({
+      tokenId: z.string(),
+      metadata: z
+        .object({})
+        .catchall(z.any())
+        .refine((obj) => Object.keys(obj).length > 0, {
+          message: `'metadata' object cannot be empty`,
+        }),
+    })).output(z.object({
+      url: z.string(),
+    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
   }),
   publishers: t.router({
     setPublisher: publicProcedure.input(z.object({

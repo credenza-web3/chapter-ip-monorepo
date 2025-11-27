@@ -42,35 +42,6 @@ export class FileRouter {
 
   @UseMiddlewares(AuthMiddleware)
   @Mutation({
-    input: uploadMetadataInputSchema,
-    output: uploadMetadataOutputSchema,
-  })
-  async uploadMetadata(
-    @Ctx() ctx: TAppContextWithTokenPayload,
-    @Input() input: TUploadMetadataInput,
-  ): Promise<TUploadMetadataOutput> {
-    const file = await this.fileService
-      .getModel()
-      .findOne({ tokenId: input.tokenId, sub: ctx.authTokenPayload.sub })
-      .lean()
-    if (!file) {
-      throw new TRPCError({ message: 'Content is not found or is not yours', code: 'NOT_FOUND' })
-    }
-
-    const metadataKey = `${input.tokenId}.json`
-    await this.fileService.uploadFile({
-      Body: JSON.stringify(input.metadata, null, 2),
-      ContentType: 'application/json',
-      Bucket: this.fileService.getBucketName('metadata'),
-      Key: metadataKey,
-    })
-
-    const metadataBucketHost = this.configService.get<string>('R2_METADATA_BUCKET_HOST')
-    return { url: `${metadataBucketHost}/${metadataKey}` }
-  }
-
-  @UseMiddlewares(AuthMiddleware)
-  @Mutation({
     input: createContentUploadUrlInputSchema,
     output: createContentUploadUrlOutputSchema,
   })
@@ -150,5 +121,34 @@ export class FileRouter {
     })
 
     return { url }
+  }
+  
+  @UseMiddlewares(AuthMiddleware)
+  @Mutation({
+    input: uploadMetadataInputSchema,
+    output: uploadMetadataOutputSchema,
+  })
+  async uploadMetadata(
+    @Ctx() ctx: TAppContextWithTokenPayload,
+    @Input() input: TUploadMetadataInput,
+  ): Promise<TUploadMetadataOutput> {
+    const file = await this.fileService
+      .getModel()
+      .findOne({ tokenId: input.tokenId, sub: ctx.authTokenPayload.sub })
+      .lean()
+    if (!file) {
+      throw new TRPCError({ message: 'Content is not found or is not yours', code: 'NOT_FOUND' })
+    }
+
+    const metadataKey = `${input.tokenId}.json`
+    await this.fileService.uploadFile({
+      Body: JSON.stringify(input.metadata, null, 2),
+      ContentType: 'application/json',
+      Bucket: this.fileService.getBucketName('metadata'),
+      Key: metadataKey,
+    })
+
+    const metadataBucketHost = this.configService.get<string>('R2_METADATA_BUCKET_HOST')
+    return { url: `${metadataBucketHost}/${metadataKey}` }
   }
 }

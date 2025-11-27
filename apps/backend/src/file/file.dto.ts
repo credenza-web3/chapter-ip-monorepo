@@ -4,7 +4,12 @@ import { paginatedRequestWithCursorSchema, createPaginatedResponseSchema } from 
 
 export const uploadMetadataInputSchema = z.object({
   tokenId: z.string(),
-  metadata: z.object({}).catchall(z.any()),
+  metadata: z
+    .object({})
+    .catchall(z.any())
+    .refine((obj) => Object.keys(obj).length > 0, {
+      message: `'metadata' object cannot be empty`,
+    }),
 })
 export type TUploadMetadataInput = z.infer<typeof uploadMetadataInputSchema>
 
