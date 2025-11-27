@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { HydratedDocument, Document } from 'mongoose'
+import { HydratedDocument, Document, ObjectId } from 'mongoose'
 
 export type TFileDocument = HydratedDocument<File>
 
@@ -10,7 +10,7 @@ export type TFileDocument = HydratedDocument<File>
   },
   collection: 'files',
 })
-export class File extends Document {
+export class File extends Document<ObjectId> {
   @Prop({ required: true })
   sub: string
 
@@ -22,8 +22,14 @@ export class File extends Document {
 
   @Prop({ required: true })
   tokenId: string
+
+  createdAt: Date
+  updatedAt: Date
 }
 
 export const FileSchema = SchemaFactory.createForClass(File)
 FileSchema.index({ sub: 1 })
+FileSchema.index({ tokenId: 1 }, { unique: true })
 FileSchema.index({ key: 1 }, { unique: true })
+FileSchema.index({ createdAt: 1 })
+FileSchema.index({ updatedAt: 1 })

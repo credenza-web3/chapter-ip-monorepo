@@ -20,6 +20,7 @@
     "@eslint/js": "^9.36.0",
     "@repo/eslint-config": "workspace:*",
     "@repo/fe-auth": "workspace:*",
+    "@repo/trpc": "workspace:*",
     "@repo/ui-components": "workspace:*",
     "@repo/trpc": "workspace:*",
     "@sveltejs/adapter-static": "^3.0.9",

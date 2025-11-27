@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { AuthMiddleware, AdminAuthMiddleware } from './common/auth/auth.middleware'
 import type { TAppContextWithTokenPayload } from './common/auth/auth.types'
 
-import { healthOutputSchema } from './app.schema'
+import { healthOutputSchema } from './app.dto'
 import type { TAppContext } from './app.context'
 @Router({ alias: 'app' })
 export class AppRouter {

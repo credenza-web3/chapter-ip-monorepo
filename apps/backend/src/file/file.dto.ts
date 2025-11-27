@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { paginatedRequestWithCursorSchema, createPaginatedResponseSchema } from '../common/model/model.dto'
+
 export const fileSchema = z.object({
   filename: z.string(),
   mimetype: z.string(),
@@ -13,12 +15,16 @@ export const uploadFileInputSchema = z.object({
 })
 export type TUploadFileInput = z.infer<typeof uploadFileInputSchema>
 
-export const uploadFileOutputSchema = z.object({
+export const fileItemSchema = z.object({
   _id: z.string(),
-  key: z.string(),
+  sub: z.string(),
   bucket: z.string(),
+  key: z.string(),
+  tokenId: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
 })
-export type TUploadFileOutput = z.infer<typeof uploadFileOutputSchema>
+export type TFileItemOutput = z.infer<typeof fileItemSchema>
 
 export const getFileLinkInputSchema = z
   .object({
@@ -56,3 +62,12 @@ export const registerUploadedFileInputSchema = z.object({
 })
 export type TRegisterUploadedFileInput = z.infer<typeof registerUploadedFileInputSchema>
 
+export const findFilesInputSchema = paginatedRequestWithCursorSchema.extend({
+  sub: z.string().optional(),
+  tokenId: z.string().optional(),
+  key: z.string().optional(),
+})
+export type TFindFilesInput = z.infer<typeof findFilesInputSchema>
+
+export const findFilesOutputSchema = createPaginatedResponseSchema(fileItemSchema)
+export type TFindFilesOutput = z.infer<typeof findFilesOutputSchema>
