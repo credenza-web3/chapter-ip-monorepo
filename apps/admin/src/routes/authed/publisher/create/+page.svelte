@@ -15,7 +15,7 @@
         getAccessTokenFn: () => authStore.state.accessToken!,
       })
 
-      await trpcClient.publisher.setPublisher.mutate({
+      await trpcClient.publishers.setPublisher.mutate({
         title: publisherName,
       })
 

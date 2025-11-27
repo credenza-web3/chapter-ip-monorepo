@@ -33,7 +33,7 @@ export const load = async ({ url }) => {
   const sub = await authStore.getSubFromToken()
   console.log('Sub:', sub)
   try {
-    const publisher = await trpcClient.publisher.getPublisher.query({
+    const publisher = await trpcClient.publishers.getPublisher.query({
       sub: sub!,
     })
 
