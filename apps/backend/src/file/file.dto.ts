@@ -55,3 +55,4 @@ export const registerUploadedFileInputSchema = z.object({
   tokenId: z.string(),
 })
 export type TRegisterUploadedFileInput = z.infer<typeof registerUploadedFileInputSchema>
+

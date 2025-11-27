@@ -45,6 +45,9 @@ importers:
       '@repo/fe-auth':
         specifier: workspace:*
         version: link:../../packages/fe-auth
+      '@repo/trpc':
+        specifier: workspace:*
+        version: link:../../packages/trpc
       '@repo/ui-components':
         specifier: workspace:*
         version: link:../../packages/ui
