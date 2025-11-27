@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { HydratedDocument, Document } from 'mongoose'
+import { HydratedDocument, Document, ObjectId } from 'mongoose'
 
 export type TFileDocument = HydratedDocument<File>
 
@@ -10,7 +10,7 @@ export type TFileDocument = HydratedDocument<File>
   },
   collection: 'files',
 })
-export class File extends Document {
+export class File extends Document<ObjectId> {
   @Prop({ required: true })
   sub: string
 

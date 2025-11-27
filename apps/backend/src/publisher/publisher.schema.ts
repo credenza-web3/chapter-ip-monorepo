@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { HydratedDocument, Document } from 'mongoose'
+import { HydratedDocument, Document, ObjectId } from 'mongoose'
 
 export type TPublisherDocument = HydratedDocument<Publisher>
 
@@ -10,7 +10,7 @@ export type TPublisherDocument = HydratedDocument<Publisher>
   },
   collection: 'publishers',
 })
-export class Publisher extends Document {
+export class Publisher extends Document<ObjectId> {
   @Prop({ required: true })
   sub: string
 
