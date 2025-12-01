@@ -127,8 +127,8 @@ importers:
         specifier: ^3.937.0
         version: 3.937.0
       '@credenza3/contracts':
-        specifier: ^0.0.2
-        version: 0.0.2
+        specifier: ^0.0.3
+        version: 0.0.3
       '@nestjs/common':
         specifier: ^11.0.1
         version: 11.1.6(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -806,8 +806,8 @@ packages:
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
     engines: {node: '>=0.1.90'}
 
-  '@credenza3/contracts@0.0.2':
-    resolution: {integrity: sha512-9FE601lbDN7FT42+DrRhCnh50oH1n1trP8kaCIv2pI5qkWZUjSsxfIN6CdMYsW6gJIW1OcVCJdRqGeEKdhv0Rg==}
+  '@credenza3/contracts@0.0.3':
+    resolution: {integrity: sha512-LUjSNA4oXkXiC7Z7xqBLiD1z9sNShSv/DZ5mNwMsHplZGVM4IwO2XQC1rs4dDHLOgdsOsJLscS9IMZ74xYAkPA==}
     engines: {node: '>=22'}
 
   '@cspotcode/source-map-support@0.8.1':
@@ -6705,7 +6705,7 @@ snapshots:
   '@colors/colors@1.5.0':
     optional: true
 
-  '@credenza3/contracts@0.0.2':
+  '@credenza3/contracts@0.0.3':
     dependencies:
       '@opengsn/contracts': 3.0.0-beta.6
       '@openzeppelin/contracts': 4.9.6
