@@ -1,9 +1,7 @@
-import { Module, MiddlewareConsumer, RequestMethod, Logger } from '@nestjs/common'
+import { Module, Logger } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
 import { TRPCModule } from 'nestjs-trpc'
-import multer from 'multer'
-import type { Request, Response, NextFunction } from 'express'
 
 import { CommonModule } from './common/common.module'
 import { AuthModule } from './auth/auth.module'
@@ -47,19 +45,4 @@ const trpcErrorLogger = new Logger('TRPC Error')
   controllers: [TrpcPanelController],
   providers: [AppContext, AppRouter],
 })
-export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    const storage = multer.memoryStorage()
-    const upload = multer({ storage })
-    const conditionalMulter = (req: Request, res: Response, next: NextFunction) => {
-      const contentType = req.headers['content-type']
-      if (contentType?.includes('multipart/form-data')) {
-        upload.any()(req, res, next)
-      } else {
-        next()
-      }
-    }
-
-    consumer.apply(conditionalMulter).forRoutes({ path: '*', method: RequestMethod.POST })
-  }
-}
+export class AppModule {}

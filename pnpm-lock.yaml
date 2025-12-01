@@ -165,9 +165,6 @@ importers:
       mongoose:
         specifier: ^8.19.1
         version: 8.19.1
-      multer:
-        specifier: ^2.0.2
-        version: 2.0.2
       nestjs-trpc:
         specifier: ^1.6.1
         version: 1.6.1(@nestjs/common@11.1.6(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6(@nestjs/common@11.1.6(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.6)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@trpc/server@11.6.0(typescript@5.9.2))(reflect-metadata@0.2.2)(rxjs@7.8.2)(zod@4.1.12)
@@ -214,9 +211,6 @@ importers:
       '@types/mime-types':
         specifier: ^3.0.1
         version: 3.0.1
-      '@types/multer':
-        specifier: ^2.0.0
-        version: 2.0.0
       '@types/node':
         specifier: ^22.10.7
         version: 22.18.8
@@ -2225,9 +2219,6 @@ packages:
 
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
-
-  '@types/multer@2.0.0':
-    resolution: {integrity: sha512-C3Z9v9Evij2yST3RSBktxP9STm6OdMc5uR1xF1SGr98uv8dUlAL2hqwrZ3GVB3uyMyiegnscEK6PGtYvNrjTjw==}
 
   '@types/node@22.18.8':
     resolution: {integrity: sha512-pAZSHMiagDR7cARo/cch1f3rXy0AEXwsVsVH09FcyeJVAzCnGgmYis7P3JidtTUjyadhTeSo8TgRPswstghDaw==}
@@ -8316,10 +8307,6 @@ snapshots:
   '@types/mime@1.3.5': {}
 
   '@types/ms@2.1.0': {}
-
-  '@types/multer@2.0.0':
-    dependencies:
-      '@types/express': 5.0.3
 
   '@types/node@22.18.8':
     dependencies:
