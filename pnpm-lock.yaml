@@ -45,6 +45,9 @@ importers:
       '@repo/fe-auth':
         specifier: workspace:*
         version: link:../../packages/fe-auth
+      '@repo/fe-evm-provider':
+        specifier: workspace:*
+        version: link:../../packages/fe-provider
       '@repo/trpc':
         specifier: workspace:*
         version: link:../../packages/trpc
@@ -408,6 +411,16 @@ importers:
       '@repo/trpc':
         specifier: workspace:*
         version: link:../trpc
+      typescript:
+        specifier: ^5.4.0
+        version: 5.9.2
+
+  packages/fe-provider:
+    dependencies:
+      '@credenza3/evm-provider':
+        specifier: 0.0.2
+        version: 0.0.2
+    devDependencies:
       typescript:
         specifier: ^5.4.0
         version: 5.9.2

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { authStore } from '$lib';
+  import { authStore } from '$lib'
   import { afterNavigate, beforeNavigate } from '$app/navigation'
   import { createClient } from '@repo/trpc/client'
   import { notify, ToastType } from '@repo/ui-components'
@@ -9,7 +9,6 @@
   let fileInput: HTMLInputElement | null = $state(null)
   let uploaded: File | null = $state(null)
   let prevHash = $state('')
-
 
   $effect(() => {
     console.log('uploaded', uploaded)
@@ -70,7 +69,7 @@
         trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
         getAccessTokenFn: () => authStore.state.accessToken!,
       })
-      
+
       // const file = await trpcClient.files.upload.mutate({
       //   file: {
       //     filename: uploaded.name,
@@ -79,8 +78,6 @@
       //   },
       //   tokenId
       // })
-
-
 
       // await uploadFile(file.hash, signers, readers, prevHash)
       // notify('File uploaded successfully', ToastType.SUCCESS)
@@ -97,7 +94,6 @@
       loading = false
     }
   }
-
 </script>
 
 <div class="mx-10">

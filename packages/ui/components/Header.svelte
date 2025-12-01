@@ -53,14 +53,17 @@
         >
       {/if}
     </div>
-    <button
-      class="md:hidden cursor-pointer"
-      onclick={() => {
-        menuOpen = !menuOpen
-      }}
-    >
-      <img src={MenuIconBlack} alt="Menu" class="size-6" />
-    </button>
+
+    {#if authState.accessToken}
+      <button
+        class="md:hidden cursor-pointer"
+        onclick={() => {
+          menuOpen = !menuOpen
+        }}
+      >
+        <img src={MenuIconBlack} alt="Menu" class="size-6" />
+      </button>
+    {/if}
   </div>
   {#if menuOpen}
     <div class="absolute top-full right-3 bg-gray-600 text-white flex flex-col md:hidden z-50 shadow-lg rounded">
