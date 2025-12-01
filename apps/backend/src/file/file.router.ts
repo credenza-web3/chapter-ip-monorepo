@@ -6,6 +6,7 @@ import { extension } from 'mime-types'
 
 import { AuthMiddleware } from '../common/auth/auth.middleware'
 import type { TAppContextWithTokenPayload } from '../common/auth/auth.types'
+import { CommonEvmService } from '../common/evm/evm.service'
 
 import { FileService } from './file.service'
 import {
@@ -38,6 +39,7 @@ export class FileRouter {
   constructor(
     private readonly configService: ConfigService,
     private readonly fileService: FileService,
+    private readonly commonEvmService: CommonEvmService,
   ) {}
 
   @UseMiddlewares(AuthMiddleware)
@@ -45,11 +47,23 @@ export class FileRouter {
     input: createContentUploadUrlInputSchema,
     output: createContentUploadUrlOutputSchema,
   })
-  async createContentUploadUrl(@Input() input: TCreateContentUploadUrlInput): Promise<TCreateContentUploadUrlOutput> {
+  async createContentUploadUrl(
+    @Ctx() ctx: TAppContextWithTokenPayload,
+    @Input() input: TCreateContentUploadUrlInput,
+  ): Promise<TCreateContentUploadUrlOutput> {
     const ext = input.extension ? input.extension.replaceAll('.', '') : extension(input.mimetype)
     if (!ext) {
-      throw new Error('Invalid mimetype')
+      throw new TRPCError({ message: 'Invalid mimetype', code: 'BAD_REQUEST' })
     }
+
+    const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(ctx.authTokenPayload.sub)
+
+    const contract = this.commonEvmService.getContentNftContract()
+    const ownerEvmAddress = (await contract.ownerOf(input.tokenId)) as string
+    if (ownerEvmAddress.toLowerCase() !== subEvmAddress.toLowerCase()) {
+      throw new TRPCError({ message: 'You are not the owner of this NFT', code: 'FORBIDDEN' })
+    }
+
     const key = [input.tokenId, ext].join('.')
     const url = await this.fileService.createUploadUrl({
       Bucket: this.fileService.getBucketName('content'),
