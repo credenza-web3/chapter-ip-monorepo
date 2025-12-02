@@ -7,6 +7,8 @@ import { extension } from 'mime-types'
 import { AuthMiddleware } from '../common/auth/auth.middleware'
 import type { TAppContextWithTokenPayload } from '../common/auth/auth.types'
 import { CommonEvmService } from '../common/evm/evm.service'
+import { CommonContentService } from '../common/content/content.service'
+import { CommonLicenseService } from '../common/license/license.service'
 
 import { FileService } from './file.service'
 import {
@@ -40,6 +42,8 @@ export class FileRouter {
     private readonly configService: ConfigService,
     private readonly fileService: FileService,
     private readonly commonEvmService: CommonEvmService,
+    private readonly commonContentService: CommonContentService,
+    private readonly commonLicenseService: CommonLicenseService,
   ) {}
 
   @UseMiddlewares(AuthMiddleware)
@@ -58,10 +62,10 @@ export class FileRouter {
 
     const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(ctx.authTokenPayload.sub)
 
-    const contract = this.commonEvmService.getContentNftContract()
-    const ownerEvmAddress = (await contract.ownerOf(input.tokenId)) as string
-    if (ownerEvmAddress.toLowerCase() !== subEvmAddress.toLowerCase()) {
-      throw new TRPCError({ message: 'You are not the owner of this NFT', code: 'FORBIDDEN' })
+    try {
+      await this.commonContentService.verifyIsOwner(subEvmAddress, input.tokenId)
+    } catch (err) {
+      throw new TRPCError({ message: (err as Error).message, code: 'FORBIDDEN' })
     }
 
     const key = [input.tokenId, ext].join('.')
@@ -128,43 +132,14 @@ export class FileRouter {
 
     const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(ctx.authTokenPayload.sub)
 
-    const contract = this.commonEvmService.getContentNftContract()
-    const ownerEvmAddress = (await contract.ownerOf(file.tokenId)) as string
-    if (ownerEvmAddress.toLowerCase() !== subEvmAddress.toLowerCase()) {
-      if (!input.licenseTokenId) {
-        throw new TRPCError({ message: 'license token id is required for non-owner ', code: 'FORBIDDEN' })
+    try {
+      if (input.licenseTokenId) {
+        await this.commonLicenseService.verify(subEvmAddress, file.tokenId, input.licenseTokenId)
+      } else {
+        await this.commonContentService.verifyIsOwner(subEvmAddress, file.tokenId)
       }
-      const licenseContract = this.commonEvmService.getLicenseNftContract()
-
-      const licenseType = Number(await licenseContract.getTokenLicenseType(input.licenseTokenId))
-      switch (licenseType) {
-        case 2: {
-          const expiresAt = (await licenseContract.getTokenLicenseExpiresAt(input.licenseTokenId)) as number
-          if (expiresAt < Date.now() / 1000) {
-            throw new TRPCError({ message: 'License expired', code: 'FORBIDDEN' })
-          }
-          break
-        }
-        case 1: {
-          // TODO block if used
-          break
-        }
-        case 0: {
-          break
-        }
-        default:
-          throw new TRPCError({ message: `Unsupported license type (${licenseType})`, code: 'FORBIDDEN' })
-      }
-
-      const licenseContentTokenId = (await licenseContract.getTokenLicenseContentNftId(input.licenseTokenId)) as number
-      if (String(licenseContentTokenId) !== file.tokenId) {
-        throw new TRPCError({ message: 'Invalid license content token ID', code: 'FORBIDDEN' })
-      }
-
-      const licenseOwner = (await licenseContract.ownerOf(input.licenseTokenId)) as string
-      if (licenseOwner.toLowerCase() !== subEvmAddress.toLowerCase()) {
-        throw new TRPCError({ message: 'You are not the owner of this license', code: 'FORBIDDEN' })
-      }
+    } catch (err) {
+      throw new TRPCError({ message: (err as Error).message, code: 'FORBIDDEN' })
     }
 
     const url = await this.fileService.getFileUrl({
