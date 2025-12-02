@@ -204,4 +204,3 @@ export class FileRouter {
     return { url: `${metadataBucketHost}/${metadataKey}` }
   }
 }
-
