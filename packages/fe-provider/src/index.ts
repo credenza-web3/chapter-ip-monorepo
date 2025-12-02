@@ -7,7 +7,7 @@ export const initProvider = async (accessToken: string): Promise<CredenzaProvide
   if (provider) return provider
 
   provider = new CredenzaProvider({
-    rpcUrl: 'https://rpc-amoy.polygon.technology/',
+    rpcUrl: 'https://avalanche-fuji-c-chain-rpc.publicnode.com',
     accessToken,
     env: 'staging', // 'prod' | 'staging'
   })
@@ -26,3 +26,5 @@ export const getSigner = async (): Promise<ethers.Signer> => {
   signer = await ethersProvider.getSigner()
   return signer
 }
+
+export { ethers }
