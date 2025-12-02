@@ -4,7 +4,7 @@ import { connectSocketIO, disconnectSocketIO } from './socket'
 export const forwardTransaction = async (
   populatedTx: ethers.ContractTransaction,
   opts: { token: string; client_id: string; evm_wss: string },
-) => {
+): Promise<string> => {
   const bearer_token = opts.token
   const client_id = opts.client_id
 
@@ -22,12 +22,12 @@ export const forwardTransaction = async (
           unsigned_serialized_meta_tx: ethers.Transaction.from(populatedTx).unsignedSerialized,
         },
       },
-      (data: { error: { message: string } }) => {
+      (data: { error?: { message: string }; payload: { hash: string } }) => {
         disconnectSocketIO(opts.evm_wss)
         if (data.error) {
           return reject(new Error(data.error.message))
         }
-        resolve({})
+        resolve(data.payload.hash)
       },
     )
   })

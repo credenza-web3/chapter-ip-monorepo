@@ -1,19 +1,14 @@
 <script lang="ts">
-	import { authStore } from '$lib';
+  import { authStore } from '$lib'
   import { afterNavigate, beforeNavigate } from '$app/navigation'
   import { createClient } from '@repo/trpc/client'
   import { notify, ToastType } from '@repo/ui-components'
+  import { mintWithPrices, uploadFileToBucket } from './helper'
 
   let isOver = $state(false)
   let loading = $state(false)
   let fileInput: HTMLInputElement | null = $state(null)
   let uploaded: File | null = $state(null)
-  let prevHash = $state('')
-
-
-  $effect(() => {
-    console.log('uploaded', uploaded)
-  })
 
   beforeNavigate(() => {
     loading = true
@@ -35,12 +30,6 @@
     const target = event?.target as HTMLInputElement
     const file = target?.files?.[0] || (event instanceof DragEvent ? event.dataTransfer?.files[0] : null)
     if (!file) return
-
-    if (file.type !== 'application/pdf') {
-      alert('Only PDF files are allowed.')
-      if (target) target.value = ''
-      return
-    }
 
     if (file.size > maximumSize) {
       alert('Selected file is too big. Maximum 100MB.')
@@ -64,27 +53,32 @@
 
     try {
       loading = true
-      const arrayBuffer = await uploaded?.arrayBuffer()
-      const uint8Array = new Uint8Array(arrayBuffer)
       const trpcClient = createClient({
         trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
         getAccessTokenFn: () => authStore.state.accessToken!,
       })
-      
-      // const file = await trpcClient.files.upload.mutate({
-      //   file: {
-      //     filename: uploaded.name,
-      //     mimetype: uploaded.type,
-      //     data: Array.from(uint8Array), // or base64 string
-      //   },
-      //   tokenId
-      // })
 
+      const tokenId = await mintWithPrices(authStore.state.accessToken!)
+      const { url, key } = await trpcClient.files.createContentUploadUrl.mutate({
+        tokenId,
+        mimetype: uploaded.type,
+      })
+      await uploadFileToBucket(uploaded, url)
+      await trpcClient.files.registerContent.mutate({
+        tokenId,
+        key,
+      })
+      await trpcClient.files.uploadMetadata.mutate({
+        tokenId,
+        metadata: {
+          name: uploaded.name,
+          size: uploaded.size,
+          type: uploaded.type,
+          key,
+        },
+      })
 
-
-      // await uploadFile(file.hash, signers, readers, prevHash)
-      // notify('File uploaded successfully', ToastType.SUCCESS)
-
+      notify('File uploaded successfully', ToastType.SUCCESS)
       onClear()
     } catch (error) {
       console.error('Error uploading file:', error)
@@ -97,7 +91,6 @@
       loading = false
     }
   }
-
 </script>
 
 <div class="mx-10">
@@ -112,7 +105,7 @@
       }`}
       role="button"
       tabindex="0"
-      aria-label="Upload or drag a PDF file"
+      aria-label="Upload or drag a file"
       ondragover={(e) => {
         e.preventDefault()
         isOver = true
@@ -143,20 +136,9 @@
         <span class="text-xs text-stone-400">Max size: 100MB</span>
       {/if}
 
-      <input type="file" accept="application/pdf" class="hidden" bind:this={fileInput} onchange={handleInput} />
+      <input type="file" class="hidden" bind:this={fileInput} onchange={handleInput} />
     </div>
     {#if uploaded}
-      <div class="grid md:grid-cols-2 gap-6 mt-6">
-        <div>
-          <input
-            class="input input-bordered w-full"
-            type="text"
-            bind:value={prevHash}
-            placeholder="Previous Hash (optional)"
-          />
-        </div>
-      </div>
-
       <div class="flex gap-10 mt-3">
         <button class="btn btn-outline" onclick={onSubmitClick} disabled={loading}>Upload</button>
       </div>

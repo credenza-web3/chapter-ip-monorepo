@@ -20,6 +20,9 @@
     "@eslint/js": "^9.36.0",
     "@repo/eslint-config": "workspace:*",
     "@repo/fe-auth": "workspace:*",
+    "@repo/fe-evm-provider": "workspace:*",
+    "@repo/trpc": "workspace:*",
+    "@repo/ui-components": "workspace:*",
     "@sveltejs/adapter-static": "^3.0.9",
     "@sveltejs/kit": "^2.43.2",
     "@sveltejs/vite-plugin-svelte": "^6.2.0",
@@ -44,8 +47,8 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",
-    "@zerodevx/svelte-toast": "^0.9.6",
     "daisyui": "^5.5.5",
-    "tailwindcss": "^4.1.17"
+    "tailwindcss": "^4.1.17",
+    "@credenza3/contracts": "^0.0.5"
   }
 }

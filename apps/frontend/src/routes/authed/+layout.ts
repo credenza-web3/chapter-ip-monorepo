@@ -20,5 +20,7 @@ export const load = async () => {
     throw redirect(302, `/`)
   }
 
-  return {}
+  return {
+    accessToken,
+  }
 }
