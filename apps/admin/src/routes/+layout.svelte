@@ -1,11 +1,14 @@
 <script lang="ts">
-  import Header from '$lib/components/Header.svelte'
   import '../app.css'
   import favicon from '$lib/assets/credenza.png'
-  import { Test, Toast } from '@repo/ui-components'
-  import { onMount } from 'svelte'
+  import { Toast, Header, Footer } from '@repo/ui-components'
+  import { authStore } from '$lib'
 
   let { children } = $props()
+  const menuItems = [
+    { label: 'Files', href: '/authed/files' },
+    { label: 'Upload', href: '/authed/upload' },
+  ]
 </script>
 
 <svelte:head>
@@ -14,9 +17,9 @@
 </svelte:head>
 <Toast />
 <div class="min-h-screen overflow-x-hidden flex flex-col">
-  <Test />
-  <Header />
+  <Header {authStore} {menuItems} />
   <main class="space-y-0 flex-1">
     {@render children?.()}
   </main>
+  <Footer />
 </div>
