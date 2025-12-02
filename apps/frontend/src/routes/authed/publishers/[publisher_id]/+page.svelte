@@ -1,43 +1,76 @@
 <script lang="ts">
+  import { authStore } from '$lib'
+  import { ethers, initProvider } from '@repo/fe-evm-provider'
+  import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
+
   let { data } = $props()
+
+  const getTokenPrice = async (tokenId: string) => {
+    const provider = await initProvider(authStore.state.accessToken!)
+    const ethersProvider = new ethers.BrowserProvider(provider)
+
+    const contentContract = new ethers.Contract(
+      import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS,
+      content_abi,
+      ethersProvider,
+    )
+
+    const priceCentsFulltimeLicense = await contentContract.getLicensePriceFiat(tokenId, '0')
+    const priceCentsOnetimeLicense = await contentContract.getLicensePriceFiat(tokenId, '2')
+    return {
+      fulltime: Number(priceCentsFulltimeLicense) / 100,
+      onetime: Number(priceCentsOnetimeLicense) / 100,
+    }
+  }
 </script>
 
 <div class="container mx-auto px-4 py-8">
   <div class="breadcrumbs text-sm mb-6">
     <ul>
       <li><a href="/authed/publishers">Publishers</a></li>
-      <li>{data.publisher.name}</li>
+      <li>{data.publisher.title}</li>
     </ul>
-  </div>
-
-  <div class="mb-8">
-    <h1 class="text-4xl font-bold mb-2">{data.publisher.name}</h1>
-    <p class="text-lg text-base-content/70">{data.publisher.description}</p>
   </div>
 
   <h2 class="text-2xl font-semibold mb-4">Products</h2>
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {#each data.products as product}
-      <a
-        href="/authed/publishers/{data.publisher.id}/{product.id}"
-        class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow"
-      >
-        <figure class="px-10 pt-10">
-          <div class="avatar placeholder">
-            <div class="bg-neutral text-neutral-content rounded-xl w-24">
-              <span class="text-3xl">📄</span>
+    {#if data.contentItems.length === 0}
+      <div class="alert">
+        <span>No content here yet.</span>
+      </div>
+    {:else}
+      {#each data.contentItems as item}
+        <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow w-md">
+          <figure class="px-10 pt-10">
+            <div class="avatar placeholder">
+              <div class="bg-neutral text-neutral-content rounded-xl w-24">
+                <span class="text-3xl">📄</span>
+              </div>
             </div>
-          </div>
-        </figure>
-        <div class="card-body">
-          <h3 class="card-title">{product.title}</h3>
-          <p class="text-sm text-base-content/70">{product.description}</p>
-          <div class="card-actions justify-between items-center mt-4">
-            <span class="text-2xl font-bold text-primary">${product.price}</span>
-            <button class="btn btn-primary btn-sm">View Details</button>
+          </figure>
+          <div class="card-body">
+            <h3 class="card-title">{item.id}</h3>
+            {#await getTokenPrice(item.tokenId) then price}
+              <div class="card-actions mt-4 flex flex-col">
+                {#if price.fulltime}
+                  <div class="flex items-center justify-between w-full">
+                    <span>Fulltime license price:</span>
+                    <span class="text-2xl font-bold text-primary">${price.fulltime}</span>
+                    <button class="btn btn-primary">Buy Now</button>
+                  </div>
+                {/if}
+                {#if price.onetime}
+                  <div class="flex items-center justify-between w-full">
+                    <span>Onetime license price:</span>
+                    <span class="text-2xl font-bold text-primary">${price.onetime}</span>
+                    <button class="btn btn-primary">Buy Now</button>
+                  </div>
+                {/if}
+              </div>
+            {/await}
           </div>
         </div>
-      </a>
-    {/each}
+      {/each}
+    {/if}
   </div>
 </div>

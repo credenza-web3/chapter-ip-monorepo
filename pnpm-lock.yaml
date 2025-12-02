@@ -26,6 +26,9 @@ importers:
 
   apps/admin:
     dependencies:
+      '@credenza3/contracts':
+        specifier: ^0.0.5
+        version: 0.0.5
       '@tailwindcss/vite':
         specifier: ^4.1.17
         version: 4.1.17(vite@7.1.9(@types/node@22.18.8)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(yaml@2.8.1))
@@ -45,6 +48,12 @@ importers:
       '@repo/fe-auth':
         specifier: workspace:*
         version: link:../../packages/fe-auth
+      '@repo/fe-evm-provider':
+        specifier: workspace:*
+        version: link:../../packages/fe-provider
+      '@repo/fe-services':
+        specifier: workspace:*
+        version: link:../../packages/services
       '@repo/trpc':
         specifier: workspace:*
         version: link:../../packages/trpc
@@ -136,8 +145,8 @@ importers:
         specifier: ^3.937.0
         version: 3.937.0
       '@credenza3/contracts':
-        specifier: ^0.0.3
-        version: 0.0.3
+        specifier: ^0.0.5
+        version: 0.0.5
       '@nestjs/common':
         specifier: ^11.0.1
         version: 11.1.6(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -271,12 +280,12 @@ importers:
 
   apps/frontend:
     dependencies:
+      '@credenza3/contracts':
+        specifier: ^0.0.5
+        version: 0.0.5
       '@tailwindcss/vite':
         specifier: ^4.1.17
         version: 4.1.17(vite@7.1.9(@types/node@22.18.8)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(yaml@2.8.1))
-      '@zerodevx/svelte-toast':
-        specifier: ^0.9.6
-        version: 0.9.6(svelte@5.39.11)
       daisyui:
         specifier: ^5.5.5
         version: 5.5.5
@@ -296,6 +305,15 @@ importers:
       '@repo/fe-auth':
         specifier: workspace:*
         version: link:../../packages/fe-auth
+      '@repo/fe-evm-provider':
+        specifier: workspace:*
+        version: link:../../packages/fe-provider
+      '@repo/trpc':
+        specifier: workspace:*
+        version: link:../../packages/trpc
+      '@repo/ui-components':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@sveltejs/adapter-static':
         specifier: ^3.0.9
         version: 3.0.10(@sveltejs/kit@2.46.4(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.39.11)(vite@7.1.9(@types/node@22.18.8)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(yaml@2.8.1)))(svelte@5.39.11)(vite@7.1.9(@types/node@22.18.8)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(yaml@2.8.1)))
@@ -405,6 +423,16 @@ importers:
       '@repo/trpc':
         specifier: workspace:*
         version: link:../trpc
+      typescript:
+        specifier: ^5.4.0
+        version: 5.9.2
+
+  packages/fe-provider:
+    dependencies:
+      '@credenza3/evm-provider':
+        specifier: 0.0.2
+        version: 0.0.2
+    devDependencies:
       typescript:
         specifier: ^5.4.0
         version: 5.9.2
@@ -824,9 +852,12 @@ packages:
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
     engines: {node: '>=0.1.90'}
 
-  '@credenza3/contracts@0.0.3':
-    resolution: {integrity: sha512-LUjSNA4oXkXiC7Z7xqBLiD1z9sNShSv/DZ5mNwMsHplZGVM4IwO2XQC1rs4dDHLOgdsOsJLscS9IMZ74xYAkPA==}
+  '@credenza3/contracts@0.0.5':
+    resolution: {integrity: sha512-7r+HWa6hR5+dqWwfl7eec5A2Nt4jKVfpjd995YnkJkeMNNDpWRUXyW8xtmJNIJ6Ks9hhXgWE33wD8sXYGXJuTA==}
     engines: {node: '>=22'}
+
+  '@credenza3/evm-provider@0.0.2':
+    resolution: {integrity: sha512-gRi2uIJvzEti9z/c5bUqlSCBlUW28OhGc+Q4TmodfCM2Ob+5gSnDyX3sj8impg0l2pHsC+tvd7x9YNGCwrG6sQ==}
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -6795,20 +6826,18 @@ snapshots:
   '@colors/colors@1.5.0':
     optional: true
 
-<<<<<<< HEAD
-  '@credenza3/contracts@0.0.3':
+  '@credenza3/contracts@0.0.5':
     dependencies:
       '@opengsn/contracts': 3.0.0-beta.6
       '@openzeppelin/contracts': 4.9.6
       '@openzeppelin/contracts-upgradeable': 4.9.6
-=======
+
   '@credenza3/evm-provider@0.0.2':
     dependencies:
       ethers: 6.15.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
->>>>>>> 67bf895ee744a131987486b4c36e7d3dfe31562a
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:

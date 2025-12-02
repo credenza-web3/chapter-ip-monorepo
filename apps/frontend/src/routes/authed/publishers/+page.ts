@@ -1,31 +1,15 @@
-export interface Publisher {
-  id: string
-  name: string
-  description: string
-  productCount: number
-}
+import { authStore } from '$lib'
+import { createClient } from '@repo/trpc/client'
 
 export const load = async () => {
-  const publishers: Publisher[] = [
-    {
-      id: '1',
-      name: 'TechBooks Publishing',
-      description: 'Leading publisher of technical books and guides',
-      productCount: 45,
-    },
-    {
-      id: '2',
-      name: 'Creative Media Group',
-      description: 'Design and creative content specialists',
-      productCount: 32,
-    },
-    {
-      id: '3',
-      name: 'Education Press',
-      description: 'Educational materials and textbooks',
-      productCount: 78,
-    },
-  ]
+  const trpcClient = createClient({
+    trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
+    getAccessTokenFn: () => authStore.state.accessToken!,
+  })
 
-  return { publishers }
+  const { items } = await trpcClient.publishers.findPublishers.query({
+    limit: '10',
+  })
+
+  return { publishers: items }
 }
