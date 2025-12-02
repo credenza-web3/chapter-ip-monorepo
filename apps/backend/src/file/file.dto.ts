@@ -62,6 +62,7 @@ export const getContentLinkInputSchema = z
   .object({
     key: z.string().optional(),
     id: z.string().optional(),
+    licenseTokenId: z.string().optional(),
   })
   .refine((data) => Boolean(data.id || data.key), {
     message: 'Either `id` or `key` must be provided.',
