@@ -133,13 +133,13 @@ export class FileRouter {
     const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(ctx.authTokenPayload.sub)
 
     try {
-      await this.commonContentService.verifyIsOwner(subEvmAddress, file.tokenId)
-    } catch {
-      try {
+      if (input.licenseTokenId) {
         await this.commonLicenseService.verify(subEvmAddress, file.tokenId, input.licenseTokenId)
-      } catch (err) {
-        throw new TRPCError({ message: (err as Error).message, code: 'FORBIDDEN' })
+      } else {
+        await this.commonContentService.verifyIsOwner(subEvmAddress, file.tokenId)
       }
+    } catch (err) {
+      throw new TRPCError({ message: (err as Error).message, code: 'FORBIDDEN' })
     }
 
     const url = await this.fileService.getFileUrl({

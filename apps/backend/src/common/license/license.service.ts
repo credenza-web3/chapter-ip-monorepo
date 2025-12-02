@@ -28,11 +28,7 @@ export class CommonLicenseService {
     return this.licenseNftContract
   }
 
-  public async verify(subEvmAddress: string, contentTokenId: string, licenseTokenId?: string) {
-    if (!licenseTokenId) {
-      throw new Error('license token id must be provided')
-    }
-
+  public async verify(subEvmAddress: string, contentTokenId: string, licenseTokenId: string) {
     const licenseContentTokenId = (await this.licenseNftContract.getTokenLicenseContentNftId(licenseTokenId)) as number
     if (String(licenseContentTokenId) !== contentTokenId) {
       throw new Error('Invalid license content token ID')
