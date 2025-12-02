@@ -9,7 +9,6 @@ import type { TAppContextWithTokenPayload } from '../common/auth/auth.types'
 import { CommonEvmService } from '../common/evm/evm.service'
 import { CommonContentService } from '../common/content/content.service'
 import { CommonLicenseService } from '../common/license/license.service'
-import { BlockedLicenseService } from '../common/license/blocked-license/blocked-license.service'
 
 import { FileService } from './file.service'
 import {
@@ -45,7 +44,6 @@ export class FileRouter {
     private readonly commonEvmService: CommonEvmService,
     private readonly commonContentService: CommonContentService,
     private readonly commonLicenseService: CommonLicenseService,
-    private readonly blockedLicenseService: BlockedLicenseService,
   ) {}
 
   @UseMiddlewares(AuthMiddleware)
@@ -64,10 +62,10 @@ export class FileRouter {
 
     const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(ctx.authTokenPayload.sub)
 
-    const contract = this.commonContentService.getContentNftContract()
-    const ownerEvmAddress = (await contract.ownerOf(input.tokenId)) as string
-    if (ownerEvmAddress.toLowerCase() !== subEvmAddress.toLowerCase()) {
-      throw new TRPCError({ message: 'You are not the owner of this NFT', code: 'FORBIDDEN' })
+    try {
+      await this.commonContentService.verifyIsOwner(subEvmAddress, input.tokenId)
+    } catch (err) {
+      throw new TRPCError({ message: (err as Error).message, code: 'FORBIDDEN' })
     }
 
     const key = [input.tokenId, ext].join('.')
@@ -134,47 +132,13 @@ export class FileRouter {
 
     const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(ctx.authTokenPayload.sub)
 
-    const contract = this.commonContentService.getContentNftContract()
-    const ownerEvmAddress = (await contract.ownerOf(file.tokenId)) as string
-    if (ownerEvmAddress.toLowerCase() !== subEvmAddress.toLowerCase()) {
-      if (!input.licenseTokenId) {
-        throw new TRPCError({ message: 'license token id is required for non-owner ', code: 'FORBIDDEN' })
-      }
-      const licenseContract = this.commonLicenseService.getLicenseNftContract()
-
-      const licenseType = Number(await licenseContract.getTokenLicenseType(input.licenseTokenId))
-      switch (licenseType) {
-        case 2: {
-          const expiresAt = (await licenseContract.getTokenLicenseExpiresAt(input.licenseTokenId)) as number
-          if (expiresAt < Date.now() / 1000) {
-            throw new TRPCError({ message: 'License expired', code: 'FORBIDDEN' })
-          }
-          break
-        }
-        case 1: {
-          const blockedLicenseModel = this.blockedLicenseService.getModel()
-          const blocked = await blockedLicenseModel.findOne({ tokenId: input.licenseTokenId })
-          if (blocked) {
-            throw new TRPCError({ message: 'License has been already used', code: 'FORBIDDEN' })
-          }
-          await blockedLicenseModel.create({ tokenId: input.licenseTokenId })
-          break
-        }
-        case 0: {
-          break
-        }
-        default:
-          throw new TRPCError({ message: `Unsupported license type (${licenseType})`, code: 'FORBIDDEN' })
-      }
-
-      const licenseContentTokenId = (await licenseContract.getTokenLicenseContentNftId(input.licenseTokenId)) as number
-      if (String(licenseContentTokenId) !== file.tokenId) {
-        throw new TRPCError({ message: 'Invalid license content token ID', code: 'FORBIDDEN' })
-      }
-
-      const licenseOwner = (await licenseContract.ownerOf(input.licenseTokenId)) as string
-      if (licenseOwner.toLowerCase() !== subEvmAddress.toLowerCase()) {
-        throw new TRPCError({ message: 'You are not the owner of this license', code: 'FORBIDDEN' })
+    try {
+      await this.commonContentService.verifyIsOwner(subEvmAddress, file.tokenId)
+    } catch {
+      try {
+        await this.commonLicenseService.verify(subEvmAddress, file.tokenId, input.licenseTokenId)
+      } catch (err) {
+        throw new TRPCError({ message: (err as Error).message, code: 'FORBIDDEN' })
       }
     }
 

@@ -24,4 +24,11 @@ export class CommonContentService {
   public getContentNftContract() {
     return this.contentNftContract
   }
+
+  public async verifyIsOwner(subEvmAddress: string, contentTokenId: string) {
+    const ownerEvmAddress = (await this.contentNftContract.ownerOf(contentTokenId)) as string
+    if (ownerEvmAddress.toLowerCase() !== subEvmAddress.toLowerCase()) {
+      throw new Error(`${subEvmAddress} is not the owner of ${contentTokenId}`)
+    }
+  }
 }
