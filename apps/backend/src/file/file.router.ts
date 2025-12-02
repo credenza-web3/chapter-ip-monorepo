@@ -6,6 +6,9 @@ import { extension } from 'mime-types'
 
 import { AuthMiddleware } from '../common/auth/auth.middleware'
 import type { TAppContextWithTokenPayload } from '../common/auth/auth.types'
+import { CommonEvmService } from '../common/evm/evm.service'
+import { CommonContentService } from '../common/content/content.service'
+import { CommonLicenseService } from '../common/license/license.service'
 
 import { FileService } from './file.service'
 import {
@@ -38,6 +41,9 @@ export class FileRouter {
   constructor(
     private readonly configService: ConfigService,
     private readonly fileService: FileService,
+    private readonly commonEvmService: CommonEvmService,
+    private readonly commonContentService: CommonContentService,
+    private readonly commonLicenseService: CommonLicenseService,
   ) {}
 
   @UseMiddlewares(AuthMiddleware)
@@ -45,11 +51,23 @@ export class FileRouter {
     input: createContentUploadUrlInputSchema,
     output: createContentUploadUrlOutputSchema,
   })
-  async createContentUploadUrl(@Input() input: TCreateContentUploadUrlInput): Promise<TCreateContentUploadUrlOutput> {
+  async createContentUploadUrl(
+    @Ctx() ctx: TAppContextWithTokenPayload,
+    @Input() input: TCreateContentUploadUrlInput,
+  ): Promise<TCreateContentUploadUrlOutput> {
     const ext = input.extension ? input.extension.replaceAll('.', '') : extension(input.mimetype)
     if (!ext) {
-      throw new Error('Invalid mimetype')
+      throw new TRPCError({ message: 'Invalid mimetype', code: 'BAD_REQUEST' })
     }
+
+    const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(ctx.authTokenPayload.sub)
+
+    try {
+      await this.commonContentService.verifyIsOwner(subEvmAddress, input.tokenId)
+    } catch (err) {
+      throw new TRPCError({ message: (err as Error).message, code: 'FORBIDDEN' })
+    }
+
     const key = [input.tokenId, ext].join('.')
     const url = await this.fileService.createUploadUrl({
       Bucket: this.fileService.getBucketName('content'),
@@ -112,8 +130,17 @@ export class FileRouter {
       throw new TRPCError({ message: 'File is not found', code: 'NOT_FOUND' })
     }
 
-    // TODO: Implement file access control logic
-    // throw new TRPCError({ message: 'You do not have access to this file', code: 'FORBIDDEN' })
+    const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(ctx.authTokenPayload.sub)
+
+    try {
+      if (input.licenseTokenId) {
+        await this.commonLicenseService.verify(subEvmAddress, file.tokenId, input.licenseTokenId)
+      } else {
+        await this.commonContentService.verifyIsOwner(subEvmAddress, file.tokenId)
+      }
+    } catch (err) {
+      throw new TRPCError({ message: (err as Error).message, code: 'FORBIDDEN' })
+    }
 
     const url = await this.fileService.getFileUrl({
       Bucket: file.bucket,
@@ -152,4 +179,3 @@ export class FileRouter {
     return { url: `${metadataBucketHost}/${metadataKey}` }
   }
 }
-

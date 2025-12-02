@@ -82,6 +82,7 @@ const appRouter = t.router({
       .object({
         key: z.string().optional(),
         id: z.string().optional(),
+        licenseTokenId: z.string().optional(),
       })
       .refine((data) => Boolean(data.id || data.key), {
         message: 'Either `id` or `key` must be provided.',
@@ -149,7 +150,26 @@ const appRouter = t.router({
       avatarUrl: z.string().optional(),
       createdAt: z.date(),
       updatedAt: z.date(),
-    }))).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
+    }))).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    mintContentNftToken: publicProcedure.input(z.object({
+      tokenUri: z.string().optional(),
+      licenseType: z.union([z.literal(0), z.literal(2)]),
+    })).output(z.object({
+      sig: z.string(),
+      domain: z.object({
+        name: z.string(),
+        version: z.string(),
+        chainId: z.number(),
+        verifyingContract: z.string(),
+      }),
+      voucher: z.object({
+        nonce: z.string(),
+        price: z.string(),
+        priceToken: z.string(),
+        licenseInfo: z.string(),
+        uri: z.string(),
+      }),
+    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
   })
 });
 export type AppRouter = typeof appRouter;

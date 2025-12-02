@@ -56,3 +56,29 @@ export const publisherItemSchema = z.object({
 
 export const findPublishersOutputSchema = createPaginatedResponseSchema(publisherItemSchema)
 export type TFindPublishersOutput = z.infer<typeof findPublishersOutputSchema>
+
+export const mintContentNftTokenInputSchema = z.object({
+  tokenUri: z.string().optional(),
+  licenseType: z.union([z.literal(0), z.literal(2)]),
+})
+export type TMintContentNftTokenInput = z.infer<typeof mintContentNftTokenInputSchema>
+
+export const contentNftVoucherSchema = z.object({
+  nonce: z.string(),
+  price: z.string(),
+  priceToken: z.string(),
+  licenseInfo: z.string(),
+  uri: z.string(),
+})
+
+export const mintContentNftTokenOutputSchema = z.object({
+  sig: z.string(),
+  domain: z.object({
+    name: z.string(),
+    version: z.string(),
+    chainId: z.number(),
+    verifyingContract: z.string(),
+  }),
+  voucher: contentNftVoucherSchema,
+})
+export type TMintContentNftTokenOutput = z.infer<typeof mintContentNftTokenOutputSchema>

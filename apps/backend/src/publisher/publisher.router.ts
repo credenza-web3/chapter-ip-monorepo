@@ -19,6 +19,10 @@ import {
   type TFindPublishersInput,
   findPublishersOutputSchema,
   type TFindPublishersOutput,
+  mintContentNftTokenInputSchema,
+  type TMintContentNftTokenInput,
+  mintContentNftTokenOutputSchema,
+  type TMintContentNftTokenOutput,
 } from './publisher.dto'
 
 @Router({ alias: 'publishers' })
@@ -79,5 +83,33 @@ export class PublisherRouter {
   async findPublishers(@Input() input: TFindPublishersInput): Promise<TFindPublishersOutput> {
     const paginationOptions = this.publisherService.buildPaginationOptions(input)
     return await this.publisherService.paginate<TFindPublishersOutput['items'][0]>(paginationOptions)
+  }
+
+  @UseMiddlewares(AuthMiddleware)
+  @Mutation({
+    input: mintContentNftTokenInputSchema,
+    output: mintContentNftTokenOutputSchema,
+  })
+  async mintContentNftToken(
+    @Ctx() ctx: TAppContextWithTokenPayload,
+    @Input() input: TMintContentNftTokenInput,
+  ): Promise<TMintContentNftTokenOutput> {
+    // Mock implementation - returns mock signature, domain, and voucher
+    return {
+      sig: '0x' + '0'.repeat(130), // Mock signature (65 bytes = 130 hex chars)
+      domain: {
+        name: 'Chapter IP Content',
+        version: '1',
+        chainId: 1,
+        verifyingContract: '0x073Cd140dCcB73AB117a2f747b89e1dAe390dD5E',
+      },
+      voucher: {
+        nonce: '0',
+        price: '0',
+        priceToken: '0',
+        licenseInfo: String(input.licenseType),
+        uri: input.tokenUri || '',
+      },
+    }
   }
 }
