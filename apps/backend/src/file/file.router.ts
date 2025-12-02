@@ -7,6 +7,9 @@ import { extension } from 'mime-types'
 import { AuthMiddleware } from '../common/auth/auth.middleware'
 import type { TAppContextWithTokenPayload } from '../common/auth/auth.types'
 import { CommonEvmService } from '../common/evm/evm.service'
+import { CommonContentService } from '../common/content/content.service'
+import { CommonLicenseService } from '../common/license/license.service'
+import { BlockedLicenseService } from '../common/license/blocked-license/blocked-license.service'
 
 import { FileService } from './file.service'
 import {
@@ -40,6 +43,9 @@ export class FileRouter {
     private readonly configService: ConfigService,
     private readonly fileService: FileService,
     private readonly commonEvmService: CommonEvmService,
+    private readonly commonContentService: CommonContentService,
+    private readonly commonLicenseService: CommonLicenseService,
+    private readonly blockedLicenseService: BlockedLicenseService,
   ) {}
 
   @UseMiddlewares(AuthMiddleware)
@@ -58,7 +64,7 @@ export class FileRouter {
 
     const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(ctx.authTokenPayload.sub)
 
-    const contract = this.commonEvmService.getContentNftContract()
+    const contract = this.commonContentService.getContentNftContract()
     const ownerEvmAddress = (await contract.ownerOf(input.tokenId)) as string
     if (ownerEvmAddress.toLowerCase() !== subEvmAddress.toLowerCase()) {
       throw new TRPCError({ message: 'You are not the owner of this NFT', code: 'FORBIDDEN' })
@@ -128,13 +134,13 @@ export class FileRouter {
 
     const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(ctx.authTokenPayload.sub)
 
-    const contract = this.commonEvmService.getContentNftContract()
+    const contract = this.commonContentService.getContentNftContract()
     const ownerEvmAddress = (await contract.ownerOf(file.tokenId)) as string
     if (ownerEvmAddress.toLowerCase() !== subEvmAddress.toLowerCase()) {
       if (!input.licenseTokenId) {
         throw new TRPCError({ message: 'license token id is required for non-owner ', code: 'FORBIDDEN' })
       }
-      const licenseContract = this.commonEvmService.getLicenseNftContract()
+      const licenseContract = this.commonLicenseService.getLicenseNftContract()
 
       const licenseType = Number(await licenseContract.getTokenLicenseType(input.licenseTokenId))
       switch (licenseType) {
@@ -146,7 +152,12 @@ export class FileRouter {
           break
         }
         case 1: {
-          // TODO block if used
+          const blockedLicenseModel = this.blockedLicenseService.getModel()
+          const blocked = await blockedLicenseModel.findOne({ tokenId: input.licenseTokenId })
+          if (blocked) {
+            throw new TRPCError({ message: 'License has been already used', code: 'FORBIDDEN' })
+          }
+          await blockedLicenseModel.create({ tokenId: input.licenseTokenId })
           break
         }
         case 0: {
