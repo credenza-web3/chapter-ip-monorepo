@@ -2,18 +2,17 @@
   import { authStore } from '$lib'
   import { ethers, initProvider } from '@repo/fe-evm-provider'
   import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
+  import { modals, type ModalProps } from 'svelte-modals'
+  import { ConfirmModal } from '@repo/ui-components'
 
   let { data } = $props()
+  const CONTENT_CONTRACT = import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS
 
   const getTokenPrice = async (tokenId: string) => {
     const provider = await initProvider(authStore.state.accessToken!)
     const ethersProvider = new ethers.BrowserProvider(provider)
 
-    const contentContract = new ethers.Contract(
-      import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS,
-      content_abi,
-      ethersProvider,
-    )
+    const contentContract = new ethers.Contract(CONTENT_CONTRACT, content_abi, ethersProvider)
 
     const priceCentsFulltimeLicense = await contentContract.getLicensePriceFiat(tokenId, '0')
     const priceCentsOnetimeLicense = await contentContract.getLicensePriceFiat(tokenId, '2')
@@ -21,6 +20,20 @@
       fulltime: Number(priceCentsFulltimeLicense) / 100,
       onetime: Number(priceCentsOnetimeLicense) / 100,
     }
+  }
+
+  const onBuyLicense = async (tokenId: string, licenseType: string) => {
+    const licenseName = licenseType === '0' ? 'Fulltime' : 'Onetime'
+    const title = `${licenseName} license purchase`
+    const url = `https://passport-ui.pages.dev/evm?contractAddress=${CONTENT_CONTRACT}&licenseType=${licenseType}&title=${title}&amount=1&contentTokenId=${tokenId}`
+
+    window.open(url, '_blank')
+
+    modals.open<ModalProps & { text: string; redirectTo: string; onClose: () => void }>(ConfirmModal, {
+      text: 'Please complete the purchase in the new window.',
+      redirectTo: '/authed/purchases',
+      onClose: modals.closeAll,
+    })
   }
 </script>
 
@@ -56,14 +69,14 @@
                   <div class="flex items-center justify-between w-full">
                     <span>Fulltime license price:</span>
                     <span class="text-2xl font-bold text-primary">${price.fulltime}</span>
-                    <button class="btn btn-primary">Buy Now</button>
+                    <button class="btn btn-primary" onclick={() => onBuyLicense(item.tokenId, '0')}>Buy Now</button>
                   </div>
                 {/if}
                 {#if price.onetime}
                   <div class="flex items-center justify-between w-full">
                     <span>Onetime license price:</span>
                     <span class="text-2xl font-bold text-primary">${price.onetime}</span>
-                    <button class="btn btn-primary">Buy Now</button>
+                    <button class="btn btn-primary" onclick={() => onBuyLicense(item.tokenId, '2')}>Buy Now</button>
                   </div>
                 {/if}
               </div>

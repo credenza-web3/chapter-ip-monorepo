@@ -89,7 +89,7 @@ export function createAuthStore<T>(
     }
   }
 
-  async function exchangeCodeForTokens(code: string, stateParam: string) {
+  async function exchangeCodeForTokens(code: string, stateParam: string, redirectAfterLogin: string) {
     if (!browser) return
 
     state.isLoading = true
@@ -126,7 +126,7 @@ export function createAuthStore<T>(
       state.isLoading = false
       state.isInitialized = true
 
-      await goto(resolve('/authed'))
+      await goto(resolve(redirectAfterLogin))
     } catch (error) {
       console.error('Error exchanging code for tokens:', error)
       state.isLoading = false

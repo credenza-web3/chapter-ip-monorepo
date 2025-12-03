@@ -9,7 +9,7 @@
 
     if (code && state) {
       try {
-        await authStore.exchangeCodeForTokens(code, state)
+        await authStore.exchangeCodeForTokens(code, state, '/authed/files')
       } catch (error) {
         console.error('Auth callback error:', error)
       }

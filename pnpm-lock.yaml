@@ -289,6 +289,9 @@ importers:
       daisyui:
         specifier: ^5.5.5
         version: 5.5.5
+      svelte-modals:
+        specifier: ^2.0.1
+        version: 2.0.1(svelte@5.39.11)
       tailwindcss:
         specifier: ^4.1.17
         version: 4.1.17
@@ -5405,6 +5408,11 @@ packages:
     peerDependenciesMeta:
       svelte:
         optional: true
+
+  svelte-modals@2.0.1:
+    resolution: {integrity: sha512-4nGWxveM0eILQnkjmlA7nComRSsCW5QssY9d1qNklZaNlnwnziW5xYqLN3ufjyA0/Cn9oMO4i9+8s8zmlw4IiQ==}
+    peerDependencies:
+      svelte: '>=5'
 
   svelte@5.39.11:
     resolution: {integrity: sha512-8MxWVm2+3YwrFbPaxOlT1bbMi6OTenrAgks6soZfiaS8Fptk4EVyRIFhJc3RpO264EeSNwgjWAdki0ufg4zkGw==}
@@ -12147,6 +12155,10 @@ snapshots:
       postcss-scss: 4.0.9(postcss@8.5.6)
       postcss-selector-parser: 7.1.0
     optionalDependencies:
+      svelte: 5.39.11
+
+  svelte-modals@2.0.1(svelte@5.39.11):
+    dependencies:
       svelte: 5.39.11
 
   svelte@5.39.11:
