@@ -16,7 +16,7 @@ export const uploadFileToBucket = async (uploaded: File, url: string) => {
     throw new Error(`Upload failed: ${uploadFileRes.status} ${uploadFileRes.statusText}`)
   }
 }
-export const mintWithPrices = async (accessToken: string, lifetimePrice: number = 0,  onetimePrice: number = 0): Promise<string> => {
+export const mintWithPrices = async (accessToken: string, lifetimePrice: number,  onetimePrice: number): Promise<string> => {
   const provider = await initProvider(accessToken)
   const ethersProvider = new ethers.BrowserProvider(provider)
   const signer = await getSigner()

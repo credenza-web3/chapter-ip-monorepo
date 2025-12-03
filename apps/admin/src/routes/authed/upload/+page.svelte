@@ -19,7 +19,6 @@
     if (!isLifetimeLicense) lifetimePrice = 0
     if (!isOneTimeLicense) oneTimePrice = 0
     isFormValid = (isLifetimeLicense && lifetimePrice > 0) || (isOneTimeLicense && oneTimePrice > 0)
-    console.log(isFormValid)
   })
 
   function resetCheckboxes() {
@@ -79,7 +78,7 @@
         getAccessTokenFn: () => authStore.state.accessToken!,
       })
 
-      const tokenId = await mintWithPrices(authStore.state.accessToken!)
+      const tokenId = await mintWithPrices(authStore.state.accessToken!, lifetimePrice, oneTimePrice)
       const { url, key } = await trpcClient.files.createContentUploadUrl.mutate({
         tokenId,
         mimetype: uploaded.type,
