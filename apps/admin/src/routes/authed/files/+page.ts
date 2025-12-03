@@ -7,10 +7,11 @@ export const load = async () => {
     trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
     getAccessTokenFn: () => authStore.state.accessToken!,
   })
-  const sub = await authStore.getSubFromToken()
-  const paginateResponse = await trpcClient.files.findContent.query({
-    sub: sub!,
+  const subRaw = await authStore.getSubFromToken();
+  const sub = subRaw ?? undefined
+  const paginatedResponse = await trpcClient.files.findContent.query({
+    sub
   })
 
-  return { paginateResponse }
+  return { paginatedResponse }
 }

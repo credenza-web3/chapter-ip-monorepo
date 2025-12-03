@@ -3,7 +3,7 @@
   import { formatDate } from '$lib/services/formatDate.js'
 
   let { data } = $props()
-  let { items, cursor } = data.paginateResponse
+  let { items, cursor } = data.paginatedResponse
 
   const openFile = (id: string) => {
     goto(`/authed/files/${id}`)
