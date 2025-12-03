@@ -22,7 +22,6 @@
         <tr>
           <th>#</th>
           <th>ID</th>
-          <th>Sub</th>
           <th>Bucket</th>
           <th>Key</th>
           <th>Token ID</th>
@@ -39,7 +38,6 @@
           >
             <th>{i + 1}</th>
             <td>{item.id}</td>
-            <td>{item.sub}</td>
             <td>{item.bucket}</td>
             <td>{item.key}</td>
             <td>{item.tokenId}</td>

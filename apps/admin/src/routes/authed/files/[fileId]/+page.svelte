@@ -21,6 +21,7 @@
     <li><strong>Key:</strong> {fileData?.key}</li>
     <li><strong>Token ID:</strong> {fileData?.tokenId}</li>
     <li><strong>Created:</strong> {formatDate(fileData.createdAt)}</li>
+    <li><strong>Updated:</strong>{formatDate(fileData.updatedAt)}</li>
   </ul>
   {/if}
 </div>
