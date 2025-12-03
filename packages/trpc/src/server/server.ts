@@ -172,7 +172,7 @@ const appRouter = t.router({
       }),
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
   }),
-  linenses: t.router({
+  licenses: t.router({
     findBlockedLicenses: publicProcedure.input(z.object({
       id: z.string().optional(),
       limit: z.string().optional(),

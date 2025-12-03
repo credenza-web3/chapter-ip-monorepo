@@ -11,7 +11,7 @@ import {
   type TFindBlockedLicensesOutput,
 } from '../common/license/blocked-license/blocked-license.dto'
 
-@Router({ alias: 'linenses' })
+@Router({ alias: 'licenses' })
 export class LicenseRouter {
   private logger = new Logger(this.constructor.name)
 
