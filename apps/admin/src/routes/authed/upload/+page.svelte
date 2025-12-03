@@ -75,6 +75,7 @@
           size: uploaded.size,
           type: uploaded.type,
           key,
+          image: "https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/chapter_ip.png"
         },
       })
 
