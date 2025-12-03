@@ -1,4 +1,22 @@
 <script lang="ts">
+  import { goto } from '$app/navigation'
+
+  let { data } = $props()
+  let { items, cursor } = data.paginateResponse
+
+  const openFile = (id: string) => {
+    goto(`/authed/files/${id}`)
+  }
+
+  const formatDate = (d: string | Date) =>
+    new Date(d).toLocaleString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    })
 </script>
 
 <div class="min-h-xl p-4">
@@ -17,21 +35,23 @@
           <th>Key</th>
           <th>Token ID</th>
           <th>Created</th>
-          <th>Updated</th>
         </tr>
       </thead>
 
       <tbody>
-        {#each files as file, i}
-          <tr>
+        {#each items as item, i (item.id)}
+          <tr
+            onclick={() => openFile(item.id)}
+            class="cursor-pointer hover:bg-gray-100 transition-colors"
+            role="button"
+          >
             <th>{i + 1}</th>
-            <td>{file.id}</td>
-            <td>{file.sub}</td>
-            <td>{file.bucket}</td>
-            <td>{file.key}</td>
-            <td>{file.tokenId}</td>
-            <td>{file.createdAt.toLocaleString()}</td>
-            <td>{file.updatedAt.toLocaleString()}</td>
+            <td>{item.id}</td>
+            <td>{item.sub}</td>
+            <td>{item.bucket}</td>
+            <td>{item.key}</td>
+            <td>{item.tokenId}</td>
+            <td>{formatDate(item.createdAt)}</td>
           </tr>
         {/each}
       </tbody>
