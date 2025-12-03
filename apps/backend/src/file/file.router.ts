@@ -134,7 +134,12 @@ export class FileRouter {
 
     try {
       if (input.licenseTokenId) {
-        await this.commonLicenseService.verify(subEvmAddress, file.tokenId, input.licenseTokenId)
+        await this.commonLicenseService.verify(
+          ctx.authTokenPayload.sub,
+          subEvmAddress,
+          file.tokenId,
+          input.licenseTokenId,
+        )
       } else {
         await this.commonContentService.verifyIsOwner(subEvmAddress, file.tokenId)
       }
