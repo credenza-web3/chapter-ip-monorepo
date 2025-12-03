@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
+  import { formatDate } from '$lib/services/formatDate.js'
 
   let { data } = $props()
   let { items, cursor } = data.paginateResponse
@@ -8,15 +9,6 @@
     goto(`/authed/files/${id}`)
   }
 
-  const formatDate = (d: string | Date) =>
-    new Date(d).toLocaleString('en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    })
 </script>
 
 <div class="min-h-xl p-4">
