@@ -1,17 +1,9 @@
 <script lang="ts">
-  import { authStore } from '$lib'
-  import { createClient } from '@repo/trpc/client'
-
   let { data } = $props()
 
   const onGetFileUrl = async (key: string, licenseTokenId: string) => {
     try {
-      const trpcClient = createClient({
-        trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
-        getAccessTokenFn: () => authStore.state.accessToken!,
-      })
-
-      const { url } = await trpcClient.files.getContentLink.query({
+      const { url } = await data.trpcClient!.files.getContentLink.query({
         licenseTokenId,
         key,
       })
@@ -40,12 +32,16 @@
                 <h3 class="card-title">{purchase.metadata.name}</h3>
               </div>
               <div class="flex flex-col sm:flex-row gap-2">
-                <button
-                  class="btn btn-sm btn-outline"
-                  onclick={() => onGetFileUrl(purchase.metadata.key, purchase.metadata.licenseTokenId)}
-                >
-                  Get file link
-                </button>
+                {#if purchase.isBlocked}
+                  <button class="btn btn-sm btn-outline btn-error">Already used</button>
+                {:else}
+                  <button
+                    class="btn btn-sm btn-outline"
+                    onclick={() => onGetFileUrl(purchase.metadata.key, purchase.licenseTokenId)}
+                  >
+                    Get file link
+                  </button>
+                {/if}
               </div>
             </div>
           </div>
