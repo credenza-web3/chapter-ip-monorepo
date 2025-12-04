@@ -11,7 +11,7 @@
 
 </script>
 
-<div class="min-h-xl p-4">
+<div class="min-h-xl p-4 card bg-base-100 shadow-md">
   <div class="mb-12 text-center">
     <h1 class="text-4xl font-light text-gray-900">File list</h1>
   </div>
