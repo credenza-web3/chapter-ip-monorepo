@@ -28,14 +28,15 @@ export class CommonLicenseService {
     return this.licenseNftContract
   }
 
-  public async verify(subEvmAddress: string, contentTokenId: string, licenseTokenId: string) {
+  public async verify(sub: string, subEvmAddress: string, contentTokenId: string, licenseTokenId: string) {
+    subEvmAddress = subEvmAddress.toLowerCase()
     const licenseContentTokenId = (await this.licenseNftContract.getTokenLicenseContentNftId(licenseTokenId)) as number
     if (String(licenseContentTokenId) !== contentTokenId) {
       throw new Error('Invalid license content token ID')
     }
 
     const licenseOwner = (await this.licenseNftContract.ownerOf(licenseTokenId)) as string
-    if (licenseOwner.toLowerCase() !== subEvmAddress.toLowerCase()) {
+    if (licenseOwner.toLowerCase() !== subEvmAddress) {
       throw new Error('You are not the owner of this license')
     }
 
@@ -50,11 +51,11 @@ export class CommonLicenseService {
       }
       case 1: {
         const blockedLicenseModel = this.blockedLicenseService.getModel()
-        const blocked = await blockedLicenseModel.findOne({ tokenId: licenseTokenId })
+        const blocked = await blockedLicenseModel.findOne({ tokenId: licenseTokenId, subEvmAddress, sub })
         if (blocked) {
           throw new Error('License has been already used')
         }
-        await blockedLicenseModel.create({ tokenId: licenseTokenId })
+        await blockedLicenseModel.create({ tokenId: licenseTokenId, subEvmAddress, sub })
         break
       }
       case 0: {

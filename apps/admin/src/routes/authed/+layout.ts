@@ -22,21 +22,22 @@ export const load = async ({ url }) => {
     throw redirect(302, `/`)
   }
 
-  if (url.pathname === '/authed/publisher/create') {
-    return {}
-  }
-
   const trpcClient = createClient({
     trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
     getAccessTokenFn: () => authStore.state.accessToken!,
   })
+
+  if (url.pathname === '/authed/publisher/create') {
+    return { trpcClient }
+  }
+
   const sub = await authStore.getSubFromToken()
   try {
     const publisher = await trpcClient.publishers.getPublisher.query({
       sub: sub!,
     })
 
-    return { publisher }
+    return { trpcClient, publisher }
   } catch {
     throw redirect(302, `/authed/publisher/create`)
   }

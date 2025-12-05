@@ -1,9 +1,9 @@
 <script lang="ts">
   import { authStore } from '$lib'
   import { afterNavigate, beforeNavigate } from '$app/navigation'
-  import { createClient } from '@repo/trpc/client'
   import { notify, ToastType } from '@repo/ui-components'
   import { mintWithPrices, uploadFileToBucket } from './helper'
+  import { createClient } from '@repo/trpc/client'
 
   let isOver = $state(false)
   let loading = $state(false)
@@ -14,6 +14,16 @@
   let lifetimePrice = $state(0)
   let oneTimePrice = $state(0)
   let isFormValid = $state(false)
+
+  let { data } = $props()
+
+  beforeNavigate(() => {
+    loading = true
+  })
+
+  afterNavigate(() => {
+    loading = false
+  })
 
   $effect(() => {
     if (!isLifetimeLicense) lifetimePrice = 0
@@ -84,17 +94,18 @@
         mimetype: uploaded.type,
       })
       await uploadFileToBucket(uploaded, url)
-      await trpcClient.files.registerContent.mutate({
+      await data.trpcClient!.files.registerContent.mutate({
         tokenId,
         key,
       })
-      await trpcClient.files.uploadMetadata.mutate({
+      await data.trpcClient!.files.uploadMetadata.mutate({
         tokenId,
         metadata: {
           name: uploaded.name,
           size: uploaded.size,
           type: uploaded.type,
           key,
+          image: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/chapter_ip.png',
         },
       })
 

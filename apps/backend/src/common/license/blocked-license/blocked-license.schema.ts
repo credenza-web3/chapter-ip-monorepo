@@ -22,9 +22,17 @@ export class BlockedLicense extends Document<ObjectId> {
   @Prop({ required: true })
   tokenId: string
 
+  @Prop({ required: true })
+  subEvmAddress: string
+
+  @Prop({ required: true })
+  sub: string
+
   createdAt: Date
   updatedAt: Date
 }
 
 export const BlockedLicenseSchema = SchemaFactory.createForClass(BlockedLicense)
-BlockedLicenseSchema.index({ tokenId: 1 }, { unique: true })
+BlockedLicenseSchema.index({ tokenId: 1 })
+BlockedLicenseSchema.index({ subEvmAddress: 1 })
+BlockedLicenseSchema.index({ sub: 1 })
