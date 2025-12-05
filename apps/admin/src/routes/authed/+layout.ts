@@ -31,7 +31,6 @@ export const load = async ({ url }) => {
     getAccessTokenFn: () => authStore.state.accessToken!,
   })
   const sub = await authStore.getSubFromToken()
-  console.log('Sub:', sub)
   try {
     const publisher = await trpcClient.publishers.getPublisher.query({
       sub: sub!,

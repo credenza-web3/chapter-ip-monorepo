@@ -4,7 +4,6 @@ import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ params }) => {
   const fileId = params.fileId;
-  console.log(typeof fileId, fileId);
 
   const trpcClient = createClient({
     trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
