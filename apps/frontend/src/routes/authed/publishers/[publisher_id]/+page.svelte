@@ -46,14 +46,14 @@
   </div>
 
   <h2 class="text-2xl font-semibold mb-4">Products</h2>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
     {#if data.contentItems.length === 0}
       <div class="alert">
         <span>No content here yet.</span>
       </div>
     {:else}
       {#each data.contentItems as item}
-        <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow w-md">
+        <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow card-sm">
           <figure class="px-10 pt-10">
             <div class="avatar placeholder">
               <div class="bg-neutral text-neutral-content rounded-xl w-24">
