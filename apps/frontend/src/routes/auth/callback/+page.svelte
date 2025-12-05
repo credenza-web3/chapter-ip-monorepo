@@ -9,7 +9,9 @@
 
     if (code && state) {
       try {
-        await authStore.exchangeCodeForTokens(code, state, '/authed/purchases')
+        page.url.searchParams.delete('code')
+        page.url.searchParams.delete('state')
+        await authStore.exchangeCodeForTokens(code, state, `/authed/purchases`)
       } catch (error) {
         console.error('Auth callback error:', error)
       }

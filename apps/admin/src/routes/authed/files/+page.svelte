@@ -8,7 +8,6 @@
   const openFile = (id: string) => {
     goto(`/authed/files/${id}`)
   }
-
 </script>
 
 <div class="min-h-xl p-4 card bg-base-100 shadow-md">
