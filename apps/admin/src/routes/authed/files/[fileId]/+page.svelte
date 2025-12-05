@@ -4,45 +4,72 @@
   import { ethers, initProvider } from '@repo/fe-evm-provider'
   import { onMount } from 'svelte'
   import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
+  import { forwardTransaction } from '@repo/fe-services'
 
   let { data } = $props()
-
   const { items } = data.paginatedResponse
+
   let contentContract: any = $state(null)
   let fulltimeLicensePrice = $state(0)
   let onetimeLicensePrice = $state(0)
-  let isFulltimeLicensePrice = $state(false)
+
+  let isFulltimeLicensePriceLoading = $state(false)
   let isOnetimeLicensePriceLoading = $state(false)
+  
 
   const handleUpdateFulltimeLicensePrice = async () => {
-    isFulltimeLicensePrice = true
+    isFulltimeLicensePriceLoading = true
+
     try {
-      const fulltimePrice = BigInt(Math.round(fulltimeLicensePrice * 100))
-      const tokenId = BigInt(items[0].tokenId)
-      
-      await contentContract.setLicensePriceFiat(tokenId, 0, fulltimePrice)
-      const tokenPrice = BigInt(Math.round(fulltimeLicensePrice * 1e18))
-      await contentContract.setLicensePriceToken(tokenId, 0, tokenPrice)
+      const provider = await initProvider(authStore.state.accessToken!)
+      const ethersProvider = new ethers.BrowserProvider(provider)
+      const tokenId = Number(items[0].tokenId)
+
+      const sendTx = async (populatedTx: any) => {
+        const txHash = await forwardTransaction(populatedTx, {
+          token: authStore.state.accessToken!,
+          client_id: import.meta.env.VITE_CLIENT_ID,
+          evm_wss: import.meta.env.VITE_CREDENZA_EVM_WSS,
+        })
+        const receipt = await ethersProvider.waitForTransaction(txHash)
+        if (!receipt) throw new Error('Transaction failed')
+        return receipt
+      }
+      await sendTx(
+        await contentContract.setLicensePriceFiat.populateTransaction(tokenId, '0', fulltimeLicensePrice * 100),
+      )
+      await sendTx(await contentContract.setLicensePriceToken.populateTransaction(tokenId, '0', fulltimeLicensePrice))
     } catch (error) {
       console.error(error)
     } finally {
-      isFulltimeLicensePrice = false
+      isFulltimeLicensePriceLoading = false
     }
   }
 
   const handleUpdateOnetimeLicensePrice = async () => {
     isOnetimeLicensePriceLoading = true
+
     try {
-      const tokenId = BigInt(items[0].tokenId)
-      const fiatPrice = BigInt(Math.round(onetimeLicensePrice * 100))
-      await contentContract.setLicensePriceFiat(tokenId, 2, fiatPrice)
+      const provider = await initProvider(authStore.state.accessToken!)
+      const ethersProvider = new ethers.BrowserProvider(provider)
+      const tokenId = Number(items[0].tokenId)
 
-      const tokenPrice = BigInt(Math.round(onetimeLicensePrice * 1e18))
-      await contentContract.setLicensePriceToken(tokenId, 2, tokenPrice)
-
+      const sendTx = async (populatedTx: any) => {
+        const txHash = await forwardTransaction(populatedTx, {
+          token: authStore.state.accessToken!,
+          client_id: import.meta.env.VITE_CLIENT_ID,
+          evm_wss: import.meta.env.VITE_CREDENZA_EVM_WSS,
+        })
+        const receipt = await ethersProvider.waitForTransaction(txHash)
+        if (!receipt) throw new Error('Transaction failed')
+        return receipt
+      }
+      await sendTx(
+        await contentContract.setLicensePriceFiat.populateTransaction(tokenId, '2', onetimeLicensePrice * 100),
+      )
+      await sendTx(await contentContract.setLicensePriceToken.populateTransaction(tokenId, '2', onetimeLicensePrice))
     } catch (error) {
       console.error(error)
-      
     } finally {
       isOnetimeLicensePriceLoading = false
     }
@@ -100,10 +127,10 @@
             </label>
             <button
               onclick={handleUpdateFulltimeLicensePrice}
-              disabled={isFulltimeLicensePrice || isOnetimeLicensePriceLoading}
+              disabled={isFulltimeLicensePriceLoading || isOnetimeLicensePriceLoading}
               class="btn btn-primary"
             >
-              {#if isFulltimeLicensePrice}
+              {#if isFulltimeLicensePriceLoading}
                 <span class="loading loading-spinner loading-sm"></span>
                 Saving...
               {:else}
@@ -128,7 +155,7 @@
             </label>
             <button
               onclick={handleUpdateOnetimeLicensePrice}
-              disabled={isOnetimeLicensePriceLoading || isFulltimeLicensePrice}
+              disabled={isOnetimeLicensePriceLoading || isFulltimeLicensePriceLoading}
               class="btn btn-primary"
             >
               {#if isOnetimeLicensePriceLoading}
