@@ -107,9 +107,9 @@
 
       <div class="space-y-3">
         {#if isFulltimeLoaded}
-          <div class="flex items-end gap-2">
+          <div class="flex items-end gap-2 justify-between">
             <label class="flex-col" for="fulltime">
-              <span class="label-text">Full time pice ($)</span>
+              <span class="label-text pb-2">Full time pice ($)</span>
               <input
                 id="fulltime"
                 type="number"
@@ -135,9 +135,9 @@
           </div>
         {/if}
         {#if isOnetimeLoaded}
-          <div class="flex items-end gap-2">
+          <div class="flex items-end gap-2 justify-between">
             <label class="flex-col" for="onetime">
-              <span>One time pice ($)</span>
+              <span class="label-text pb-2">One time pice ($)</span>
               <input
                 id="onetime"
                 type="number"
