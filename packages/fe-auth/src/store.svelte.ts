@@ -173,17 +173,26 @@ export function createAuthStore<T>(
     }
   }
 
+  let accessTokenPromise: Promise<string | null> | null = null
   async function getAccessToken(): Promise<string | null> {
     if (state.accessToken) {
       return state.accessToken
     }
 
-    const refreshed = await refreshAccessToken(true)
-    if (refreshed) {
-      return state.accessToken
+    if (!accessTokenPromise) {
+      accessTokenPromise = new Promise(async (resolve) => {
+        const refreshed = await refreshAccessToken(true)
+        if (refreshed) {
+          resolve(state.accessToken)
+        } else {
+          resolve(null)
+        }
+
+        accessTokenPromise = null
+      })
     }
 
-    return null
+    return accessTokenPromise
   }
 
   async function getSubFromToken(): Promise<string | null> {

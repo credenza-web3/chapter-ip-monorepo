@@ -2,8 +2,8 @@
   import { authStore } from '$lib'
   import { ethers, initProvider } from '@repo/fe-evm-provider'
   import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
-  import { modals, type ModalProps } from 'svelte-modals'
-  import { ConfirmModal } from '@repo/ui-components'
+  import { passportStore } from '$lib/passport.store'
+  import { get } from 'svelte/store'
 
   let { data } = $props()
   const CONTENT_CONTRACT = import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS
@@ -25,15 +25,22 @@
   const onBuyLicense = async (tokenId: string, licenseType: string) => {
     const licenseName = licenseType === '0' ? 'Fulltime' : 'Onetime'
     const title = `${licenseName} license purchase`
-    const url = `https://passport-ui.pages.dev/evm?contractAddress=${CONTENT_CONTRACT}&licenseType=${licenseType}&title=${title}&amount=1&contentTokenId=${tokenId}`
 
-    window.open(url, '_blank')
-
-    modals.open<ModalProps & { text: string; redirectTo: string; onClose: () => void }>(ConfirmModal, {
-      text: 'Please complete the purchase in the new window.',
-      redirectTo: '/authed/purchases',
-      onClose: modals.closeAll,
+    get(passportStore)?.openUI('payment', {
+      title,
+      licenses: [
+        {
+          contractAddress: CONTENT_CONTRACT,
+          licenseType,
+          contentTokenId: tokenId,
+          amount: 1,
+        },
+      ],
     })
+
+    // data.passport?.once('payment', (data) => {
+    //   console.log('Payment success', data)
+    // })
   }
 </script>
 
