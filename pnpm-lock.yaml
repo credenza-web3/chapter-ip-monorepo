@@ -284,8 +284,8 @@ importers:
         specifier: ^0.0.5
         version: 0.0.5
       '@credenza3/passport-evm':
-        specifier: ^0.3.9
-        version: 0.3.9(@toruslabs/openlogin@6.2.11(@babel/runtime@7.28.4))
+        specifier: ^0.3.12
+        version: 0.3.12(@toruslabs/openlogin@6.2.11(@babel/runtime@7.28.4))
       '@tailwindcss/vite':
         specifier: ^4.1.17
         version: 4.1.17(vite@7.1.9(@types/node@22.18.8)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(yaml@2.8.1))
@@ -314,6 +314,9 @@ importers:
       '@repo/fe-evm-provider':
         specifier: workspace:*
         version: link:../../packages/fe-provider
+      '@repo/fe-services':
+        specifier: workspace:*
+        version: link:../../packages/services
       '@repo/trpc':
         specifier: workspace:*
         version: link:../../packages/trpc
@@ -872,8 +875,8 @@ packages:
   '@credenza3/evm-provider@0.0.2':
     resolution: {integrity: sha512-gRi2uIJvzEti9z/c5bUqlSCBlUW28OhGc+Q4TmodfCM2Ob+5gSnDyX3sj8impg0l2pHsC+tvd7x9YNGCwrG6sQ==}
 
-  '@credenza3/passport-evm@0.3.9':
-    resolution: {integrity: sha512-8/lSh+SpgffYc5/pITAqTSJHD10rWJ4Oi8ZqZ96yOTgbkdG4hVMAxLEnlG9lcnmeMXKzCdRJC1nGoToxnqqa1Q==}
+  '@credenza3/passport-evm@0.3.12':
+    resolution: {integrity: sha512-CwtVznF5mU2EYWsH0qbMU2xA7Zoh68vxxQOZYZmgdkubAKj0XHZSvHgI7NfW5eUAMayZGnIfqpa8NPKOMB0D+g==}
     engines: {node: '>=20.10.0', pnpm: '>=9'}
     peerDependencies:
       '@toruslabs/openlogin': ^6.1.0
@@ -7273,7 +7276,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@credenza3/passport-evm@0.3.9(@toruslabs/openlogin@6.2.11(@babel/runtime@7.28.4))':
+  '@credenza3/passport-evm@0.3.12(@toruslabs/openlogin@6.2.11(@babel/runtime@7.28.4))':
     dependencies:
       '@credenza3/contracts': 0.0.5
       '@credenza3/core-web-evm-ext': 0.0.10
