@@ -66,6 +66,5 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
     })
   }
 
-  console.log(tokens)
   return tokens
 }
