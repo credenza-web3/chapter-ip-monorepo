@@ -52,7 +52,7 @@ export class CommonLicenseService {
         break
       }
       case 1: {
-       const expiresAt = (await this.licenseNftContract.getTokenLicenseExpiresAt(licenseTokenId)) as number
+        const expiresAt = (await this.licenseNftContract.getTokenLicenseExpiresAt(licenseTokenId)) as number
         if (expiresAt < Date.now() / 1000) {
           throw new Error('License expired')
         }
