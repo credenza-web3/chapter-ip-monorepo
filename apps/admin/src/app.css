@@ -2,7 +2,7 @@
 @source "../src";
 @source "../../../packages/ui/components/";
 
-@plugin "daisyui"{themes: light --default, dark --prefersdark, wireframe;};
+@plugin "daisyui"{themes: light --default, dark --prefersdark, wireframe};
 
 @theme {
   --font-family-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;

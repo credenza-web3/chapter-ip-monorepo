@@ -1,8 +1,9 @@
 import { authStore } from '$lib'
 import { ethers, initProvider, getSigner } from '@repo/fe-evm-provider'
 import { abi as license_abi } from '@credenza3/contracts/artifacts/LicenseNftContract.json'
+import { createClient } from '@repo/trpc/client'
 
-export const getTokensWithMetadata = async (accessToken: string) => {
+export const getTokensWithMetadata = async (accessToken: string, trpcClient: ReturnType<typeof createClient>) => {
   await initProvider(accessToken)
   const signer = await getSigner()
   const licenseContract = new ethers.Contract(
@@ -22,8 +23,18 @@ export const getTokensWithMetadata = async (accessToken: string) => {
 
   const tokens = []
 
+  const { items: blockedLicenses } = await trpcClient.licenses.findBlockedLicenses.query({
+    subEvmAddress: userAddress,
+  })
+
+  const blockedLicensesIds = blockedLicenses.map((blockedLicense) => blockedLicense.tokenId)
+
   for (let i = 0; i < balanceNum; i++) {
     const licenseTokenId = await licenseContract.tokenOfOwnerByIndex(userAddress, i)
+
+    if (blockedLicensesIds.includes(licenseTokenId)) {
+      continue
+    }
     // const contentTokenId = await licenseContract.getTokenLicenseContentNftId(Number(licenseTokenId))
 
     // const metaUri = await licenseContract.tokenURI(contentTokenId)
@@ -32,7 +43,8 @@ export const getTokensWithMetadata = async (accessToken: string) => {
     // const metadata = await response.json()
 
     tokens.push({
-      licenseTokenId: Number(licenseTokenId),
+      licenseTokenId,
+      isBlocked: blockedLicensesIds.includes(licenseTokenId),
       // contentTokenId: Number(contentTokenId),
       metadata: {
         name: 'image_2025-11-19_08-53-56.png',

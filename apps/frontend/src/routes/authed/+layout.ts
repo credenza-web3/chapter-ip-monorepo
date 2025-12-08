@@ -1,6 +1,7 @@
 import { browser } from '$app/environment'
+import { goto } from '$app/navigation'
 import { authStore } from '$lib'
-import { redirect } from '@sveltejs/kit'
+import { createClient } from '@repo/trpc/client'
 
 export const prerender = false
 export const ssr = false
@@ -17,10 +18,19 @@ export const load = async () => {
   const accessToken = await authStore.getAccessToken()
 
   if (!accessToken) {
-    throw redirect(302, `/`)
+    return goto(`/`)
   }
+
+  const trpcClient = createClient({
+    trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
+    getAccessTokenFn: () => accessToken,
+  })
+
+  localStorage.setItem('credenza_web_sdk:access_token', accessToken)
+  localStorage.setItem('credenza_web_sdk:login_provider', 'oauth')
 
   return {
     accessToken,
+    trpcClient,
   }
 }

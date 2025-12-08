@@ -1,21 +1,15 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
-  import { authStore } from '$lib'
-  import { createClient } from '@repo/trpc/client'
   import { notify, ToastType } from '@repo/ui-components'
 
   let publisherName = $state('')
   let loading = $state(false)
+  let { data } = $props()
 
   async function handleSubmit() {
     try {
       loading = true
-      const trpcClient = createClient({
-        trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
-        getAccessTokenFn: () => authStore.state.accessToken!,
-      })
-
-      await trpcClient.publishers.setPublisher.mutate({
+      await data.trpcClient!.publishers.setPublisher.mutate({
         title: publisherName,
       })
 

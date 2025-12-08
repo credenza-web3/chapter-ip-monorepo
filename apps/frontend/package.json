@@ -47,6 +47,7 @@
   },
   "dependencies": {
     "@credenza3/contracts": "^0.0.5",
+    "@credenza3/passport-evm": "^0.3.9",
     "@tailwindcss/vite": "^4.1.17",
     "daisyui": "^5.5.5",
     "svelte-modals": "^2.0.1",

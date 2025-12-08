@@ -1,14 +1,42 @@
 <script lang="ts">
   import { authStore } from '$lib'
   import { afterNavigate, beforeNavigate } from '$app/navigation'
-  import { createClient } from '@repo/trpc/client'
   import { notify, ToastType } from '@repo/ui-components'
   import { mintWithPrices, uploadFileToBucket } from './helper'
+  import { createClient } from '@repo/trpc/client'
 
   let isOver = $state(false)
   let loading = $state(false)
   let fileInput: HTMLInputElement | null = $state(null)
   let uploaded: File | null = $state(null)
+  let isLifetimeLicense = $state(false)
+  let isOneTimeLicense = $state(false)
+  let lifetimePrice = $state(0)
+  let oneTimePrice = $state(0)
+  let isFormValid = $state(false)
+
+  let { data } = $props()
+
+  beforeNavigate(() => {
+    loading = true
+  })
+
+  afterNavigate(() => {
+    loading = false
+  })
+
+  $effect(() => {
+    if (!isLifetimeLicense) lifetimePrice = 0
+    if (!isOneTimeLicense) oneTimePrice = 0
+    isFormValid = (isLifetimeLicense && lifetimePrice > 0) || (isOneTimeLicense && oneTimePrice > 0)
+  })
+
+  function resetCheckboxes() {
+    isLifetimeLicense = false
+    isOneTimeLicense = false
+    lifetimePrice = 0
+    oneTimePrice = 0
+  }
 
   beforeNavigate(() => {
     loading = true
@@ -38,10 +66,12 @@
     }
 
     uploaded = file
+    resetCheckboxes()
   }
 
   const onClear = () => {
     uploaded = null
+    resetCheckboxes()
     if (fileInput) fileInput.value = ''
   }
 
@@ -58,24 +88,24 @@
         getAccessTokenFn: () => authStore.state.accessToken!,
       })
 
-      const tokenId = await mintWithPrices(authStore.state.accessToken!)
+      const tokenId = await mintWithPrices(authStore.state.accessToken!, lifetimePrice, oneTimePrice)
       const { url, key } = await trpcClient.files.createContentUploadUrl.mutate({
         tokenId,
         mimetype: uploaded.type,
       })
       await uploadFileToBucket(uploaded, url)
-      await trpcClient.files.registerContent.mutate({
+      await data.trpcClient!.files.registerContent.mutate({
         tokenId,
         key,
       })
-      await trpcClient.files.uploadMetadata.mutate({
+      await data.trpcClient!.files.uploadMetadata.mutate({
         tokenId,
         metadata: {
           name: uploaded.name,
           size: uploaded.size,
           type: uploaded.type,
           key,
-          image: "https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/chapter_ip.png"
+          image: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/chapter_ip.png',
         },
       })
 
@@ -94,7 +124,10 @@
   }
 </script>
 
-<div class="mx-10">
+<div class="p-6 min-h-xl card bg-base-100 shadow-md">
+  <div class="mb-12 text-center">
+    <h1 class="text-4xl font-light text-gray-900">Upload File</h1>
+  </div>
   {#if loading}
     <div class="flex items-center justify-center h-16">
       <span class="loading loading-dots loading-lg"></span>
@@ -140,8 +173,49 @@
       <input type="file" class="hidden" bind:this={fileInput} onchange={handleInput} />
     </div>
     {#if uploaded}
-      <div class="flex gap-10 mt-3">
-        <button class="btn btn-outline" onclick={onSubmitClick} disabled={loading}>Upload</button>
+      <div class="mt-6 space-y-4">
+        <fieldset class="fieldset bg-base-100 rounded-box border p-4 max-w-lg">
+          <legend class="fieldset-legend">Choose License Type</legend>
+          <label class="label justify-between">
+            <div class="space-x-2">
+              <input type="checkbox" bind:checked={isLifetimeLicense} class="checkbox" />
+              <span class="label-text">Lifetime License</span>
+            </div>
+            {#if isLifetimeLicense}
+              <input
+                type="number"
+                class="input validator max-w-xs"
+                required
+                placeholder="Enter the price in dollars."
+                min="1"
+                bind:value={lifetimePrice}
+              />
+            {/if}
+          </label>
+          <label class="label justify-between">
+            <div class="space-x-2">
+              <input type="checkbox" bind:checked={isOneTimeLicense} class="checkbox" />
+              <span class="label-text">One Time License</span>
+            </div>
+
+            {#if isOneTimeLicense}
+              <input
+                type="number"
+                class="input validator max-w-xs"
+                required
+                placeholder="Enter the price in dollars."
+                min="1"
+                bind:value={oneTimePrice}
+              />
+            {/if}
+          </label>
+        </fieldset>
+
+        <div class="flex gap-10 mt-3">
+          <button class="btn btn-outline" onclick={onSubmitClick} disabled={loading} class:hidden={!isFormValid}
+            >Upload</button
+          >
+        </div>
       </div>
     {/if}
   {/if}
