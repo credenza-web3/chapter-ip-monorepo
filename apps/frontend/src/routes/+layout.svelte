@@ -19,7 +19,7 @@
 <Toast />
 <div class="min-h-screen overflow-x-hidden flex flex-col">
   <Header {authStore} {menuItems} />
-  <main class="space-y-0 flex-1">
+  <main class="space-y-0 flex-1 md:p-6 p-2">
     {@render children?.()}
   </main>
   <Footer />
