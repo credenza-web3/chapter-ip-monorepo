@@ -19,7 +19,7 @@ export class BlockedLicenseService extends CommonModelService<BlockedLicense> {
     result.query = {
       ...result.query,
       ...(opts.sub && { sub: opts.sub }),
-      ...(opts.subEvmAddress && { subEvmAddress: opts.subEvmAddress }),
+      ...(opts.subEvmAddress && { subEvmAddress: opts.subEvmAddress.toLowerCase() }),
       ...(opts.tokenId && { tokenId: opts.tokenId }),
     }
     return result

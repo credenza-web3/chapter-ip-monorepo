@@ -26,7 +26,6 @@ export class LicenseRouter {
     @Ctx() ctx: TAppContextWithTokenPayload,
     @Input() input: TFindBlockedLicensesInput,
   ): Promise<TFindBlockedLicensesOutput> {
-    if (input.subEvmAddress) input.subEvmAddress = input.subEvmAddress.toLowerCase()
     const paginationOptions = this.blockedLicenseService.buildPaginationOptions(input)
     return await this.blockedLicenseService.paginate<TFindBlockedLicensesOutput['items'][0]>(paginationOptions)
   }
