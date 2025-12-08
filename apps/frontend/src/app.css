@@ -1,14 +1,16 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 @source "../src";
 @source "../../../packages/ui/components/";
 
-@plugin "daisyui" {
-  themes:
-    light --default,
-    dark --prefersdark,
-    wireframe;
+@plugin "daisyui"{themes: light --default, dark --prefersdark, wireframe};
+
+.shadow-lg {
+  --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
 }
 
-@theme {
-  --font-family-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+.shadow-xl {
+  --tw-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
 }
+
