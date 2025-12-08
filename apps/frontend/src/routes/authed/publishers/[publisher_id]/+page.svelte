@@ -1,12 +1,19 @@
 <script lang="ts">
   import { authStore } from '$lib'
-  import { ethers, initProvider } from '@repo/fe-evm-provider'
+  import { ethers, getSigner, initProvider } from '@repo/fe-evm-provider'
   import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
+  import { abi as license_abi } from '@credenza3/contracts/artifacts/LicenseNftContract.json'
   import { passportStore } from '$lib/passport.store'
+  import { forwardTransaction } from '@repo/fe-services'
   import { get } from 'svelte/store'
+  import { goto } from '$app/navigation'
 
   let { data } = $props()
+
+  let loading = $state(false);
+
   const CONTENT_CONTRACT = import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS
+  const LICENSE_CONTRACT = import.meta.env.VITE_EVM_LICENSE_NFT_CONTRACT_ADDRESS
 
   const getTokenPrice = async (tokenId: string) => {
     const provider = await initProvider(authStore.state.accessToken!)
@@ -23,24 +30,53 @@
   }
 
   const onBuyLicense = async (tokenId: string, licenseType: string) => {
+    const pass = get(passportStore);
     const licenseName = licenseType === '0' ? 'Fulltime' : 'Onetime'
     const title = `${licenseName} license purchase`
 
-    get(passportStore)?.openUI('payment', {
-      title,
-      licenses: [
-        {
-          contractAddress: CONTENT_CONTRACT,
-          licenseType,
-          contentTokenId: tokenId,
-          amount: 1,
-        },
-      ],
-    })
+    pass?.openUI('payment', {
+        title,
+        licenses: [
+          {
+            contractAddress: CONTENT_CONTRACT,
+            licenseContractAddress: LICENSE_CONTRACT,
+            licenseType,
+            contentTokenId: tokenId,
+            amount: 1,
+          },
+        ],
+      })
 
-    // data.passport?.once('payment', (data) => {
-    //   console.log('Payment success', data)
-    // })
+    pass?.once('PAYMENT', async (data: { results: { items: Array<{ outcome: { voucher: string, sig: string } }> } }) => {
+      console.log('Payment success', data)
+      try {
+        loading = true
+        const {voucher, sig} = data.results.items[0].outcome
+        console.log('Voucher:', voucher);
+        console.log('Signature:', sig);
+
+        const provider = await initProvider(authStore.state.accessToken!)
+        const signer = await getSigner()
+        const userAddress = await signer.getAddress()
+        const licenseContract = new ethers.Contract(LICENSE_CONTRACT, license_abi, signer)
+        const tx = await licenseContract.redeem.populateTransaction(userAddress, voucher, sig)
+
+        const txHash = await forwardTransaction(tx, {
+          token: authStore.state.accessToken!,
+          client_id: import.meta.env.VITE_CLIENT_ID,
+          evm_wss: import.meta.env.VITE_CREDENZA_EVM_WSS,
+        })
+
+        const ethersProvider = new ethers.BrowserProvider(provider)
+        const receipt = await ethersProvider.waitForTransaction(txHash)
+        if (!receipt) throw new Error('Transaction failed')
+
+        goto('/authed/purchases');
+      } finally {
+        loading = false;
+      }
+      
+    })
   }
 </script>
 
@@ -52,6 +88,11 @@
     </ul>
   </div>
 
+  {#if loading}
+    <div class="flex items-center justify-center h-16">
+      <span class="loading loading-dots loading-lg"></span>
+    </div>
+  {:else}
   <h2 class="text-2xl font-semibold mb-4">Products</h2>
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
     {#if data.contentItems.length === 0}
@@ -93,4 +134,5 @@
       {/each}
     {/if}
   </div>
+  {/if}
 </div>

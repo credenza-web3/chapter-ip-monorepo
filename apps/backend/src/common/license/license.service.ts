@@ -43,19 +43,19 @@ export class CommonLicenseService {
     const licenseType = Number(await this.licenseNftContract.getTokenLicenseType(licenseTokenId))
     switch (licenseType) {
       case 2: {
-        const expiresAt = (await this.licenseNftContract.getTokenLicenseExpiresAt(licenseTokenId)) as number
-        if (expiresAt < Date.now() / 1000) {
-          throw new Error('License expired')
-        }
-        break
-      }
-      case 1: {
         const blockedLicenseModel = this.blockedLicenseService.getModel()
         const blocked = await blockedLicenseModel.findOne({ tokenId: licenseTokenId, subEvmAddress, sub })
         if (blocked) {
           throw new Error('License has been already used')
         }
         await blockedLicenseModel.create({ tokenId: licenseTokenId, subEvmAddress, sub })
+        break
+      }
+      case 1: {
+       const expiresAt = (await this.licenseNftContract.getTokenLicenseExpiresAt(licenseTokenId)) as number
+        if (expiresAt < Date.now() / 1000) {
+          throw new Error('License expired')
+        }
         break
       }
       case 0: {

@@ -2,12 +2,18 @@
   let { data } = $props()
 
   const onGetFileUrl = async (key: string, licenseTokenId: string) => {
+    console.log(key, licenseTokenId);
     try {
       const { url } = await data.trpcClient!.files.getContentLink.query({
         licenseTokenId,
         key,
       })
-      window.open(url, '_blank')
+
+
+      const newWindow = window.open('', '_blank');
+      if (newWindow) {
+        newWindow.location.href = url;
+      }
     } catch (error) {
       console.error('Error fetching file URL:', error)
     }
@@ -37,7 +43,7 @@
                 {:else}
                   <button
                     class="btn btn-sm btn-outline"
-                    onclick={() => onGetFileUrl(purchase.metadata.key, purchase.licenseTokenId)}
+                    onclick={() => onGetFileUrl(purchase.metadata.key, String(purchase.licenseTokenId))}
                   >
                     Get file link
                   </button>
