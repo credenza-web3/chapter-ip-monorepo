@@ -18,9 +18,9 @@
   <h1 class="text-4xl font-bold mb-8">My Purchases</h1>
 
   {#if data.purchases.length === 0}
-    <div class="alert">
+    <div class="alert p-7">
       <span>You haven't made any purchases yet.</span>
-      <a href="/authed/publishers" class="btn btn-sm btn-primary">Browse Publishers</a>
+      <a href="/authed/publishers" class="btn btn-primary py-6 md:py-0">Browse Publishers</a>
     </div>
   {:else}
     <div class="grid grid-cols-1 gap-4">

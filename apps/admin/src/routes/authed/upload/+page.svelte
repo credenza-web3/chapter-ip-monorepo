@@ -1,6 +1,6 @@
 <script lang="ts">
   import { authStore } from '$lib'
-  import { afterNavigate, beforeNavigate } from '$app/navigation'
+  import { afterNavigate, beforeNavigate, goto } from '$app/navigation'
   import { notify, ToastType } from '@repo/ui-components'
   import { mintWithPrices, uploadFileToBucket } from './helper'
   import { createClient } from '@repo/trpc/client'
@@ -17,13 +17,8 @@
 
   let { data } = $props()
 
-  beforeNavigate(() => {
-    loading = true
-  })
-
-  afterNavigate(() => {
-    loading = false
-  })
+  beforeNavigate(() => loading = true)
+  afterNavigate(() => loading = false)
 
   $effect(() => {
     if (!isLifetimeLicense) lifetimePrice = 0
@@ -37,14 +32,6 @@
     lifetimePrice = 0
     oneTimePrice = 0
   }
-
-  beforeNavigate(() => {
-    loading = true
-  })
-
-  afterNavigate(() => {
-    loading = false
-  })
 
   const maximumSize = 100 * 1024 * 1024 // 100MB
 
@@ -111,6 +98,7 @@
 
       notify('File uploaded successfully', ToastType.SUCCESS)
       onClear()
+      goto('/authed/files')
     } catch (error) {
       console.error('Error uploading file:', error)
       let errorMessage = 'Failed to upload file.'
