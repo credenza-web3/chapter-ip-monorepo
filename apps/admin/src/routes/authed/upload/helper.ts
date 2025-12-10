@@ -36,13 +36,13 @@ export const mintWithPrices = async (
     '',
     '',
     lifetimePrice * 100,
-    lifetimePrice,
+    lifetimePrice * 10 ** 6, // cred decimals (6 decimals)
     0,
     0,
     0,
     0,
     onetimePrice * 100,
-    onetimePrice,
+    onetimePrice * 10 ** 6, // cred decimals
     0,
   )
 

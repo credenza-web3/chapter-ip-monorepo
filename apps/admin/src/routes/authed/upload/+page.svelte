@@ -116,95 +116,90 @@
   <div class="mb-12 text-center">
     <h1 class="text-4xl font-light text-gray-900">Upload File</h1>
   </div>
-  {#if loading}
-    <div class="flex items-center justify-center h-16">
-      <span class="loading loading-dots loading-lg"></span>
-    </div>
-  {:else}
-    <div
-      class={`mt-10 bg-white h-32 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-gray-500 text-sm cursor-pointer transition ${
-        isOver ? 'border-primary bg-white' : 'border-gray-300'
-      }`}
-      role="button"
-      tabindex="0"
-      aria-label="Upload or drag a file"
-      ondragover={(e) => {
-        e.preventDefault()
-        isOver = true
-      }}
-      ondragleave={() => (isOver = false)}
-      ondrop={handleDrop}
-      onclick={() => fileInput?.click()}
-      onkeydown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') fileInput?.click()
-      }}
-    >
-      {#if uploaded}
-        <div class="flex flex-col items-center">
-          <span class="mb-2">📄 {uploaded.name}</span>
-          <button onclick={onClear} class="btn btn-xs btn-outline" type="button">Clear</button>
-        </div>
-      {:else}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="w-8 h-8 mb-2"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
-        <span class="text-center mb-2">Upload or drag a PDF file</span>
-        <span class="text-xs text-stone-400">Max size: 100MB</span>
-      {/if}
 
-      <input type="file" class="hidden" bind:this={fileInput} onchange={handleInput} />
-    </div>
+  <div
+    class={`mt-10 bg-white h-32 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-gray-500 text-sm cursor-pointer transition ${
+      isOver ? 'border-primary bg-white' : 'border-gray-300'
+    }`}
+    role="button"
+    tabindex="0"
+    aria-label="Upload or drag a file"
+    ondragover={(e) => {
+      e.preventDefault()
+      isOver = true
+    }}
+    ondragleave={() => (isOver = false)}
+    ondrop={handleDrop}
+    onclick={() => fileInput?.click()}
+    onkeydown={(e) => {
+      if (e.key === 'Enter' || e.key === ' ') fileInput?.click()
+    }}
+  >
     {#if uploaded}
-      <div class="mt-6 space-y-4">
-        <fieldset class="fieldset bg-base-100 rounded-box border p-4 max-w-lg">
-          <legend class="fieldset-legend">Choose License Type</legend>
-          <label class="label justify-between">
-            <div class="space-x-2">
-              <input type="checkbox" bind:checked={isLifetimeLicense} class="checkbox" />
-              <span class="label-text">Lifetime License</span>
-            </div>
-            {#if isLifetimeLicense}
-              <input
-                type="number"
-                class="input validator max-w-xs"
-                required
-                placeholder="Enter the price in dollars."
-                min="1"
-                bind:value={lifetimePrice}
-              />
-            {/if}
-          </label>
-          <label class="label justify-between">
-            <div class="space-x-2">
-              <input type="checkbox" bind:checked={isOneTimeLicense} class="checkbox" />
-              <span class="label-text">One Time License</span>
-            </div>
-
-            {#if isOneTimeLicense}
-              <input
-                type="number"
-                class="input validator max-w-xs"
-                required
-                placeholder="Enter the price in dollars."
-                min="1"
-                bind:value={oneTimePrice}
-              />
-            {/if}
-          </label>
-        </fieldset>
-
-        <div class="flex gap-10 mt-3">
-          <button class="btn btn-outline" onclick={onSubmitClick} disabled={loading} class:hidden={!isFormValid}
-            >Upload</button
-          >
-        </div>
+      <div class="flex flex-col items-center">
+        <span class="mb-2">📄 {uploaded.name}</span>
+        <button onclick={onClear} class="btn btn-xs btn-outline" type="button">Clear</button>
       </div>
+    {:else}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="w-8 h-8 mb-2"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      <span class="text-center mb-2">Upload or drag a PDF file</span>
+      <span class="text-xs text-stone-400">Max size: 100MB</span>
     {/if}
+
+    <input type="file" class="hidden" bind:this={fileInput} onchange={handleInput} />
+  </div>
+  {#if uploaded}
+    <div class="mt-6 space-y-4">
+      <fieldset class="fieldset bg-base-100 rounded-box border p-4 max-w-lg">
+        <legend class="fieldset-legend">Choose License Type</legend>
+        <label class="label justify-between">
+          <div class="space-x-2">
+            <input type="checkbox" bind:checked={isLifetimeLicense} class="checkbox" />
+            <span class="label-text">Lifetime License</span>
+          </div>
+          {#if isLifetimeLicense}
+            <input
+              type="number"
+              class="input validator max-w-xs"
+              required
+              placeholder="Enter the price in dollars."
+              min="1"
+              bind:value={lifetimePrice}
+            />
+          {/if}
+        </label>
+        <label class="label justify-between">
+          <div class="space-x-2">
+            <input type="checkbox" bind:checked={isOneTimeLicense} class="checkbox" />
+            <span class="label-text">One Time License</span>
+          </div>
+
+          {#if isOneTimeLicense}
+            <input
+              type="number"
+              class="input validator max-w-xs"
+              required
+              placeholder="Enter the price in dollars."
+              min="1"
+              bind:value={oneTimePrice}
+            />
+          {/if}
+        </label>
+      </fieldset>
+
+      <div class="flex gap-10 mt-3">
+        <button class="btn btn-outline" onclick={onSubmitClick} disabled={loading} class:hidden={!isFormValid}
+          >Upload</button
+        >
+      </div>
+    </div>
   {/if}
 </div>

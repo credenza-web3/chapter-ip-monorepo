@@ -43,11 +43,13 @@
   const handleUpdateFulltimeLicensePrice = async () => {
     isFulltimeLicensePriceLoading = true
     try {
-      const tokenId = Number(items[0].tokenId)
+      const tokenId = data.tokenId
       await sendTx(
         await contentContract.setLicensePriceFiat.populateTransaction(tokenId, '0', fulltimeLicensePrice * 100),
       )
-      await sendTx(await contentContract.setLicensePriceToken.populateTransaction(tokenId, '0', fulltimeLicensePrice))
+      await sendTx(
+        await contentContract.setLicensePriceToken.populateTransaction(tokenId, '0', fulltimeLicensePrice * 10 ** 6),
+      )
       notify('Full-time license price updated', ToastType.SUCCESS)
     } catch {
       notify('Failed to update license prices', ToastType.FAIL)
@@ -59,11 +61,13 @@
   const handleUpdateOnetimeLicensePrice = async () => {
     isOnetimeLicensePriceLoading = true
     try {
-      const tokenId = Number(items[0].tokenId)
+      const tokenId = data.tokenId
       await sendTx(
         await contentContract.setLicensePriceFiat.populateTransaction(tokenId, '2', onetimeLicensePrice * 100),
       )
-      await sendTx(await contentContract.setLicensePriceToken.populateTransaction(tokenId, '2', onetimeLicensePrice))
+      await sendTx(
+        await contentContract.setLicensePriceToken.populateTransaction(tokenId, '2', onetimeLicensePrice * 10 ** 6),
+      )
       notify('One-time license price updated', ToastType.SUCCESS)
     } catch {
       notify('Failed to update license prices', ToastType.FAIL)

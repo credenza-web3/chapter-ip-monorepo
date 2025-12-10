@@ -1,4 +1,3 @@
-import { authStore } from '$lib'
 import { ethers, initProvider, getSigner } from '@repo/fe-evm-provider'
 import { abi as license_abi } from '@credenza3/contracts/artifacts/LicenseNftContract.json'
 import { createClient } from '@repo/trpc/client'
@@ -22,36 +21,48 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
   const balanceNum = Number(balance)
 
   const tokens = []
-
   const { items: blockedLicenses } = await trpcClient.licenses.findBlockedLicenses.query({
     subEvmAddress: userAddress,
   })
 
   const blockedLicensesIds = blockedLicenses.map((blockedLicense) => blockedLicense.tokenId)
-
+  let metaUris: Record<
+    string,
+    {
+      name: string
+      size: number
+      type: string
+      key: string
+    }
+  > = {}
   for (let i = 0; i < balanceNum; i++) {
     const licenseTokenId = await licenseContract.tokenOfOwnerByIndex(userAddress, i)
-
-    if (blockedLicensesIds.includes(licenseTokenId)) {
+    const contentTokenId = (await licenseContract.getTokenLicenseContentNftId(String(licenseTokenId))).toString()
+    if (!Number(contentTokenId)) {
       continue
     }
-    // const contentTokenId = await licenseContract.getTokenLicenseContentNftId(Number(licenseTokenId))
+    const licenseType = (await licenseContract.getTokenLicenseType(String(licenseTokenId))).toString()
+    const metaUri = await contentContract.tokenURI(String(contentTokenId))
 
-    // const metaUri = await licenseContract.tokenURI(contentTokenId)
+    let metadata: {
+      name: string
+      size: number
+      type: string
+      key: string
+    } = metaUris[metaUri]
 
-    // const response = await fetch(metaUri)
-    // const metadata = await response.json()
+    if (!metaUris[metaUri]) {
+      const response = await fetch(metaUri)
+      metadata = await response.json()
+      metaUris[metaUri] = metadata
+    }
 
     tokens.push({
       licenseTokenId,
-      isBlocked: blockedLicensesIds.includes(licenseTokenId),
-      // contentTokenId: Number(contentTokenId),
-      metadata: {
-        name: 'image_2025-11-19_08-53-56.png',
-        size: 81682,
-        type: 'image/png',
-        key: '8.png',
-      },
+      isBlocked: blockedLicensesIds.includes(String(licenseTokenId)),
+      contentTokenId: Number(contentTokenId),
+      metadata,
+      licenseType,
     })
   }
 

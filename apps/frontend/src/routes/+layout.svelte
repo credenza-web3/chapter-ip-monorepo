@@ -6,6 +6,7 @@
   import { Modals } from 'svelte-modals'
 
   let { children } = $props()
+
   const menuItems = [
     { label: 'Home', href: '/authed/purchases' },
     { label: 'Publishers', href: '/authed/publishers' },

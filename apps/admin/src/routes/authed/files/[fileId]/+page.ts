@@ -18,5 +18,5 @@ export const load: PageLoad = async ({ params }) => {
   })
   const tokenId = paginatedResponse.items[0].tokenId
 
-  return { paginatedResponse }
+  return { paginatedResponse, tokenId }
 }
