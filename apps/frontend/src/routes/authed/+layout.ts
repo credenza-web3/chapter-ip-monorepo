@@ -1,6 +1,7 @@
 import { browser } from '$app/environment'
 import { goto } from '$app/navigation'
 import { authStore } from '$lib'
+import { getSigner, initProvider } from '@repo/fe-evm-provider'
 import { createClient } from '@repo/trpc/client'
 
 export const prerender = false
@@ -29,8 +30,14 @@ export const load = async () => {
   localStorage.setItem('credenza_web_sdk:access_token', accessToken)
   localStorage.setItem('credenza_web_sdk:login_provider', 'oauth')
 
+  initProvider(accessToken )
+  const signer = await getSigner()
+  const userAddress = await signer.getAddress()
+
   return {
     accessToken,
     trpcClient,
+    userAddress,
   }
 }
+

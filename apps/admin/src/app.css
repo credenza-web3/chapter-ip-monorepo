@@ -7,3 +7,12 @@
 @theme {
   --font-family-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
 }
+
+.input.validator:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.input.validator {
+  outline: none !important;
+}
