@@ -17,8 +17,8 @@
 
   let { data } = $props()
 
-  beforeNavigate(() => loading = true)
-  afterNavigate(() => loading = false)
+  beforeNavigate(() => (loading = true))
+  afterNavigate(() => (loading = false))
 
   $effect(() => {
     if (!isLifetimeLicense) lifetimePrice = 0
@@ -33,7 +33,7 @@
     oneTimePrice = 0
   }
 
-  const maximumSize = 100 * 1024 * 1024 // 100MB
+  const maximumSize = 1 * 1024 * 1024 * 1024 // 1GB
 
   function handleDrop(event: DragEvent) {
     event.preventDefault()
@@ -47,7 +47,7 @@
     if (!file) return
 
     if (file.size > maximumSize) {
-      alert('Selected file is too big. Maximum 100MB.')
+      alert('Selected file is too big. Maximum size is 1GB.')
       if (target) target.value = ''
       return
     }
@@ -150,8 +150,8 @@
       >
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
       </svg>
-      <span class="text-center mb-2">Upload or drag a PDF file</span>
-      <span class="text-xs text-stone-400">Max size: 100MB</span>
+      <span class="text-center mb-2">Upload or drag a file</span>
+      <span class="text-xs text-stone-400">All file types supported — Max size: 1GB</span>
     {/if}
 
     <input type="file" class="hidden" bind:this={fileInput} onchange={handleInput} />
@@ -159,18 +159,18 @@
   {#if uploaded}
     <div class="mt-6 space-y-4">
       <fieldset class="fieldset bg-base-100 rounded-box border p-4 max-w-lg">
-        <legend class="fieldset-legend">Choose License Type</legend>
+        <legend class="fieldset-legend">Choose License Type  <span class="text-[10px] opacity-50">(set license prices in (USD))</span></legend>
         <label class="label justify-between">
           <div class="space-x-2">
             <input type="checkbox" bind:checked={isLifetimeLicense} class="checkbox" />
-            <span class="label-text">Lifetime License</span>
+            <span class="label-text">Lifetime License (USD)</span>
           </div>
           {#if isLifetimeLicense}
             <input
               type="number"
               class="input validator max-w-xs"
               required
-              placeholder="Enter the price in dollars."
+              placeholder="Enter the price in (USD)."
               min="1"
               bind:value={lifetimePrice}
             />
@@ -179,7 +179,7 @@
         <label class="label justify-between">
           <div class="space-x-2">
             <input type="checkbox" bind:checked={isOneTimeLicense} class="checkbox" />
-            <span class="label-text">One Time License</span>
+            <span class="label-text">One Time License (USD)</span>
           </div>
 
           {#if isOneTimeLicense}
@@ -187,7 +187,7 @@
               type="number"
               class="input validator max-w-xs"
               required
-              placeholder="Enter the price in dollars."
+              placeholder="Enter the price in (USD)."
               min="1"
               bind:value={oneTimePrice}
             />
