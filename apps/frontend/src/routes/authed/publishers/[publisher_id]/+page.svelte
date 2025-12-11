@@ -36,11 +36,6 @@
 
     pass?.openUI('payment', {
       title,
-      payments: {
-        credenzaStoredValue: {
-          disabled: true,
-        },
-      },
 
       licenses: [
         {
@@ -55,9 +50,12 @@
 
     pass?.once(
       'PAYMENT',
-      async (data: { results: { items: Array<{ outcome: { voucher: string; sig: string } }> } }) => {
+      async (data: { type: string, results: { items: Array<{ outcome: { voucher: string; sig: string } }> } }) => {
+        if (data.type !== "STRIPE") return goto('/authed/purchases');
+
         try {
           loading = true
+          if (!data.results.items[0].outcome) return;
           const { voucher, sig } = data.results.items[0].outcome
 
           const provider = await initProvider(authStore.state.accessToken!)
