@@ -1,5 +1,5 @@
 <script lang="ts">
-  let { purchase, trpcClient, onBlockFile } = $props()
+  let {purchase, trpcClient, onBlockFile } = $props()
 
   let loading = $state(false)
   const onGetFileUrl = async () => {
@@ -27,8 +27,8 @@
 </script>
 
 <div class="card bg-base-100 shadow-lg">
-  <div class="card-body">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+  <div class="card-body p-1">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center md:gap-8 gap-0">
       <div class="flex-1">
         <h3 class="card-title">{purchase.metadata.name}</h3>
       </div>

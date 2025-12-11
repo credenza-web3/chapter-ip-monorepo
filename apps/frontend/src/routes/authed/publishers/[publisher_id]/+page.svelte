@@ -104,7 +104,7 @@
         </div>
       {:else}
         {#each data.contentItems as item}
-          <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow card-sm">
+          <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow card-sm border border-gray-200">
             <figure class="px-10 pt-10">
               <div class="avatar placeholder">
                 <div class="bg-neutral text-neutral-content rounded-xl w-24">

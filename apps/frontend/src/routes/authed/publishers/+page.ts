@@ -4,6 +4,5 @@ export const load = async ({ parent }) => {
   const { items } = await trpcClient!.publishers.findPublishers.query({
     limit: '10',
   })
-
   return { publishers: items }
 }

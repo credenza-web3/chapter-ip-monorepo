@@ -1,5 +1,6 @@
 import { browser } from '$app/environment'
 import { authStore } from '$lib'
+import { getSigner, initProvider } from '@repo/fe-evm-provider'
 import { createClient } from '@repo/trpc/client'
 import { redirect } from '@sveltejs/kit'
 
@@ -36,8 +37,10 @@ export const load = async ({ url }) => {
     const publisher = await trpcClient.publishers.getPublisher.query({
       sub: sub!,
     })
-
-    return { trpcClient, publisher }
+    initProvider(accessToken)
+    const signer = await getSigner()
+    const userAddress = await signer.getAddress()
+    return { trpcClient, publisher, userAddress }
   } catch {
     throw redirect(302, `/authed/publisher/create`)
   }
