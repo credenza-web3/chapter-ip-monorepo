@@ -12,11 +12,7 @@
         key: purchase.metadata.key,
       })
 
-      const newWindow = window.open('', '_blank')
-      if (newWindow) {
-        newWindow.location.href = url
-      }
-
+      window.open(url, '_blank')
       if (purchase.licenseType === '2') {
         isBlocked = true
       }
