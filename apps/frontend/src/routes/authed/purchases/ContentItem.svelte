@@ -1,5 +1,7 @@
 <script lang="ts">
-  let {purchase, trpcClient, onBlockFile } = $props()
+  let { purchase, trpcClient } = $props()
+
+  let isBlocked: boolean = $derived(purchase.isBlocked)
 
   let loading = $state(false)
   const onGetFileUrl = async () => {
@@ -16,7 +18,7 @@
       }
 
       if (purchase.licenseType === '2') {
-        onBlockFile()
+        isBlocked = true
       }
     } catch (error) {
       console.error('Error fetching file URL:', error)
@@ -34,7 +36,7 @@
       </div>
 
       <div class="flex flex-col sm:flex-row gap-2">
-        {#if purchase.isBlocked}
+        {#if isBlocked}
           <button class="btn btn-sm btn-outline btn-error">Already used</button>
         {:else if loading}
           <div class="loading loading-dots"></div>

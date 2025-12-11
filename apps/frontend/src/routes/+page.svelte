@@ -26,7 +26,7 @@
       <div class="p-6 rounded-2xl bg-gray-100 border border-gray-200">
         <h3 class="text-lg font-semibold mb-1">Newest Releases</h3>
         <p class="text-sm text-gray-600">Fresh digital products added by authors in real time.</p>
-      </div> 
+      </div>
     </section>
 
     <footer class="mt-8 text-sm text-gray-500"></footer>

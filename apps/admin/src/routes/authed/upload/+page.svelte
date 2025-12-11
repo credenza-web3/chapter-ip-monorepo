@@ -159,7 +159,9 @@
   {#if uploaded}
     <div class="mt-6 space-y-4">
       <fieldset class="fieldset bg-base-100 rounded-box border p-4 max-w-lg">
-        <legend class="fieldset-legend">Choose License Type  <span class="text-[10px] opacity-50">(set license prices in (USD))</span></legend>
+        <legend class="fieldset-legend"
+          >Choose License Type <span class="text-[10px] opacity-50">(set license prices in (USD))</span></legend
+        >
         <label class="label justify-between">
           <div class="space-x-2">
             <input type="checkbox" bind:checked={isLifetimeLicense} class="checkbox" />

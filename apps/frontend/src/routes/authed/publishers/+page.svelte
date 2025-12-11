@@ -1,5 +1,5 @@
 <script lang="ts">
-  import AvatarDefat from '$lib/assets/user-placeholder.svg'
+  import AvatarDefault from '$lib/assets/user-placeholder.svg'
 
   let { data } = $props()
 </script>
@@ -14,7 +14,7 @@
       >
         <div class="flex items-center gap-4">
           <div class="h-14 w-auto overflow-hidden">
-            <img src={publisher.avatarUrl ?? AvatarDefat} alt="Publisher avatar" class="w-full h-full object-cover" />
+            <img src={publisher.avatarUrl || AvatarDefault} alt="Publisher avatar" class="w-full h-full object-cover" />
           </div>
           <h2 class="card-title">{publisher.title}</h2>
         </div>
