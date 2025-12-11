@@ -24,7 +24,7 @@
     </div>
   {:else}
     <div class="flex flex-col md:flex-row gap-8 justify-between">
-      <div>
+      <div class="border border-gray-200 rounded-lg p-3">
         <h1 class="text-primary text-lg font-semibold mb-3">Life Time Purchases</h1>
         {#each purchasesByType.lifeTimeLicense as purchase, i}
           <ContentItem
@@ -34,7 +34,7 @@
           />
         {/each}
       </div>
-      <div>
+      <div class="border border-gray-200 rounded-lg p-3">
         <h1 class="text-primary text-lg font-semibold mb-3">One Time Purchases</h1>
         {#each purchasesByType.oneTimeLicense as purchase, i}
           <ContentItem
