@@ -27,7 +27,7 @@
   bind:this={headerRef}
   class="mx-auto w-full flex items-center justify-between md:px-10 px-4 py-4 border-b border-gray-200 bg-testColor relative"
 >
-  <a href="/">
+  <a href="/" class="md:hidden block">
     <img src={CredenzaLogo} alt="Credenza Logo" class="md:w-44 w-32" />
   </a>
   {#if authState.accessToken}

@@ -6,10 +6,10 @@
   import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
   import { forwardTransaction } from '@repo/fe-services'
   import { notify, ToastType } from '@repo/ui-components'
+  import { getTokenPrice } from '../getTokenPrice.js'
 
   let { data } = $props()
   const { items } = data.paginatedResponse
-
   type PopulatedTx = Awaited<ReturnType<typeof contentContract.setLicensePriceFiat.populateTransaction>>
 
   let contentContract: any = $state(null)
@@ -20,6 +20,13 @@
 
   let isFulltimeLicensePriceLoading = $state(false)
   let isOnetimeLicensePriceLoading = $state(false)
+
+  let initialFulltimePrice = $state(0)
+  let initialOnetimePrice = $state(0)
+
+  const hasFulltimeChanged = $derived(fulltimeLicensePrice !== initialFulltimePrice)
+  const hasOnetimeChanged = $derived(onetimeLicensePrice !== initialOnetimePrice)
+  const hasAnyChanges = $derived(hasFulltimeChanged || hasOnetimeChanged)
 
   const sendTx = async (populatedTx: PopulatedTx) => {
     const { ethersProvider } = await getSignerAndProvider()
@@ -38,6 +45,40 @@
     const ethersProvider = new ethers.BrowserProvider(provider)
     const signer = await ethersProvider.getSigner()
     return { provider, ethersProvider, signer }
+  }
+  const handleSaveChanges = async () => {
+    try {
+      const tokenId = data.tokenId
+
+      if (hasFulltimeChanged) {
+        isFulltimeLicensePriceLoading = true
+        await sendTx(
+          await contentContract.setLicensePriceFiat.populateTransaction(tokenId, '0', fulltimeLicensePrice * 100),
+        )
+        await sendTx(
+          await contentContract.setLicensePriceToken.populateTransaction(tokenId, '0', fulltimeLicensePrice * 10 ** 6),
+        )
+        initialFulltimePrice = fulltimeLicensePrice
+      }
+
+      if (hasOnetimeChanged) {
+        isOnetimeLicensePriceLoading = true
+        await sendTx(
+          await contentContract.setLicensePriceFiat.populateTransaction(tokenId, '2', onetimeLicensePrice * 100),
+        )
+        await sendTx(
+          await contentContract.setLicensePriceToken.populateTransaction(tokenId, '2', onetimeLicensePrice * 10 ** 6),
+        )
+        initialOnetimePrice = onetimeLicensePrice
+      }
+
+      notify('Prices updated successfully', ToastType.SUCCESS)
+    } catch {
+      notify('Failed to update license prices', ToastType.FAIL)
+    } finally {
+      isFulltimeLicensePriceLoading = false
+      isOnetimeLicensePriceLoading = false
+    }
   }
 
   const handleUpdateFulltimeLicensePrice = async () => {
@@ -83,90 +124,86 @@
     contentContract = new ethers.Contract(import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS, content_abi, signer)
     fulltimeLicensePrice = Number(await contentContract.getLicensePriceFiat(tokenId, '0')) / 100
     onetimeLicensePrice = Number(await contentContract.getLicensePriceFiat(tokenId, '2')) / 100
+    initialFulltimePrice = fulltimeLicensePrice
+    initialOnetimePrice = onetimeLicensePrice
     if (fulltimeLicensePrice) isFulltimeLoaded = true
     if (onetimeLicensePrice) isOnetimeLoaded = true
   })
 </script>
 
-<div class="card bg-base-100 shadow-md p-6">
-  <div class="mb-12 text-center">
-    <h1 class="text-4xl font-light text-gray-900">File Details</h1>
-  </div>
-  <div class="flex flex-col md:flex-row justify-between gap-6 md:px-7">
-    {#if items.length > 0}
-      {#each items as item}
-        <ul class="basis-1/2">
-          <li><strong>ID:</strong> {item.id}</li>
-          <li><strong>Sub:</strong> {item.sub}</li>
-          <li><strong>Bucket:</strong> {item.bucket}</li>
-          <li><strong>Key:</strong> {item.key}</li>
-          <li><strong>Token ID:</strong> {item.tokenId}</li>
-          <li><strong>Created:</strong> {formatDate(item.createdAt)}</li>
-          <li><strong>Updated:</strong> {formatDate(item.updatedAt)}</li>
-        </ul>
-      {/each}
-    {/if}
-    <div class="basis-1/2">
-      <h2 class="text-xl font-semibold mb-2">Prices</h2>
-
-      <div class="space-y-3">
-        {#if isFulltimeLoaded}
-          <div class="flex items-end gap-2 justify-between">
-            <label class="flex-col" for="fulltime">
-              <span class="label-text pb-2">Full time pice ($)</span>
-              <input
-                id="fulltime"
-                type="number"
-                placeholder="Enter full time pice"
-                class="input input-bordered"
-                bind:value={fulltimeLicensePrice}
-                step="0.01"
-                min="0"
-              />
-            </label>
-            <button
-              onclick={handleUpdateFulltimeLicensePrice}
-              disabled={isFulltimeLicensePriceLoading || isOnetimeLicensePriceLoading}
-              class="btn btn-primary"
-            >
-              {#if isFulltimeLicensePriceLoading}
-                <span class="loading loading-spinner loading-sm"></span>
-                Saving...
-              {:else}
-                Update Prices
-              {/if}
-            </button>
+<div class="p-6 max-w-3xl">
+  <h1 class="text-3xl font-light text-gray-900 mb-6">File details</h1>
+  <div class="flex gap-10 p-6 bg-white w-fit">
+    <img src="$lib/assets/file_icon.png" alt="File Icon" class="w-32 h-32 object-contain border border-gray-200" />
+    {#each items as item}
+      <div class="grid grid-cols-2 gap-3 text-sm text-gray-700">
+        {#each [{ label: 'ID', value: item.id }, { label: 'Sub', value: item.sub }, { label: 'Bucket', value: item.bucket }, { label: 'Type', value: 'Book' }, { label: 'Key', value: item.key }, { label: 'Token ID', value: item.tokenId }, { label: 'Date created', value: formatDate(item.createdAt) }, { label: 'Last updated on', value: formatDate(item.updatedAt) }] as field}
+          <div>
+            <p class="text-gray-400 uppercase text-xs">{field.label}</p>
+            <p class="break-all">{field.value}</p>
           </div>
-        {/if}
-        {#if isOnetimeLoaded}
-          <div class="flex items-end gap-2 justify-between">
-            <label class="flex-col" for="onetime">
-              <span class="label-text pb-2">One time pice ($)</span>
-              <input
-                id="onetime"
-                type="number"
-                placeholder="Enter one time pice"
-                class="input input-bordered"
-                bind:value={onetimeLicensePrice}
-                step="0.01"
-                min="0"
-              />
-            </label>
-            <button
-              onclick={handleUpdateOnetimeLicensePrice}
-              disabled={isOnetimeLicensePriceLoading || isFulltimeLicensePriceLoading}
-              class="btn btn-primary"
-            >
-              {#if isOnetimeLicensePriceLoading}
-                <span class="loading loading-spinner loading-sm"></span>
-                Saving...
-              {:else}
-                Update Prices
-              {/if}
-            </button>
-          </div>
-        {/if}
+        {/each}
       </div>
+    {/each}
+    <span class="border-b my-6"></span>
+  </div>
+
+  <div class="mt-10">
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">General details</h2>
+
+    <div class="space-y-6">
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Name</legend>
+        <input type="text" class="input w-full" placeholder="Name" />
+      </fieldset>
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Description</legend>
+        <textarea class="textarea h-24 w-full" placeholder="Description"></textarea>
+        <div class="label">Optional</div>
+      </fieldset>
+    </div>
+  </div>
+
+  <div class="mt-10 max-w-xl">
+    <h2 class="text-xl font-semibold mb-4">Prices</h2>
+    <div class="space-y-4 flex gap-2">
+      {#if isFulltimeLoaded}
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">ull-time price ($)</legend>
+          <div class="join">
+            <div>
+              <label class="input join-item">
+                <span class="opacity-50 mt-px">$</span>
+                <input type="number" placeholder="Price ($)" min="1" bind:value={fulltimeLicensePrice} />
+              </label>
+            </div>
+          </div>
+        </fieldset>
+      {/if}
+
+      {#if isOnetimeLoaded}
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">One-time price ($)</legend>
+          <div class="join">
+            <div>
+              <label class="input join-item">
+                <span class="opacity-50 mt-px">$</span>
+                <input type="number" placeholder="Price ($)" min="1" bind:value={onetimeLicensePrice} />
+              </label>
+            </div>
+          </div>
+        </fieldset>
+      {/if}
+    </div>
+
+    <div class="flex justify-end">
+      <button class="btn btn-outline mt-6 w-[200px]" class:btn-disabled={!hasAnyChanges} onclick={handleSaveChanges} >
+        {#if isOnetimeLicensePriceLoading || isFulltimeLicensePriceLoading}
+          <span class="loading loading-spinner loading-sm"></span>
+        {:else}
+          Save changes
+        {/if}
+      </button>
     </div>
   </div>
 </div>
