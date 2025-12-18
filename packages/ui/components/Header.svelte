@@ -3,7 +3,7 @@
   import CredenzaLogo from '../assets/credenza.svg'
   import MenuIconBlack from '../assets/menu_burger_black.svg'
 
-  let { authStore, menuItems } = $props()
+  let { authStore, menuItems = [] } = $props()
   const { state: authState } = $derived(authStore)
   let menuOpen = $state(false)
   let headerRef: HTMLElement

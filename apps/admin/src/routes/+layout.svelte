@@ -30,7 +30,7 @@
 <Toast />
 <div class="min-h-screen overflow-x-hidden flex flex-col">
   <LayoutSidebar {menuItems}>
-    <Header {authStore} {menuItems} />
+    <Header {authStore} />
     <main class="space-y-0 flex-1 md:p-6 p-2 w-full">
       {#if loading}
         <div class="flex items-center justify-center h-16">
