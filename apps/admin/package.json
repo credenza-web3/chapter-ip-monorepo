@@ -20,8 +20,8 @@
     "@eslint/js": "^9.36.0",
     "@repo/eslint-config": "workspace:*",
     "@repo/fe-auth": "workspace:*",
-    "@repo/fe-services": "workspace:*",
     "@repo/fe-evm-provider": "workspace:*",
+    "@repo/fe-services": "workspace:*",
     "@repo/trpc": "workspace:*",
     "@repo/ui-components": "workspace:*",
     "@sveltejs/adapter-static": "^3.0.9",
@@ -50,8 +50,9 @@
     "yaml": "^2.8.1"
   },
   "dependencies": {
+    "@credenza3/contracts": "^0.0.5",
     "@tailwindcss/vite": "^4.1.17",
     "daisyui": "^5.5.5",
-    "@credenza3/contracts": "^0.0.5"
+    "svelte-modals": "^2.0.1"
   }
 }

@@ -1,4 +1,8 @@
 <script lang="ts">
+	import UploadFileModal from '../../lib/ui/UploadFileModal.svelte';
+  import { modals } from 'svelte-modals'
+  import FloatingAddButton from '../../../../../packages/ui/components/FloatingAddButton.svelte'
+
   let { children, data } = $props()
 </script>
 
@@ -9,5 +13,12 @@
   </div>
 {/if}
 <div class="">
+  <FloatingAddButton
+        onAdd={() =>
+          modals.open (UploadFileModal, {
+            onClose: () => modals.close(),
+            data
+          })}
+      />
   {@render children?.()}
 </div>

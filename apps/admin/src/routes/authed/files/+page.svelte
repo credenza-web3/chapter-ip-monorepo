@@ -26,17 +26,6 @@
 
 <div class="min-h-xl p-4">
   <h1 class="text-2xl font-bold text-gray-900 mb-12">Dashboard</h1>
-  <div class="flex w-full justify-end mb-2">
-    <button
-      class="flex items-center gap-2 text-xs text-[#6B7280] hover:text-[#A323EB] font-medium cursor-pointer"
-      onclick={() => console.log('Add file')}
-    >
-      Add File
-      <div class="w-7 h-7 bg-[#A323EB] text-white rounded-full relative">
-        <span class="leading-[25px] flex items-center justify-center text-xl"> + </span>
-      </div>
-    </button>
-  </div>
   <div class="overflow-x-auto">
     <table class="table bg-white border border-gray-200">
       <thead class="bg-gray-50">

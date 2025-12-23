@@ -2,8 +2,8 @@
   import { authStore } from '$lib'
   import { afterNavigate, beforeNavigate, goto } from '$app/navigation'
   import { notify, ToastType } from '@repo/ui-components'
-  import { mintWithPrices, uploadFileToBucket } from './helper'
   import { createClient } from '@repo/trpc/client'
+  import { mintWithPrices, uploadFileToBucket } from '$lib/services/helper.js'
 
   let isOver = $state(false)
   let loading = $state(false)
@@ -180,6 +180,7 @@
         </label>
         <label class="label justify-between">
           <div class="space-x-2">
+            
             <input type="checkbox" bind:checked={isOneTimeLicense} class="checkbox" />
             <span class="label-text">One Time License (USD)</span>
           </div>

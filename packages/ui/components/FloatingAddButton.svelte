@@ -1,6 +1,5 @@
 <script lang="ts">
-  let isOpen = $state(false)
-  $effect(() => console.log(isOpen))
+  let { onAdd } = $props<{ onAdd: () => void }>()
 </script>
 
 <button
@@ -11,7 +10,7 @@
          flex items-center justify-center
          shadow-lg pb-[5px] cursor-pointer"
   aria-label="Add"
-  onclick={() => (isOpen = !isOpen)}
+  onclick={onAdd}
 >
   +
 </button>
