@@ -7,7 +7,7 @@
   import { afterNavigate, beforeNavigate } from '$app/navigation'
   import { Modals } from 'svelte-modals'
 
-  let { children, data } = $props()
+  let { children} = $props()
 
   let loading = $state(false)
   const menuItems = [{ label: 'Dashboard', href: '/authed/files' }]

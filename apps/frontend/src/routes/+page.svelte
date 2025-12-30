@@ -1,7 +1,7 @@
 <div class=" text-gray-900 flex justify-center p-8">
   <div class="w-full max-w-5xl bg-white border border-gray-200 rounded-3xl p-10 shadow-xl">
     <!-- Header -->
-    <header class="flex items-start gap-6 mb-10">
+    <header class="flex flex-col md:flex-row items-start gap-6 mb-10">
       <div
         class="w-16 h-16 rounded-xl bg-linear-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg font-bold text-2xl text-white"
       >
