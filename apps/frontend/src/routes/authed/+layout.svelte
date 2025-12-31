@@ -3,6 +3,7 @@
   import { Passport } from '@credenza3/passport-evm'
   import { onMount } from 'svelte'
   import { afterNavigate, beforeNavigate } from '$app/navigation'
+  import { page } from '$app/state'
 
   let { children, data } = $props()
   let isMounted = $state(false)
@@ -41,11 +42,11 @@
     <span class="loading loading-dots loading-lg"></span>
   </div>
 {:else if isMounted}
-  {#if data.userAddress}
-    <span class="text-[10px]">
+  {#if !page.url.pathname.startsWith('/authed/publishers/')}
+    <div class="text-[10px] flex flex-col md:flex-row md:justify-start items-center mb-4 mr-2">
       <span class="font-semibold text-gray-900">User Address:</span>
       <span class="text-gray-500 ml-1">{data.userAddress}</span>
-    </span>
+    </div>
   {/if}
   {@render children?.()}
 {/if}

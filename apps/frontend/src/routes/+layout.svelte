@@ -6,13 +6,15 @@
   import { authStore } from '$lib'
   import { afterNavigate, beforeNavigate } from '$app/navigation'
   import { Modals } from 'svelte-modals'
+  import { page } from '$app/state'
 
   let { children } = $props()
 
   let loading = $state(false)
   const menuItems = [
-    { label: 'Home', href: '/authed/purchases' },
+    { label: 'Dashboard', href: '/authed/purchases' },
     { label: 'Publishers', href: '/authed/publishers' },
+    { label: 'Products', href: '/authed/purchases' },
   ]
   const isAuthenticated = $derived(authStore.state?.accessToken)
 
@@ -44,7 +46,9 @@
   {#if isAuthenticated}
     <LayoutSidebar {menuItems}>
       <Header {authStore} />
-      <main class="space-y-0 flex-1 md:p-6 p-2 w-full">
+      <main
+        class={`space-y-0 flex-1 w-full ${page.url.pathname.startsWith('/authed/publishers/') ? 'p-0' : 'p-2 md:p-6'}`}
+      >
         {#if loading}
           <div class="flex items-center justify-center h-16">
             <span class="loading loading-dots loading-lg"></span>

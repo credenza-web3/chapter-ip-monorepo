@@ -83,61 +83,74 @@
   }
 </script>
 
+<div class="relative">
+  <img src="https://loremflickr.com/1280/400" alt="Background" />
+  <div class="flex gap-6 absolute bottom-[-50px] left-[60px]">
+    <img src="https://loremflickr.com/150/150" alt="Background" />
+    <h1 class="pt-6 text-4xl text-white" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">{data.publisher.title}</h1>
+  </div>
+</div>
 <div class="container mx-auto px-4 py-8">
-  <div class="breadcrumbs text-sm mb-6">
+  <!-- <div class="breadcrumbs text-sm mb-6">
     <ul>
       <li><a href="/authed/publishers">Publishers</a></li>
       <li>{data.publisher.title}</li>
     </ul>
-  </div>
+  </div> -->
 
   {#if loading}
     <div class="flex items-center justify-center h-16">
       <span class="loading loading-dots loading-lg"></span>
     </div>
   {:else}
-    <h2 class="text-2xl font-semibold mb-4">Products</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-20 px-10">
       {#if data.contentItems.length === 0}
         <div class="alert">
           <span>No content here yet.</span>
         </div>
       {:else}
         {#each data.contentItems as item}
-          <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow card-sm border border-gray-200">
-            <figure class="px-10 pt-10">
-              <div class="avatar placeholder">
-                <div class="bg-neutral text-neutral-content rounded-xl w-24">
-                  <span class="text-3xl">📄</span>
+          <div class="bg-base-100 border border-gray-200 max-w-2xl p-10 pb-2">
+            <figure class="pb-6">
+              <div class=" flex gap-3">
+                <img src="https://loremflickr.com/120/120" alt="Shoes" class="rounded" />
+                <div class="text-sm">
+                  <h2 class="">title</h2>
+                  <span class="text-gray-500"><span class="font-bold">ID: </span>{item.id} </span>
+                  <h2 class="font-bold mt-6">Descriptions:</h2>
+                  <p>rrrrrrrrrrrr rrrr rrrrr rrrr rrr</p>
                 </div>
               </div>
-            </figure>
-            <div class="card-body">
-              <h3 class="card-title">{item.id}</h3>
               {#await getTokenPrice(item.tokenId) then price}
-                <div class="card-actions mt-4 flex flex-col">
+                <div class="mt-4 flex gap-2 justify-end">
                   {#if price.fulltime}
-                    <div class="flex items-center justify-between w-full">
-                      <span>Fulltime license price:</span>
-                      <span class="text-2xl font-bold text-primary">${price.fulltime}</span>
-                      <button class="btn btn-primary" onclick={() => onBuyLicense(item.tokenId, '0')}>Buy Now</button>
+                    <div class="flex flex-col gap-1">
+                      <button
+                        class="btn btn-primary hover:bg-white hover:text-primary hover:border hover:border-primary"
+                        onclick={() => onBuyLicense(item.tokenId, '0')}>Buy Now</button
+                      >
+                      <span class="text-2xl font-bold pl-2"
+                        >${price.fulltime}<span class="text-xs text-gray-500">/Fulltime license price</span></span
+                      >
                     </div>
                   {/if}
                   {#if price.onetime}
-                    <div class="flex flex-col w-full gap-1">
-                      <div class="flex items-center justify-between w-full">
-                        <span>One Time license price:</span>
-                        <span class="text-2xl font-bold text-primary">${price.onetime}</span>
-                        <button class="btn btn-primary" onclick={() => onBuyLicense(item.tokenId, '2')}>Buy Now</button>
-                      </div>
-                      <p class="text-xs text-yellow-600 mt-1">
-                        Warning: One Time License allows interaction with this content only once.
-                      </p>
+                    <div class="flex flex-col gap-1">
+                      <button
+                        class="btn btn-primary hover:bg-white hover:text-primary hover:border hover:border-primary"
+                        onclick={() => onBuyLicense(item.tokenId, '2')}>Buy Now</button
+                      >
+                      <span class="text-2xl font-bold pl-2"
+                        >${price.onetime}<span class="text-xs text-gray-500">/One Time license price</span></span
+                      >
                     </div>
                   {/if}
                 </div>
               {/await}
-            </div>
+            </figure>
+            <p class="text-xs text-yellow-600 mt-1">
+              Warning: One Time License allows interaction with this content only once.
+            </p>
           </div>
         {/each}
       {/if}
