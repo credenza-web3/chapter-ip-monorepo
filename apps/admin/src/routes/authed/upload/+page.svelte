@@ -1,103 +1,39 @@
 <script lang="ts">
-  import { authStore } from '$lib'
   import { afterNavigate, beforeNavigate, goto } from '$app/navigation'
   import { notify, ToastType } from '@repo/ui-components'
-  import { mintWithPrices, uploadFileToBucket } from './helper'
-  import { createClient } from '@repo/trpc/client'
+  import { UploadService } from './services/upload.service'
+  import { uploadStore, isFormValid } from './stores/upload-store'
+  import FileUpload from './components/FileUpload.svelte'
+  import ImageUpload from './components/ImageUpload.svelte'
+  import LicenseForm from './components/LicenseForm.svelte'
 
-  let isOver = $state(false)
-  let loading = $state(false)
-  let fileInput: HTMLInputElement | null = $state(null)
-  let uploaded: File | null = $state(null)
-  let isLifetimeLicense = $state(false)
-  let isOneTimeLicense = $state(false)
-  let lifetimePrice = $state(0)
-  let oneTimePrice = $state(0)
-  let isFormValid = $state(false)
+  const uploadService = new UploadService()
 
-  let { data } = $props()
-
-  beforeNavigate(() => (loading = true))
-  afterNavigate(() => (loading = false))
-
-  $effect(() => {
-    if (!isLifetimeLicense) lifetimePrice = 0
-    if (!isOneTimeLicense) oneTimePrice = 0
-    isFormValid = (isLifetimeLicense && lifetimePrice > 0) || (isOneTimeLicense && oneTimePrice > 0)
-  })
-
-  function resetCheckboxes() {
-    isLifetimeLicense = false
-    isOneTimeLicense = false
-    lifetimePrice = 0
-    oneTimePrice = 0
-  }
-
-  const maximumSize = 1 * 1024 * 1024 * 1024 // 1GB
-
-  function handleDrop(event: DragEvent) {
-    event.preventDefault()
-    isOver = false
-    handleInput(event)
-  }
-
-  function handleInput(event: Event) {
-    const target = event?.target as HTMLInputElement
-    const file = target?.files?.[0] || (event instanceof DragEvent ? event.dataTransfer?.files[0] : null)
-    if (!file) return
-
-    if (file.size > maximumSize) {
-      alert('Selected file is too big. Maximum size is 1GB.')
-      if (target) target.value = ''
-      return
-    }
-
-    uploaded = file
-    resetCheckboxes()
-  }
-
-  const onClear = () => {
-    uploaded = null
-    resetCheckboxes()
-    if (fileInput) fileInput.value = ''
-  }
+  beforeNavigate(() => uploadStore.setLoading(true))
+  afterNavigate(() => uploadStore.setLoading(false))
 
   const onSubmitClick = async () => {
-    if (!uploaded) {
+    if (!$uploadStore.uploaded) {
       notify('No file selected', ToastType.FAIL)
       return
     }
 
     try {
-      loading = true
-      const trpcClient = createClient({
-        trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
-        getAccessTokenFn: () => authStore.state.accessToken!,
-      })
-
-      const tokenId = await mintWithPrices(authStore.state.accessToken!, lifetimePrice, oneTimePrice)
-      const { url, key } = await trpcClient.files.createContentUploadUrl.mutate({
-        tokenId,
-        mimetype: uploaded.type,
-      })
-      await uploadFileToBucket(uploaded, url)
-      await data.trpcClient!.files.registerContent.mutate({
-        tokenId,
-        key,
-      })
-      await data.trpcClient!.files.uploadMetadata.mutate({
-        tokenId,
-        metadata: {
-          name: uploaded.name,
-          size: uploaded.size,
-          type: uploaded.type,
-          key,
-          image: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/chapter_ip.png',
-        },
-      })
+      uploadStore.setLoading(true)
+      const trpcClient = uploadService.createTrpcClient()
+      
+      const { tokenId, imageUrl, key } = await uploadService.uploadContent(
+        $uploadStore.uploaded!,
+        $uploadStore.uploadedImage,
+        $uploadStore.lifetimePrice,
+        $uploadStore.oneTimePrice,
+        trpcClient
+      )
+      
+      await uploadService.saveMetadata(tokenId, $uploadStore.uploaded!, imageUrl, key, trpcClient)
 
       notify('File uploaded successfully', ToastType.SUCCESS)
-      onClear()
+      uploadStore.reset()
       goto('/authed/files')
     } catch (error) {
       console.error('Error uploading file:', error)
@@ -107,7 +43,7 @@
       }
       notify(errorMessage, ToastType.FAIL)
     } finally {
-      loading = false
+      uploadStore.setLoading(false)
     }
   }
 </script>
@@ -117,90 +53,24 @@
     <h1 class="text-4xl font-light text-gray-900">Upload File</h1>
   </div>
 
-  <div
-    class={`mt-10 bg-white h-32 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-gray-500 text-sm cursor-pointer transition ${
-      isOver ? 'border-primary bg-white' : 'border-gray-300'
-    }`}
-    role="button"
-    tabindex="0"
-    aria-label="Upload or drag a file"
-    ondragover={(e) => {
-      e.preventDefault()
-      isOver = true
-    }}
-    ondragleave={() => (isOver = false)}
-    ondrop={handleDrop}
-    onclick={() => fileInput?.click()}
-    onkeydown={(e) => {
-      if (e.key === 'Enter' || e.key === ' ') fileInput?.click()
-    }}
-  >
-    {#if uploaded}
-      <div class="flex flex-col items-center">
-        <span class="mb-2">📄 {uploaded.name}</span>
-        <button onclick={onClear} class="btn btn-xs btn-outline" type="button">Clear</button>
-      </div>
-    {:else}
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="w-8 h-8 mb-2"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-      </svg>
-      <span class="text-center mb-2">Upload or drag a file</span>
-      <span class="text-xs text-stone-400">All file types supported — Max size: 1GB</span>
-    {/if}
-
-    <input type="file" class="hidden" bind:this={fileInput} onchange={handleInput} />
-  </div>
-  {#if uploaded}
+  <FileUpload />
+  
+  {#if $uploadStore.uploaded}
+    <div class="mt-6">
+      <ImageUpload />
+    </div>
     <div class="mt-6 space-y-4">
-      <fieldset class="fieldset bg-base-100 rounded-box border p-4 max-w-lg">
-        <legend class="fieldset-legend"
-          >Choose License Type <span class="text-[10px] opacity-50">(set license prices in (USD))</span></legend
-        >
-        <label class="label justify-between">
-          <div class="space-x-2">
-            <input type="checkbox" bind:checked={isLifetimeLicense} class="checkbox" />
-            <span class="label-text">Lifetime License (USD)</span>
-          </div>
-          {#if isLifetimeLicense}
-            <input
-              type="number"
-              class="input validator max-w-xs"
-              required
-              placeholder="Enter the price in (USD)."
-              min="1"
-              bind:value={lifetimePrice}
-            />
-          {/if}
-        </label>
-        <label class="label justify-between">
-          <div class="space-x-2">
-            <input type="checkbox" bind:checked={isOneTimeLicense} class="checkbox" />
-            <span class="label-text">One Time License (USD)</span>
-          </div>
-
-          {#if isOneTimeLicense}
-            <input
-              type="number"
-              class="input validator max-w-xs"
-              required
-              placeholder="Enter the price in (USD)."
-              min="1"
-              bind:value={oneTimePrice}
-            />
-          {/if}
-        </label>
-      </fieldset>
+      <LicenseForm />
 
       <div class="flex gap-10 mt-3">
-        <button class="btn btn-outline" onclick={onSubmitClick} disabled={loading} class:hidden={!isFormValid}
-          >Upload</button
-        >
+        <button class="btn btn-outline" onclick={onSubmitClick} disabled={$uploadStore.loading} class:hidden={!$isFormValid}
+          >
+          {#if $uploadStore.loading}
+            <div class="loading loading-spinner"></div>
+          {:else}
+            Upload
+          {/if}
+        </button>
       </div>
     </div>
   {/if}
