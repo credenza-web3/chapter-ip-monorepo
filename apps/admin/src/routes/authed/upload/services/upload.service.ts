@@ -22,9 +22,7 @@ export class UploadService {
       tokenId,
       mimetype: uploaded.type,
     })
-    console.log("createContentUploadUrl for main file", url)
     await uploadFileToBucket(uploaded, url)
-    console.log("uploaded to bucket", uploaded)
     // Upload image if provided
     let imageUrl = 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/chapter_ip.png'
     if (uploadedImage) {
@@ -33,9 +31,7 @@ export class UploadService {
         mimetype: uploadedImage.type,
         bucket: "preview"
       })
-      console.log("createContentUploadUrl for image", imageUrlResponse)
       await uploadFileToBucket(uploadedImage, imageUrlResponse)
-      console.log("uploaded image to bucket", location)
       imageUrl = imageUrlResponse.split('?')[0]
     }
     
@@ -44,7 +40,6 @@ export class UploadService {
       tokenId,
       key,
     })
-    console.log("registerContent", key)
     
     return { tokenId, imageUrl, key }
   }

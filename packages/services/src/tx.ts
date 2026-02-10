@@ -13,7 +13,7 @@ export const forwardTransaction = async (
     auth: { client_id, bearer_token },
   })
   populatedTx.chainId = BigInt(chainId)
-  console.log(ethers.Transaction.from(populatedTx).unsignedSerialized)
+
   return new Promise((resolve, reject) => {
     socket.emit(
       'contracts/forward_transaction',

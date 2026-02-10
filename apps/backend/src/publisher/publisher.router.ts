@@ -49,8 +49,6 @@ export class PublisherRouter {
       { new: true, upsert: true },
     )
 
-    console.log(publisher.toJSON())
-
     if (!publisher) {
       throw new TRPCError({ message: 'Failed to set publisher data', code: 'INTERNAL_SERVER_ERROR' })
     }
