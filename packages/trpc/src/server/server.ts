@@ -40,6 +40,7 @@ const appRouter = t.router({
       tokenId: z.string(),
       mimetype: z.string(),
       extension: z.string().optional(),
+      bucket: z.enum(["content", "preview"]).default("content"),
     })).output(z.object({
       url: z.string(),
       key: z.string(),
