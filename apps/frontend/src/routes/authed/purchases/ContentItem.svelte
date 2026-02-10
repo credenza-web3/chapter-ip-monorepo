@@ -1,5 +1,7 @@
 <script lang="ts">
-  let { purchase, trpcClient, onBlockFile } = $props()
+  let { purchase, trpcClient } = $props()
+
+  let isBlocked: boolean = $derived(purchase.isBlocked)
 
   let loading = $state(false)
   const onGetFileUrl = async () => {
@@ -10,13 +12,9 @@
         key: purchase.metadata.key,
       })
 
-      const newWindow = window.open('', '_blank')
-      if (newWindow) {
-        newWindow.location.href = url
-      }
-
+      window.open(url, '_blank')
       if (purchase.licenseType === '2') {
-        onBlockFile()
+        isBlocked = true
       }
     } catch (error) {
       console.error('Error fetching file URL:', error)
@@ -27,14 +25,14 @@
 </script>
 
 <div class="card bg-base-100 shadow-lg">
-  <div class="card-body">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+  <div class="card-body p-1">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center md:gap-8 gap-0">
       <div class="flex-1">
         <h3 class="card-title">{purchase.metadata.name}</h3>
       </div>
 
       <div class="flex flex-col sm:flex-row gap-2">
-        {#if purchase.isBlocked}
+        {#if isBlocked}
           <button class="btn btn-sm btn-outline btn-error">Already used</button>
         {:else if loading}
           <div class="loading loading-dots"></div>

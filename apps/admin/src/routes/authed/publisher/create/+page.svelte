@@ -3,6 +3,7 @@
   import { notify, ToastType } from '@repo/ui-components'
 
   let publisherName = $state('')
+  let avatarUrl = $state('')
   let loading = $state(false)
   let { data } = $props()
 
@@ -11,9 +12,10 @@
       loading = true
       await data.trpcClient!.publishers.setPublisher.mutate({
         title: publisherName,
+        avatarUrl,
       })
 
-      goto('/authed')
+      goto('/authed/upload')
     } catch (error) {
       console.error(error)
       notify('Failed to create publisher', ToastType.FAIL)
@@ -41,6 +43,21 @@
           class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 transition-colors"
           required
         />
+      </div>
+      <div>
+        <label for="publisher-name" class="block text-sm text-gray-700 mb-2">Avatar URI</label>
+        <label class="input validator mb-0 h-[50px] w-full">
+          <input
+            type="url"
+            required
+            placeholder="https://"
+            bind:value={avatarUrl}
+            pattern="^(https?://)?([a-zA-Z0-9]([a-zA-Z0-9\-].*[a-zA-Z0-9])?\.)+[a-zA-Z].*$"
+            title="Must be valid URL"
+            class="w-full px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-gray-900 transition-colors mb-0"
+          />
+        </label>
+        <p class="validator-hint">Must be valid URL</p>
       </div>
 
       <button

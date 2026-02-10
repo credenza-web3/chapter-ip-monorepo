@@ -36,11 +36,6 @@
 
     pass?.openUI('payment', {
       title,
-      payments: {
-        credenzaStoredValue: {
-          disabled: true,
-        },
-      },
 
       licenses: [
         {
@@ -55,9 +50,12 @@
 
     pass?.once(
       'PAYMENT',
-      async (data: { results: { items: Array<{ outcome: { voucher: string; sig: string } }> } }) => {
+      async (data: { type: string; results: { items: Array<{ outcome: { voucher: string; sig: string } }> } }) => {
+        if (data.type !== 'STRIPE') return goto('/authed/purchases')
+
         try {
           loading = true
+          if (!data.results.items[0].outcome) return
           const { voucher, sig } = data.results.items[0].outcome
 
           const provider = await initProvider(authStore.state.accessToken!)
@@ -106,7 +104,7 @@
         </div>
       {:else}
         {#each data.contentItems as item}
-          <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow card-sm">
+          <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow card-sm border border-gray-200">
             <figure class="px-10 pt-10">
               <div class="avatar placeholder">
                 <div class="bg-neutral text-neutral-content rounded-xl w-24">
@@ -126,10 +124,15 @@
                     </div>
                   {/if}
                   {#if price.onetime}
-                    <div class="flex items-center justify-between w-full">
-                      <span>Onetime license price:</span>
-                      <span class="text-2xl font-bold text-primary">${price.onetime}</span>
-                      <button class="btn btn-primary" onclick={() => onBuyLicense(item.tokenId, '2')}>Buy Now</button>
+                    <div class="flex flex-col w-full gap-1">
+                      <div class="flex items-center justify-between w-full">
+                        <span>One Time license price:</span>
+                        <span class="text-2xl font-bold text-primary">${price.onetime}</span>
+                        <button class="btn btn-primary" onclick={() => onBuyLicense(item.tokenId, '2')}>Buy Now</button>
+                      </div>
+                      <p class="text-xs text-yellow-600 mt-1">
+                        Warning: One Time License allows interaction with this content only once.
+                      </p>
                     </div>
                   {/if}
                 </div>

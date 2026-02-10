@@ -2,28 +2,44 @@
   import ContentItem from './ContentItem.svelte'
 
   let { data: rawData } = $props()
-  let data = $state(rawData)
+
+  let data = $derived(rawData)
 </script>
 
 <div class="container mx-auto px-4 py-8">
-  <h1 class="text-4xl font-bold mb-8">My Purchases</h1>
+  <div class="flex flex-col md:flex-row md:gap-6 gap-1 md:items-end mb-8">
+    <h1 class="text-4xl font-bold">My Purchases</h1>
+    <div>
+      ( Total Purchases: <span class="text-primary text-lg font-semibold"
+        >{[...data.onetimeLicenses, ...data.lifetimeLicenses].length}</span
+      > )
+    </div>
+  </div>
 
-  {#if data.purchases.length === 0}
-    <div class="alert">
+  {#if !data.lifetimeLicenses.length && !data.onetimeLicenses.length}
+    <div class="alert p-7">
       <span>You haven't made any purchases yet.</span>
-      <a href="/authed/publishers" class="btn btn-sm btn-primary">Browse Publishers</a>
+      <a href="/authed/publishers" class="btn btn-primary py-6 md:py-0">Browse Publishers</a>
     </div>
   {:else}
-    <div class="grid grid-cols-1 gap-4">
-      {#each data.purchases as purchase, i}
-        <ContentItem {purchase} trpcClient={data.trpcClient} onBlockFile={() => (data.purchases[i].isBlocked = true)} />
-      {/each}
-    </div>
-
-    <div class="stats shadow mt-8 w-full">
-      <div class="stat">
-        <div class="stat-title">Total Purchases</div>
-        <div class="stat-value">{data.purchases.length}</div>
+    <div class="flex flex-col gap-8 justify-between">
+      <div class="border border-gray-200 rounded-lg p-3">
+        <h1 class="text-primary text-lg font-semibold mb-3">Life Time Purchases</h1>
+        {#if !data.lifetimeLicenses.length}
+          No lifetime content purchased yet
+        {/if}
+        {#each data.lifetimeLicenses as purchase, i}
+          <ContentItem {purchase} trpcClient={data.trpcClient} />
+        {/each}
+      </div>
+      <div class="border border-gray-200 rounded-lg p-3">
+        <h1 class="text-primary text-lg font-semibold mb-3">One Time Purchases</h1>
+        {#if !data.onetimeLicenses.length}
+          No onetime content purchased yet
+        {/if}
+        {#each data.onetimeLicenses as purchase, i}
+          <ContentItem {purchase} trpcClient={data.trpcClient} />
+        {/each}
       </div>
     </div>
   {/if}
