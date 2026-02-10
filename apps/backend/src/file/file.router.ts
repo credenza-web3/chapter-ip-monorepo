@@ -70,7 +70,7 @@ export class FileRouter {
 
     const key = [input.tokenId, ext].join('.')
     const url = await this.fileService.createUploadUrl({
-      Bucket: this.fileService.getBucketName('content'),
+      Bucket: this.fileService.getBucketName(input.bucket),
       Key: key,
       ContentType: input.mimetype,
     })

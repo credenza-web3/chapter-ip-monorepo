@@ -62,7 +62,7 @@ export class FileService extends CommonModelService<File> {
     return result
   }
 
-  getBucketName(type: 'metadata' | 'content') {
+  getBucketName(type: 'metadata' | 'content' | 'preview') {
     let bucketName = `chapter-ip-${type}`
     const env = this.configService.get<string>('NODE_ENV')
     if (env !== 'prod') {
