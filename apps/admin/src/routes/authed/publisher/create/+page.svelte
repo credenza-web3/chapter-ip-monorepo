@@ -1,11 +1,15 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import { notify, ToastType } from '@repo/ui-components'
+  import AgencyAddressInput from '$lib/components/AgencyAddressInput.svelte'
+  import type { AgencyAddressInputRef } from '$lib/types/components'
 
   let publisherName = $state('')
   let avatarUrl = $state('')
   let loading = $state(false)
   let { data } = $props()
+  
+  let agencyInputRef: AgencyAddressInputRef
 
   async function handleSubmit() {
     try {
@@ -14,6 +18,11 @@
         title: publisherName,
         avatarUrl,
       })
+
+      // TODO: Add separate call to save agency address after mutation
+      if (agencyInputRef) {
+        agencyInputRef.saveAddress()
+      }
 
       goto('/authed/upload')
     } catch (error) {
@@ -58,6 +67,10 @@
           />
         </label>
         <p class="validator-hint">Must be valid URL</p>
+      </div>
+
+      <div>
+        <AgencyAddressInput bind:this={agencyInputRef} />
       </div>
 
       <button
