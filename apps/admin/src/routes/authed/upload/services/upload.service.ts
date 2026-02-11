@@ -1,5 +1,5 @@
 import { createClient } from '@repo/trpc/client'
-import { authStore } from '$lib'
+import { authStore, r2Config } from '$lib'
 import { uploadFileToBucket, TransactionService } from '../services'
 
 export class UploadService {
@@ -24,7 +24,7 @@ export class UploadService {
     })
     await uploadFileToBucket(uploaded, url)
     // Upload image if provided
-    let imageUrl = 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/chapter_ip.png'
+    let imageUrl = r2Config.url
     if (uploadedImage) {
       const { url: imageUrlResponse } = await trpcClient.files.createContentUploadUrl.mutate({
         tokenId,
@@ -32,7 +32,9 @@ export class UploadService {
         bucket: "preview"
       })
       await uploadFileToBucket(uploadedImage, imageUrlResponse)
-      imageUrl = imageUrlResponse.split('?')[0]
+      imageUrl += `${uploadedImage.name}.${uploadedImage.type.split('/')[1]}`
+    } else {
+      imageUrl += r2Config.defaultImage
     }
     
     // Register content

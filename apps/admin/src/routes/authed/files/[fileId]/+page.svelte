@@ -6,6 +6,7 @@
   import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
   import { forwardTransaction } from '@repo/fe-services'
   import { notify, ToastType } from '@repo/ui-components'
+  import { r2Config } from '$lib'
 
   let { data } = $props()
   const { items } = data.paginatedResponse
@@ -103,6 +104,13 @@
           <li><strong>Token ID:</strong> {item.tokenId}</li>
           <li><strong>Created:</strong> {formatDate(item.createdAt)}</li>
           <li><strong>Updated:</strong> {formatDate(item.updatedAt)}</li>
+          {#if data.metadata?.image}
+            <li><strong>Image:</strong> 
+              <object data={data.metadata.image} type="image/jpeg" title="File" class="w-30 h-30 rounded-lg">
+                <img src={r2Config.url + r2Config.defaultImage} alt="File" />
+              </object>
+            </li>
+          {/if}
         </ul>
       {/each}
     {/if}

@@ -12,6 +12,7 @@
   const menuItems = [
     { label: 'Files', href: '/authed/files' },
     { label: 'Upload', href: '/authed/upload' },
+    { label: 'Profile', href: '/authed/profile' },
   ]
 
   beforeNavigate(() => {
