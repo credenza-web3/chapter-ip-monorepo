@@ -20,9 +20,9 @@
       })
 
       // TODO: Add separate call to save agency address after mutation
-      if (agencyInputRef) {
-        agencyInputRef.saveAddress()
-      }
+      // if (agencyInputRef) {
+      //   agencyInputRef.saveData()
+      // }
 
       goto('/authed/upload')
     } catch (error) {
@@ -70,7 +70,7 @@
       </div>
 
       <div>
-        <AgencyAddressInput bind:this={agencyInputRef} />
+        <!-- <AgencyAddressInput bind:this={agencyInputRef} /> -->
       </div>
 
       <button

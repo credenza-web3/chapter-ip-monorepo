@@ -5,9 +5,9 @@
   
   let agencyInputRef: AgencyAddressInputRef
   
-  function saveAgencyAddress() {
+  function saveAgency() {
     if (agencyInputRef) {
-      agencyInputRef.saveAddress()
+      agencyInputRef.saveData()
     }
   }
 </script>
@@ -28,14 +28,14 @@
           <p class="text-sm font-mono text-gray-900 break-all">{data.userAddress}</p>
         </div>
       </div>
-      <hr />
+      <!-- <hr />
       <div class="flex-1 max-w-md">
         <h2 class="text-lg font-medium text-gray-900 mb-4">Agency Settings</h2>
         <AgencyAddressInput bind:this={agencyInputRef} />
-        <button onclick={saveAgencyAddress} class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-          Save Agency Address
+        <button onclick={saveAgency} class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          Save Agency
         </button>
-      </div>
+      </div> -->
     </div>
   </div>
 </div>
