@@ -69,8 +69,12 @@
         <p class="validator-hint">Must be valid URL</p>
       </div>
 
-      <div>
-        <!-- <AgencyAddressInput bind:this={agencyInputRef} /> -->
+      <div class="flex-1 max-w-md relative opacity-50 pointer-events-none">
+        <!-- TODO: implement agency settings and remove cover -->
+        <div class="absolute inset-0 bg-gray-200 opacity-10 rounded-lg z-10 flex items-center justify-center">
+        </div>
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Agency Settings (in development)</h2>
+        <AgencyAddressInput bind:this={agencyInputRef} />
       </div>
 
       <button

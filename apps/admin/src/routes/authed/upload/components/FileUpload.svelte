@@ -5,6 +5,17 @@
   let fileInput: HTMLInputElement | null = $state(null)
   
   const maximumSize = 1 * 1024 * 1024 * 1024 // 1GB
+  
+  const allowedExtensions = ['.mp4', '.mov', '.txt', '.docx', '.zip']
+  
+  function getFileExtension(filename: string): string {
+    return filename.slice((filename.lastIndexOf('.') - 1 >>> 0) + 2).toLowerCase()
+  }
+  
+  function isValidFileType(filename: string): boolean {
+    const ext = getFileExtension(filename)
+    return allowedExtensions.includes('.' + ext)
+  }
 
   function handleDrop(event: DragEvent) {
     event.preventDefault()
@@ -19,6 +30,12 @@
 
     if (file.size > maximumSize) {
       alert('Selected file is too big. Maximum size is 1GB.')
+      if (target) target.value = ''
+      return
+    }
+    
+    if (!isValidFileType(file.name)) {
+      alert('Invalid file type. Allowed types: MP4, MOV, TXT, DOCX, ZIP.')
       if (target) target.value = ''
       return
     }
@@ -66,8 +83,8 @@
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
     </svg>
     <span class="text-center mb-2">Upload or drag a file</span>
-    <span class="text-xs text-stone-400">All file types supported — Max size: 1GB</span>
+    <span class="text-xs text-stone-400">Allowed: MP4, MOV, TXT, DOCX, ZIP — Max size: 1GB</span>
   {/if}
 
-  <input type="file" class="hidden" bind:this={fileInput} onchange={handleInput} />
+  <input type="file" class="hidden" bind:this={fileInput} onchange={handleInput} accept=".mp4,.mov,.txt,.docx,.zip" />
 </div>
