@@ -1,6 +1,7 @@
 import { createClient } from '@repo/trpc/client'
-import { authStore, r2Config } from '$lib'
+import { authStore } from '$lib'
 import { uploadFileToBucket, TransactionService } from '../services'
+import { r2Config } from '@repo/fe-services'
 
 export class UploadService {
   transactionService: TransactionService
@@ -32,7 +33,7 @@ export class UploadService {
         bucket: "preview"
       })
       await uploadFileToBucket(uploadedImage, imageUrlResponse)
-      imageUrl += `${uploadedImage.name}.${uploadedImage.type.split('/')[1]}`
+      imageUrl += `${tokenId}.${uploadedImage.type.split('/')[1]}`
     } else {
       imageUrl += r2Config.defaultImage
     }
@@ -46,13 +47,21 @@ export class UploadService {
     return { tokenId, imageUrl, key }
   }
 
-  async saveMetadata(
+  async saveMetadata({ 
+    tokenId,
+    uploaded,
+    imageUrl,
+    key,
+    title,
+    trpcClient
+  }: {
     tokenId: string,
     uploaded: File,
     imageUrl: string,
     key: string,
+    title: string,
     trpcClient: any
-  ): Promise<void> {
+  }): Promise<void> {
     await trpcClient.files.uploadMetadata.mutate({
       tokenId,
       metadata: {
@@ -61,6 +70,7 @@ export class UploadService {
         type: uploaded.type,
         key,
         image: imageUrl,
+        title,
       },
     })
   }

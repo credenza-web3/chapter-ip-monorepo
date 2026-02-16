@@ -30,7 +30,14 @@
         trpcClient
       )
       
-      await uploadService.saveMetadata(tokenId, $uploadStore.uploaded!, imageUrl, key, trpcClient)
+      await uploadService.saveMetadata({
+        tokenId,
+        uploaded: $uploadStore.uploaded!,
+        imageUrl,
+        key,
+        title: $uploadStore.title,
+        trpcClient,
+      })
 
       notify('File uploaded successfully', ToastType.SUCCESS)
       uploadStore.reset()
@@ -50,13 +57,16 @@
 
 <div class="p-6 min-h-xl card bg-base-100 shadow-md">
   <div class="mb-12 text-center">
-    <h1 class="text-4xl font-light text-gray-900">Upload File</h1>
+    <h1 class="text-4xl font-light text-gray-900">Upload Text (TXT/DOCX), Location (MOV/MP4), or NIL (ZIP) File</h1>
   </div>
 
   <FileUpload />
   
   {#if $uploadStore.uploaded}
     <div class="mt-6">
+      <h2 class="text-xl font-semibold mb-3">Content Details</h2>
+
+      <input id="title" type="text" bind:value={$uploadStore.title} placeholder="Title" class="input input-bordered w-1/3 mb-3" />
       <ImageUpload />
     </div>
     <div class="mt-6 space-y-4">

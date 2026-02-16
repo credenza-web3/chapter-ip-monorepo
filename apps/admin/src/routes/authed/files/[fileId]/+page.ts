@@ -29,7 +29,7 @@ export const load: PageLoad = async ({ params }) => {
   )
   const metaUri = await contentContract.tokenURI(String(tokenId))
   const response = await fetch(metaUri)
-  const metadata: { image: string } = await response.json()
+  const metadata: { image: string, title: string } = await response.json()
 
   return { paginatedResponse, tokenId, metadata }
 }

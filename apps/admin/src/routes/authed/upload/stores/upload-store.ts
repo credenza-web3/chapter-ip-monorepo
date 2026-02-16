@@ -8,6 +8,7 @@ interface UploadState {
   lifetimePrice: number
   oneTimePrice: number
   loading: boolean
+  title: string
 }
 
 function createUploadStore() {
@@ -19,10 +20,12 @@ function createUploadStore() {
     lifetimePrice: 0,
     oneTimePrice: 0,
     loading: false,
+    title: '',
   })
 
   return {
     subscribe,
+    set,
     
     setUploaded: (file: File | null) => update(state => ({ 
       ...state, 
@@ -71,6 +74,7 @@ function createUploadStore() {
       lifetimePrice: 0,
       oneTimePrice: 0,
       loading: false,
+      title: '',
     })
   }
 }

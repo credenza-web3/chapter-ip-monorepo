@@ -6,7 +6,7 @@
   import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
   import { forwardTransaction } from '@repo/fe-services'
   import { notify, ToastType } from '@repo/ui-components'
-  import { r2Config } from '$lib'
+  import { r2Config } from '@repo/fe-services'
 
   let { data } = $props()
   const { items } = data.paginatedResponse
@@ -111,6 +111,7 @@
               </object>
             </li>
           {/if}
+          <li><strong>Title:</strong> {data.metadata?.title || "Untitled"}</li>
         </ul>
       {/each}
     {/if}
