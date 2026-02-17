@@ -6,7 +6,7 @@
   import { sendTx } from '$lib/services/transaction'
 
   let { data } = $props()
-  const { items } = data.paginatedResponse
+  const { items } = data.paginatedResponse ?? { items: []}
 
   
   let fulltimeLicensePrice = $state(0)
@@ -54,7 +54,7 @@
   }
 
   onMount(async () => {
-    const tokenId = data.paginatedResponse.items[0].tokenId
+    const tokenId = data.paginatedResponse?.items[0].tokenId
 
     fulltimeLicensePrice = Number(await data?.contentContract?.getLicensePriceFiat(tokenId, '0')) / 100
     onetimeLicensePrice = Number(await data?.contentContract?.getLicensePriceFiat(tokenId, '2')) / 100
@@ -68,7 +68,7 @@
     <h1 class="text-4xl font-light text-gray-900">File Details</h1>
   </div>
   <div class="flex flex-col md:flex-row justify-between gap-6 md:px-7">
-    {#if items.length > 0}
+    {#if items?.length > 0}
       {#each items as item}
         <ul class="basis-1/2">
           <li><strong>ID:</strong> {item.id}</li>
