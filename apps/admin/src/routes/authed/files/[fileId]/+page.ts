@@ -23,5 +23,5 @@ export const load: PageLoad = async ({ params, parent }) => {
   const response = await fetch(metaUri!)
   const metadata: { image: string, title: string } = await response.json()
 
-  return { paginatedResponse, tokenId, metadata }
+  return { paginatedResponse, tokenId, metadata, contentContract }
 }

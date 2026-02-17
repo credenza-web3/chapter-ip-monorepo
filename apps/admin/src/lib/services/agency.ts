@@ -1,5 +1,6 @@
 import { ethers } from '@repo/fe-evm-provider'
 import { notify, ToastType } from '@repo/ui-components'
+import { sendTx } from './transaction'
 
 export async function savePublisherAgency(
   contentContract: ethers.Contract,
@@ -7,7 +8,8 @@ export async function savePublisherAgency(
   agencyAddress: string,
 ): Promise<boolean> {
   try {
-    await contentContract.setPublisherAgency(userAddress, agencyAddress)
+    const tx = await contentContract.setPublisherAgency.populateTransaction(userAddress, agencyAddress)
+    await sendTx(tx)
     notify('Agency settings saved successfully', ToastType.SUCCESS)
     return true
   } catch (error) {
