@@ -17,16 +17,21 @@
   const LICENSE_CONTRACT = import.meta.env.VITE_EVM_LICENSE_NFT_CONTRACT_ADDRESS
 
   const getTokenPrice = async (tokenId: string) => {
-    const provider = await initProvider(authStore.state.accessToken!)
-    const ethersProvider = new ethers.BrowserProvider(provider)
+    try {
+      const provider = await initProvider(authStore.state.accessToken!)
+      const ethersProvider = new ethers.BrowserProvider(provider)
 
-    const contentContract = new ethers.Contract(CONTENT_CONTRACT, content_abi, ethersProvider)
+      const contentContract = new ethers.Contract(CONTENT_CONTRACT, content_abi, ethersProvider)
 
-    const priceCentsFulltimeLicense = await contentContract.getLicensePriceFiat(tokenId, '0')
-    const priceCentsOnetimeLicense = await contentContract.getLicensePriceFiat(tokenId, '2')
-    return {
-      fulltime: Number(priceCentsFulltimeLicense) / 100,
-      onetime: Number(priceCentsOnetimeLicense) / 100,
+      const priceCentsFulltimeLicense = await contentContract.getLicensePriceFiat(tokenId, '0')
+      const priceCentsOnetimeLicense = await contentContract.getLicensePriceFiat(tokenId, '2')
+      return {
+        fulltime: Number(priceCentsFulltimeLicense) / 100,
+        onetime: Number(priceCentsOnetimeLicense) / 100,
+      }
+    } catch (error) {
+      console.error('Error fetching token price:', error)
+      return { fulltime: 0, onetime: 0 }
     }
   }
 
