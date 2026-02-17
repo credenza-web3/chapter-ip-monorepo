@@ -1,0 +1,4 @@
+export enum HistoryTabs {
+  CRED_BALANCE = 'CRED_BALANCE',
+  TRANSACTIONS = 'TRANSACTIONS',
+}
