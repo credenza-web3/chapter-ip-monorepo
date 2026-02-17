@@ -2,14 +2,18 @@
   import { goto } from '$app/navigation'
   import { notify, ToastType } from '@repo/ui-components'
   import AgencyAddressInput from '$lib/components/AgencyAddressInput.svelte'
-  import type { AgencyAddressInputRef } from '$lib/types/components'
+  import { agencyStore } from '$lib/stores/agency.svelte.js'
+  import { savePublisherAgency } from '$lib/services/agency'
 
   let publisherName = $state('')
   let avatarUrl = $state('')
   let loading = $state(false)
   let { data } = $props()
-  
-  let agencyInputRef: AgencyAddressInputRef
+
+  async function saveAgency() {
+    if (!data.contentContract) return
+    await savePublisherAgency(data.contentContract, data.userAddress, agencyStore.agencyAddress)
+  }
 
   async function handleSubmit() {
     try {
@@ -19,10 +23,7 @@
         avatarUrl,
       })
 
-      // TODO: Add separate call to save agency address after mutation
-      // if (agencyInputRef) {
-      //   agencyInputRef.saveData()
-      // }
+      await saveAgency()
 
       goto('/authed/upload')
     } catch (error) {
@@ -69,17 +70,14 @@
         <p class="validator-hint">Must be valid URL</p>
       </div>
 
-      <div class="flex-1 max-w-md relative opacity-50 pointer-events-none">
-        <!-- TODO: implement agency settings and remove cover -->
-        <div class="absolute inset-0 bg-gray-200 opacity-10 rounded-lg z-10 flex items-center justify-center">
-        </div>
-        <h2 class="text-lg font-medium text-gray-900 mb-4">Agency Settings (in development)</h2>
-        <AgencyAddressInput bind:this={agencyInputRef} />
+      <div class="flex-1 max-w-md">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Agency Settings</h2>
+        <AgencyAddressInput />
       </div>
 
       <button
         type="button"
-        disabled={!publisherName || loading}
+        disabled={!publisherName || loading || !agencyStore.canSave}
         onclick={handleSubmit}
         class="w-full py-3 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
       >

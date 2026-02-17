@@ -1,8 +1,10 @@
 import { browser } from '$app/environment'
 import { authStore } from '$lib'
-import { getSigner, initProvider } from '@repo/fe-evm-provider'
+import { ethers, getSigner, initProvider } from '@repo/fe-evm-provider'
 import { createClient } from '@repo/trpc/client'
 import { redirect } from '@sveltejs/kit'
+import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
+import { agencyStore } from '$lib/stores/agency.svelte'
 
 export const prerender = false
 export const ssr = false
@@ -28,8 +30,26 @@ export const load = async ({ url }) => {
     getAccessTokenFn: () => authStore.state.accessToken!,
   })
 
+  initProvider(accessToken)
+  const signer = await getSigner()
+  const userAddress = await signer.getAddress()
+
+  const contentContract = new ethers.Contract(
+    import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS,
+    content_abi,
+    signer,
+  )
+
+  const agencyAddress = await contentContract.publisherAgency(userAddress)
+  // const agencyFee = contentContract.agencyFee
+
+  agencyStore.setData({
+    agencyAddress,
+    agencyFee: 0
+  })
+
   if (url.pathname === '/authed/publisher/create') {
-    return { trpcClient }
+    return { trpcClient, userAddress, contentContract }
   }
 
   const sub = await authStore.getSubFromToken()
@@ -37,10 +57,7 @@ export const load = async ({ url }) => {
     const publisher = await trpcClient.publishers.getPublisher.query({
       sub: sub!,
     })
-    initProvider(accessToken)
-    const signer = await getSigner()
-    const userAddress = await signer.getAddress()
-    return { trpcClient, publisher, userAddress }
+    return { trpcClient, publisher, userAddress, contentContract }
   } catch {
     throw redirect(302, `/authed/publisher/create`)
   }

@@ -1,41 +1,11 @@
 <script lang="ts">
-  let agencyAddress = $state('')
-  let agencyPercentage = $state('')
-  
-  function saveData() {
-    if (!agencyAddress) {
-      console.log('Agency address is empty')
-      throw new Error('Agency address is empty')
-    }
-    if (!agencyPercentage) {
-      console.log('Agency percentage is empty')
-      throw new Error('Agency percentage is empty')
-    }
-    console.log('Saving agency address:', agencyAddress)
-    console.log('Saving agency percentage:', agencyPercentage)
-    // TODO: Add actual save logic here
+  import { agencyStore } from '$lib/stores/agency.svelte'
+
+  let touched = $state(false)
+
+  function handleChange() {
+    touched = true
   }
-  
-  // Load data from blockchain (mock for now)
-  async function loadFromBlockchain() {
-    // TODO: Replace with actual blockchain call
-    console.log('Loading agency data from blockchain...')
-    
-    // Mock data
-    const mockData = {
-      address: '0x1234567890123456789012345678901234567890',
-      percentage: '15.5'
-    }
-    
-    agencyAddress = mockData.address
-    agencyPercentage = mockData.percentage
-    
-    console.log('Loaded agency data:', mockData)
-    return mockData
-  }
-  
-  // Export methods for parent component
-  export { saveData }
 </script>
 
 <div>
@@ -43,22 +13,26 @@
   <input
     id="agency-address"
     type="text"
-    bind:value={agencyAddress}
-    placeholder="Enter agency address"
-    class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 transition-colors"
+    bind:value={agencyStore.agencyAddress}
+    onchange={handleChange}
+    placeholder="Enter agency address (0x...)"
+    class="w-full px-4 py-3 border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none transition-colors {!touched || agencyStore.isValidAddress ? 'border-gray-300 focus:border-gray-900' : 'border-red-500 focus:border-red-600'}"
   />
+  {#if touched && !agencyStore.isValidAddress}
+    <p class="text-sm text-red-500 mt-1">Invalid Ethereum address</p>
+  {/if}
 </div>
 
-<div class="mt-4">
-  <label for="agency-percentage" class="block text-sm text-gray-700 mb-2">Agency Share Percentage</label>
+<!-- <div class="mt-4">
+  <label for="agency-fee" class="block text-sm text-gray-700 mb-2">Agency Share Fee</label>
   <input
-    id="agency-percentage"
+    id="agency-fee"
     type="number"
-    bind:value={agencyPercentage}
-    placeholder="Enter agency share percentage"
+    bind:value={agencyStore.agencyFee}
+    placeholder="Enter agency share fee"
     min="0"
     max="100"
     step="0.01"
     class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 transition-colors"
   />
-</div>
+</div> -->
