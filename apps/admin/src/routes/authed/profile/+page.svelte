@@ -3,7 +3,6 @@
   import type { AgencyAddressInputRef } from '$lib/types/components'
   import NavigationBar from './components/NavigationBar.svelte'
   import { HistoryTabs } from './types'
-
   import CredContractHistory from './components/CredContractHistory.svelte'
   import ContentNftHistory from './components/ContentNftHistory.svelte'
   import LicenseNftHistory from './components/LicenseNftHistory.svelte'
@@ -13,15 +12,11 @@
   let agencyInputRef: AgencyAddressInputRef
   let activeTab = $state<HistoryTabs>(HistoryTabs.CRED_BALANCE)
 
-  const CONTENT_CONTRACT = import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS
-  const LICENSE_CONTRACT = import.meta.env.VITE_EVM_LICENSE_NFT_CONTRACT_ADDRESS
-
   function saveAgency() {
     if (agencyInputRef) {
       agencyInputRef.saveData()
     }
   }
-
 </script>
 
 <div class="min-h-xl flex items-center justify-center bg-white p-4 w-full">
