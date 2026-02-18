@@ -16,10 +16,17 @@
 
     <button
       type="button"
-      class={`cursor-pointer py-3.25 ${activeTab === 'nft' ? active : ''}`}
-      onclick={() => (activeTab = 'nft')}
+      class={`cursor-pointer py-3.25 ${activeTab === 'contentNft' ? active : ''}`}
+      onclick={() => (activeTab = 'contentNft')}
     >
-      NFT History
+      Content NFT History
+    </button>
+    <button
+      type="button"
+      class={`cursor-pointer py-3.25 ${activeTab === 'licenseNft' ? active : ''}`}
+      onclick={() => (activeTab = 'licenseNft')}
+    >
+      License NFT History
     </button>
   </nav>
 </header>

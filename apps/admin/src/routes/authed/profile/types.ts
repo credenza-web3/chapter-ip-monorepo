@@ -1,4 +1,5 @@
 export enum HistoryTabs {
-  CRED_BALANCE = 'CRED_BALANCE',
-  TRANSACTIONS = 'TRANSACTIONS',
+  CRED_BALANCE = 'cred',
+  CONTENT_NFT = 'contentNft',
+  LICENSES_NFT = 'licenseNft',
 }
