@@ -1,11 +1,5 @@
 <script lang="ts">
   import { formatDate } from '$lib/services/formatDate.js'
-   import { onMount } from 'svelte'
-  import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
-  import { forwardTransaction } from '@repo/fe-services'
-  import { notify, ToastType } from '@repo/ui-components'
-  import { r2Config } from '$lib'
-  import { ethers, initProvider } from '@repo/fe-evm-provider'
   import { onMount } from 'svelte'
   import { notify, ToastType } from '@repo/ui-components'
   import { r2Config } from '@repo/fe-services'
