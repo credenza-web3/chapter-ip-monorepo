@@ -2,7 +2,7 @@
   import BaseContractHistory from './BaseContractHistory.svelte'
   import { abi } from '@credenza3/contracts/artifacts/LicenseNftContract.json'
 
-  const { userAddress }: { userAddress: string } = $props()
+  const { userAddress }: { userAddress?: string } = $props()
   const contractAddress = import.meta.env.VITE_EVM_LICENSE_NFT_CONTRACT_ADDRESS
 </script>
 
