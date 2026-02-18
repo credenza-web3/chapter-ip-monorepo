@@ -1,21 +1,22 @@
 <script lang="ts">
   import AgencyAddressInput from '$lib/components/AgencyAddressInput.svelte'
-  import type { AgencyAddressInputRef } from '$lib/types/components'
+  import { agencyStore } from '$lib/stores/agency.svelte.js'
+  import { savePublisherAgency } from '$lib/services/agency'
   import NavigationBar from './components/NavigationBar.svelte'
-  import { HistoryTabs } from './types'
   import CredContractHistory from './components/CredContractHistory.svelte'
   import ContentNftHistory from './components/ContentNftHistory.svelte'
   import LicenseNftHistory from './components/LicenseNftHistory.svelte'
+  import { HistoryTabs } from './types'
 
   let { data } = $props()
+  let loading = $state(false)
+  let activeTab = $state(HistoryTabs.CRED_BALANCE)
 
-  let agencyInputRef: AgencyAddressInputRef
-  let activeTab = $state<HistoryTabs>(HistoryTabs.CRED_BALANCE)
-
-  function saveAgency() {
-    if (agencyInputRef) {
-      agencyInputRef.saveData()
-    }
+  async function saveAgency() {
+    if (!data.contentContract) return
+    loading = true
+    await savePublisherAgency(data.contentContract, data.userAddress, agencyStore.agencyAddress)
+    loading = false
   }
 </script>
 
@@ -36,13 +37,15 @@
         </div>
       </div>
       <hr />
-      <div class="flex-1 max-w-md relative opacity-50 pointer-events-none">
-        <!-- TODO: implement agency settings and remove cover -->
-        <div class="absolute inset-0 bg-gray-200 opacity-10 rounded-lg z-10 flex items-center justify-center"></div>
-        <h2 class="text-lg font-medium text-gray-900 mb-4">Agency Settings (in development)</h2>
-        <AgencyAddressInput bind:this={agencyInputRef} />
-        <button onclick={saveAgency} class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-          Save Agency
+      <div class="flex-1 max-w-md">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Agency Settings</h2>
+        <AgencyAddressInput />
+        <button
+          onclick={saveAgency}
+          class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+          disabled={loading || !agencyStore.canSave}
+        >
+          {loading ? 'Saving...' : 'Save Agency'}
         </button>
       </div>
       <hr />

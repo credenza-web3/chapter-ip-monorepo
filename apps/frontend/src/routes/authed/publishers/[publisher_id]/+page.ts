@@ -9,5 +9,6 @@ export const load = async ({ params, parent }) => {
   const { items: contentItems } = await trpcClient!.files.findContent.query({
     sub: publisher.sub,
   })
+
   return { publisher, contentItems }
 }

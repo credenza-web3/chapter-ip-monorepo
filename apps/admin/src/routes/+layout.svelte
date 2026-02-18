@@ -3,25 +3,14 @@
   import favicon from '$lib/assets/credenza.png'
   import { Toast, Header, Footer } from '@repo/ui-components'
   import { authStore } from '$lib'
-  import { afterNavigate, beforeNavigate } from '$app/navigation'
 
   let { children } = $props()
-
-  let loading = $state(false)
 
   const menuItems = [
     { label: 'Files', href: '/authed/files' },
     { label: 'Upload', href: '/authed/upload' },
     { label: 'Profile', href: '/authed/profile' },
   ]
-
-  beforeNavigate(() => {
-    loading = true
-  })
-
-  afterNavigate(() => {
-    loading = false
-  })
 </script>
 
 <svelte:head>
@@ -32,13 +21,7 @@
 <div class="min-h-screen overflow-x-hidden flex flex-col">
   <Header {authStore} {menuItems} />
   <main class="space-y-0 flex-1 md:p-6 p-2">
-    {#if loading}
-      <div class="flex items-center justify-center h-16">
-        <span class="loading loading-dots loading-lg"></span>
-      </div>
-    {:else}
-      {@render children?.()}
-    {/if}
+    {@render children?.()}
   </main>
   <Footer />
 </div>

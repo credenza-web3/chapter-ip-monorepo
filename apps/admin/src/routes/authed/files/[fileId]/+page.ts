@@ -1,10 +1,11 @@
 import { authStore } from '$lib'
 import { createClient } from '@repo/trpc/client'
 import type { PageLoad } from './$types'
-import { ethers, getSigner, initProvider } from '@repo/fe-evm-provider'
-import { abi as license_abi } from '@credenza3/contracts/artifacts/LicenseNftContract.json'
+import { goto } from '$app/navigation'
+import { notify, ToastType } from '@repo/ui-components'
 
-export const load: PageLoad = async ({ params }) => {
+export const load: PageLoad = async ({ params, parent }) => {
+  const { contentContract } = await parent()
   const fileId = params.fileId
 
   const trpcClient = createClient({
@@ -19,17 +20,16 @@ export const load: PageLoad = async ({ params }) => {
     id: fileId,
   })
   const tokenId = paginatedResponse.items[0].tokenId
-
-  await initProvider(authStore.state.accessToken!)
-  const signer = await getSigner()
-  const contentContract = new ethers.Contract(
-    import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS,
-    license_abi,
-    signer,
-  )
-  const metaUri = await contentContract.tokenURI(String(tokenId))
-  const response = await fetch(metaUri)
-  const metadata: { image: string } = await response.json()
-
-  return { paginatedResponse, tokenId, metadata }
+  console.log('tokenId', tokenId)
+  try {
+    const metaUri = await contentContract?.tokenURI(String(tokenId))
+    console.log('metaUri', metaUri)
+    const response = await fetch(metaUri!)
+    const metadata: { image: string, title: string } = await response.json()
+    return { paginatedResponse, tokenId, metadata, contentContract }
+  } catch (error) {
+    console.error('Error fetching metadata:', error)
+    notify('Outdated contract metadata, we can not display the file details', ToastType.FAIL)
+    return goto('/authed/files')
+  }
 }

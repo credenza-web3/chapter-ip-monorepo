@@ -32,6 +32,8 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
       name: string
       size: number
       type: string
+      title: string
+      image: string
       key: string
     }
   > = {}
@@ -48,6 +50,8 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
       name: string
       size: number
       type: string
+      title: string
+      image: string
       key: string
     } = metaUris[metaUri]
 
@@ -67,4 +71,25 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
   }
 
   return tokens
+}
+
+export const getTokenMetadata = async (accessToken: string, tokenId: string) => {
+  await initProvider(accessToken)
+  const signer = await getSigner()
+  const contentContract = new ethers.Contract(
+    import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS,
+    license_abi,
+    signer,
+  )
+
+  try {
+    const metaUri = await contentContract.tokenURI(String(tokenId))
+    const response = await fetch(metaUri)
+    const metadata: { image: string, title: string } = await response.json()
+
+    return metadata
+  } catch (error) {
+    console.error('Error fetching metadata:', error)
+    return { image: '', title: '' }
+  }
 }

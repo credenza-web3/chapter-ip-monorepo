@@ -4,9 +4,10 @@
   import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
   import { abi as license_abi } from '@credenza3/contracts/artifacts/LicenseNftContract.json'
   import { passportStore } from '$lib/passport.store'
-  import { forwardTransaction } from '@repo/fe-services'
+  import { forwardTransaction, r2Config } from '@repo/fe-services'
   import { get } from 'svelte/store'
   import { goto } from '$app/navigation'
+  import { getTokenMetadata } from '../../purchases/helper.js'
 
   let { data } = $props()
 
@@ -16,16 +17,21 @@
   const LICENSE_CONTRACT = import.meta.env.VITE_EVM_LICENSE_NFT_CONTRACT_ADDRESS
 
   const getTokenPrice = async (tokenId: string) => {
-    const provider = await initProvider(authStore.state.accessToken!)
-    const ethersProvider = new ethers.BrowserProvider(provider)
+    try {
+      const provider = await initProvider(authStore.state.accessToken!)
+      const ethersProvider = new ethers.BrowserProvider(provider)
 
-    const contentContract = new ethers.Contract(CONTENT_CONTRACT, content_abi, ethersProvider)
+      const contentContract = new ethers.Contract(CONTENT_CONTRACT, content_abi, ethersProvider)
 
-    const priceCentsFulltimeLicense = await contentContract.getLicensePriceFiat(tokenId, '0')
-    const priceCentsOnetimeLicense = await contentContract.getLicensePriceFiat(tokenId, '2')
-    return {
-      fulltime: Number(priceCentsFulltimeLicense) / 100,
-      onetime: Number(priceCentsOnetimeLicense) / 100,
+      const priceCentsFulltimeLicense = await contentContract.getLicensePriceFiat(tokenId, '0')
+      const priceCentsOnetimeLicense = await contentContract.getLicensePriceFiat(tokenId, '2')
+      return {
+        fulltime: Number(priceCentsFulltimeLicense) / 100,
+        onetime: Number(priceCentsOnetimeLicense) / 100,
+      }
+    } catch (error) {
+      console.error('Error fetching token price:', error)
+      return { fulltime: 0, onetime: 0 }
     }
   }
 
@@ -105,15 +111,12 @@
       {:else}
         {#each data.contentItems as item}
           <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow card-sm border border-gray-200">
-            <figure class="px-10 pt-10">
-              <div class="avatar placeholder">
-                <div class="bg-neutral text-neutral-content rounded-xl w-24">
-                  <span class="text-3xl">📄</span>
-                </div>
-              </div>
-            </figure>
+            {#await getTokenMetadata(authStore.state.accessToken!, item.tokenId) then metadata}
+             <object data={metadata.image} type="image/jpeg" title="File" class="w-30 h-30 rounded-lg mx-auto mt-4">
+                <img src={r2Config.url + r2Config.defaultImage} alt="File" />
+              </object>
             <div class="card-body">
-              <h3 class="card-title">{item.id}</h3>
+              <h3 class="card-title">{metadata.title || 'UNTITLED'}</h3>
               {#await getTokenPrice(item.tokenId) then price}
                 <div class="card-actions mt-4 flex flex-col">
                   {#if price.fulltime}
@@ -138,6 +141,7 @@
                 </div>
               {/await}
             </div>
+            {/await}
           </div>
         {/each}
       {/if}
