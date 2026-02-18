@@ -33,7 +33,11 @@ export class UploadService {
         bucket: "preview"
       })
       await uploadFileToBucket(uploadedImage, imageUrlResponse)
-      imageUrl += `${tokenId}.${uploadedImage.type.split('/')[1]}`
+
+      let ext = uploadedImage.type.split('/')[1]
+      if (ext === 'jpeg')
+        ext = 'jpg'
+      imageUrl += `${tokenId}.${ext}`
     } else {
       imageUrl += r2Config.defaultImage
     }
