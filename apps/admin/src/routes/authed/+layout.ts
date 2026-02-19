@@ -2,9 +2,9 @@ import { browser } from '$app/environment'
 import { authStore } from '$lib'
 import { ethers, getSigner, initProvider } from '@repo/fe-evm-provider'
 import { createClient } from '@repo/trpc/client'
-import { redirect } from '@sveltejs/kit'
 import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
 import { agencyStore } from '$lib/stores/agency.svelte'
+import { goto } from '$app/navigation'
 
 export const prerender = false
 export const ssr = false
@@ -22,7 +22,7 @@ export const load = async ({ url }) => {
   const accessToken = await authStore.getAccessToken()
 
   if (!accessToken) {
-    throw redirect(302, `/`)
+    return goto(`/`)
   }
 
   const trpcClient = createClient({
@@ -41,17 +41,11 @@ export const load = async ({ url }) => {
   )
 
   const agencyAddress = await contentContract.publisherAgency(userAddress)
-  // const agencyFee = contentContract.agencyFee
+  const agencyFee = await contentContract.publisherAgencyFee(userAddress)
 
-  agencyStore.setData({
-    agencyAddress,
-    agencyFee: 0
-  })
-
-  if (url.pathname === '/authed/publisher/create') {
-    return { trpcClient, userAddress, contentContract }
-  }
-
+  agencyStore.setAddress(agencyAddress)
+  agencyStore.setFee(agencyFee)
+  
   const sub = await authStore.getSubFromToken()
   try {
     const publisher = await trpcClient.publishers.getPublisher.query({
@@ -59,6 +53,9 @@ export const load = async ({ url }) => {
     })
     return { trpcClient, publisher, userAddress, contentContract }
   } catch {
-    throw redirect(302, `/authed/publisher/create`)
+    if (url.pathname === '/authed/publisher/create') {
+      return { trpcClient, userAddress, contentContract, publisher: null }
+    }
+    return goto(`/authed/publisher/create`)
   }
 }
