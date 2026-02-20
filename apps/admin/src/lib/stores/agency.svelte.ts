@@ -4,28 +4,49 @@ class AgencyStore {
   agencyAddress = $state('')
   agencyFee = $state(0)
   originalAddress = $state('')
+  originalFee = $state(0)
 
   isValidAddress = $derived(
     this.agencyAddress === '' || ethers.isAddress(this.agencyAddress)
+  )
+
+  isFeeValid = $derived(
+    this.agencyFee >= 0 && this.agencyFee <= 100
   )
 
   hasValidAddress = $derived(
     this.agencyAddress !== '' && ethers.isAddress(this.agencyAddress)
   )
 
-  hasChanged = $derived(
+  hasAddressChanged = $derived(
     this.agencyAddress !== this.originalAddress
   )
 
-  setData(data: { agencyAddress: string; agencyFee: number }) {
-    this.agencyFee = data.agencyFee
-    if (data.agencyAddress === ethers.ZeroAddress) {
+  hasFeeChanged = $derived(
+    this.agencyFee !== this.originalFee
+  )
+
+  setAddress(address: string) {
+    if (address === ethers.ZeroAddress) {
       this.agencyAddress = ''
       this.originalAddress = ''
       return
     }
-    this.agencyAddress = data.agencyAddress
-    this.originalAddress = data.agencyAddress
+    this.agencyAddress = address
+    this.setOriginalAddress(address)
+  }
+
+  setOriginalAddress(address: string) {
+    this.originalAddress = address
+  }
+
+  setFee(fee: number) {
+    this.agencyFee = fee
+    this.setOriginalFee(fee)
+  }
+
+  setOriginalFee(fee: number) {
+    this.originalFee = fee
   }
 
   reset() {
@@ -34,8 +55,12 @@ class AgencyStore {
     this.agencyFee = 0
   }
 
-  get canSave(): boolean {
-    return this.isValidAddress && this.hasChanged
+  get canSaveAddress(): boolean {
+    return (this.isValidAddress && this.hasAddressChanged)
+  }
+
+  get canSaveFee(): boolean {
+    return this.hasFeeChanged && this.isFeeValid
   }
 
   getData() {

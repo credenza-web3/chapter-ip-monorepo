@@ -3,16 +3,30 @@
   import { notify, ToastType } from '@repo/ui-components'
   import AgencyAddressInput from '$lib/components/AgencyAddressInput.svelte'
   import { agencyStore } from '$lib/stores/agency.svelte.js'
-  import { savePublisherAgency } from '$lib/services/agency'
+  import { savePublisherAgencyAddress, savePublisherAgencyFee } from '$lib/services/agency'
+  import AgencyFeeInput from '$lib/components/AgencyFeeInput.svelte'
+  import { onMount } from 'svelte'
 
   let publisherName = $state('')
   let avatarUrl = $state('')
   let loading = $state(false)
   let { data } = $props()
 
-  async function saveAgency() {
-    if (!data.contentContract) return
-    await savePublisherAgency(data.contentContract, data.userAddress, agencyStore.agencyAddress)
+  onMount(() => {
+    console.log(data)
+    if (data.publisher) {
+      return goto('/authed/profile')
+    }
+  })
+
+  async function saveAgencyAddress() {
+    if (!data.contentContract || !agencyStore.canSaveAddress) return
+    await savePublisherAgencyAddress(data.contentContract, data.userAddress)
+  }
+
+  async function saveAgencyFee() {
+    if (!data.contentContract || !agencyStore.canSaveFee) return
+    await savePublisherAgencyFee(data.contentContract, data.userAddress)
   }
 
   async function handleSubmit() {
@@ -23,7 +37,8 @@
         avatarUrl,
       })
 
-      await saveAgency()
+      await saveAgencyAddress()
+      await saveAgencyFee()
 
       goto('/authed/upload')
     } catch (error) {
@@ -72,12 +87,17 @@
 
       <div class="flex-1 max-w-md">
         <h2 class="text-lg font-medium text-gray-900 mb-4">Agency Settings</h2>
-        <AgencyAddressInput />
+        
+        <div class="flex gap-2 mt-4">
+          <AgencyAddressInput />
+
+          <AgencyFeeInput />
+        </div>
       </div>
 
       <button
         type="button"
-        disabled={!publisherName || loading || !agencyStore.canSave}
+        disabled={!publisherName || loading}
         onclick={handleSubmit}
         class="w-full py-3 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
       >

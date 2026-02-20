@@ -1,7 +1,5 @@
 <script lang="ts">
-  import AgencyAddressInput from '$lib/components/AgencyAddressInput.svelte'
-  import { agencyStore } from '$lib/stores/agency.svelte.js'
-  import { savePublisherAgency } from '$lib/services/agency'
+  import AgencyControls from './AgencyControls.svelte'
   import NavigationBar from './components/NavigationBar.svelte'
   import CredContractHistory from './components/CredContractHistory.svelte'
   import ContentNftHistory from './components/ContentNftHistory.svelte'
@@ -9,15 +7,8 @@
   import { HistoryTabs } from './types'
 
   let { data } = $props()
-  let loading = $state(false)
+  
   let activeTab = $state(HistoryTabs.CRED_BALANCE)
-
-  async function saveAgency() {
-    if (!data.contentContract) return
-    loading = true
-    await savePublisherAgency(data.contentContract, data.userAddress, agencyStore.agencyAddress)
-    loading = false
-  }
 </script>
 
 <div class="min-h-xl flex items-center justify-center bg-white p-4 w-full">
@@ -28,7 +19,7 @@
     </div>
 
     <div class="flex flex-col gap-6 w-full justify-between">
-      <div class="flex-1 max-w-md">
+      <div class="max-w-md">
         <h2 class="text-lg font-medium text-gray-900 mb-4">Your Information</h2>
 
         <div class="bg-gray-50 p-4 rounded-lg mb-6">
@@ -37,19 +28,8 @@
         </div>
       </div>
       <hr />
-      <div class="flex-1 max-w-md">
-        <h2 class="text-lg font-medium text-gray-900 mb-4">Agency Settings</h2>
-        <AgencyAddressInput />
-        <button
-          onclick={saveAgency}
-          class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
-          disabled={loading || !agencyStore.canSave}
-        >
-          {loading ? 'Saving...' : 'Save Agency'}
-        </button>
-      </div>
+      <AgencyControls contentContract={data.contentContract} userAddress={data.userAddress as string} />
       <hr />
-      <!-- TODO: implement transactions history and remove cover -->
       <NavigationBar bind:activeTab />
       <h2 class="text-lg font-medium mb-4">Your transactions history</h2>
       <div class="flex-1 max-w-2xl">

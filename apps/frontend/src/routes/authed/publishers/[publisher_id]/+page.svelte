@@ -112,7 +112,7 @@
         {#each data.contentItems as item}
           <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow card-sm border border-gray-200">
             {#await getTokenMetadata(authStore.state.accessToken!, item.tokenId) then metadata}
-             <object data={metadata.image} type="image/jpeg" title="File" class="w-30 h-30 rounded-lg mx-auto mt-4">
+             <object data={metadata.image} type="image/jpeg" title="File" class="w-30 h-30 object-contain mx-auto mt-4">
                 <img src={r2Config.url + r2Config.defaultImage} alt="File" />
               </object>
             <div class="card-body">
