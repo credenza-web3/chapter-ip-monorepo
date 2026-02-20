@@ -132,19 +132,23 @@ export class FileRouter {
 
     const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(ctx.authTokenPayload.sub)
 
-    try {
-      if (input.licenseTokenId) {
-        await this.commonLicenseService.verify(
-          ctx.authTokenPayload.sub,
-          subEvmAddress,
-          file.tokenId,
-          input.licenseTokenId,
-        )
-      } else {
-        await this.commonContentService.verifyIsOwner(subEvmAddress, file.tokenId)
+    const hasMembership = await this.commonContentService.verifyHasSubscription(subEvmAddress)
+
+    if (!hasMembership) {
+      try {
+        if (input.licenseTokenId) {
+          await this.commonLicenseService.verify(
+            ctx.authTokenPayload.sub,
+            subEvmAddress,
+            file.tokenId,
+            input.licenseTokenId,
+          )
+        } else {
+          await this.commonContentService.verifyIsOwner(subEvmAddress, file.tokenId)
+        }
+      } catch (err) {
+        throw new TRPCError({ message: (err as Error).message, code: 'FORBIDDEN' })
       }
-    } catch (err) {
-      throw new TRPCError({ message: (err as Error).message, code: 'FORBIDDEN' })
     }
 
     const url = await this.fileService.getFileUrl({

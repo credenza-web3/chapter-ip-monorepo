@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Contract } from 'ethers'
 import { abi as contentAbi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
+import { abi as membershipAbi } from '@credenza3/contracts/artifacts/SellableMetadataMembershipContract.json'
 
 import { CommonEvmService } from '../evm/evm.service'
 
 @Injectable()
 export class CommonContentService {
   private contentNftContract!: Contract
+  private membershipContract!: Contract
 
   constructor(
     private readonly configService: ConfigService,
@@ -19,6 +21,10 @@ export class CommonContentService {
       throw new Error('Missing EVM_CONTENT_NFT_CONTRACT_ADDRESS')
     }
     this.contentNftContract = new Contract(contentContractAddress, contentAbi, provider)
+    const membershipContractAddress = this.configService.get<string>('EVM_MEMBERSHIP_CONTRACT_ADDRESS')
+    if (membershipContractAddress) {
+      this.membershipContract = new Contract(membershipContractAddress, membershipAbi, provider)
+    }
   }
 
   public getContentNftContract() {
@@ -30,5 +36,12 @@ export class CommonContentService {
     if (ownerEvmAddress.toLowerCase() !== subEvmAddress.toLowerCase()) {
       throw new Error(`${subEvmAddress} is not the owner of ${contentTokenId}`)
     }
+  }
+  public async verifyHasSubscription(subEvmAddress: string): Promise<boolean> {
+    if (!this.membershipContract) {
+      return false
+    }
+    const res = (await this.membershipContract.confirmMembership(subEvmAddress)) as boolean
+    return res
   }
 }
