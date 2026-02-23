@@ -22,6 +22,10 @@
       loading = false
     }
   }
+
+  const onGetTransactionReceipt = () => {
+    window.open(`https://testnet.snowtrace.io/nft/${import.meta.env.VITE_EVM_LICENSE_NFT_CONTRACT_ADDRESS}/${purchase.licenseTokenId}`, '_blank')
+  }
 </script>
 
 <div class="card bg-base-100 shadow-lg">
@@ -38,6 +42,7 @@
           <div class="loading loading-dots"></div>
         {:else}
           <button class="btn btn-sm btn-outline" onclick={onGetFileUrl}> Get file link </button>
+          <button class="btn btn-sm btn-outline" onclick={onGetTransactionReceipt}> Get transaction receipt </button>
         {/if}
       </div>
     </div>
