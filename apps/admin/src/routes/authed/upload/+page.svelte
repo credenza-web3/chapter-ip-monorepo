@@ -36,6 +36,7 @@
         imageUrl,
         key,
         title: $uploadStore.title,
+        description: $uploadStore.description,
         trpcClient,
       })
 
@@ -67,6 +68,7 @@
       <h2 class="text-xl font-semibold mb-3">Content Details</h2>
 
       <input id="title" type="text" bind:value={$uploadStore.title} placeholder="Title" class="input input-bordered w-1/3 mb-3" />
+      <input id="description" type="text" bind:value={$uploadStore.description} placeholder="Description" class="input input-bordered w-1/3 mb-3" />
       <ImageUpload />
     </div>
     <div class="mt-6 space-y-4">

@@ -57,6 +57,7 @@ export class UploadService {
     imageUrl,
     key,
     title,
+    description,
     trpcClient
   }: {
     tokenId: string,
@@ -64,6 +65,7 @@ export class UploadService {
     imageUrl: string,
     key: string,
     title: string,
+    description: string,
     trpcClient: any
   }): Promise<void> {
     await trpcClient.files.uploadMetadata.mutate({
@@ -75,6 +77,7 @@ export class UploadService {
         key,
         image: imageUrl,
         title,
+        description,
       },
     })
   }

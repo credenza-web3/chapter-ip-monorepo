@@ -85,11 +85,11 @@ export const getTokenMetadata = async (accessToken: string, tokenId: string) => 
   try {
     const metaUri = await contentContract.tokenURI(String(tokenId))
     const response = await fetch(metaUri)
-    const metadata: { image: string, title: string } = await response.json()
+    const metadata: { image: string, title: string, description: string } = await response.json()
 
     return metadata
   } catch (error) {
     console.error('Error fetching metadata:', error)
-    return { image: '', title: '' }
+    return { image: '', title: '', description: '' }
   }
 }

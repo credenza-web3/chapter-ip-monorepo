@@ -61,6 +61,9 @@
     if (fulltimeLicensePrice) isFulltimeLoaded = true
     if (onetimeLicensePrice) isOnetimeLoaded = true
   })
+
+  const CONTENT_CONTRACT = import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS
+  const EXPLORER_LINK = 'https://testnet.snowtrace.io/nft'
 </script>
 
 <div class="card bg-base-100 shadow-md p-6">
@@ -71,13 +74,12 @@
     {#if items?.length > 0}
       {#each items as item}
         <ul class="basis-1/2">
-          <li><strong>ID:</strong> {item.id}</li>
-          <li><strong>Sub:</strong> {item.sub}</li>
-          <li><strong>Bucket:</strong> {item.bucket}</li>
-          <li><strong>Key:</strong> {item.key}</li>
+          <li><strong>Contract Address:</strong> {CONTENT_CONTRACT}</li>
           <li><strong>Token ID:</strong> {item.tokenId}</li>
+           <li><strong>Explorer link:</strong>
+             <a class="text-blue-500 hover:underline" href={`${EXPLORER_LINK}/${CONTENT_CONTRACT}/${item.tokenId}`} target="_blank">{EXPLORER_LINK}/{CONTENT_CONTRACT}/{item.tokenId}</a>
+           </li>
           <li><strong>Created:</strong> {formatDate(item.createdAt)}</li>
-          <li><strong>Updated:</strong> {formatDate(item.updatedAt)}</li>
           {#if data.metadata?.image}
             <li><strong>Image:</strong> 
               <object data={data.metadata.image} type="image/jpeg" title="File" class="w-30 h-30 rounded-lg">
@@ -86,6 +88,7 @@
             </li>
           {/if}
           <li><strong>Title:</strong> {data.metadata?.title || "Untitled"}</li>
+          <li><strong>Description:</strong> {data.metadata?.description || "No description"}</li>
         </ul>
       {/each}
     {/if}
