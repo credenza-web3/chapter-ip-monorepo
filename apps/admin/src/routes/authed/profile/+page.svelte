@@ -19,12 +19,24 @@
     </div>
 
     <div class="flex flex-col gap-6 w-full justify-between">
-      <div class="max-w-md">
+      <div class="max-w-md gap-2">
         <h2 class="text-lg font-medium text-gray-900 mb-4">Your Information</h2>
 
-        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+        <div class="bg-gray-50 p-4 rounded-lg">
+         
           <p class="text-sm text-gray-600 mb-1">Your Address</p>
           <p class="text-sm font-mono text-gray-900 break-all">{data.userAddress}</p>
+          <hr />
+          <div class="flex items-end gap-2 my-3">
+            {#if data.publisher?.avatarUrl}
+            <div class="flex items-center gap-2">
+              <img src={data.publisher?.avatarUrl} alt="" class="w-24 h-24 rounded-full" />
+            </div>
+            {/if}
+            {#if data.publisher?.title}
+             <p class="text-sm font-mono text-gray-900 break-all">Publisher title: {data.publisher?.title}</p>
+            {/if}
+          </div>
         </div>
       </div>
       <hr />

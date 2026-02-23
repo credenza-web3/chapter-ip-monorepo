@@ -9,6 +9,7 @@ interface UploadState {
   oneTimePrice: number
   loading: boolean
   title: string
+  description: string
 }
 
 function createUploadStore() {
@@ -21,6 +22,7 @@ function createUploadStore() {
     oneTimePrice: 0,
     loading: false,
     title: '',
+    description: '',
   })
 
   return {
@@ -75,6 +77,7 @@ function createUploadStore() {
       oneTimePrice: 0,
       loading: false,
       title: '',
+      description: '',
     })
   }
 }

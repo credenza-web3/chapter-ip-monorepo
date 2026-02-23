@@ -32,7 +32,6 @@
     await passport.init()
     passportStore.set(passport)
 
-    passport.showNavigation({ bottom: "0", right: "0" },)
     isMounted = true
     loading = false
   })

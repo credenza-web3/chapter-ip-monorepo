@@ -204,7 +204,9 @@ export function createAuthStore<T>(
 
   function logout() {
     if (!browser) return
+    console.log('go')
 
+    revokeOAuth2Session()
     localStorage.removeItem('refresh_token')
 
     state = {
@@ -216,6 +218,20 @@ export function createAuthStore<T>(
     }
 
     goto(resolve('/'))
+  }
+
+  async function revokeOAuth2Session() {
+    try {
+      const response = await fetch(`${config.accountsUri}/oauth2/revoke-session`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${await getAccessToken()}`,
+        },
+      })
+      if (!response.ok) throw new Error(response.statusText)
+    } catch {
+      throw new Error(`Error revoking session`)
+    }
   }
 
   return {

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
-  import CredenzaLogo from '../assets/credenza.svg'
+  import Logo from '../assets/ch-logo.png'
   import MenuIconBlack from '../assets/menu_burger_black.svg'
 
   let { authStore, menuItems } = $props()
@@ -25,10 +25,10 @@
 
 <header
   bind:this={headerRef}
-  class="mx-auto w-full flex items-center justify-between md:px-10 px-4 py-4 border-b border-gray-200 bg-testColor relative"
+  class="mx-auto w-full flex items-center justify-between md:px-10 px-4 py-4 border-b border-gray-200 bg-black relative text-white"
 >
   <a href="/">
-    <img src={CredenzaLogo} alt="Credenza Logo" class="md:w-44 w-32" />
+    <img src={Logo} alt="Logo" class="w-12" />
   </a>
   {#if authState.accessToken}
     <nav>

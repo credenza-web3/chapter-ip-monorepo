@@ -23,7 +23,7 @@ export const load: PageLoad = async ({ params, parent }) => {
   try {
     const metaUri = await contentContract?.tokenURI(String(tokenId))
     const response = await fetch(metaUri!)
-    const metadata: { image: string, title: string } = await response.json()
+    const metadata: { image: string, title: string, description: string } = await response.json()
     return { paginatedResponse, tokenId, metadata, contentContract }
   } catch (error) {
     console.error('Error fetching metadata:', error)

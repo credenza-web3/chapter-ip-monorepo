@@ -13,6 +13,7 @@ export type TTokenResponse = {
 }
 
 export type TAuthConfig = {
+  accountsUri: string
   oauthUri: string
   clientId: string
   scopes: string
