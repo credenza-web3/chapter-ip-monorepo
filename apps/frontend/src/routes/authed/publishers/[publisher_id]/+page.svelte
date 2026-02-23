@@ -55,7 +55,9 @@
   const onBuyLicense = async (tokenId: string, licenseType: string) => {
     const pass = get(passportStore)
     const licenseName = licenseType === '0' ? 'Fulltime' : 'Onetime'
-    const title = `${licenseName} license purchase`
+    const metadata = metadataCache.get(tokenId)
+    const itemtitle = metadata?.title || ''
+    const title = `${licenseName} license for ${itemtitle} purchase`
 
     pass?.openUI('payment', {
       title,
