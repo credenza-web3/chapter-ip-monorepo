@@ -22,7 +22,8 @@
     "dev": "concurrently \"pnpm run trpc:watch\" \"pnpm run start:dev\"",
     "trpc:generate": "nestjs-trpc generate --output ../../packages/trpc/src/server/server.ts",
     "trpc:watch": "nestjs-trpc watch --output ../../packages/trpc/src/server/server.ts",
-    "postinstall": "chmod +x ../../node_modules/.pnpm/nestjs-trpc@*/node_modules/nestjs-trpc/native/aarch64-apple-darwin/*"
+    "trpc:chmod": "chmod +x ../../node_modules/.pnpm/nestjs-trpc@*/node_modules/nestjs-trpc/native/*",
+    "postinstall": "pnpm run trpc:chmod && pnpm run trpc:generate"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.996.0",
