@@ -35,6 +35,9 @@ importers:
       daisyui:
         specifier: ^5.5.18
         version: 5.5.18
+      svelte-modals:
+        specifier: ^2.0.1
+        version: 2.0.1(svelte@5.51.4)
     devDependencies:
       '@eslint/compat':
         specifier: ^2.0.2
@@ -13835,6 +13838,10 @@ snapshots:
   svelte-modals@2.0.1(svelte@5.45.8):
     dependencies:
       svelte: 5.45.8
+
+  svelte-modals@2.0.1(svelte@5.51.4):
+    dependencies:
+      svelte: 5.51.4
 
   svelte@4.2.20:
     dependencies:

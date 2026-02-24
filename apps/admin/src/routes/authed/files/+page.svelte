@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import { formatDate } from '$lib/services/formatDate.js'
+  import { fetchContentTokenMeta } from '@repo/fe-services'
 
   let { data } = $props()
   let { items, cursor } = data.paginatedResponse
@@ -21,9 +22,9 @@
         <tr>
           <th>#</th>
           <th>ID</th>
-          <th>Bucket</th>
           <th>Key</th>
-          <th>Token ID</th>
+          <th>Title</th>
+          <th>description</th>
           <th>Created</th>
         </tr>
       </thead>
@@ -37,9 +38,15 @@
           >
             <th>{i + 1}</th>
             <td>{item.id}</td>
-            <td>{item.bucket}</td>
             <td>{item.key}</td>
-            <td>{item.tokenId}</td>
+            {#await fetchContentTokenMeta(data.contentContract!, item.tokenId)}
+              <td>Loading title...</td>
+              <td>Loading description...</td>
+            {:then meta}
+              <td>{meta.title || 'N/A'}</td>
+              <td>{meta.description || 'N/A'}</td>
+            {/await}
+           
             <td>{formatDate(item.createdAt)}</td>
           </tr>
         {/each}
