@@ -52,6 +52,7 @@ export type TRegisterContentOutput = z.infer<typeof registerContentOutputSchema>
 export const findContentInputSchema = paginatedRequestWithCursorSchema.extend({
   sub: z.string().optional(),
   tokenId: z.string().optional(),
+  contractAddress: z.string().optional(),
   key: z.string().optional(),
 })
 export type TFindContentInput = z.infer<typeof findContentInputSchema>

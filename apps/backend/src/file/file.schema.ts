@@ -30,6 +30,9 @@ export class File extends Document<ObjectId> {
 
   @Prop({ required: true })
   tokenId: string
+  
+  @Prop({ required: true, lowercase: true, trim: true })
+  contractAddress: string
 
   createdAt: Date
   updatedAt: Date
@@ -37,7 +40,7 @@ export class File extends Document<ObjectId> {
 
 export const FileSchema = SchemaFactory.createForClass(File)
 FileSchema.index({ sub: 1 })
-FileSchema.index({ tokenId: 1 }, { unique: true })
 FileSchema.index({ key: 1 }, { unique: true })
+FileSchema.index({ contractAddress: 1, tokenId: 1 }, { unique: true })
 FileSchema.index({ createdAt: 1 })
 FileSchema.index({ updatedAt: 1 })

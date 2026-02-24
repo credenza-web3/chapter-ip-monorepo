@@ -30,6 +30,10 @@ export class CommonContentService {
   public getContentNftContract() {
     return this.contentNftContract
   }
+  
+  public async getContentNftContractAddress() { 
+    return (await this.getContentNftContract().getAddress()).toLowerCase()
+  }
 
   public async verifyIsOwner(subEvmAddress: string, contentTokenId: string) {
     const ownerEvmAddress = (await this.contentNftContract.ownerOf(contentTokenId)) as string
