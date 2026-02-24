@@ -10,6 +10,7 @@ export const load = async () => {
   const sub = subRaw ?? undefined
   const paginatedResponse = await trpcClient.files.findContent.query({
     sub,
+    contractAddress: import.meta.env.VITE_CONTENT_CONTRACT_ADDRESS,
   })
 
   return { paginatedResponse }
