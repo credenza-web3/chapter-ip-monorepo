@@ -287,8 +287,8 @@ importers:
         specifier: ^0.0.5
         version: 0.0.5
       '@credenza3/passport-evm':
-        specifier: ^0.3.14
-        version: 0.3.14(@toruslabs/openlogin@6.2.11(@babel/runtime@7.28.4))
+        specifier: ^0.4.7
+        version: 0.4.7(@toruslabs/openlogin@6.2.11(@babel/runtime@7.28.4))
       '@tailwindcss/vite':
         specifier: ^4.1.17
         version: 4.1.17(vite@7.2.7(@types/node@22.19.2)(jiti@2.6.1)(lightningcss@1.31.1)(terser@5.44.1)(yaml@2.8.2))
@@ -483,10 +483,6 @@ packages:
 
   '@adraffy/ens-normalize@1.10.1':
     resolution: {integrity: sha512-96Z2IP3mYmF1Xg2cDm8f1gWGf/HUVedQ3FMifV4kG/PQ4yEP51xDtRAEfhVNt5f/uzpNkZHwWQuUcu6D6K+Ekw==}
-
-  '@ampproject/remapping@2.3.0':
-    resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
-    engines: {node: '>=6.0.0'}
 
   '@angular-devkit/core@19.2.17':
     resolution: {integrity: sha512-Ah008x2RJkd0F+NLKqIpA34/vUGwjlprRCkvddjDopAWRzYn6xCkz1Tqwuhn0nR1Dy47wTLKYD999TYl5ONOAQ==}
@@ -876,21 +872,21 @@ packages:
     resolution: {integrity: sha512-7r+HWa6hR5+dqWwfl7eec5A2Nt4jKVfpjd995YnkJkeMNNDpWRUXyW8xtmJNIJ6Ks9hhXgWE33wD8sXYGXJuTA==}
     engines: {node: '>=22'}
 
-  '@credenza3/core-web-evm-ext@0.0.10':
-    resolution: {integrity: sha512-DcgxKS9o1+qgGAgxmTZLaty3IW+Q9UsJRt5/CMteebUDe8SflvojYtb7WI660nfeGtINJM2nDYLfR0RVck/bew==}
+  '@credenza3/contracts@0.0.6':
+    resolution: {integrity: sha512-RvH8DeAHlUm6sD+SS9kOLASZGmK0t2knUUVf1C38MhicJG8Bdxc1CexmJSjcMceI3M1NcxOY8pkgcUHYSdAsNg==}
+    engines: {node: '>=22'}
+
+  '@credenza3/core-web-evm-ext@0.0.13':
+    resolution: {integrity: sha512-sUPO23tyRj63c2ZNfIOvFyHS5fMGXyfSxcKsL6O+qEI+tsvl2xyRuhpQIq5LHtcepvJb1H85lQMvcuH67VNcdA==}
 
   '@credenza3/evm-provider@0.0.2':
     resolution: {integrity: sha512-gRi2uIJvzEti9z/c5bUqlSCBlUW28OhGc+Q4TmodfCM2Ob+5gSnDyX3sj8impg0l2pHsC+tvd7x9YNGCwrG6sQ==}
 
-  '@credenza3/passport-evm@0.3.14':
-    resolution: {integrity: sha512-SF5q/zxQ2KgzQeCKv5TvQmpYFxBX3qWhN9xVwe+G+rhi9KNychdX2rWTXXHshfoMXKQjvPursctikoPmI1gqPQ==}
+  '@credenza3/passport-evm@0.4.7':
+    resolution: {integrity: sha512-yAf3ObBl7ak9oPDk29nO9cGFkX7B2HCrWyVvQaisPJjUkhrv9ZvSIUQ5L5X29rZgEmvnvODMDMUOiIfvWTa3OA==}
     engines: {node: '>=20.10.0', pnpm: '>=9'}
     peerDependencies:
       '@toruslabs/openlogin': ^6.1.0
-
-  '@credenza3/scanner-lib@0.0.1':
-    resolution: {integrity: sha512-/K00YRqRebrBJWIcWkvNR6RLlA/YrBTMquk407krGv71EpsU2A+wwULtz+HNGCosFr1/NxxkY/fM2WmRpZpaMQ==}
-    engines: {node: '>=20.10', pnpm: '>=9.0.0'}
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -3541,9 +3537,6 @@ packages:
   code-block-writer@13.0.3:
     resolution: {integrity: sha512-Oofo0pq3IKnsFtuHqSF7TqBfr71aeyZDVJ0HpmqB7FBM2qEigL0iPONSCZSO9pE9dZTAxANe5XHG9Uy0YMv8cg==}
 
-  code-red@1.0.4:
-    resolution: {integrity: sha512-7qJWqItLA8/VPVlKJlFXU+NBlo/qyfs39aJcuMT/2ere32ZqvF5OSxgdM5xOfJJ7O429gg2HM47y8v9P+9wrNw==}
-
   collect-v8-coverage@1.0.3:
     resolution: {integrity: sha512-1L5aqIkwPfiodaMgQunkF1zRhNqifHBmtbbbxcr6yVxxBnliw4TDOW6NxpO8DJLgJ16OT+Y4ztZqP6p/FtXnAw==}
 
@@ -3644,10 +3637,6 @@ packages:
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
-
-  css-tree@2.3.1:
-    resolution: {integrity: sha512-6Fv1DV/TYw//QF5IzQdqsNDjx/wc8TrMBZsqjL9eW01tWb7R7k/mq+/VXfJCl7SoD5emsJop9cOByJZfs8hYIw==}
-    engines: {node: ^10 || ^12.20.0 || ^14.13.0 || >=15.0.0}
 
   cssesc@3.0.0:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
@@ -4833,8 +4822,8 @@ packages:
   known-css-properties@0.37.0:
     resolution: {integrity: sha512-JCDrsP4Z1Sb9JwG0aJ8Eo2r7k4Ou5MwmThS/6lcIe1ICyb7UBJKGRIUUdqc2ASdE/42lgz6zFUnzAIhtXnBVrQ==}
 
-  lean-qr@2.6.1:
-    resolution: {integrity: sha512-VE7orqJ6sx68HqGtHZqmMSNbTL002cBT6LsFPJs9/PhyM+1ZEOA0OotWkzPiHLYVcyk1HakEbRrbWfbeZ0zMDA==}
+  lean-qr@2.7.1:
+    resolution: {integrity: sha512-4WfYs9t1jpiF6nDRxe9LFlWzRhvVeiV3tpsjAkrijHx5dtrF0E4dupvjJX3SUoS18CAaU6QF2gSZILO10z8utA==}
     hasBin: true
 
   leven@3.1.0:
@@ -5100,9 +5089,6 @@ packages:
 
   mdast-util-to-string@4.0.0:
     resolution: {integrity: sha512-0H44vDimn51F0YwvxSJSm0eCDOJTRlmN0R1yBh4HLj9wiV1Dn0QoXGbvFAWj2hSItVTlCmBF1hqKlIyUBVFLPg==}
-
-  mdn-data@2.0.30:
-    resolution: {integrity: sha512-GaqWWShW4kv/G9IEucWScBx9G1/vsFZZJUO+tD26M8J8z3Kw5RDQjaoZe03YAClgeS/SWPOcb4nkFBTEi5DUEA==}
 
   media-typer@0.3.0:
     resolution: {integrity: sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==}
@@ -5532,9 +5518,6 @@ packages:
   pathval@2.0.1:
     resolution: {integrity: sha512-//nshmD55c46FuFw26xV/xFAaB5HF9Xdap7HJBBnrKdAd6/GxDBaNA1870O79+9ueg61cZLSVc+OaFlfmObYVQ==}
     engines: {node: '>= 14.16'}
-
-  periscopic@3.1.0:
-    resolution: {integrity: sha512-vKiQ8RRtkl9P+r/+oefh25C3fhybptkHKCZSPlcXiJux2tJF55GnEj3BVn4A5gKfq9NWWXXrxkHBwVPUfH0opw==}
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -6159,10 +6142,6 @@ packages:
     resolution: {integrity: sha512-4nGWxveM0eILQnkjmlA7nComRSsCW5QssY9d1qNklZaNlnwnziW5xYqLN3ufjyA0/Cn9oMO4i9+8s8zmlw4IiQ==}
     peerDependencies:
       svelte: '>=5'
-
-  svelte@4.2.20:
-    resolution: {integrity: sha512-eeEgGc2DtiUil5ANdtd8vPwt9AgaMdnuUFnPft9F5oMvU/FHu5IHFic+p1dR/UOB7XU2mX2yHW+NcTch4DCh5Q==}
-    engines: {node: '>=16'}
 
   svelte@5.45.8:
     resolution: {integrity: sha512-1Jh7FwVh/2Uxg0T7SeE1qFKMhwYH45b2v53bcZpW7qHa6O8iU1ByEj56PF0IQ6dU4HE5gRkic6h+vx+tclHeiw==}
@@ -6925,11 +6904,6 @@ packages:
 snapshots:
 
   '@adraffy/ens-normalize@1.10.1': {}
-
-  '@ampproject/remapping@2.3.0':
-    dependencies:
-      '@jridgewell/gen-mapping': 0.3.13
-      '@jridgewell/trace-mapping': 0.3.31
 
   '@angular-devkit/core@19.2.17(chokidar@4.0.3)':
     dependencies:
@@ -7701,7 +7675,13 @@ snapshots:
       '@openzeppelin/contracts': 4.9.6
       '@openzeppelin/contracts-upgradeable': 4.9.6
 
-  '@credenza3/core-web-evm-ext@0.0.10':
+  '@credenza3/contracts@0.0.6':
+    dependencies:
+      '@opengsn/contracts': 3.0.0-beta.6
+      '@openzeppelin/contracts': 4.9.6
+      '@openzeppelin/contracts-upgradeable': 4.9.6
+
+  '@credenza3/core-web-evm-ext@0.0.13':
     dependencies:
       ethers: 6.16.0
       js-sha3: 0.9.3
@@ -7717,24 +7697,19 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@credenza3/passport-evm@0.3.14(@toruslabs/openlogin@6.2.11(@babel/runtime@7.28.4))':
+  '@credenza3/passport-evm@0.4.7(@toruslabs/openlogin@6.2.11(@babel/runtime@7.28.4))':
     dependencies:
-      '@credenza3/contracts': 0.0.5
-      '@credenza3/core-web-evm-ext': 0.0.10
-      '@credenza3/scanner-lib': 0.0.1
+      '@credenza3/contracts': 0.0.6
+      '@credenza3/core-web-evm-ext': 0.0.13
       '@toruslabs/openlogin': 6.2.11(@babel/runtime@7.28.4)
       '@zerodevx/svelte-toast': 0.9.6(svelte@5.51.4)
       ethers: 6.16.0
-      lean-qr: 2.6.1
+      lean-qr: 2.7.1
       lodash.merge: 4.6.2
       svelte: 5.51.4
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
-
-  '@credenza3/scanner-lib@0.0.1':
-    dependencies:
-      svelte: 4.2.20
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -10630,14 +10605,6 @@ snapshots:
 
   code-block-writer@13.0.3: {}
 
-  code-red@1.0.4:
-    dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.5
-      '@types/estree': 1.0.8
-      acorn: 8.15.0
-      estree-walker: 3.0.3
-      periscopic: 3.1.0
-
   collect-v8-coverage@1.0.3: {}
 
   color-convert@2.0.1:
@@ -10726,11 +10693,6 @@ snapshots:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
-
-  css-tree@2.3.1:
-    dependencies:
-      mdn-data: 2.0.30
-      source-map-js: 1.2.1
 
   cssesc@3.0.0: {}
 
@@ -12354,7 +12316,7 @@ snapshots:
 
   known-css-properties@0.37.0: {}
 
-  lean-qr@2.6.1: {}
+  lean-qr@2.7.1: {}
 
   leven@3.1.0: {}
 
@@ -12620,8 +12582,6 @@ snapshots:
   mdast-util-to-string@4.0.0:
     dependencies:
       '@types/mdast': 4.0.4
-
-  mdn-data@2.0.30: {}
 
   media-typer@0.3.0: {}
 
@@ -13079,12 +13039,6 @@ snapshots:
   pathe@2.0.3: {}
 
   pathval@2.0.1: {}
-
-  periscopic@3.1.0:
-    dependencies:
-      '@types/estree': 1.0.8
-      estree-walker: 3.0.3
-      is-reference: 3.0.3
 
   picocolors@1.1.1: {}
 
@@ -13842,23 +13796,6 @@ snapshots:
   svelte-modals@2.0.1(svelte@5.51.4):
     dependencies:
       svelte: 5.51.4
-
-  svelte@4.2.20:
-    dependencies:
-      '@ampproject/remapping': 2.3.0
-      '@jridgewell/sourcemap-codec': 1.5.5
-      '@jridgewell/trace-mapping': 0.3.31
-      '@types/estree': 1.0.8
-      acorn: 8.15.0
-      aria-query: 5.3.2
-      axobject-query: 4.1.0
-      code-red: 1.0.4
-      css-tree: 2.3.1
-      estree-walker: 3.0.3
-      is-reference: 3.0.3
-      locate-character: 3.0.0
-      magic-string: 0.30.21
-      periscopic: 3.1.0
 
   svelte@5.45.8:
     dependencies:
