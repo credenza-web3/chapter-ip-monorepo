@@ -27,3 +27,8 @@ export function getAmount(args: [string, string, bigint]) {
   const value = args[2]
   return typeof value === 'bigint' ? value.toString() : value
 }
+
+export const mapLicenseType = (licenseType: bigint | number | string) => {
+    if (typeof licenseType === 'bigint') licenseType = Number(licenseType)
+    return licenseType === 0 ? 'Fulltime' : 'Onetime'
+  }

@@ -46,11 +46,11 @@
       <h2 class="text-lg font-medium mb-4">Your transactions history</h2>
       <div class="flex-1 max-w-2xl">
         {#if activeTab === HistoryTabs.CRED_BALANCE}
-          <CredContractHistory userAddress={data.userAddress} />
+          <CredContractHistory userAddress={data.userAddress}/>
         {:else if activeTab === HistoryTabs.CONTENT_NFT}
-          <ContentNftHistory userAddress={data.userAddress} />
+          <ContentNftHistory userAddress={data.userAddress} {activeTab} />
         {:else if activeTab === HistoryTabs.LICENSES_NFT}
-          <LicenseNftHistory userAddress={data.userAddress} />
+          <LicenseNftHistory userAddress={data.userAddress} {activeTab} />
         {/if}
       </div>
     </div>
