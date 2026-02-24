@@ -76,24 +76,12 @@
   }
 
   onMount(async () => {
-    try {
-      if (!authStore.state.accessToken) return
-      if (!contractAddress || !abi) return
-
-      const provider = await initProvider(authStore.state.accessToken)
-      rpcProvider = await provider.getRpcProvider()
-
-      if (!rpcProvider) return
-
-      latestBlock = await rpcProvider.getBlockNumber()
-      currentFromBlock = latestBlock
-
-      contract = new ethers.Contract(contractAddress, abi, rpcProvider)
-
-      await loadUntilFound()
-    } catch (err) {
-      console.error('onMount error:', err)
-    }
+    const provider = await initProvider(authStore.state.accessToken!)
+    rpcProvider = await provider.getRpcProvider()
+    latestBlock = await rpcProvider?.getBlockNumber()
+    currentFromBlock = latestBlock
+    contract = new ethers.Contract(contractAddress, abi, rpcProvider)
+    await loadUntilFound()
   })
 </script>
 
