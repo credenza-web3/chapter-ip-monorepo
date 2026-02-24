@@ -68,7 +68,7 @@ export class FileRouter {
       throw new TRPCError({ message: (err as Error).message, code: 'FORBIDDEN' })
     }
 
-    const key = [input.tokenId, ext].join('.')
+    const key = [await this.commonContentService.getContentNftContractAddress(), input.tokenId, ext].join('.')
     const url = await this.fileService.createUploadUrl({
       Bucket: this.fileService.getBucketName(input.bucket),
       Key: key,
@@ -94,11 +94,16 @@ export class FileRouter {
     if (!isFileExists) {
       throw new TRPCError({ message: 'File is not found', code: 'NOT_FOUND' })
     }
+    const contractAddress = await this.commonContentService.getContentNftContractAddress()
+    if (!input.key.includes(contractAddress)) {
+      throw new TRPCError({ message: 'Invalid key. Must start with contract address', code: 'NOT_FOUND' })
+    }
     const file = await this.fileService.getModel().create({
       sub: ctx.authTokenPayload.sub,
       key: input.key,
       bucket,
       tokenId: input.tokenId,
+      contractAddress,
     })
     return file.toJSON()
   }
@@ -168,15 +173,16 @@ export class FileRouter {
     @Ctx() ctx: TAppContextWithTokenPayload,
     @Input() input: TUploadMetadataInput,
   ): Promise<TUploadMetadataOutput> {
+    const contractAddress = await this.commonContentService.getContentNftContractAddress()
     const file = await this.fileService
       .getModel()
-      .findOne({ tokenId: input.tokenId, sub: ctx.authTokenPayload.sub })
+      .findOne({ contractAddress, tokenId: input.tokenId, sub: ctx.authTokenPayload.sub })
       .lean()
     if (!file) {
       throw new TRPCError({ message: 'Content is not found or is not yours', code: 'NOT_FOUND' })
     }
 
-    const metadataKey = `${input.tokenId}.json`
+    const metadataKey = [contractAddress, input.tokenId, 'json'].join('.')
     await this.fileService.uploadFile({
       Body: JSON.stringify(input.metadata, null, 2),
       ContentType: 'application/json',
