@@ -22,7 +22,7 @@
     "dev": "concurrently \"pnpm run trpc:watch\" \"pnpm run start:dev\"",
     "trpc:generate": "nestjs-trpc generate --output ../../packages/trpc/src/server/server.ts",
     "trpc:watch": "nestjs-trpc watch --output ../../packages/trpc/src/server/server.ts",
-    "trpc:chmod": "chmod +x ../../node_modules/.pnpm/nestjs-trpc@*/node_modules/nestjs-trpc/native/*",
+    "trpc:chmod": "chmod +x ../../node_modules/.pnpm/nestjs-trpc@*/node_modules/nestjs-trpc/native/**/*",
     "postinstall": "pnpm run trpc:chmod && pnpm run trpc:generate"
   },
   "dependencies": {
