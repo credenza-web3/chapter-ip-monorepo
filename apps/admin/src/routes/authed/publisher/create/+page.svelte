@@ -1,11 +1,14 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
-  import { notify, ToastType } from '@repo/ui-components'
   import AgencyAddressInput from '$lib/components/AgencyAddressInput.svelte'
   import { agencyStore } from '$lib/stores/agency.svelte.js'
   import { savePublisherAgencyAddress, savePublisherAgencyFee } from '$lib/services/agency'
   import AgencyFeeInput from '$lib/components/AgencyFeeInput.svelte'
+  import PublisherNameInput from '$lib/components/PublisherNameInput.svelte'
+  import PublisherAvatarInput from '$lib/components/PublisherAvatarInput.svelte'
+  import { savePublisher } from '$lib/services/publisher'
   import { onMount } from 'svelte'
+  import { publisherStore } from '$lib/stores/publisher.svelte.js'
 
   let publisherName = $state('')
   let avatarUrl = $state('')
@@ -13,8 +16,7 @@
   let { data } = $props()
 
   onMount(() => {
-    console.log(data)
-    if (data.publisher) {
+    if (publisherStore.title) {
       return goto('/authed/profile')
     }
   })
@@ -32,18 +34,16 @@
   async function handleSubmit() {
     try {
       loading = true
-      await data.trpcClient!.publishers.setPublisher.mutate({
-        title: publisherName,
-        avatarUrl,
-      })
+      const result = await savePublisher(data.trpcClient!, publisherName, avatarUrl)
+      
+      if (!result.success) {
+        return
+      }
 
       await saveAgencyAddress()
       await saveAgencyFee()
 
       goto('/authed/upload')
-    } catch (error) {
-      console.error(error)
-      notify('Failed to create publisher', ToastType.FAIL)
     } finally {
       loading = false
     }
@@ -58,32 +58,8 @@
     </div>
 
     <form onsubmit={handleSubmit} class="space-y-6">
-      <div>
-        <label for="publisher-name" class="block text-sm text-gray-700 mb-2"> Publisher Name </label>
-        <input
-          id="publisher-name"
-          type="text"
-          bind:value={publisherName}
-          placeholder="Enter name"
-          class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 transition-colors"
-          required
-        />
-      </div>
-      <div>
-        <label for="publisher-name" class="block text-sm text-gray-700 mb-2">Avatar URI</label>
-        <label class="input validator mb-0 h-[50px] w-full">
-          <input
-            type="url"
-            required
-            placeholder="https://"
-            bind:value={avatarUrl}
-            pattern="^(https?://)?([a-zA-Z0-9]([a-zA-Z0-9\-].*[a-zA-Z0-9])?\.)+[a-zA-Z].*$"
-            title="Must be valid URL"
-            class="w-full px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-gray-900 transition-colors mb-0"
-          />
-        </label>
-        <p class="validator-hint">Must be valid URL</p>
-      </div>
+      <PublisherNameInput bind:value={publisherName} />
+      <PublisherAvatarInput bind:value={avatarUrl} />
 
       <div class="flex-1 max-w-md">
         <h2 class="text-lg font-medium text-gray-900 mb-4">Agency Settings</h2>

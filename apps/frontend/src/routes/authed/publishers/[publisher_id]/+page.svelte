@@ -118,7 +118,10 @@
         title: "Get your purchase licence proof",
         action: {
           text: "Check it out",
-          onClick: () => window.open(`https://testnet.snowtrace.io/tx/${hash}`, '_blank'),
+          onClick: () => {
+            window.open(`https://testnet.snowtrace.io/tx/${hash}`, '_blank')
+            get(passportStore)?.close()
+          },
         },
         closeButtonText: "cancel",
       },
