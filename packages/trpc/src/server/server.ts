@@ -70,6 +70,7 @@ const appRouter = t.router({
     }).extend({
       sub: z.string().optional(),
       tokenId: z.string().optional(),
+      contractAddress: z.string().optional(),
       key: z.string().optional(),
     })).output(createPaginatedResponseSchema(z.object({
       id: z.string(),

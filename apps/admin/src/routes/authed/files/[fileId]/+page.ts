@@ -18,6 +18,7 @@ export const load: PageLoad = async ({ params, parent }) => {
   const paginatedResponse = await trpcClient.files.findContent.query({
     sub,
     id: fileId,
+    contractAddress: import.meta.env.VITE_CONTENT_CONTRACT_ADDRESS,
   })
   const tokenId = paginatedResponse.items[0].tokenId
   try {
