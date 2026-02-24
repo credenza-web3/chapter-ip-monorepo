@@ -1,7 +1,6 @@
 <script lang="ts">
   import AvatarDefault from '$lib/assets/user-placeholder.svg'
   import AddFundsButton from './AddFundsButton.svelte'
-  import PurchaseSubscription from './PurchaseSubscription.svelte'
 
   let { data } = $props()
   let searchQuery = $state('')
@@ -19,7 +18,6 @@
     <AddFundsButton />
   </div>
 
-  <PurchaseSubscription  hasMembership={data.hasMembership}/>
   <div class="mb-6">
     <input
       type="text"
