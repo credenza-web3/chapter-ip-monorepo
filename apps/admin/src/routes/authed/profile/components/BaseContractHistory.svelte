@@ -6,49 +6,70 @@
   import { HistoryTabs } from '../types'
 
   const { userAddress, contractAddress, abi, activeTab = '' } = $props()
+
   let isLoading = $state(false)
   let events = $state<any[]>([])
 
-  const STEP = 50_000
-  let rpcProvider: ethers.JsonRpcProvider
-  let contract: ethers.Contract
-  let currentFromBlock: number
-  let latestBlock: number
+  const STEP = 45_000
+
+  let rpcProvider: ethers.JsonRpcProvider | null = null
+  let contract: ethers.Contract | null = null
+  let currentFromBlock: number = 0
+  let latestBlock: number = 0
   let stopLoading = $state(false)
 
   async function loadUntilFound() {
     if (isLoading) return
     if (!currentFromBlock || currentFromBlock <= 0) return
+    if (!contract || !rpcProvider) return
 
     isLoading = true
     stopLoading = false
 
     try {
       const result = await fetchUntilFound(contract, userAddress, currentFromBlock, STEP, () => stopLoading)
-
-      const eventsWithDate = await Promise.all(
+      if (!result?.foundEvents?.length) {
+        currentFromBlock = result?.nextBlock ?? 0
+        return
+      }
+      const processed = await Promise.allSettled(
         result.foundEvents.map(async (event: any) => {
-          const tokenId = event.args?.[2]
-          const block = await rpcProvider.getBlock(event.blockNumber)
+          const tokenId = event?.args?.[2]
 
-          let licenseTypeLabel = undefined
+          let date = '-'
+          let licenseTypeLabel: string | undefined = undefined
 
-          if (activeTab === HistoryTabs.LICENSES_NFT && tokenId !== undefined) {
-            const licenseType: bigint = await contract.getTokenLicenseType(tokenId)
-            licenseTypeLabel = mapLicenseType(licenseType)
-            console.log('License type:', licenseType)
+          try {
+            if (event?.blockNumber && rpcProvider) {
+              const block = await rpcProvider.getBlock(event.blockNumber)
+              if (block?.timestamp) {
+                date = new Date(block.timestamp * 1000).toLocaleString()
+              }
+            }
+          } catch (e) {
+            console.warn('Block fetch failed:', e)
+          }
+          if (activeTab === HistoryTabs.LICENSES_NFT && tokenId !== undefined && contract) {
+            try {
+              const licenseType: bigint = await contract.getTokenLicenseType(tokenId)
+              licenseTypeLabel = mapLicenseType(licenseType)
+            } catch (e) {
+              console.warn('License fetch failed:', e)
+            }
           }
           return {
             ...event,
-            date: block?.timestamp ? new Date(block.timestamp * 1000).toLocaleString() : '-',
+            date,
             licenseType: licenseTypeLabel,
           }
         }),
       )
-      events = [...events, ...eventsWithDate]
-      currentFromBlock = result.nextBlock
+      const safeEvents = processed.filter((r) => r.status === 'fulfilled').map((r: any) => r.value)
+
+      events = [...events, ...safeEvents]
+      currentFromBlock = result.nextBlock ?? 0
     } catch (e) {
-      console.error(e)
+      console.error('loadUntilFound error:', e)
     } finally {
       isLoading = false
     }
@@ -57,7 +78,7 @@
   onMount(async () => {
     const provider = await initProvider(authStore.state.accessToken!)
     rpcProvider = await provider.getRpcProvider()
-    latestBlock = await rpcProvider.getBlockNumber()
+    latestBlock = await rpcProvider?.getBlockNumber()
     currentFromBlock = latestBlock
     contract = new ethers.Contract(contractAddress, abi, rpcProvider)
     await loadUntilFound()
@@ -72,11 +93,9 @@
           <tr>
             <th>Event</th>
             <th>Tx Hash</th>
-            <th
-              >{activeTab === HistoryTabs.CONTENT_NFT || activeTab === HistoryTabs.LICENSES_NFT
-                ? 'Token ID'
-                : 'Amount'}</th
-            >
+            <th>
+              {activeTab === HistoryTabs.CONTENT_NFT || activeTab === HistoryTabs.LICENSES_NFT ? 'Token ID' : 'Amount'}
+            </th>
             <th>Date</th>
             {#if activeTab === HistoryTabs.LICENSES_NFT}
               <th>License Type</th>
@@ -86,16 +105,18 @@
         <tbody>
           {#each events as event}
             <tr>
-              <td>{activeTab === HistoryTabs.CONTENT_NFT ? ' ' : event.fragment?.name}</td>
+              <td>
+                {activeTab === HistoryTabs.CONTENT_NFT ? 'Create' : event.fragment?.name}
+              </td>
               <td class="break-all">{event.transactionHash}</td>
               <td>
                 {contractAddress === import.meta.env.VITE_EVM_CRED_CONTRACT_ADDRESS
                   ? ethers.formatUnits(getAmount(event.args), 6)
                   : getAmount(event.args)}
               </td>
-              <td> {event.date}</td>
+              <td>{event.date}</td>
               {#if activeTab === HistoryTabs.LICENSES_NFT}
-                <td>{event.licenseType}</td>
+                <td>{event.licenseType ?? '-'}</td>
               {/if}
             </tr>
           {/each}
