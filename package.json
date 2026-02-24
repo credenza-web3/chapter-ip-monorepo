@@ -6,8 +6,10 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{js,ts,tsx,svelte,md,html,json}\"",
+    "trpc:generate": "turbo run trpc:generate",
     "check-types": "turbo run check-types",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "pnpm run trpc:generate"
   },
   "devDependencies": {
     "husky": "^9.1.7",

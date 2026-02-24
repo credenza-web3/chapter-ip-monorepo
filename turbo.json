@@ -17,6 +17,10 @@
     "dev": {
       "cache": false,
       "persistent": true
-    }
+    },
+    "trpc:generate": {
+      "cache": false,
+      "persistent": true
+    },
   }
 }
