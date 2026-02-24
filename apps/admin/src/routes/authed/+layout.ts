@@ -5,13 +5,14 @@ import { createClient } from '@repo/trpc/client'
 import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
 import { agencyStore } from '$lib/stores/agency.svelte'
 import { goto } from '$app/navigation'
+import { publisherStore } from '$lib/stores/publisher.svelte'
 
 export const prerender = false
 export const ssr = false
 
 let authInitialized = false
 
-export const load = async ({ url }) => {
+async function loadFunction({ url }: { url: URL }) {
   if (!browser) return {}
 
   if (!authInitialized) {
@@ -51,11 +52,14 @@ export const load = async ({ url }) => {
     const publisher = await trpcClient.publishers.getPublisher.query({
       sub: sub!,
     })
-    return { trpcClient, publisher, userAddress, contentContract }
+    publisherStore.setData(publisher)
+    return { trpcClient, userAddress, contentContract }
   } catch {
     if (url.pathname === '/authed/publisher/create') {
-      return { trpcClient, userAddress, contentContract, publisher: null }
+      return { trpcClient, userAddress, contentContract }
     }
     return goto(`/authed/publisher/create`)
   }
 }
+
+export const load = loadFunction

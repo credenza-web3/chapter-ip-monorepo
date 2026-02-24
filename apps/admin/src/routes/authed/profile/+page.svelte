@@ -5,10 +5,19 @@
   import ContentNftHistory from './components/ContentNftHistory.svelte'
   import LicenseNftHistory from './components/LicenseNftHistory.svelte'
   import { HistoryTabs } from './types'
+  import { modals } from 'svelte-modals'
+  import EditPublisherModal from './EditPublisherModal.svelte'
+  import { publisherStore } from '$lib/stores/publisher.svelte'
 
   let { data } = $props()
   
   let activeTab = $state(HistoryTabs.CRED_BALANCE)
+
+  function openEditModal() {
+    modals.open(EditPublisherModal, {
+      trpcClient: data.trpcClient
+    })
+  }
 </script>
 
 <div class="min-h-xl flex items-center justify-center bg-white p-4 w-full">
@@ -28,13 +37,21 @@
           <p class="text-sm font-mono text-gray-900 break-all">{data.userAddress}</p>
           <hr />
           <div class="flex items-end gap-2 my-3">
-            {#if data.publisher?.avatarUrl}
+            {#if publisherStore?.avatarUrl}
             <div class="flex items-center gap-2">
-              <img src={data.publisher?.avatarUrl} alt="" class="w-24 h-24 rounded-full" />
+              <img src={publisherStore?.avatarUrl} alt="" class="w-24 h-24 rounded-full" />
             </div>
             {/if}
-            {#if data.publisher?.title}
-             <p class="text-sm font-mono text-gray-900 break-all">Publisher title: {data.publisher?.title}</p>
+            {#if publisherStore?.title}
+             <p class="text-sm font-mono text-gray-900 break-all">Publisher title: {publisherStore?.title}</p>
+            {/if}
+            {#if publisherStore}
+              <button
+                onclick={openEditModal}
+                class="ml-auto px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+              >
+                Edit
+              </button>
             {/if}
           </div>
         </div>
