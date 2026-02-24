@@ -32,7 +32,7 @@ const trpcErrorLogger = new Logger('TRPC Error')
     }),
     TRPCModule.forRoot({
       context: AppContext,
-      autoSchemaFile: process.env.NODE_ENV === 'local' ? '../../packages/trpc/src/server' : undefined,
+      // autoSchemaFile: process.env.NODE_ENV === 'local' ? '../../packages/trpc/src/server' : undefined,
       errorFormatter: ({ shape, error }) => {
         trpcErrorLogger.error(error)
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
