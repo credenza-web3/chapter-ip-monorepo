@@ -175,11 +175,6 @@
                   <h3 class="card-description">{metadata.description || ''}</h3>
                   {#await getTokenPrice(item.tokenId) then price}
                     <div class="card-actions mt-4 flex flex-col">
-                      <div class="flex items-center justify-between w-full opacity-50 cursor-not-allowed">
-                        <span>Subscription price:</span>
-                        <span class="text-2xl font-bold text-primary">TBD</span>
-                        <button class="btn btn-primary opacity-50 cursor-not-allowed w-[95px]">Subscribe</button>
-                      </div>
                       {#if price.fulltime}
                         <div class="flex items-center justify-between w-full">
                           <span>Fulltime license price:</span>

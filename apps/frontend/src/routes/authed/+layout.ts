@@ -3,6 +3,7 @@ import { goto } from '$app/navigation'
 import { authStore } from '$lib'
 import { getSigner, initProvider } from '@repo/fe-evm-provider'
 import { createClient } from '@repo/trpc/client'
+import { verifyMembership } from '$lib/membership'
 
 export const prerender = false
 export const ssr = false
@@ -34,9 +35,13 @@ export const load = async () => {
   const signer = await getSigner()
   const userAddress = await signer.getAddress()
 
+  const hasMembership = await verifyMembership(userAddress)
+  console.log('hasMembership', hasMembership)
   return {
     accessToken,
     trpcClient,
     userAddress,
+    hasMembership,
   }
 }
+
