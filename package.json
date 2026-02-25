@@ -6,13 +6,18 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{js,ts,tsx,svelte,md,html,json}\"",
-    "trpc:generate": "turbo run trpc:generate",
+    "trpc:chmod": "chmod +x node_modules/.pnpm/nestjs-trpc@*/node_modules/nestjs-trpc/native/**/*",
+    "trpc:generate": "nestjs-trpc generate --output packages/trpc/src/server/server.ts --entrypoint apps/backend/main.ts",
+    "trpc:watch": "sleep 3 && nestjs-trpc watch --output packages/trpc/src/server/server.ts --entrypoint apps/backend/main.ts",
     "check-types": "turbo run check-types",
     "ncu": "pnpm dlx npm-check-updates --deep -i",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "pnpm run trpc:chmod && pnpm run trpc:generate"
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "husky": "^9.1.7",
+    "nestjs-trpc": "^2.9.1",
     "prettier": "^3.8.1",
     "prettier-plugin-svelte": "^3.5.0",
     "turbo": "^2.8.10",

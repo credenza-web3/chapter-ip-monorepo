@@ -10,7 +10,6 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
-    "_dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -19,11 +18,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "dev": "concurrently \"pnpm run trpc:watch\" \"pnpm run start:dev\"",
-    "trpc:generate": "nestjs-trpc generate --output ../../packages/trpc/src/server/server.ts",
-    "trpc:watch": "nestjs-trpc watch --output ../../packages/trpc/src/server/server.ts",
-    "trpc:chmod": "chmod +x ../../node_modules/.pnpm/nestjs-trpc@*/node_modules/nestjs-trpc/native/**/*",
-    "postinstall": "pnpm run trpc:chmod && pnpm run trpc:generate"
+    "dev": "nest start --watch"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.996.0",
@@ -61,7 +56,6 @@
     "@types/mime-types": "^3.0.1",
     "@types/node": "^25.3.0",
     "@types/supertest": "^6.0.3",
-    "concurrently": "^9.2.1",
     "eslint": "^10.0.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",

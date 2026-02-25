@@ -38,4 +38,3 @@ yarn-error.log*
 *.pem
 
 __ignore
-packages/trpc/src/server/server.ts
