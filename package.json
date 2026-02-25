@@ -12,7 +12,7 @@
     "check-types": "turbo run check-types",
     "ncu": "pnpm dlx npm-check-updates --deep -i",
     "prepare": "husky",
-    "postinstall": "pnpm run trpc:chmod && pnpm run trpc:generate"
+    "postinstall": "pnpm run trpc:chmod"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
