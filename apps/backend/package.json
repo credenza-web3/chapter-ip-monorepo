@@ -21,10 +21,10 @@
     "dev": "nest start --watch"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.996.0",
-    "@aws-sdk/lib-storage": "^3.996.0",
-    "@aws-sdk/s3-request-presigner": "^3.996.0",
-    "@credenza3/contracts": "^0.0.11",
+    "@aws-sdk/client-s3": "^3.997.0",
+    "@aws-sdk/lib-storage": "^3.997.0",
+    "@aws-sdk/s3-request-presigner": "^3.997.0",
+    "@credenza3/contracts": "^0.0.13",
     "@nestjs/common": "^11.1.14",
     "@nestjs/config": "^4.0.3",
     "@nestjs/core": "^11.1.14",
