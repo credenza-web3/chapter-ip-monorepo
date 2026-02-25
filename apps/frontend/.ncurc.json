@@ -1,0 +1,5 @@
+{
+  "reject": [
+    "@sveltejs/vite-plugin-svelte"
+  ]
+}

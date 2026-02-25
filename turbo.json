@@ -3,10 +3,28 @@
   "ui": "tui",
   "globalEnv": ["PORT", "NODE_ENV", "ACCOUNTS_URL"],
   "tasks": {
+    "//#trpc:generate": {
+      "cache": true,
+      "persistent": false,
+    },
+    "//#trpc:watch": {
+      "persistent": true,
+      "cache": true,
+    },
+    "backend#dev": {
+      "with": ["//#trpc:watch"],
+      "cache": false,
+      "persistent": true
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
     "build": {
       "dependsOn": ["^build"],
       "env": ["PORT", "NODE_ENV", "ACCOUNTS_URL"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"]
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "cache": false
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -14,9 +32,5 @@
     "check-types": {
       "dependsOn": ["^check-types"]
     },
-    "dev": {
-      "cache": false,
-      "persistent": true
-    }
   }
 }
