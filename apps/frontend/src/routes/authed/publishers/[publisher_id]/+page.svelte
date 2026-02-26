@@ -18,12 +18,12 @@
   let metadataCache = $state(new Map())
 
   const filteredContentItems = $derived(() =>
-    data.contentItems.filter(item => {
+    data.contentItems.filter((item) => {
       const metadata = metadataCache.get(item.tokenId)
       const title = metadata?.title || ''
-      
+
       return title.toLowerCase().includes(searchQuery.toLowerCase())
-    })
+    }),
   )
 
   const cacheMetadata = async (tokenId: string, metadata: any) => {
@@ -74,7 +74,11 @@
 
     pass?.once(
       'PAYMENT',
-      async (data: { type: string; data: { hash: string }, results: { items: Array<{ outcome: { voucher: string; sig: string } }> } }) => {
+      async (data: {
+        type: string
+        data: { hash: string }
+        results: { items: Array<{ outcome: { voucher: string; sig: string } }> }
+      }) => {
         if (data.type !== 'STRIPE') {
           goto('/authed/purchases')
           openConfirm(data.data.hash)
@@ -115,15 +119,15 @@
   const openConfirm = (hash: string) => {
     get(passportStore)?.openUI(Passport.pages.RICH_ALERT, {
       richAlertData: {
-        title: "Get your purchase licence proof",
+        title: 'Get your purchase licence proof',
         action: {
-          text: "Check it out",
+          text: 'Check it out',
           onClick: () => {
             window.open(`https://testnet.snowtrace.io/tx/${hash}`, '_blank')
             get(passportStore)?.close()
           },
         },
-        closeButtonText: "cancel",
+        closeButtonText: 'cancel',
       },
     })
   }
@@ -143,16 +147,13 @@
     </div>
   {:else}
     <h2 class="text-2xl font-semibold mb-4">Products</h2>
-    
+
     {#if data.contentItems.length > 1}
       <div class="mb-6">
-        <SearchInput 
-          placeholder="Search products by title" 
-          bind:value={searchQuery} 
-        />
+        <SearchInput placeholder="Search products by title" bind:value={searchQuery} />
       </div>
     {/if}
-    
+
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       {#if filteredContentItems().length === 0}
         <div class="alert col-span-full">
@@ -184,7 +185,9 @@
                         <div class="flex items-center justify-between w-full">
                           <span>Fulltime license price:</span>
                           <span class="text-2xl font-bold text-primary">${price.fulltime}</span>
-                          <button class="btn btn-primary" onclick={() => onBuyLicense(item.tokenId, '0')}>Buy Now</button>
+                          <button class="btn btn-primary" onclick={() => onBuyLicense(item.tokenId, '0')}
+                            >Buy Now</button
+                          >
                         </div>
                       {/if}
                       {#if price.onetime}
@@ -192,7 +195,9 @@
                           <div class="flex items-center justify-between w-full">
                             <span>One Time license price:</span>
                             <span class="text-2xl font-bold text-primary">${price.onetime}</span>
-                            <button class="btn btn-primary" onclick={() => onBuyLicense(item.tokenId, '2')}>Buy Now</button>
+                            <button class="btn btn-primary" onclick={() => onBuyLicense(item.tokenId, '2')}
+                              >Buy Now</button
+                            >
                           </div>
                           <p class="text-xs text-yellow-600 mt-1">
                             Warning: One Time License allows interaction with this content only once.

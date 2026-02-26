@@ -36,7 +36,6 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
     }
     const licenseType = (await licenseContract.getTokenLicenseType(String(licenseTokenId))).toString()
 
-
     let metadata: {
       name: string
       size: number
@@ -70,7 +69,7 @@ export const getTokenMetadata = async (accessToken: string, tokenId: string) => 
   try {
     const metaUri = await contentContract.tokenURI(String(tokenId))
     const response = await fetch(metaUri)
-    const metadata: { image: string, title: string, description: string } = await response.json()
+    const metadata: { image: string; title: string; description: string } = await response.json()
 
     return metadata
   } catch (error) {

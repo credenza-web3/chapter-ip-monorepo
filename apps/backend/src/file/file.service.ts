@@ -58,7 +58,7 @@ export class FileService extends CommonModelService<File> {
       ...(opts.sub && { sub: opts.sub }),
       ...(opts.key && { key: opts.key }),
       ...(opts.tokenId && { tokenId: opts.tokenId }),
-      ...(opts.contractAddress && { contractAddress: opts.contractAddress.toLowerCase().trim() })
+      ...(opts.contractAddress && { contractAddress: opts.contractAddress.toLowerCase().trim() }),
     }
     return result
   }

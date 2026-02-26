@@ -1,5 +1,3 @@
 {
-  "reject": [
-    "@sveltejs/vite-plugin-svelte"
-  ]
+  "reject": ["@sveltejs/vite-plugin-svelte"]
 }

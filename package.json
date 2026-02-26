@@ -5,7 +5,7 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{js,ts,tsx,svelte,md,html,json}\"",
+    "format": "prettier --write \"**/*.{js,ts,tsx,svelte,md,html,json,css}\"",
     "trpc:chmod": "chmod +x node_modules/.pnpm/nestjs-trpc@*/node_modules/nestjs-trpc/native/**/*",
     "trpc:generate": "nestjs-trpc generate --output packages/trpc/src/server/server.ts --entrypoint apps/backend/main.ts",
     "trpc:watch": "sleep 3 && nestjs-trpc watch --output packages/trpc/src/server/server.ts --entrypoint apps/backend/main.ts",

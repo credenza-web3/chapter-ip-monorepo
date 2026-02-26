@@ -1,4 +1,4 @@
-import { ethers } from "@repo/fe-evm-provider";
+import { ethers } from '@repo/fe-evm-provider'
 
 class AgencyStore {
   agencyAddress = $state('')
@@ -6,25 +6,15 @@ class AgencyStore {
   originalAddress = $state('')
   originalFee = $state(0)
 
-  isValidAddress = $derived(
-    this.agencyAddress === '' || ethers.isAddress(this.agencyAddress)
-  )
+  isValidAddress = $derived(this.agencyAddress === '' || ethers.isAddress(this.agencyAddress))
 
-  isFeeValid = $derived(
-    this.agencyFee >= 0 && this.agencyFee <= 100
-  )
+  isFeeValid = $derived(this.agencyFee >= 0 && this.agencyFee <= 100)
 
-  hasValidAddress = $derived(
-    this.agencyAddress !== '' && ethers.isAddress(this.agencyAddress)
-  )
+  hasValidAddress = $derived(this.agencyAddress !== '' && ethers.isAddress(this.agencyAddress))
 
-  hasAddressChanged = $derived(
-    this.agencyAddress !== this.originalAddress
-  )
+  hasAddressChanged = $derived(this.agencyAddress !== this.originalAddress)
 
-  hasFeeChanged = $derived(
-    this.agencyFee !== this.originalFee
-  )
+  hasFeeChanged = $derived(this.agencyFee !== this.originalFee)
 
   setAddress(address: string) {
     if (address === ethers.ZeroAddress) {
@@ -56,7 +46,7 @@ class AgencyStore {
   }
 
   get canSaveAddress(): boolean {
-    return (this.isValidAddress && this.hasAddressChanged)
+    return this.isValidAddress && this.hasAddressChanged
   }
 
   get canSaveFee(): boolean {

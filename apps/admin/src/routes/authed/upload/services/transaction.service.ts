@@ -7,17 +7,9 @@ import { BlockchainService } from './blockchain.service'
 export class TransactionService {
   private blockchainService = new BlockchainService()
 
-  async mintWithPrices(
-    accessToken: string,
-    lifetimePrice: number,
-    onetimePrice: number,
-  ): Promise<string> {
+  async mintWithPrices(accessToken: string, lifetimePrice: number, onetimePrice: number): Promise<string> {
     const userAddress = await this.blockchainService.getUserAddress()
-    const mintPopulatedTx = await this.blockchainService.createMintTransaction(
-      userAddress,
-      lifetimePrice,
-      onetimePrice,
-    )
+    const mintPopulatedTx = await this.blockchainService.createMintTransaction(userAddress, lifetimePrice, onetimePrice)
 
     const txHash = await this.forwardMintTransaction(mintPopulatedTx)
     const tokenId = await this.extractTokenIdFromTransaction(txHash, accessToken)
@@ -36,7 +28,7 @@ export class TransactionService {
   private async extractTokenIdFromTransaction(txHash: string, accessToken: string): Promise<number> {
     const ethersProvider = await this.blockchainService.getEthersProvider(accessToken)
     const receipt = await ethersProvider.waitForTransaction(txHash)
-    
+
     if (!receipt) {
       throw new Error('Transaction failed')
     }
@@ -49,7 +41,7 @@ export class TransactionService {
 
     const transferEvent = this.blockchainService.parseTransferEvent(receipt, contentContract)
     const tokenId = Number(transferEvent?.args.tokenId)
-    
+
     if (!tokenId) {
       throw new Error('Could not extract token ID from transaction')
     }

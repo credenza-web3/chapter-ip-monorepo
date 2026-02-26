@@ -13,11 +13,14 @@ export class UploadService {
     uploadedImage: File | null,
     lifetimePrice: number,
     oneTimePrice: number,
-    trpcClient: any
+    trpcClient: any,
   ): Promise<{ tokenId: string; imageUrl: string; key: string }> {
+    const tokenId = await this.transactionService.mintWithPrices(
+      authStore.state.accessToken!,
+      lifetimePrice,
+      oneTimePrice,
+    )
 
-    const tokenId = await this.transactionService.mintWithPrices(authStore.state.accessToken!, lifetimePrice, oneTimePrice)
-    
     // Upload main file
     const { url, key } = await trpcClient.files.createContentUploadUrl.mutate({
       tokenId,
@@ -30,42 +33,41 @@ export class UploadService {
       const { url: imageUrlResponse } = await trpcClient.files.createContentUploadUrl.mutate({
         tokenId,
         mimetype: uploadedImage.type,
-        bucket: "preview"
+        bucket: 'preview',
       })
       await uploadFileToBucket(uploadedImage, imageUrlResponse)
 
       let ext = uploadedImage.type.split('/')[1]
-      if (ext === 'jpeg')
-        ext = 'jpg'
+      if (ext === 'jpeg') ext = 'jpg'
       imageUrl += `${tokenId}.${ext}`
     } else {
       imageUrl += r2Config.defaultImage
     }
-    
+
     // Register content
     await trpcClient.files.registerContent.mutate({
       tokenId,
       key,
     })
-    
+
     return { tokenId, imageUrl, key }
   }
 
-  async saveMetadata({ 
+  async saveMetadata({
     tokenId,
     uploaded,
     imageUrl,
     key,
     title,
     description,
-    trpcClient
+    trpcClient,
   }: {
-    tokenId: string,
-    uploaded: File,
-    imageUrl: string,
-    key: string,
-    title: string,
-    description: string,
+    tokenId: string
+    uploaded: File
+    imageUrl: string
+    key: string
+    title: string
+    description: string
     trpcClient: any
   }): Promise<void> {
     await trpcClient.files.uploadMetadata.mutate({
