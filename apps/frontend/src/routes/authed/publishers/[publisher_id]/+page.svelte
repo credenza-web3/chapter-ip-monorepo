@@ -13,12 +13,12 @@
   let metadataCache = $state(new Map())
 
   const filteredContentItems = $derived(() =>
-    data.contentItems.filter(item => {
+    data.contentItems.filter((item) => {
       const metadata = metadataCache.get(item.tokenId)
       const title = metadata?.title || ''
-      
+
       return title.toLowerCase().includes(searchQuery.toLowerCase())
-    })
+    }),
   )
 
   const cacheMetadata = async (tokenId: string, metadata: any) => {
@@ -47,17 +47,14 @@
       <span class="loading loading-dots loading-lg"></span>
     </div>
   {:else}
-    <PurchaseSubscription hasMembership={true}/>
-    
+    <PurchaseSubscription hasMembership={true} />
+
     {#if data.contentItems.length > 1}
       <div class="mb-6">
-        <SearchInput 
-          placeholder="Search products by title" 
-          bind:value={searchQuery} 
-        />
+        <SearchInput placeholder="Search products by title" bind:value={searchQuery} />
       </div>
     {/if}
-    
+
     <ContentGrid contentItems={filteredContentItems()} {searchQuery} />
   {/if}
 </div>

@@ -28,11 +28,11 @@
   >
   <label class="label justify-between">
     <div class="space-x-2">
-      <input 
-        type="checkbox" 
-        checked={$uploadStore.isLifetimeLicense} 
+      <input
+        type="checkbox"
+        checked={$uploadStore.isLifetimeLicense}
         onchange={handleLifetimeChange}
-        class="checkbox" 
+        class="checkbox"
       />
       <span class="label-text">Lifetime License (USD)</span>
     </div>
@@ -50,12 +50,7 @@
   </label>
   <label class="label justify-between">
     <div class="space-x-2">
-      <input 
-        type="checkbox" 
-        checked={$uploadStore.isOneTimeLicense} 
-        onchange={handleOneTimeChange}
-        class="checkbox" 
-      />
+      <input type="checkbox" checked={$uploadStore.isOneTimeLicense} onchange={handleOneTimeChange} class="checkbox" />
       <span class="label-text">One Time License (USD)</span>
     </div>
 

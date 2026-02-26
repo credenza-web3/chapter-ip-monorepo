@@ -6,9 +6,8 @@
   import { sendTx } from '$lib/services/transaction'
 
   let { data } = $props()
-  const { items } = data.paginatedResponse ?? { items: []}
+  const { items } = data.paginatedResponse ?? { items: [] }
 
-  
   let fulltimeLicensePrice = $state(0)
   let onetimeLicensePrice = $state(0)
   let isFulltimeLoaded = $state(false)
@@ -25,7 +24,11 @@
         await data.contentContract?.setLicensePriceFiat?.populateTransaction(tokenId, '0', fulltimeLicensePrice * 100)!,
       )
       await sendTx(
-        await data.contentContract?.setLicensePriceToken?.populateTransaction(tokenId, '0', fulltimeLicensePrice * 10 ** 6)!,
+        await data.contentContract?.setLicensePriceToken?.populateTransaction(
+          tokenId,
+          '0',
+          fulltimeLicensePrice * 10 ** 6,
+        )!,
       )
       notify('Full-time license price updated', ToastType.SUCCESS)
     } catch {
@@ -43,7 +46,11 @@
         await data.contentContract?.setLicensePriceFiat?.populateTransaction(tokenId, '2', onetimeLicensePrice * 100)!,
       )
       await sendTx(
-        await data.contentContract?.setLicensePriceToken?.populateTransaction(tokenId, '2', onetimeLicensePrice * 10 ** 6)!,
+        await data.contentContract?.setLicensePriceToken?.populateTransaction(
+          tokenId,
+          '2',
+          onetimeLicensePrice * 10 ** 6,
+        )!,
       )
       notify('One-time license price updated', ToastType.SUCCESS)
     } catch {
@@ -76,19 +83,25 @@
         <ul class="basis-1/2">
           <li><strong>Contract Address:</strong> {CONTENT_CONTRACT}</li>
           <li><strong>Token ID:</strong> {item.tokenId}</li>
-           <li><strong>Explorer link:</strong>
-             <a class="text-blue-500 hover:underline" href={`${EXPLORER_LINK}/${CONTENT_CONTRACT}/${item.tokenId}`} target="_blank">{EXPLORER_LINK}/{CONTENT_CONTRACT}/{item.tokenId}</a>
-           </li>
+          <li>
+            <strong>Explorer link:</strong>
+            <a
+              class="text-blue-500 hover:underline"
+              href={`${EXPLORER_LINK}/${CONTENT_CONTRACT}/${item.tokenId}`}
+              target="_blank">{EXPLORER_LINK}/{CONTENT_CONTRACT}/{item.tokenId}</a
+            >
+          </li>
           <li><strong>Created:</strong> {formatDate(item.createdAt)}</li>
           {#if data.metadata?.image}
-            <li><strong>Image:</strong> 
+            <li>
+              <strong>Image:</strong>
               <object data={data.metadata.image} type="image/jpeg" title="File" class="w-30 h-30 rounded-lg">
                 <img src={r2Config.url + r2Config.defaultImage} alt="File" />
               </object>
             </li>
           {/if}
-          <li><strong>Title:</strong> {data.metadata?.title || "Untitled"}</li>
-          <li><strong>Description:</strong> {data.metadata?.description || "No description"}</li>
+          <li><strong>Title:</strong> {data.metadata?.title || 'Untitled'}</li>
+          <li><strong>Description:</strong> {data.metadata?.description || 'No description'}</li>
         </ul>
       {/each}
     {/if}

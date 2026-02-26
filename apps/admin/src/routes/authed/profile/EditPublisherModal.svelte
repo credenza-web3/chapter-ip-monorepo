@@ -12,7 +12,7 @@
   }
 
   let { isOpen, close, trpcClient }: Props = $props()
-  
+
   let publisherName = $state(publisherStore.title || '')
   let avatarUrl = $state(publisherStore.avatarUrl || '')
   let loading = $state(false)
@@ -21,7 +21,7 @@
     try {
       loading = true
       const result = await savePublisher(trpcClient, publisherName, avatarUrl)
-      
+
       if (result.success) {
         notify('Publisher updated successfully', ToastType.SUCCESS)
         close()
@@ -41,11 +41,7 @@
   <div class="p-6">
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-xl font-semibold text-gray-900">Edit Publisher</h2>
-      <button
-        onclick={close}
-        class="text-gray-400 hover:text-gray-600 transition-colors"
-        aria-label="Close modal"
-      >
+      <button onclick={close} class="text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -64,7 +60,7 @@
         >
           Cancel
         </button>
-        
+
         <button
           type="submit"
           disabled={!publisherName || loading}

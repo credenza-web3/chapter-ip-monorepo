@@ -32,7 +32,11 @@ export const useLicensePurchase = () => {
 
     pass?.once(
       'PAYMENT',
-      async (data: { type: string; data: { hash: string }, results: { items: Array<{ outcome: { voucher: string; sig: string } }> } }) => {
+      async (data: {
+        type: string
+        data: { hash: string }
+        results: { items: Array<{ outcome: { voucher: string; sig: string } }> }
+      }) => {
         if (data.type !== 'STRIPE') {
           goto('/authed/purchases')
           openConfirm(data.data.hash)
@@ -71,15 +75,15 @@ export const useLicensePurchase = () => {
   const openConfirm = (hash: string) => {
     get(passportStore)?.openUI(Passport.pages.RICH_ALERT, {
       richAlertData: {
-        title: "Get your purchase licence proof",
+        title: 'Get your purchase licence proof',
         action: {
-          text: "Check it out",
+          text: 'Check it out',
           onClick: () => {
             window.open(`https://testnet.snowtrace.io/tx/${hash}`, '_blank')
             get(passportStore)?.close()
           },
         },
-        closeButtonText: "cancel",
+        closeButtonText: 'cancel',
       },
     })
   }

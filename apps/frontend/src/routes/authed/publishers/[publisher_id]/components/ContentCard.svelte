@@ -35,15 +35,15 @@
     <div class="card-body">
       <h3 class="card-title">{metadata.title || 'UNTITLED'}</h3>
       <h3 class="card-description">{metadata.description || ''}</h3>
-      
+
       {#if price}
         <div class="card-actions mt-4 flex flex-col">
           {#if price.fulltime}
             <div class="flex items-center justify-between w-full">
               <span>Fulltime license price:</span>
               <span class="text-2xl font-bold text-primary">${price.fulltime}</span>
-              <button 
-                class="btn btn-primary" 
+              <button
+                class="btn btn-primary"
                 onclick={() => onBuyLicense(item.tokenId, '0', metadata)}
                 disabled={loading}
               >
@@ -56,8 +56,8 @@
               <div class="flex items-center justify-between w-full">
                 <span>One Time license price:</span>
                 <span class="text-2xl font-bold text-primary">${price.onetime}</span>
-                <button 
-                  class="btn btn-primary" 
+                <button
+                  class="btn btn-primary"
                   onclick={() => onBuyLicense(item.tokenId, '2', metadata)}
                   disabled={loading}
                 >

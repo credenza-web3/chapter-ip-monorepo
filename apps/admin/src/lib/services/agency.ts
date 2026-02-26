@@ -20,10 +20,7 @@ export async function savePublisherAgencyAddress(
   }
 }
 
-export async function savePublisherAgencyFee(
-  contentContract: ethers.Contract,
-  userAddress: string,
-): Promise<boolean> {
+export async function savePublisherAgencyFee(contentContract: ethers.Contract, userAddress: string): Promise<boolean> {
   try {
     const agencyFee = agencyStore.agencyFee ?? 0
     const tx = await contentContract.setPublisherAgencyFee.populateTransaction(userAddress, agencyFee)

@@ -40,4 +40,3 @@ export const load = async () => {
     userAddress,
   }
 }
-

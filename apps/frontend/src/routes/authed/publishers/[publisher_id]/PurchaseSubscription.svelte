@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { goto } from "$app/navigation"
-  import { getMembershipPrice } from "$lib/membership"
-  import { passportStore } from "$lib/passport.store"
-  import { get } from "svelte/store"
+  import { goto } from '$app/navigation'
+  import { getMembershipPrice } from '$lib/membership'
+  import { passportStore } from '$lib/passport.store'
+  import { get } from 'svelte/store'
 
   let { hasMembership } = $props()
-
 
   const purchaseSubscription = async () => {
     const pass = get(passportStore)
@@ -16,7 +15,7 @@
       memberships: [
         {
           contractAddress: import.meta.env.VITE_EVM_MEMBERSHIP_CONTRACT_ADDRESS,
-          typeId: "0"
+          typeId: '0',
         },
       ],
     })

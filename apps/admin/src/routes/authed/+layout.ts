@@ -46,7 +46,7 @@ async function loadFunction({ url }: { url: URL }) {
 
   agencyStore.setAddress(agencyAddress)
   agencyStore.setFee(agencyFee)
-  
+
   const sub = await authStore.getSubFromToken()
   try {
     const publisher = await trpcClient.publishers.getPublisher.query({
