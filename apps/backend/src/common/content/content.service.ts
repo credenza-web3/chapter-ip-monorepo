@@ -30,8 +30,8 @@ export class CommonContentService {
   public getContentNftContract() {
     return this.contentNftContract
   }
-  
-  public async getContentNftContractAddress() { 
+
+  public async getContentNftContractAddress() {
     return (await this.getContentNftContract().getAddress()).toLowerCase()
   }
 

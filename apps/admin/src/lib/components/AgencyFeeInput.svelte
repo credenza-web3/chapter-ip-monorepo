@@ -18,7 +18,10 @@
     min="0"
     max="100"
     step="0.01"
-    class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 transition-colors {!feeTouched || agencyStore.isFeeValid ? 'border-gray-300 focus:border-gray-900' : 'border-red-500 focus:border-red-600'}"
+    class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 transition-colors {!feeTouched ||
+    agencyStore.isFeeValid
+      ? 'border-gray-300 focus:border-gray-900'
+      : 'border-red-500 focus:border-red-600'}"
   />
   {#if feeTouched && !agencyStore.isFeeValid}
     <p class="text-sm text-red-500 mt-1">Invalid fee</p>

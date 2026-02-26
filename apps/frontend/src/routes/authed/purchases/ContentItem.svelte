@@ -24,7 +24,10 @@
   }
 
   const onGetTransactionReceipt = () => {
-    window.open(`https://testnet.snowtrace.io/nft/${import.meta.env.VITE_EVM_LICENSE_NFT_CONTRACT_ADDRESS}/${purchase.licenseTokenId}`, '_blank')
+    window.open(
+      `https://testnet.snowtrace.io/nft/${import.meta.env.VITE_EVM_LICENSE_NFT_CONTRACT_ADDRESS}/${purchase.licenseTokenId}`,
+      '_blank',
+    )
   }
 </script>
 

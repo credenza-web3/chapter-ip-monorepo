@@ -5,11 +5,11 @@
   "tasks": {
     "//#trpc:generate": {
       "cache": true,
-      "persistent": false,
+      "persistent": false
     },
     "//#trpc:watch": {
       "persistent": true,
-      "cache": true,
+      "cache": true
     },
     "backend#dev": {
       "with": ["//#trpc:watch"],
@@ -31,6 +31,6 @@
     },
     "check-types": {
       "dependsOn": ["^check-types"]
-    },
+    }
   }
 }

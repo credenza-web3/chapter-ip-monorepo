@@ -21,15 +21,15 @@
     try {
       uploadStore.setLoading(true)
       const trpcClient = uploadService.createTrpcClient()
-      
+
       const { tokenId, imageUrl, key } = await uploadService.uploadContent(
         $uploadStore.uploaded!,
         $uploadStore.uploadedImage,
         $uploadStore.lifetimePrice,
         $uploadStore.oneTimePrice,
-        trpcClient
+        trpcClient,
       )
-      
+
       await uploadService.saveMetadata({
         tokenId,
         uploaded: $uploadStore.uploaded!,
@@ -62,21 +62,37 @@
   </div>
 
   <FileUpload />
-  
+
   {#if $uploadStore.uploaded}
     <div class="mt-6">
       <h2 class="text-xl font-semibold mb-3">Content Details</h2>
 
-      <input id="title" type="text" bind:value={$uploadStore.title} placeholder="Title" class="input input-bordered w-1/3 mb-3" />
-      <input id="description" type="text" bind:value={$uploadStore.description} placeholder="Description" class="input input-bordered w-1/3 mb-3" />
+      <input
+        id="title"
+        type="text"
+        bind:value={$uploadStore.title}
+        placeholder="Title"
+        class="input input-bordered w-1/3 mb-3"
+      />
+      <input
+        id="description"
+        type="text"
+        bind:value={$uploadStore.description}
+        placeholder="Description"
+        class="input input-bordered w-1/3 mb-3"
+      />
       <ImageUpload />
     </div>
     <div class="mt-6 space-y-4">
       <LicenseForm />
 
       <div class="flex gap-10 mt-3">
-        <button class="btn btn-outline" onclick={onSubmitClick} disabled={$uploadStore.loading} class:hidden={!$isFormValid}
-          >
+        <button
+          class="btn btn-outline"
+          onclick={onSubmitClick}
+          disabled={$uploadStore.loading}
+          class:hidden={!$isFormValid}
+        >
           {#if $uploadStore.loading}
             <div class="loading loading-spinner"></div>
           {:else}

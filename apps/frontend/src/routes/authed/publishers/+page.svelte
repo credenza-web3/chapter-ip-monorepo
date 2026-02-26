@@ -6,9 +6,7 @@
   let searchQuery = $state('')
 
   const filteredPublishers = $derived(() =>
-    data.publishers.filter(publisher =>
-      publisher.title.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    data.publishers.filter((publisher) => publisher.title.toLowerCase().includes(searchQuery.toLowerCase())),
   )
 </script>
 
@@ -17,7 +15,7 @@
     <h1 class="text-4xl font-bold">Publishers</h1>
     <AddFundsButton />
   </div>
-  
+
   <div class="mb-6">
     <input
       type="text"
@@ -26,7 +24,7 @@
       class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
     />
   </div>
-  
+
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {#each filteredPublishers() as publisher}
       <a

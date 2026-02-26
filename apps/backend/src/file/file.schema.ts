@@ -30,7 +30,7 @@ export class File extends Document<ObjectId> {
 
   @Prop({ required: true })
   tokenId: string
-  
+
   @Prop({ required: true, lowercase: true, trim: true })
   contractAddress: string
 

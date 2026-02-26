@@ -3,7 +3,7 @@ export async function fetchUntilFound(
   userAddress: string,
   fromBlock: number,
   step: number,
-  stopSignal: () => boolean
+  stopSignal: () => boolean,
 ) {
   let currentBlock = fromBlock
   const filter = contract.filters.Transfer(null, userAddress)
@@ -21,10 +21,7 @@ export async function fetchUntilFound(
         return { foundEvents: chunk, nextBlock: currentBlock }
       }
     } catch (err) {
-      console.warn(
-        `queryFilter failed for blocks ${startBlock}-${toBlock}`,
-        err
-      )
+      console.warn(`queryFilter failed for blocks ${startBlock}-${toBlock}`, err)
       currentBlock = startBlock - 1
     }
   }

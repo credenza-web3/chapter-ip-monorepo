@@ -46,7 +46,7 @@
               <td>{meta.title || 'N/A'}</td>
               <td>{meta.description || 'N/A'}</td>
             {/await}
-           
+
             <td>{formatDate(item.createdAt)}</td>
           </tr>
         {/each}

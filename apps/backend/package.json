@@ -21,9 +21,9 @@
     "dev": "nest start --watch"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.997.0",
-    "@aws-sdk/lib-storage": "^3.997.0",
-    "@aws-sdk/s3-request-presigner": "^3.997.0",
+    "@aws-sdk/client-s3": "^3.998.0",
+    "@aws-sdk/lib-storage": "^3.998.0",
+    "@aws-sdk/s3-request-presigner": "^3.998.0",
     "@credenza3/contracts": "^0.0.13",
     "@nestjs/common": "^11.1.14",
     "@nestjs/config": "^4.0.3",
@@ -44,8 +44,6 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.4",
-    "@eslint/js": "^10.0.1",
     "@nestjs/cli": "^11.0.16",
     "@nestjs/schematics": "^11.0.9",
     "@nestjs/testing": "^11.1.14",
@@ -54,12 +52,9 @@
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/mime-types": "^3.0.1",
-    "@types/node": "^25.3.0",
-    "@types/supertest": "^6.0.3",
+    "@types/node": "^25.3.1",
+    "@types/supertest": "^7.2.0",
     "eslint": "^10.0.2",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.5",
-    "globals": "^17.3.0",
     "jest": "^30.2.0",
     "prettier": "^3.8.1",
     "source-map-support": "^0.5.21",
@@ -68,8 +63,7 @@
     "ts-loader": "^9.5.4",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.56.1"
+    "typescript": "^5.9.3"
   },
   "jest": {
     "moduleFileExtensions": [

@@ -3,18 +3,10 @@ import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftCon
 
 export class BlockchainService {
   private getContentContract(signer: any) {
-    return new ethers.Contract(
-      import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS,
-      content_abi,
-      signer,
-    )
+    return new ethers.Contract(import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS, content_abi, signer)
   }
 
-  async createMintTransaction(
-    userAddress: string,
-    lifetimePrice: number,
-    onetimePrice: number,
-  ) {
+  async createMintTransaction(userAddress: string, lifetimePrice: number, onetimePrice: number) {
     const signer = await getSigner()
     const contentContract = this.getContentContract(signer)
 

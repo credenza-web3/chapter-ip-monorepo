@@ -35,7 +35,7 @@
     try {
       loading = true
       const result = await savePublisher(data.trpcClient!, publisherName, avatarUrl)
-      
+
       if (!result.success) {
         return
       }
@@ -63,7 +63,7 @@
 
       <div class="flex-1 max-w-md">
         <h2 class="text-lg font-medium text-gray-900 mb-4">Agency Settings</h2>
-        
+
         <div class="flex gap-2 mt-4">
           <AgencyAddressInput />
 
