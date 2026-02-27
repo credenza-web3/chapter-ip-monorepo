@@ -36,22 +36,27 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
     }
     const licenseType = (await licenseContract.getTokenLicenseType(String(licenseTokenId))).toString()
 
-    let metadata: {
-      name: string
-      size: number
-      type: string
-      title: string
-      image: string
-      key: string
-    } = await fetchContentTokenMeta(contentContract, contentTokenId)
+    try {
+      let metadata: {
+        name: string
+        size: number
+        type: string
+        title: string
+        image: string
+        key: string
+      } = await fetchContentTokenMeta(contentContract, contentTokenId)
 
-    tokens.push({
-      licenseTokenId,
-      isBlocked: blockedLicensesIds.includes(String(licenseTokenId)),
-      contentTokenId: Number(contentTokenId),
-      metadata,
-      licenseType,
-    })
+      tokens.push({
+        licenseTokenId,
+        isBlocked: blockedLicensesIds.includes(String(licenseTokenId)),
+        contentTokenId: Number(contentTokenId),
+        metadata,
+        licenseType,
+      })
+    } catch (error) {
+      console.error('Error fetching metadata for token', licenseTokenId, error)
+    }
+    
   }
 
   return tokens
