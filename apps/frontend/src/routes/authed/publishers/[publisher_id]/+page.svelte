@@ -38,7 +38,7 @@
             contentContract = new ethers.Contract(
               import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS,
               content_abi,
-              signer
+              signer,
             )
           }
           const metadata = await fetchContentTokenMeta(contentContract, item.tokenId)

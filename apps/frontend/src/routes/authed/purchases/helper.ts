@@ -61,11 +61,10 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
   return tokens
 }
 
-
 export const getPurchasedMembershipContent = async (
-  accessToken: string, 
+  accessToken: string,
   trpcClient: ReturnType<typeof createClient>,
-  publisherIds: string[]
+  publisherIds: string[],
 ) => {
   // Initialize provider and contract for metadata fetching
   await initProvider(accessToken)
@@ -76,22 +75,25 @@ export const getPurchasedMembershipContent = async (
     signer,
   )
 
-  const groupedContent: Record<string, {
-    publisherId: string
-    publisherTitle: string
-    publisherSub: string
-    contentItems: Array<{
-      contentTokenId: number
-      metadata: any
-    }>
-  }> = {}
+  const groupedContent: Record<
+    string,
+    {
+      publisherId: string
+      publisherTitle: string
+      publisherSub: string
+      contentItems: Array<{
+        contentTokenId: number
+        metadata: any
+      }>
+    }
+  > = {}
 
   const { items: publishers } = await trpcClient.publishers.findPublishers.query({
     limit: '100',
   })
   for (const publisherId of publisherIds) {
     try {
-      const publisher = publishers.find(p => p.id === publisherId)
+      const publisher = publishers.find((p) => p.id === publisherId)
       if (!publisher) {
         console.warn(`Publisher ${publisherId} not found`)
         continue
@@ -108,7 +110,7 @@ export const getPurchasedMembershipContent = async (
       for (const item of contentItems) {
         try {
           const metadata = await fetchContentTokenMeta(contentContract, item.tokenId)
-          
+
           processedContentItems.push({
             contentTokenId: Number(item.tokenId),
             metadata,
@@ -123,7 +125,7 @@ export const getPurchasedMembershipContent = async (
           publisherId,
           publisherTitle: publisher.title,
           publisherSub: publisher.sub,
-          contentItems: processedContentItems
+          contentItems: processedContentItems,
         }
       }
     } catch (error) {
