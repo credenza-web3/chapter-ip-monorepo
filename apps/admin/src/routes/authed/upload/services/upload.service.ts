@@ -39,7 +39,7 @@ export class UploadService {
 
       let ext = uploadedImage.type.split('/')[1]
       if (ext === 'jpeg') ext = 'jpg'
-      imageUrl += `${tokenId}.${ext}`
+      imageUrl += `${import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS.toLowerCase()}/${tokenId}.${ext}`
     } else {
       imageUrl += r2Config.defaultImage
     }
