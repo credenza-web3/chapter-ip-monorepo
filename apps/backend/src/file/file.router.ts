@@ -137,7 +137,8 @@ export class FileRouter {
 
     const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(ctx.authTokenPayload.sub)
 
-    const hasMembership = await this.commonContentService.verifyHasSubscription(subEvmAddress)
+    const publisherAddress = await this.commonContentService.getOwner(file.tokenId)
+    const hasMembership = await this.commonContentService.verifyHasSubscription(publisherAddress, subEvmAddress)
 
     if (!hasMembership) {
       try {
