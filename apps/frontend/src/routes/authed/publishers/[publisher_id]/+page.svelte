@@ -2,7 +2,7 @@
   import { authStore } from '$lib'
   import { getTokenMetadata } from '../../purchases/helper'
   import SearchInput from '$lib/components/SearchInput.svelte'
-  import PurchaseSubscription from './PurchaseSubscription.svelte'
+  import PurchaseSubscription from './components/PurchaseSubscription.svelte'
   import PublisherHeader from './components/PublisherHeader.svelte'
   import ContentGrid from './components/ContentGrid.svelte'
 
