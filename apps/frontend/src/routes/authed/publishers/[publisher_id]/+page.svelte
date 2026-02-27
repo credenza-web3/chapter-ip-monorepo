@@ -1,6 +1,8 @@
 <script lang="ts">
   import { authStore } from '$lib'
-  import { getTokenMetadata } from '../../purchases/helper'
+  import { fetchContentTokenMeta } from '@repo/fe-services'
+  import { ethers, initProvider, getSigner } from '@repo/fe-evm-provider'
+  import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
   import SearchInput from '$lib/components/SearchInput.svelte'
   import PurchaseSubscription from './components/PurchaseSubscription.svelte'
   import PublisherHeader from './components/PublisherHeader.svelte'
@@ -11,6 +13,7 @@
   let loading = $state(false)
   let searchQuery = $state('')
   let metadataCache = $state(new Map())
+  let contentContract: any = null
 
   const filteredContentItems = $derived(() =>
     data.contentItems.filter((item) => {
@@ -29,7 +32,16 @@
     data.contentItems.forEach(async (item: any) => {
       if (!metadataCache.has(item.tokenId)) {
         try {
-          const metadata = await getTokenMetadata(authStore.state.accessToken!, item.tokenId)
+          if (!contentContract) {
+            await initProvider(authStore.state.accessToken!)
+            const signer = await getSigner()
+            contentContract = new ethers.Contract(
+              import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS,
+              content_abi,
+              signer
+            )
+          }
+          const metadata = await fetchContentTokenMeta(contentContract, item.tokenId)
           cacheMetadata(item.tokenId, metadata)
         } catch (error) {
           console.error('Error caching metadata:', error)
@@ -47,7 +59,7 @@
       <span class="loading loading-dots loading-lg"></span>
     </div>
   {:else}
-    <PurchaseSubscription hasMembership={true} />
+    <PurchaseSubscription hasMembership={false} />
 
     {#if data.contentItems.length > 1}
       <div class="mb-6">

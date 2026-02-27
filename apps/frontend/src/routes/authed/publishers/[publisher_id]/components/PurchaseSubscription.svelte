@@ -26,12 +26,9 @@
 
 {#if !hasMembership}
   {#await getMembershipPrice() then price}
-    <div class="flex items-center justify-between w-full">
+    <div class="flex items-center w-full justify-between border border-gray-200 p-2 rounded-md my-2">
       <span>Purchase a subscription to have access to all files.</span>
-      <span class="text-2xl font-bold text-primary">
-        {price}
-      </span>
-      <button class="btn btn-primary w-[95px]" onclick={purchaseSubscription}>Subscribe</button>
+      <button class="btn btn-primary" onclick={purchaseSubscription}>Subscribe for ${price}</button>
     </div>
   {/await}
 {/if}

@@ -61,7 +61,13 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
   return tokens
 }
 
-export const getTokenMetadata = async (accessToken: string, tokenId: string) => {
+
+export const getPurchasedMembershipContent = async (
+  accessToken: string, 
+  trpcClient: ReturnType<typeof createClient>,
+  publisherIds: string[]
+) => {
+  // Initialize provider and contract for metadata fetching
   await initProvider(accessToken)
   const signer = await getSigner()
   const contentContract = new ethers.Contract(
@@ -70,14 +76,60 @@ export const getTokenMetadata = async (accessToken: string, tokenId: string) => 
     signer,
   )
 
-  try {
-    const metaUri = await contentContract.tokenURI(String(tokenId))
-    const response = await fetch(metaUri)
-    const metadata: { image: string; title: string; description: string } = await response.json()
+  const groupedContent: Record<string, {
+    publisherId: string
+    publisherTitle: string
+    publisherSub: string
+    contentItems: Array<{
+      contentTokenId: number
+      metadata: any
+    }>
+  }> = {}
 
-    return metadata
-  } catch (error) {
-    console.error('Error fetching metadata:', error)
-    return { image: '', title: '', description: '' }
+  const { items: publishers } = await trpcClient.publishers.findPublishers.query({
+    limit: '100',
+  })
+  for (const publisherId of publisherIds) {
+    try {
+      const publisher = publishers.find(p => p.id === publisherId)
+      if (!publisher) {
+        console.warn(`Publisher ${publisherId} not found`)
+        continue
+      }
+
+      // Get content items for this publisher
+      const { items: contentItems } = await trpcClient.files.findContent.query({
+        sub: publisher.sub,
+        contractAddress: import.meta.env.VITE_CONTENT_CONTRACT_ADDRESS,
+      })
+
+      // Get tokens and metadata for each content item
+      const processedContentItems = []
+      for (const item of contentItems) {
+        try {
+          const metadata = await fetchContentTokenMeta(contentContract, item.tokenId)
+          
+          processedContentItems.push({
+            contentTokenId: Number(item.tokenId),
+            metadata,
+          })
+        } catch (error) {
+          console.error(`Error fetching metadata for token ${item.tokenId}:`, error)
+        }
+      }
+
+      if (processedContentItems.length > 0) {
+        groupedContent[publisherId] = {
+          publisherId,
+          publisherTitle: publisher.title,
+          publisherSub: publisher.sub,
+          contentItems: processedContentItems
+        }
+      }
+    } catch (error) {
+      console.error(`Error fetching content for publisher ${publisherId}:`, error)
+    }
   }
+
+  return groupedContent
 }

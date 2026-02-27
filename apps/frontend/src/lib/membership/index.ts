@@ -34,7 +34,7 @@ const getMembershipPrice = async (): Promise<number> => {
   if (!membershipContract) return 0
 
   const price: bigint = await membershipContract.getPriceFiat('0')
-  return Number(price)
+  return Number(price) / 100
 }
 
 export { verifyMembership, getMembershipPrice }

@@ -14,9 +14,14 @@
         >{[...data.onetimeLicenses, ...data.lifetimeLicenses].length}</span
       > )
     </div>
+    <div>
+      ( Total Memberships: <span class="text-primary text-lg font-semibold"
+        >{data.purchasedMembershipPublishersIds.length}</span
+      > )
+    </div>
   </div>
 
-  {#if !data.lifetimeLicenses.length && !data.onetimeLicenses.length}
+  {#if !data.lifetimeLicenses.length && !data.onetimeLicenses.length && Object.keys(data.membershipContent).length === 0}
     <div class="alert p-7">
       <span>You haven't made any purchases yet.</span>
       <a href="/authed/publishers" class="btn btn-primary py-6 md:py-0">Browse Publishers</a>
@@ -39,6 +44,25 @@
         {/if}
         {#each data.onetimeLicenses as purchase, i}
           <ContentItem {purchase} trpcClient={data.trpcClient} />
+        {/each}
+      </div>
+
+      <div class="border border-gray-200 rounded-lg p-3">
+        <h1 class="text-primary text-lg font-semibold mb-3">Memberships Content</h1>
+        {#if Object.keys(data.membershipContent).length === 0}
+          No membership purchased yet
+        {/if}
+        {#each Object.entries(data.membershipContent) as [publisherId, publisherData]}
+          <div class="mb-6">
+            <h2 class="text-secondary text-md font-semibold mb-3">
+              {publisherData.publisherTitle}
+            </h2>
+            <div class="ml-4 space-y-3">
+              {#each publisherData.contentItems as purchase}
+                <ContentItem {purchase} trpcClient={data.trpcClient} />
+              {/each}
+            </div>
+          </div>
         {/each}
       </div>
     </div>
