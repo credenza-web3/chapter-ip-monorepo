@@ -56,7 +56,6 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
     } catch (error) {
       console.error('Error fetching metadata for token', licenseTokenId, error)
     }
-    
   }
 
   return tokens
