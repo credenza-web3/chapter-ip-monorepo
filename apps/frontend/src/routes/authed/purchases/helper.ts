@@ -80,7 +80,7 @@ export const getPurchasedMembershipContent = async (
     membership_abi,
     signer,
   )
-  
+
   const d = await membershipContract.getMembershipMetadata()
   console.log('d', d)
 

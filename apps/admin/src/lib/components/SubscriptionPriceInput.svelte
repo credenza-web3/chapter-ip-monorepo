@@ -24,9 +24,9 @@
     try {
       const signer = await getSigner()
       const membershipContract = getMembershipContract(signer)
-      
+
       const price: bigint = await membershipContract.getPriceFiat(BigInt(ethers.getAddress(publisherStore.evmAddress)))
-      value = Number(price) / 100 
+      value = Number(price) / 100
     } catch (error) {
       console.error('Error getting current subscription price:', error)
       value = 0
@@ -47,23 +47,21 @@
       loading = true
       const signer = await getSigner()
       const instance = getMembershipContract(signer)
-      
+
       const tokenId = BigInt(ethers.getAddress(publisherStore.evmAddress))
       console.log(instance, tokenId)
 
-      const setPriceFiatPopulatedTx = await instance.setPriceFiat.populateTransaction(
-        tokenId,
-        value * 100
-      );
+      const setPriceFiatPopulatedTx = await instance.setPriceFiat.populateTransaction(tokenId, value * 100)
 
-      const setPriceTokenFunction = instance.interface.getFunction('setPriceToken', ['uint', 'uint']);
+      const setPriceTokenFunction = instance.interface.getFunction('setPriceToken', ['uint', 'uint'])
       if (!setPriceTokenFunction) {
-        throw new Error('setPriceToken function not found');
+        throw new Error('setPriceToken function not found')
       }
 
-      const setPriceTokenPopulatedTx = await instance[
-        setPriceTokenFunction.format()
-      ].populateTransaction(tokenId, value * 10 ** 6);
+      const setPriceTokenPopulatedTx = await instance[setPriceTokenFunction.format()].populateTransaction(
+        tokenId,
+        value * 10 ** 6,
+      )
 
       const fwtOpts = {
         token: authStore.state.accessToken!,
@@ -74,7 +72,7 @@
       await forwardTransaction(setPriceTokenPopulatedTx, fwtOpts)
 
       await forwardTransaction(setPriceFiatPopulatedTx, fwtOpts)
-      
+
       notify('Subscription price updated successfully!', ToastType.SUCCESS)
     } catch (error) {
       console.error('Error setting subscription price:', error)
@@ -87,9 +85,7 @@
 
 <div class="space-y-4">
   <div class="space-y-2">
-    <label for="subscription-price" class="block text-sm font-medium text-gray-700">
-      Subscription Price ($)
-    </label>
+    <label for="subscription-price" class="block text-sm font-medium text-gray-700"> Subscription Price ($) </label>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         <span class="text-gray-500 sm:text-sm">$</span>
@@ -100,7 +96,7 @@
         step="0.01"
         min="0"
         placeholder="0.00"
-        value={value}
+        {value}
         oninput={handleInput}
         disabled={loading}
         class="block w-full pl-7 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"

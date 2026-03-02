@@ -9,10 +9,7 @@ export const load = async ({ parent }) => {
   const onetimeLicenses = tokens.filter((p) => p.licenseType === '2')
 
   // Get content items for purchased membership publishers
-  const membershipContent = await getPurchasedMembershipContent(
-    accessToken!,
-    trpcClient!,
-  )
+  const membershipContent = await getPurchasedMembershipContent(accessToken!, trpcClient!)
 
   return {
     lifetimeLicenses,

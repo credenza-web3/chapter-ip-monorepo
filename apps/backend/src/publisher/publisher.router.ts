@@ -30,7 +30,10 @@ import { CommonEvmService } from 'src/common/evm/evm.service'
 export class PublisherRouter {
   private logger = new Logger(this.constructor.name)
 
-  constructor(private readonly publisherService: PublisherService, private readonly commonEvmService: CommonEvmService) {}
+  constructor(
+    private readonly publisherService: PublisherService,
+    private readonly commonEvmService: CommonEvmService,
+  ) {}
 
   @UseMiddlewares(AuthMiddleware)
   @Mutation({
@@ -67,8 +70,6 @@ export class PublisherRouter {
       ...(input.id ? { _id: input.id } : {}),
     }
     const publisher = await this.publisherService.getModel().findOne(query)
-
-   
 
     if (!publisher) {
       throw new TRPCError({ message: 'Publisher not found', code: 'NOT_FOUND' })

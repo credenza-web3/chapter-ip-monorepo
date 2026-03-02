@@ -10,6 +10,5 @@ export const load = async ({ params, parent }) => {
     contractAddress: import.meta.env.VITE_CONTENT_CONTRACT_ADDRESS,
   })
 
-
   return { publisher, contentItems }
 }
