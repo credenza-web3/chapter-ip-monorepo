@@ -76,6 +76,10 @@ export const getPurchasedMembershipContent = async (
   const userAddress = await signer.getAddress()
   const publisherAddressesConfirmed: string[] = await getMemberships(userAddress)
 
+  if (publisherAddressesConfirmed.length === 0) {
+    return {}
+  }
+  
   const groupedContent: Record<
     string,
     {

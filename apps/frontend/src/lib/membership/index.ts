@@ -49,17 +49,25 @@ const getMemberships = async (userAddress: string) => {
   if (!membershipContract) return []
 
   const memberships = await membershipContract.getMemberships(userAddress)
-  return (
-    await Promise.all(
-      memberships.map(async (membership: string) => {
-        const hasMembership = await membershipContract.confirmMembership(
-          normalizeAddress(membership),
-          normalizeAddress(userAddress),
-        )
-        return hasMembership ? normalizeAddress(membership) : null
-      }),
-    )
-  ).filter((membership) => membership !== null) as string[]
+
+  
+  const confirmedMemberships: string[] = []
+  
+  for (const membership of memberships) {
+    try {
+      const hasMembership = await membershipContract.confirmMembership(
+        normalizeAddress(membership),
+        normalizeAddress(userAddress),
+      )
+      if (hasMembership) {
+        confirmedMemberships.push(normalizeAddress(membership))
+      }
+    } catch (error) {
+      console.error(`Error checking membership for ${membership}:`, error)
+    }
+  }
+  
+  return confirmedMemberships
 }
 
 export { verifyMembership, getMembershipPrice, normalizeAddress, getMemberships }
