@@ -79,7 +79,7 @@ export const getPurchasedMembershipContent = async (
   if (publisherAddressesConfirmed.length === 0) {
     return {}
   }
-  
+
   const groupedContent: Record<
     string,
     {

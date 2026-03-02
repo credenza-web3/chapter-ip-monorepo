@@ -50,9 +50,8 @@ const getMemberships = async (userAddress: string) => {
 
   const memberships = await membershipContract.getMemberships(userAddress)
 
-  
   const confirmedMemberships: string[] = []
-  
+
   for (const membership of memberships) {
     try {
       const hasMembership = await membershipContract.confirmMembership(
@@ -66,7 +65,7 @@ const getMemberships = async (userAddress: string) => {
       console.error(`Error checking membership for ${membership}:`, error)
     }
   }
-  
+
   return confirmedMemberships
 }
 
