@@ -29,9 +29,7 @@ import {
 export class PublisherRouter {
   private logger = new Logger(this.constructor.name)
 
-  constructor(
-    private readonly publisherService: PublisherService,
-  ) {}
+  constructor(private readonly publisherService: PublisherService) {}
 
   @UseMiddlewares(AuthMiddleware)
   @Mutation({
