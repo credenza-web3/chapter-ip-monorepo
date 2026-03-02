@@ -59,7 +59,7 @@
       <span class="loading loading-dots loading-lg"></span>
     </div>
   {:else}
-    <PurchaseSubscription hasMembership={false} publisherAddress={data.publisher.evmAddress} />
+    <PurchaseSubscription publisherAddress={data.publisher.evmAddress} />
 
     {#if data.contentItems.length > 1}
       <div class="mb-6">

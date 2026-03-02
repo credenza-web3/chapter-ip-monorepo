@@ -1,5 +1,5 @@
 import { ethers, getSigner, initProvider } from '@repo/fe-evm-provider'
-import { abi as membership_abi } from '@credenza3/contracts/artifacts/SellableMetadataMembershipContract.json'
+import { abi as membership_abi } from '@credenza3/contracts/artifacts/ChapterIpMembershipContract.json'
 import { authStore } from '$lib/auth'
 
 let membershipContract: ethers.Contract | null
@@ -16,12 +16,12 @@ const getMembershipContract = async (): Promise<ethers.Contract | null> => {
   return membershipContract
 }
 
-const verifyMembership = async (subEvmAddress: string) => {
+const verifyMembership = async (publisherAddress: string, subEvmAddress: string) => {
   try {
     const membershipContract = await getMembershipContract()
     if (!membershipContract) return false
 
-    const res = (await membershipContract.confirmMembership(subEvmAddress)) as boolean
+    const res = (await membershipContract.confirmMembership(ethers.getAddress(publisherAddress), ethers.getAddress(subEvmAddress))) as boolean
     return res
   } catch (error) {
     console.error('Error verifying membership:', error)
@@ -29,12 +29,27 @@ const verifyMembership = async (subEvmAddress: string) => {
   }
 }
 
-const getMembershipPrice = async (): Promise<number> => {
+const getMembershipPrice = async (publisherAddress: string): Promise<number> => {
   const membershipContract = await getMembershipContract()
   if (!membershipContract) return 0
 
-  const price: bigint = await membershipContract.getPriceFiat('0')
+  const price: bigint = await membershipContract.getPriceFiat(BigInt(publisherAddress))
   return Number(price) / 100
 }
 
-export { verifyMembership, getMembershipPrice }
+const normalizeAddress = (address: string) => {
+  return ethers.getAddress(address)
+}
+
+const getMemberships = async (userAddress: string) => {
+  const membershipContract = await getMembershipContract()
+  if (!membershipContract) return []
+  
+  const memberships = await membershipContract.getMemberships(userAddress)
+  return (await Promise.all(memberships.map(async (membership: string) => {
+    const hasMembership = await membershipContract.confirmMembership(normalizeAddress(membership), normalizeAddress(userAddress))
+    return hasMembership ? normalizeAddress(membership) : null
+  }))).filter((membership) => membership !== null) as string[]
+}
+
+export { verifyMembership, getMembershipPrice, normalizeAddress, getMemberships }

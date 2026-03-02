@@ -6,6 +6,7 @@
   import { modals } from 'svelte-modals'
   import EditPublisherModal from './EditPublisherModal.svelte'
   import { publisherStore } from '$lib/stores/publisher.svelte'
+  import SubscriptionPriceInput from '$lib/components/SubscriptionPriceInput.svelte'
 
   let { data } = $props()
 
@@ -26,7 +27,7 @@
     </div>
 
     <div class="flex flex-col gap-6 w-full justify-between">
-      <div class="max-w-md gap-2">
+      <div class="max-w-lg gap-2">
         <h2 class="text-lg font-medium text-gray-900 mb-4">Your Information</h2>
 
         <div class="bg-gray-50 p-4 rounded-lg">
@@ -52,6 +53,8 @@
             {/if}
           </div>
         </div>
+
+        <SubscriptionPriceInput />
       </div>
       <hr />
       <AgencyControls contentContract={data.contentContract} userAddress={data.userAddress as string} />

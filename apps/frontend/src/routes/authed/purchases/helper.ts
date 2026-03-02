@@ -1,8 +1,8 @@
 import { ethers, initProvider, getSigner } from '@repo/fe-evm-provider'
 import { abi as license_abi } from '@credenza3/contracts/artifacts/LicenseNftContract.json'
-import { abi as membership_abi } from '@credenza3/contracts/artifacts/ChapterIpMembershipContract.json'
 import { createClient } from '@repo/trpc/client'
 import { fetchContentTokenMeta } from '@repo/fe-services'
+import { getMemberships } from '$lib/membership'
 
 export const getTokensWithMetadata = async (accessToken: string, trpcClient: ReturnType<typeof createClient>) => {
   await initProvider(accessToken)
@@ -62,11 +62,11 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
   return tokens
 }
 
+
 export const getPurchasedMembershipContent = async (
   accessToken: string,
   trpcClient: ReturnType<typeof createClient>,
 ) => {
-  const publisherIds: string[] = []
   await initProvider(accessToken)
   const signer = await getSigner()
   const contentContract = new ethers.Contract(
@@ -74,15 +74,8 @@ export const getPurchasedMembershipContent = async (
     license_abi,
     signer,
   )
-
-  const membershipContract = new ethers.Contract(
-    import.meta.env.VITE_EVM_MEMBERSHIP_CONTRACT_ADDRESS,
-    membership_abi,
-    signer,
-  )
-
-  // const d = await membershipContract.getMembershipMetadata()
-  // console.log('d', d)
+  const userAddress = await signer.getAddress()
+  const publisherAddressesConfirmed: string[] = await getMemberships(userAddress)
 
   const groupedContent: Record<
     string,
@@ -99,15 +92,10 @@ export const getPurchasedMembershipContent = async (
 
   const { items: publishers } = await trpcClient.publishers.findPublishers.query({
     limit: '100',
+    addresses: publisherAddressesConfirmed,
   })
-  for (const publisherId of publisherIds) {
+  for (const publisher of publishers) {
     try {
-      const publisher = publishers.find((p) => p.id === publisherId)
-      if (!publisher) {
-        console.warn(`Publisher ${publisherId} not found`)
-        continue
-      }
-
       // Get content items for this publisher
       const { items: contentItems } = await trpcClient.files.findContent.query({
         sub: publisher.sub,
@@ -130,15 +118,15 @@ export const getPurchasedMembershipContent = async (
       }
 
       if (processedContentItems.length > 0) {
-        groupedContent[publisherId] = {
-          publisherId,
+        groupedContent[publisher.id] = {
+          publisherId: publisher.id,
           publisherTitle: publisher.title,
           publisherSub: publisher.sub,
           contentItems: processedContentItems,
         }
       }
     } catch (error) {
-      console.error(`Error fetching content for publisher ${publisherId}:`, error)
+      console.error(`Error fetching content for publisher ${publisher.id}:`, error)
     }
   }
 

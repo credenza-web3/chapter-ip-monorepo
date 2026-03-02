@@ -3,7 +3,6 @@
   import type { ModalProps } from 'svelte-modals'
   import PublisherNameInput from '$lib/components/PublisherNameInput.svelte'
   import PublisherAvatarInput from '$lib/components/PublisherAvatarInput.svelte'
-  import SubscriptionPriceInput from '$lib/components/SubscriptionPriceInput.svelte'
   import { savePublisher } from '$lib/services/publisher'
   import ModalWrapper from '$lib/components/ModalWrapper.svelte'
   import { publisherStore } from '$lib/stores/publisher.svelte'
@@ -52,7 +51,6 @@
     <form onsubmit={handleSubmit} class="space-y-6">
       <PublisherNameInput bind:value={publisherName} />
       <PublisherAvatarInput bind:value={avatarUrl} />
-      <SubscriptionPriceInput />
 
       <div class="flex gap-3">
         <button
