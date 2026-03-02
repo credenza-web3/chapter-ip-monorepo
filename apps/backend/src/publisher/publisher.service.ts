@@ -20,6 +20,9 @@ export class PublisherService extends CommonModelService<Publisher> {
       ...result.query,
       ...(opts.title && { title: { $regex: opts.title, $options: 'i' } }),
       ...(opts.sub && { sub: opts.sub }),
+      ...(opts.addresses?.length && {
+      evmAddress: { $in: opts.addresses.map((a) => a.toLowerCase()) },
+    }),
     }
     return result
   }

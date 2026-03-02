@@ -26,6 +26,9 @@ export class Publisher extends Document<ObjectId> {
   title: string
 
   @Prop({ required: false })
+  evmAddress: string
+
+  @Prop({ required: false })
   avatarUrl?: string
 
   createdAt: Date
