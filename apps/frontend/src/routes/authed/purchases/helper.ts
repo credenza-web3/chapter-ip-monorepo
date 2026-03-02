@@ -81,8 +81,8 @@ export const getPurchasedMembershipContent = async (
     signer,
   )
 
-  const d = await membershipContract.getMembershipMetadata()
-  console.log('d', d)
+  // const d = await membershipContract.getMembershipMetadata()
+  // console.log('d', d)
 
   const groupedContent: Record<
     string,

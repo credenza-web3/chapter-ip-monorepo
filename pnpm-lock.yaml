@@ -257,8 +257,8 @@ importers:
         specifier: ^0.0.13
         version: 0.0.13
       '@credenza3/passport-evm':
-        specifier: ^0.4.7
-        version: 0.4.7(@toruslabs/openlogin@6.2.11(@babel/runtime@7.28.6))
+        specifier: ^0.4.8
+        version: 0.4.8(@toruslabs/openlogin@6.2.11(@babel/runtime@7.28.6))
       '@tailwindcss/vite':
         specifier: ^4.2.1
         version: 4.2.1(vite@7.3.1(@types/node@25.3.1)(jiti@2.6.1)(lightningcss@1.31.1)(terser@5.46.0)(yaml@2.8.2))
@@ -836,8 +836,8 @@ packages:
   '@credenza3/evm-provider@0.0.2':
     resolution: {integrity: sha512-gRi2uIJvzEti9z/c5bUqlSCBlUW28OhGc+Q4TmodfCM2Ob+5gSnDyX3sj8impg0l2pHsC+tvd7x9YNGCwrG6sQ==}
 
-  '@credenza3/passport-evm@0.4.7':
-    resolution: {integrity: sha512-yAf3ObBl7ak9oPDk29nO9cGFkX7B2HCrWyVvQaisPJjUkhrv9ZvSIUQ5L5X29rZgEmvnvODMDMUOiIfvWTa3OA==}
+  '@credenza3/passport-evm@0.4.8':
+    resolution: {integrity: sha512-5zQ/pZh6+Ip7YX5lZkAhXyrPmtQrVFxTdUyOXNe7SpbTY1DqPu7xv3jTJsykDNEt2Pc3NQ9cRUY5IgQtkfbnbg==}
     engines: {node: '>=20.10.0', pnpm: '>=9'}
     peerDependencies:
       '@toruslabs/openlogin': ^6.1.0
@@ -6595,7 +6595,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@credenza3/passport-evm@0.4.7(@toruslabs/openlogin@6.2.11(@babel/runtime@7.28.6))':
+  '@credenza3/passport-evm@0.4.8(@toruslabs/openlogin@6.2.11(@babel/runtime@7.28.6))':
     dependencies:
       '@credenza3/contracts': 0.0.6
       '@credenza3/core-web-evm-ext': 0.0.13
