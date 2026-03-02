@@ -16,7 +16,7 @@
     </div>
     <div>
       ( Total Memberships: <span class="text-primary text-lg font-semibold"
-        >{data.purchasedMembershipPublishersIds.length}</span
+        >{Object.keys(data.membershipContent).length}</span
       > )
     </div>
   </div>

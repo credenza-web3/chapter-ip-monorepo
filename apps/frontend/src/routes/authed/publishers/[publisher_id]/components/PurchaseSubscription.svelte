@@ -4,7 +4,7 @@
   import { passportStore } from '$lib/passport.store'
   import { get } from 'svelte/store'
 
-  let { hasMembership } = $props()
+  let { hasMembership, publisherAddress } = $props()
 
   const purchaseSubscription = async () => {
     const pass = get(passportStore)
@@ -15,7 +15,7 @@
       memberships: [
         {
           contractAddress: import.meta.env.VITE_EVM_MEMBERSHIP_CONTRACT_ADDRESS,
-          typeId: '0',
+          membershipTokenId: String(BigInt(publisherAddress)),
         },
       ],
     })

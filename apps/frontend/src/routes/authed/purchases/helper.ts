@@ -1,5 +1,6 @@
 import { ethers, initProvider, getSigner } from '@repo/fe-evm-provider'
 import { abi as license_abi } from '@credenza3/contracts/artifacts/LicenseNftContract.json'
+import { abi as membership_abi } from '@credenza3/contracts/artifacts/ChapterIpMembershipContract.json'
 import { createClient } from '@repo/trpc/client'
 import { fetchContentTokenMeta } from '@repo/fe-services'
 
@@ -64,9 +65,8 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
 export const getPurchasedMembershipContent = async (
   accessToken: string,
   trpcClient: ReturnType<typeof createClient>,
-  publisherIds: string[],
 ) => {
-  // Initialize provider and contract for metadata fetching
+  const publisherIds: string[] = []
   await initProvider(accessToken)
   const signer = await getSigner()
   const contentContract = new ethers.Contract(
@@ -74,6 +74,15 @@ export const getPurchasedMembershipContent = async (
     license_abi,
     signer,
   )
+
+  const membershipContract = new ethers.Contract(
+    import.meta.env.VITE_EVM_MEMBERSHIP_CONTRACT_ADDRESS,
+    membership_abi,
+    signer,
+  )
+  
+  const d = await membershipContract.getMembershipMetadata()
+  console.log('d', d)
 
   const groupedContent: Record<
     string,

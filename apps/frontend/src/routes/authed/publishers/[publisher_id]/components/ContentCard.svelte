@@ -1,16 +1,17 @@
 <script lang="ts">
   import { authStore } from '$lib'
-  import { getTokenMetadata } from '../../../purchases/helper'
   import { getTokenPrice } from '../hooks/useTokenPrice'
   import { useLicensePurchase } from '../hooks/useLicensePurchase'
-  import { r2Config } from '@repo/fe-services'
+  import { fetchContentTokenMeta, r2Config } from '@repo/fe-services'
   import { onMount } from 'svelte'
+  import type { ethers } from '@repo/fe-evm-provider'
 
   interface Props {
     item: any
+    contentContract: ethers.Contract
   }
 
-  let { item }: Props = $props()
+  let { item, contentContract }: Props = $props()
   let metadata = $state<any>(null)
   let price = $state<any>(null)
   let loading = $state(false)
@@ -19,7 +20,7 @@
 
   onMount(async () => {
     try {
-      metadata = await getTokenMetadata(authStore.state.accessToken!, item.tokenId)
+      metadata = await fetchContentTokenMeta(contentContract, item.tokenId)
       price = await getTokenPrice(authStore.state.accessToken!, item.tokenId)
     } catch (error) {
       console.error('Error loading content data:', error)

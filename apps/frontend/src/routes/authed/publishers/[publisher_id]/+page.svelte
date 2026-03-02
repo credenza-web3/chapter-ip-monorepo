@@ -13,7 +13,7 @@
   let loading = $state(false)
   let searchQuery = $state('')
   let metadataCache = $state(new Map())
-  let contentContract: any = null
+  let contentContract = $state<any>(null)
 
   const filteredContentItems = $derived(() =>
     data.contentItems.filter((item) => {
@@ -59,7 +59,7 @@
       <span class="loading loading-dots loading-lg"></span>
     </div>
   {:else}
-    <PurchaseSubscription hasMembership={false} />
+    <PurchaseSubscription hasMembership={false} publisherAddress={data.publisher.evmAddress} />
 
     {#if data.contentItems.length > 1}
       <div class="mb-6">
@@ -67,6 +67,8 @@
       </div>
     {/if}
 
-    <ContentGrid contentItems={filteredContentItems()} {searchQuery} />
+    {#if contentContract}
+      <ContentGrid contentItems={filteredContentItems()} {searchQuery} {contentContract} />
+    {/if}
   {/if}
 </div>
