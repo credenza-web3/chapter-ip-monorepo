@@ -21,7 +21,10 @@ const verifyMembership = async (publisherAddress: string, subEvmAddress: string)
     const membershipContract = await getMembershipContract()
     if (!membershipContract) return false
 
-    const res = (await membershipContract.confirmMembership(ethers.getAddress(publisherAddress), ethers.getAddress(subEvmAddress))) as boolean
+    const res = (await membershipContract.confirmMembership(
+      ethers.getAddress(publisherAddress),
+      ethers.getAddress(subEvmAddress),
+    )) as boolean
     return res
   } catch (error) {
     console.error('Error verifying membership:', error)
@@ -44,12 +47,19 @@ const normalizeAddress = (address: string) => {
 const getMemberships = async (userAddress: string) => {
   const membershipContract = await getMembershipContract()
   if (!membershipContract) return []
-  
+
   const memberships = await membershipContract.getMemberships(userAddress)
-  return (await Promise.all(memberships.map(async (membership: string) => {
-    const hasMembership = await membershipContract.confirmMembership(normalizeAddress(membership), normalizeAddress(userAddress))
-    return hasMembership ? normalizeAddress(membership) : null
-  }))).filter((membership) => membership !== null) as string[]
+  return (
+    await Promise.all(
+      memberships.map(async (membership: string) => {
+        const hasMembership = await membershipContract.confirmMembership(
+          normalizeAddress(membership),
+          normalizeAddress(userAddress),
+        )
+        return hasMembership ? normalizeAddress(membership) : null
+      }),
+    )
+  ).filter((membership) => membership !== null) as string[]
 }
 
 export { verifyMembership, getMembershipPrice, normalizeAddress, getMemberships }

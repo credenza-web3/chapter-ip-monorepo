@@ -62,7 +62,6 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
   return tokens
 }
 
-
 export const getPurchasedMembershipContent = async (
   accessToken: string,
   trpcClient: ReturnType<typeof createClient>,
