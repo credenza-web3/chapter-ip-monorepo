@@ -77,7 +77,6 @@ export class PublisherRouter {
     if (!publisher) {
       throw new TRPCError({ message: 'Publisher not found', code: 'NOT_FOUND' })
     }
-
     return publisher.toJSON()
   }
 

@@ -8,7 +8,7 @@
     try {
       loading = true
       const { url } = await trpcClient!.files.getContentLink.query({
-        licenseTokenId: String(purchase.licenseTokenId),
+        ...(purchase.licenseTokenId ? { licenseTokenId: String(purchase.licenseTokenId) } : {}),
         key: purchase.metadata.key,
       })
 
@@ -45,7 +45,9 @@
           <div class="loading loading-dots"></div>
         {:else}
           <button class="btn btn-sm btn-outline" onclick={onGetFileUrl}> Get file link </button>
-          <button class="btn btn-sm btn-outline" onclick={onGetTransactionReceipt}> Get transaction receipt </button>
+          {#if purchase.licenseTokenId}
+            <button class="btn btn-sm btn-outline" onclick={onGetTransactionReceipt}> Get transaction receipt </button>
+          {/if}
         {/if}
       </div>
     </div>
