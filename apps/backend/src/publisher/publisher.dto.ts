@@ -42,6 +42,7 @@ export type TGetPublisherDataOutput = z.infer<typeof getPublisherDataOutputSchem
 export const findPublishersInputSchema = paginatedRequestWithCursorSchema.extend({
   title: z.string().optional(),
   sub: z.string().optional(),
+  addresses: z.array(z.string()).optional(),
 })
 export type TFindPublishersInput = z.infer<typeof findPublishersInputSchema>
 
