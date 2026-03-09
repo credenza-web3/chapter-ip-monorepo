@@ -12,45 +12,47 @@
 </script>
 
 <div class="min-h-xl p-4 card bg-base-100 shadow-md">
-  <div class="mb-12 text-center">
-    <h1 class="text-4xl font-light text-gray-900">File list</h1>
-  </div>
-
-  <div class="overflow-x-auto">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>ID</th>
-          <th>Key</th>
-          <th>Title</th>
-          <th>description</th>
-          <th>Created</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {#each items as item, i (item.id)}
-          <tr
-            onclick={() => openFile(item.id)}
-            class="cursor-pointer hover:bg-gray-100 transition-colors"
-            role="button"
-          >
-            <th>{i + 1}</th>
-            <td>{item.id}</td>
-            <td>{item.key}</td>
-            {#await fetchContentTokenMeta(data.contentContract!, item.tokenId)}
-              <td>Loading title...</td>
-              <td>Loading description...</td>
-            {:then meta}
-              <td>{meta.title || 'N/A'}</td>
-              <td>{meta.description || 'N/A'}</td>
-            {/await}
-
-            <td>{formatDate(item.createdAt)}</td>
+  {#if !items.length}
+    <div class="text-center py-8">
+      <p class="text-gray-500">No files found</p>
+    </div>
+  {:else}
+    <div class="overflow-x-auto">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>ID</th>
+            <th>Key</th>
+            <th>Title</th>
+            <th>description</th>
+            <th>Created</th>
           </tr>
-        {/each}
-      </tbody>
-    </table>
-  </div>
+        </thead>
+
+        <tbody>
+          {#each items as item, i (item.id)}
+            <tr
+              onclick={() => openFile(item.id)}
+              class="cursor-pointer hover:bg-gray-100 transition-colors"
+              role="button"
+            >
+              <th>{i + 1}</th>
+              <td>{item.id}</td>
+              <td>{item.key}</td>
+              {#await fetchContentTokenMeta(data.contentContract!, item.tokenId)}
+                <td>Loading title...</td>
+                <td>Loading description...</td>
+              {:then meta}
+                <td>{meta.title || 'N/A'}</td>
+                <td>{meta.description || 'N/A'}</td>
+              {/await}
+
+              <td>{formatDate(item.createdAt)}</td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+  {/if}
 </div>

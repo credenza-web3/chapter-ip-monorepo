@@ -7,8 +7,7 @@
 </script>
 
 <div>
-  <label for="avatar-url" class="block text-sm text-gray-700 mb-2">Avatar URI</label>
-  <label class="input validator mb-0 h-[50px] w-full">
+  <label class="input validator mb-0 p-0 pt-2 w-full">
     <input
       id="avatar-url"
       type="url"
@@ -17,7 +16,7 @@
       bind:value
       pattern="^(https?://)?([a-zA-Z0-9]([a-zA-Z0-9\-].*[a-zA-Z0-9])?\.)+[a-zA-Z].*$"
       title="Must be valid URL"
-      class="w-full px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-gray-900 transition-colors mb-0"
+      class="input w-full mb-3 focus:border-[#988cff] focus:outline-none focus:ring-0"
     />
   </label>
   <p class="validator-hint">Must be valid URL</p>

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { uploadStore } from '../stores/upload-store'
+  import UploadIcon from '$lib/components/UploadIcon.svelte'
 
   let isOver = $state(false)
   let fileInput: HTMLInputElement | null = $state(null)
@@ -43,14 +44,14 @@
     uploadStore.setUploaded(file)
   }
 
-  function onClear() {
-    uploadStore.reset()
-    if (fileInput) fileInput.value = ''
-  }
+  // function onClear() {
+  //   uploadStore.reset()
+  //   if (fileInput) fileInput.value = ''
+  // }
 </script>
 
 <div
-  class={`mt-10 bg-white h-32 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-gray-500 text-sm cursor-pointer transition ${
+  class={`w-1/2 mt-10 bg-white h-50 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-gray-500 text-sm cursor-pointer transition ${
     isOver ? 'border-primary bg-white' : 'border-gray-300'
   }`}
   role="button"
@@ -67,17 +68,17 @@
     if (e.key === 'Enter' || e.key === ' ') fileInput?.click()
   }}
 >
+  <div class="mb-2">
+    <UploadIcon />
+  </div>
+  <span class="text-center mb-2 font-medium text-sm">Upload or drag a file</span>
   {#if $uploadStore.uploaded}
-    <div class="flex flex-col items-center">
+    <div class="flex flex-col items-center mt-4">
       <span class="mb-2">📄 {$uploadStore.uploaded.name}</span>
-      <button onclick={onClear} class="btn btn-xs btn-outline" type="button">Clear</button>
     </div>
   {:else}
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-    </svg>
-    <span class="text-center mb-2">Upload or drag a file</span>
-    <span class="text-xs text-stone-400">Allowed: MP4, MOV, TXT, DOCX, ZIP — Max size: 1GB</span>
+    <button class="btn bg-[#6e4ff7] text-white px-2 w-[200px] mb-2"> Add file </button>
+    <span class="text-xs text-[#707070] font-medium">.txt, .docx, .mov, .mp4, .nil, and .zip files supported</span>
   {/if}
 
   <input type="file" class="hidden" bind:this={fileInput} onchange={handleInput} accept=".mp4,.mov,.txt,.docx,.zip" />

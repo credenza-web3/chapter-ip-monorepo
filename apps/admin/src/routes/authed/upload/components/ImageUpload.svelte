@@ -2,6 +2,7 @@
   import { uploadStore } from '../stores/upload-store'
 
   let imageInput: HTMLInputElement | null = $state(null)
+  let imageUrl = $state<string | null>(null)
 
   function handleImageInput(event: Event) {
     const target = event?.target as HTMLInputElement
@@ -15,26 +16,45 @@
     }
 
     uploadStore.setUploadedImage(file)
+    imageUrl = URL.createObjectURL(file)
   }
 
-  function onImageClear() {
-    uploadStore.setUploadedImage(null)
-    if (imageInput) imageInput.value = ''
-  }
+  // function onImageClear() {
+  //   uploadStore.setUploadedImage(null)
+  //   if (imageInput) imageInput.value = ''
+  //   // Clean up URL object
+  //   if (imageUrl) {
+  //     URL.revokeObjectURL(imageUrl)
+  //     imageUrl = null
+  //   }
+  // }
 </script>
 
-<div class="mb-4">
-  <label for="image-select" class="block text-sm font-medium text-gray-700 mb-2">Select Cover Image (Optional)</label>
-  <div class="flex items-center gap-4">
-    <button id="image-select" class="btn btn-outline btn-sm" onclick={() => imageInput?.click()} type="button">
-      {$uploadStore.uploadedImage ? 'Change Image' : 'Select Image'}
-    </button>
+<div class="mb-4 mt-10">
+  <label for="image-select" class="block font-semibold"
+    >Select Cover Image
+    <span class="text-sm font-medium">(Optional)</span>
+  </label>
+  <span class="text-xs text-[#747474]"> 600px by 600px .jpg, .gif, .png images will work best </span>
+  <div class="flex items-start gap-4 mt-5 flex-col">
     {#if $uploadStore.uploadedImage}
-      <div class="flex items-center gap-2">
-        <span class="text-sm text-gray-600">📷 {$uploadStore.uploadedImage.name}</span>
-        <button onclick={onImageClear} class="btn btn-xs btn-outline" type="button"> Clear </button>
+      <div class="flex flex-col gap-3">
+        <!-- Image Preview -->
+        {#if imageUrl}
+          <div class="relative w-32 h-32 rounded-lg overflow-hidden border border-gray-200">
+            <img src={imageUrl} alt="" class="w-full h-full object-cover" />
+          </div>
+        {/if}
       </div>
     {/if}
+    <button
+      id="image-select"
+      class="text-[#6e4ff7] text-xs font-medium cursor-pointer"
+      onclick={() => imageInput?.click()}
+      type="button"
+    >
+      Upload a new cover image
+    </button>
   </div>
   <input type="file" class="hidden" bind:this={imageInput} onchange={handleImageInput} accept="image/*" />
 </div>

@@ -9,14 +9,14 @@
 </script>
 
 <div class="w-full">
-  <label for="agency-address" class="block text-sm text-gray-700 mb-2">Agency Address</label>
+  <label for="agency-address" class="block text-sm mb-2 font-medium">Agency Address</label>
   <input
     id="agency-address"
     type="text"
     bind:value={agencyStore.agencyAddress}
     onchange={handleAddressChange}
     placeholder="Enter agency address (0x...)"
-    class="w-full px-4 py-3 border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none transition-colors {!addressTouched ||
+    class="w-full bg-white text-xs px-4 py-3 border rounded-md text-gray-900 placeholder-gray-400 focus:outline-none transition-colors {!addressTouched ||
     agencyStore.isValidAddress
       ? 'border-gray-300 focus:border-gray-900'
       : 'border-red-500 focus:border-red-600'}"
