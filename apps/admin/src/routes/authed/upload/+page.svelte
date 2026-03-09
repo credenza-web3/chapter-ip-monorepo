@@ -56,50 +56,46 @@
   }
 </script>
 
-<div class="p-6 min-h-xl card bg-base-100 shadow-md">
-  <div class="mb-12 text-center">
-    <h1 class="text-4xl font-light text-gray-900">Upload Text (TXT/DOCX), Location (MOV/MP4), or NIL (ZIP) File</h1>
+<div class="p-10 min-h-xl card bg-base-100 shadow-md rounded-[24px]">
+  <div class="mb-12 text-left">
+    <h1 class="text-2xl font-semibold text-[#202225]">Upload</h1>
   </div>
 
+  <div class="mt-6 flex flex-col border-b-2 border-dashed border-gray-300 pb-6 w-1/2">
+    <h2 class="font-semibold mb-3">Details</h2>
+
+    <input
+      id="title"
+      type="text"
+      bind:value={$uploadStore.title}
+      placeholder="Title"
+      class="input w-full mb-3 focus:border-[#988cff] focus:outline-none focus:ring-0"
+    />
+    <textarea
+      id="description"
+      bind:value={$uploadStore.description}
+      placeholder="Description"
+      class="input w-full mb-3 h-[100px] py-2 px-3 focus:border-[#988cff] focus:outline-none focus:ring-0"
+    ></textarea>
+    <ImageUpload />
+  </div>
   <FileUpload />
 
-  {#if $uploadStore.uploaded}
-    <div class="mt-6">
-      <h2 class="text-xl font-semibold mb-3">Content Details</h2>
+  <div class="mt-8 space-y-4">
+    <LicenseForm />
 
-      <input
-        id="title"
-        type="text"
-        bind:value={$uploadStore.title}
-        placeholder="Title"
-        class="input input-bordered w-1/3 mb-3"
-      />
-      <input
-        id="description"
-        type="text"
-        bind:value={$uploadStore.description}
-        placeholder="Description"
-        class="input input-bordered w-1/3 mb-3"
-      />
-      <ImageUpload />
+    <div class="flex gap-10 mt-10">
+      <button
+        class="btn btn-outline w-[220px] text-white bg-[#6e4ff7] disabled:bg-[#f9fafb] disabled:text-black/10 disabled:border-[#6e4ff7]/20"
+        onclick={onSubmitClick}
+        disabled={$uploadStore.loading || !$isFormValid || !$uploadStore.uploaded}
+      >
+        {#if $uploadStore.loading}
+          <div class="loading loading-spinner"></div>
+        {:else}
+          Upload file
+        {/if}
+      </button>
     </div>
-    <div class="mt-6 space-y-4">
-      <LicenseForm />
-
-      <div class="flex gap-10 mt-3">
-        <button
-          class="btn btn-outline"
-          onclick={onSubmitClick}
-          disabled={$uploadStore.loading}
-          class:hidden={!$isFormValid}
-        >
-          {#if $uploadStore.loading}
-            <div class="loading loading-spinner"></div>
-          {:else}
-            Upload
-          {/if}
-        </button>
-      </div>
-    </div>
-  {/if}
+  </div>
 </div>

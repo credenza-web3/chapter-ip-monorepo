@@ -19,7 +19,17 @@
 </svelte:head>
 <Toast />
 <div class="min-h-screen overflow-x-hidden flex flex-col">
-  <Header {authStore} {menuItems} />
+  <Header {authStore}>
+    <nav>
+      <ul class="flex space-x-8">
+        {#each menuItems as { label, href }}
+          <li>
+            <a {href}><span class="text-lg font-semibold">{label}</span></a>
+          </li>
+        {/each}
+      </ul>
+    </nav>
+  </Header>
   <main class="space-y-0 flex-1 md:p-6 p-2">
     {@render children?.()}
   </main>

@@ -1,15 +1,6 @@
 <script lang="ts">
   import { uploadStore } from '../stores/upload-store'
-
-  function handleLifetimeChange(e: Event) {
-    const target = e.target as HTMLInputElement
-    if (target) uploadStore.setLifetimeLicense(target.checked)
-  }
-
-  function handleOneTimeChange(e: Event) {
-    const target = e.target as HTMLInputElement
-    if (target) uploadStore.setOneTimeLicense(target.checked)
-  }
+  import LicenceInput from './LicenceInput.svelte'
 
   function handleLifetimePriceChange(e: Event) {
     const target = e.target as HTMLInputElement
@@ -22,48 +13,49 @@
   }
 </script>
 
-<fieldset class="fieldset bg-base-100 rounded-box border p-4 max-w-lg">
-  <legend class="fieldset-legend"
-    >Choose License Type <span class="text-[10px] opacity-50">(set license prices in (USD))</span></legend
-  >
-  <label class="label justify-between">
-    <div class="space-x-2">
-      <input
-        type="checkbox"
-        checked={$uploadStore.isLifetimeLicense}
-        onchange={handleLifetimeChange}
-        class="checkbox"
-      />
-      <span class="label-text">Lifetime License (USD)</span>
-    </div>
-    {#if $uploadStore.isLifetimeLicense}
-      <input
-        type="number"
-        class="input validator max-w-xs"
-        required
-        placeholder="Enter the price in (USD)."
-        min="1"
-        value={$uploadStore.lifetimePrice}
-        oninput={handleLifetimePriceChange}
-      />
-    {/if}
-  </label>
-  <label class="label justify-between">
-    <div class="space-x-2">
-      <input type="checkbox" checked={$uploadStore.isOneTimeLicense} onchange={handleOneTimeChange} class="checkbox" />
-      <span class="label-text">One Time License (USD)</span>
+<fieldset class="fieldset bg-base-100 rounded-box p-4 max-w-lg">
+  <legend class="fieldset-legend">Choose license type and pricing</legend>
+  <label class="label justify-between cursor-pointer">
+    <div class="space-x-2 flex items-center">
+      <LicenceInput bind:checked={$uploadStore.isLifetimeLicense} />
+      <span class="font-medium text-xs text-black">Lifetime License</span>
     </div>
 
-    {#if $uploadStore.isOneTimeLicense}
+    <div
+      class="inline-flex items-center py-2.5 pr-2 pl-3 rounded-mb border border-gray-200 bg-gray-50 transition-all duration-200 w-20"
+    >
       <input
         type="number"
-        class="input validator max-w-xs"
-        required
-        placeholder="Enter the price in (USD)."
-        min="1"
+        value={$uploadStore.lifetimePrice}
+        oninput={handleLifetimePriceChange}
+        disabled={!$uploadStore.isLifetimeLicense}
+        placeholder="100"
+        class="bg-transparent border-none outline-none w-full text-sm placeholder-gray-300"
+      />
+      <span class="text-[10px] font-medium text-gray-400 shrink-0 select-none">
+        USD
+      </span>
+    </div>
+  </label>
+  <label class="label justify-between">
+    <div class="space-x-2 flex items-center">
+      <LicenceInput bind:checked={$uploadStore.isOneTimeLicense} />
+      <span class="font-medium text-xs text-black">One Time License</span>
+    </div>
+    <div
+      class="inline-flex items-center py-2.5 pr-2 pl-3 rounded-mb border border-gray-200 bg-gray-50 transition-all duration-200 w-20"
+    >
+      <input
+        type="number"
         value={$uploadStore.oneTimePrice}
         oninput={handleOneTimePriceChange}
+        placeholder="100"
+        class="bg-transparent border-none outline-none w-full text-sm placeholder-gray-300"
+        disabled={!$uploadStore.isOneTimeLicense}
       />
-    {/if}
+      <span class="text-[10px] font-medium text-gray-400 shrink-0 select-none">
+        USD
+      </span>
+    </div> 
   </label>
 </fieldset>
