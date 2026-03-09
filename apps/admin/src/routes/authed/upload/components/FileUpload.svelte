@@ -1,6 +1,6 @@
 <script lang="ts">
   import { uploadStore } from '../stores/upload-store'
-  import uploadIcon from '$lib/assets/upload.svg'
+  import UploadIcon from '$lib/components/UploadIcon.svelte'
 
   let isOver = $state(false)
   let fileInput: HTMLInputElement | null = $state(null)
@@ -68,7 +68,9 @@
     if (e.key === 'Enter' || e.key === ' ') fileInput?.click()
   }}
 >
-  <img src={uploadIcon} alt="upload" class="w-8 h-8 mb-2" />
+  <div class="mb-2">
+     <UploadIcon />
+  </div>
   <span class="text-center mb-2 font-medium text-sm">Upload or drag a file</span>
   {#if $uploadStore.uploaded}
     <div class="flex flex-col items-center mt-4">

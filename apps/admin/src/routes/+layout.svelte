@@ -3,11 +3,18 @@
   import favicon from '$lib/assets/credenza.png'
   import { Toast, Header, Footer } from '@repo/ui-components'
   import { authStore } from '$lib'
-  import dashboardIcon from '$lib/assets/dashboard.svg'
-  import uploadIcon from '$lib/assets/upload.svg'
+  import DashboardIcon from '$lib/components/DashboardIcon.svelte'
+  import UploadIcon from '$lib/components/UploadIcon.svelte'
+  import NavLink from '$lib/components/NavLink.svelte'
   import { publisherStore } from '$lib/stores/publisher.svelte'
 
   let { children } = $props()
+  const menuItems = [
+    {
+      text: 'History',
+      href: '/authed/history'
+    }
+  ]
 </script>
 
 <svelte:head>
@@ -16,20 +23,18 @@
 </svelte:head>
 <Toast />
 <div class="min-h-screen overflow-x-hidden flex flex-col bg-[#f9fafb] text-[#202225]">
-  <Header {authStore}>
+  <Header {authStore} {menuItems}>
     <div class="flex items-center w-full justify-between pl-15 pr-5">
       <div>
-        <a href="/authed/files" class="flex py-4 px-8 bg-[#e4e8eb] gap-3 font-semibold">
-          <img src={dashboardIcon} alt="Dashboard" class="w-[22px]" />
+        <NavLink href="/authed/files" icon={DashboardIcon}>
           Dashboard
-        </a>
+        </NavLink>
       </div>
 
       <div class="flex items-center gap-4">
-        <a href="/authed/upload" class="text-[#6e4ff7] flex py-4 px-8 gap-3 font-semibold">
-          <img src={uploadIcon} alt="Upload" class="w-[26px]" />
+        <NavLink href="/authed/upload" icon={UploadIcon}>
           Upload
-        </a>
+        </NavLink>
         <a
           href="/authed/profile"
           class="flex items-center justify-center rounded-full bg-[#6e4ff7] text-white font-semibold w-7 h-7"
