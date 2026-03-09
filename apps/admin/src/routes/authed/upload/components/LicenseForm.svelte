@@ -32,9 +32,7 @@
         placeholder="100"
         class="bg-transparent border-none outline-none w-full text-sm placeholder-gray-300"
       />
-      <span class="text-[10px] font-medium text-gray-400 shrink-0 select-none">
-        USD
-      </span>
+      <span class="text-[10px] font-medium text-gray-400 shrink-0 select-none"> USD </span>
     </div>
   </label>
   <label class="label justify-between">
@@ -53,9 +51,7 @@
         class="bg-transparent border-none outline-none w-full text-sm placeholder-gray-300"
         disabled={!$uploadStore.isOneTimeLicense}
       />
-      <span class="text-[10px] font-medium text-gray-400 shrink-0 select-none">
-        USD
-      </span>
-    </div> 
+      <span class="text-[10px] font-medium text-gray-400 shrink-0 select-none"> USD </span>
+    </div>
   </label>
 </fieldset>

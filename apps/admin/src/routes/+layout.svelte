@@ -20,7 +20,7 @@
     <div class="flex items-center w-full justify-between pl-15 pr-5">
       <div>
         <a href="/authed/files" class="flex py-4 px-8 bg-[#e4e8eb] gap-3 font-semibold">
-          <img src={dashboardIcon} alt="Dashboard" class="w-[22px]"/>
+          <img src={dashboardIcon} alt="Dashboard" class="w-[22px]" />
           Dashboard
         </a>
       </div>
@@ -30,8 +30,11 @@
           <img src={uploadIcon} alt="Upload" class="w-[26px]" />
           Upload
         </a>
-        <a href="/authed/profile" class="flex items-center justify-center rounded-full bg-[#6e4ff7] text-white font-semibold w-7 h-7">
-          {(publisherStore.title?.slice(0, 1)?.toUpperCase() || 'U')}
+        <a
+          href="/authed/profile"
+          class="flex items-center justify-center rounded-full bg-[#6e4ff7] text-white font-semibold w-7 h-7"
+        >
+          {publisherStore.title?.slice(0, 1)?.toUpperCase() || 'U'}
         </a>
       </div>
     </div>

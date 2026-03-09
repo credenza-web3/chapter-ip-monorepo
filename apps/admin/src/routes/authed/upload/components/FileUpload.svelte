@@ -68,16 +68,14 @@
     if (e.key === 'Enter' || e.key === ' ') fileInput?.click()
   }}
 >
-<img src={uploadIcon} alt="upload" class="w-8 h-8 mb-2">
+  <img src={uploadIcon} alt="upload" class="w-8 h-8 mb-2" />
   <span class="text-center mb-2 font-medium text-sm">Upload or drag a file</span>
   {#if $uploadStore.uploaded}
     <div class="flex flex-col items-center mt-4">
       <span class="mb-2">📄 {$uploadStore.uploaded.name}</span>
     </div>
   {:else}
-    <button class="btn bg-[#6e4ff7] text-white px-2 w-[200px] mb-2">
-      Add file
-    </button>
+    <button class="btn bg-[#6e4ff7] text-white px-2 w-[200px] mb-2"> Add file </button>
     <span class="text-xs text-[#707070] font-medium">.txt, .docx, .mov, .mp4, .nil, and .zip files supported</span>
   {/if}
 
