@@ -12,8 +12,8 @@
   const menuItems = [
     {
       text: 'History',
-      href: '/authed/history'
-    }
+      href: '/authed/history',
+    },
   ]
 </script>
 
@@ -26,15 +26,11 @@
   <Header {authStore} {menuItems}>
     <div class="flex items-center w-full justify-between pl-15 pr-5">
       <div>
-        <NavLink href="/authed/files" icon={DashboardIcon}>
-          Dashboard
-        </NavLink>
+        <NavLink href="/authed/files" icon={DashboardIcon}>Dashboard</NavLink>
       </div>
 
       <div class="flex items-center gap-4">
-        <NavLink href="/authed/upload" icon={UploadIcon}>
-          Upload
-        </NavLink>
+        <NavLink href="/authed/upload" icon={UploadIcon}>Upload</NavLink>
         <a
           href="/authed/profile"
           class="flex items-center justify-center rounded-full bg-[#6e4ff7] text-white font-semibold w-7 h-7"

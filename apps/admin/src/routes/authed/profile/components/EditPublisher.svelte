@@ -4,9 +4,9 @@
   import { publisherStore } from '$lib/stores/publisher.svelte'
 
   let { onUpdate, onPriceUpdate } = $props<{
-  onUpdate?: (name: string, avatar: string) => void
-  onPriceUpdate?: (price: number) => void
-}>()
+    onUpdate?: (name: string, avatar: string) => void
+    onPriceUpdate?: (price: number) => void
+  }>()
 
   let publisherName = $state(publisherStore.title || '')
   let avatarUrl = $state(publisherStore.avatarUrl || '')
@@ -26,8 +26,6 @@
   })
 </script>
 
-
-
 <div class="mb-6 flex flex-col gap-2 w-full">
   <h2 class="text-xl font-semibold text-gray-900">Details</h2>
   <div class="w-full">
@@ -35,6 +33,3 @@
     <PublisherAvatarInput bind:value={avatarUrl} />
   </div>
 </div>
-
-
-

@@ -69,7 +69,7 @@
   }}
 >
   <div class="mb-2">
-     <UploadIcon />
+    <UploadIcon />
   </div>
   <span class="text-center mb-2 font-medium text-sm">Upload or drag a file</span>
   {#if $uploadStore.uploaded}

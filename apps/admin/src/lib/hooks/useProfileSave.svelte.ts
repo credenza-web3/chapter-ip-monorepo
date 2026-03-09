@@ -23,19 +23,19 @@ interface SaveResult {
 }
 export function useProfileSave(trpcClient: any, contentContract: ethers.Contract, userAddress: string) {
   let loading = $state(false)
-  
+
   // Profile data state
   let profileData = $state<ProfileData>({
     publisherName: publisherStore.title || '',
     avatarUrl: publisherStore.avatarUrl || '',
-    subscriptionPrice: 0
+    subscriptionPrice: 0,
   })
-  
+
   // Original values for change detection
   let originalData = $state<ProfileData>({
     publisherName: publisherStore.title || '',
     avatarUrl: publisherStore.avatarUrl || '',
-    subscriptionPrice: 0
+    subscriptionPrice: 0,
   })
 
   async function saveSubscriptionPrice(price: number): Promise<void> {
@@ -44,17 +44,13 @@ export function useProfileSave(trpcClient: any, contentContract: ethers.Contract
     }
 
     const signer = await getSigner()
-    const contract = new ethers.Contract(
-      import.meta.env.VITE_EVM_MEMBERSHIP_CONTRACT_ADDRESS, 
-      membership_abi, 
-      signer
-    )
+    const contract = new ethers.Contract(import.meta.env.VITE_EVM_MEMBERSHIP_CONTRACT_ADDRESS, membership_abi, signer)
 
     const tokenId = BigInt(ethers.getAddress(publisherStore.evmAddress))
 
     const [setPriceFiatTx, setPriceTokenTx] = await Promise.all([
       contract.setPriceFiat.populateTransaction(tokenId, price * FIAT_PRICE_MULTIPLIER),
-      contract.setPriceToken.populateTransaction(tokenId, price * TOKEN_PRICE_MULTIPLIER)
+      contract.setPriceToken.populateTransaction(tokenId, price * TOKEN_PRICE_MULTIPLIER),
     ])
 
     const fwtOpts = {
@@ -65,23 +61,20 @@ export function useProfileSave(trpcClient: any, contentContract: ethers.Contract
 
     const [fiatHash, tokenHash] = await Promise.all([
       forwardTransaction(setPriceFiatTx, fwtOpts),
-      forwardTransaction(setPriceTokenTx, fwtOpts)
+      forwardTransaction(setPriceTokenTx, fwtOpts),
     ])
 
     // Wait for transactions to be mined
-    await Promise.all([
-      signer.provider?.waitForTransaction(fiatHash),
-      signer.provider?.waitForTransaction(tokenHash)
-    ])
+    await Promise.all([signer.provider?.waitForTransaction(fiatHash), signer.provider?.waitForTransaction(tokenHash)])
   }
 
   // Check if any fields have changed
   let hasChanges = $derived(
     profileData.publisherName !== originalData.publisherName ||
-    profileData.avatarUrl !== originalData.avatarUrl ||
-    profileData.subscriptionPrice !== originalData.subscriptionPrice ||
-    agencyStore.hasAddressChanged ||
-    agencyStore.hasFeeChanged
+      profileData.avatarUrl !== originalData.avatarUrl ||
+      profileData.subscriptionPrice !== originalData.subscriptionPrice ||
+      agencyStore.hasAddressChanged ||
+      agencyStore.hasFeeChanged,
   )
 
   // Update functions for child components
@@ -99,15 +92,17 @@ export function useProfileSave(trpcClient: any, contentContract: ethers.Contract
 
   async function handleSaveAll(): Promise<void> {
     if (!hasChanges || loading) return
-    
+
     loading = true
-    
+
     try {
       const savePromises: Promise<SaveResult>[] = []
-      
+
       // Save publisher info if changed
-      if (profileData.publisherName !== originalData.publisherName || 
-          profileData.avatarUrl !== originalData.avatarUrl) {
+      if (
+        profileData.publisherName !== originalData.publisherName ||
+        profileData.avatarUrl !== originalData.avatarUrl
+      ) {
         const publisherPromise = savePublisher(trpcClient, profileData.publisherName, profileData.avatarUrl)
         savePromises.push(
           publisherPromise.then((result: any) => {
@@ -120,54 +115,71 @@ export function useProfileSave(trpcClient: any, contentContract: ethers.Contract
               originalData.avatarUrl = profileData.avatarUrl
             }
             return result as SaveResult
-          })
+          }),
         )
       }
-      
+
       // Save agency address if changed
       if (agencyStore.hasAddressChanged && contentContract) {
         const addressPromise = savePublisherAgencyAddress(contentContract, userAddress)
         savePromises.push(
-          addressPromise.then(() => {
-            agencyStore.setOriginalAddress(agencyStore.agencyAddress)
-            return { success: true }
-          }).catch((error: unknown) => ({ success: false, error: error instanceof Error ? error.message : String(error) }))
+          addressPromise
+            .then(() => {
+              agencyStore.setOriginalAddress(agencyStore.agencyAddress)
+              return { success: true }
+            })
+            .catch((error: unknown) => ({
+              success: false,
+              error: error instanceof Error ? error.message : String(error),
+            })),
         )
       }
-      
+
       // Save agency fee if changed
       if (agencyStore.hasFeeChanged && contentContract) {
         const feePromise = savePublisherAgencyFee(contentContract, userAddress)
         savePromises.push(
-          feePromise.then(() => {
-            agencyStore.setOriginalFee(agencyStore.agencyFee)
-            return { success: true }
-          }).catch((error: unknown) => ({ success: false, error: error instanceof Error ? error.message : String(error) }))
+          feePromise
+            .then(() => {
+              agencyStore.setOriginalFee(agencyStore.agencyFee)
+              return { success: true }
+            })
+            .catch((error: unknown) => ({
+              success: false,
+              error: error instanceof Error ? error.message : String(error),
+            })),
         )
       }
-      
+
       // Save subscription price if changed
       if (profileData.subscriptionPrice !== originalData.subscriptionPrice) {
         const pricePromise = saveSubscriptionPrice(profileData.subscriptionPrice)
         savePromises.push(
-          pricePromise.then(() => {
-            originalData.subscriptionPrice = profileData.subscriptionPrice
-            return { success: true }
-          }).catch((error: unknown) => ({ success: false, error: error instanceof Error ? error.message : String(error) }))
+          pricePromise
+            .then(() => {
+              originalData.subscriptionPrice = profileData.subscriptionPrice
+              return { success: true }
+            })
+            .catch((error: unknown) => ({
+              success: false,
+              error: error instanceof Error ? error.message : String(error),
+            })),
         )
       }
-      
+
       const results = await Promise.all(savePromises)
-      
+
       // Check if any operations failed
-      const failures = results.filter(result => !result.success)
+      const failures = results.filter((result) => !result.success)
       if (failures.length > 0) {
-        const errorMessages = failures.map(f => f.error).filter(Boolean).join('; ')
+        const errorMessages = failures
+          .map((f) => f.error)
+          .filter(Boolean)
+          .join('; ')
         throw new Error(`Some operations failed: ${errorMessages}`)
       }
-      
+
       notify('All changes saved successfully!', ToastType.SUCCESS)
-      
     } catch (error) {
       console.error('Error saving changes:', error)
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
@@ -179,10 +191,14 @@ export function useProfileSave(trpcClient: any, contentContract: ethers.Contract
   }
 
   return {
-    get loading() { return loading },
-    get hasChanges() { return hasChanges },
+    get loading() {
+      return loading
+    },
+    get hasChanges() {
+      return hasChanges
+    },
     updatePublisherData,
     updateSubscriptionPrice,
-    handleSaveAll
+    handleSaveAll,
   }
 }

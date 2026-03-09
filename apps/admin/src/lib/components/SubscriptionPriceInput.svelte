@@ -19,7 +19,7 @@
     const target = event.target as HTMLInputElement
     const numValue = parseFloat(target.value)
     value = isNaN(numValue) ? 0 : numValue
-    
+
     // Notify parent of changes
     if (onUpdate) {
       onUpdate(value)
@@ -33,7 +33,7 @@
 
       const price: bigint = await membershipContract.getPriceFiat(BigInt(ethers.getAddress(publisherStore.evmAddress)))
       value = Number(price) / 100
-      
+
       // Notify parent of initial value
       if (onUpdate) {
         onUpdate(value)

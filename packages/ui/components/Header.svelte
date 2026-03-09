@@ -3,7 +3,11 @@
   import Logo from '../assets/ch-logo.svg'
   import Dots from '../assets/dots.svg'
 
-  let { authStore, children, menuItems } = $props<{ authStore: any; children?: () => any; menuItems?: {text: string, href: string}[] }>()
+  let { authStore, children, menuItems } = $props<{
+    authStore: any
+    children?: () => any
+    menuItems?: { text: string; href: string }[]
+  }>()
   const { state: authState } = $derived(authStore)
   let menuOpen = $state(false)
   let headerRef: HTMLElement
@@ -34,37 +38,29 @@
     {@render children?.()}
   {/if}
   <div class="flex items-center gap-6">
-      <button
-        class="cursor-pointer"
-        onclick={() => {
-          menuOpen = !menuOpen
-        }}
-      >
-        <img src={Dots} alt="Menu" class="size-4" />
-      </button>
+    <button
+      class="cursor-pointer"
+      onclick={() => {
+        menuOpen = !menuOpen
+      }}
+    >
+      <img src={Dots} alt="Menu" class="size-4" />
+    </button>
   </div>
   {#if menuOpen}
     <div class="absolute top-full w-60 right-3 bg-white text-black flex flex-col z-50 shadow-lg rounded p-2">
       {#if authState.accessToken}
-       
         {#each menuItems as item}
-          <a href={item.href} class="cursor-pointer border border-[#eef2f6] py-2 text-center"
-            >{item.text}</a
-          >
+          <a href={item.href} class="cursor-pointer border border-[#eef2f6] py-2 text-center">{item.text}</a>
         {/each}
 
         {#if menuItems?.length}
           <hr class="my-2" />
         {/if}
 
-        <button onclick={() => authStore.logout()} class="cursor-pointer">
-          Logout</button
-        >
-
+        <button onclick={() => authStore.logout()} class="cursor-pointer"> Logout</button>
       {:else}
-        <button onclick={() => authStore.startLogin()} class="cursor-pointer">
-          Login</button
-        >
+        <button onclick={() => authStore.startLogin()} class="cursor-pointer"> Login</button>
       {/if}
     </div>
   {/if}

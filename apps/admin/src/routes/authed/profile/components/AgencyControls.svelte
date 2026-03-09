@@ -4,11 +4,15 @@
   import AgencyFeeInput from '$lib/components/AgencyFeeInput.svelte'
   import type { ethers } from '@repo/fe-evm-provider'
 
-  let { contentContract, userAddress, hideSaveButtons = false } = $props<{
-  contentContract?: any
-  userAddress: string
-  hideSaveButtons?: boolean
-}>()
+  let {
+    contentContract,
+    userAddress,
+    hideSaveButtons = false,
+  } = $props<{
+    contentContract?: any
+    userAddress: string
+    hideSaveButtons?: boolean
+  }>()
 </script>
 
 <div class="w-1/2 mt-10 bg-[#f9fafb] p-6 rounded-lg border-[#dddddd] border">
