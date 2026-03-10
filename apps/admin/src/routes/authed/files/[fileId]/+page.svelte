@@ -4,6 +4,7 @@
   import { notify, ToastType } from '@repo/ui-components'
   import { r2Config } from '@repo/fe-services'
   import { sendTx } from '$lib/services/transaction'
+  import { getFilePricing } from '../helper.js'
 
   let { data } = $props()
   const { items } = data.paginatedResponse ?? { items: [] }
@@ -63,8 +64,12 @@
   onMount(async () => {
     const tokenId = data.paginatedResponse?.items[0].tokenId
 
-    fulltimeLicensePrice = Number(await data?.contentContract?.getLicensePriceFiat(tokenId, '0')) / 100
-    onetimeLicensePrice = Number(await data?.contentContract?.getLicensePriceFiat(tokenId, '2')) / 100
+    const { fulltimeLicensePrice: fulltime, onetimeLicensePrice: onetime } = await getFilePricing(
+      data.contentContract!,
+      tokenId,
+    )
+    fulltimeLicensePrice = fulltime
+    onetimeLicensePrice = onetime
     if (fulltimeLicensePrice) isFulltimeLoaded = true
     if (onetimeLicensePrice) isOnetimeLoaded = true
   })
