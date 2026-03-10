@@ -1,4 +1,4 @@
-import type { ethers } from "@repo/fe-evm-provider"
+import type { ethers } from '@repo/fe-evm-provider'
 
 interface RecentFile {
   id: string
@@ -14,7 +14,7 @@ export const addToRecent = (fileId: string, title: string, description: string, 
     title,
     description,
     image,
-    openedAt: new Date().toISOString()
+    openedAt: new Date().toISOString(),
   }
 
   let existing = JSON.parse(localStorage.getItem('recentFiles') || '[]')

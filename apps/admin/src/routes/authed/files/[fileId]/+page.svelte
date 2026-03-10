@@ -64,7 +64,10 @@
   onMount(async () => {
     const tokenId = data.paginatedResponse?.items[0].tokenId
 
-    const { fulltimeLicensePrice: fulltime, onetimeLicensePrice: onetime } = await getFilePricing(data.contentContract!, tokenId)
+    const { fulltimeLicensePrice: fulltime, onetimeLicensePrice: onetime } = await getFilePricing(
+      data.contentContract!,
+      tokenId,
+    )
     fulltimeLicensePrice = fulltime
     onetimeLicensePrice = onetime
     if (fulltimeLicensePrice) isFulltimeLoaded = true

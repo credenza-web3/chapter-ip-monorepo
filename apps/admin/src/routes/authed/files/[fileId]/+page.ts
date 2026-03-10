@@ -26,10 +26,10 @@ export const load: PageLoad = async ({ params, parent }) => {
     const metaUri = await contentContract?.tokenURI(String(tokenId))
     const response = await fetch(metaUri!)
     const metadata: { image: string; title: string; description: string } = await response.json()
-    
+
     // Add to recent files
     addToRecent(fileId, metadata.title || 'Untitled', metadata.description || '', metadata.image)
-    
+
     return { paginatedResponse, tokenId, metadata, contentContract }
   } catch (error) {
     console.error('Error fetching metadata:', error)

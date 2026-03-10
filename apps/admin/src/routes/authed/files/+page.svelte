@@ -18,12 +18,14 @@
   const { copyToClipboard } = useClipboard()
 </script>
 
-
- <RecentFiles />
+<RecentFiles />
 
 <div class="min-h-xl p-8 border border-[#eef2f6] rounded-3xl bg-white">
   <h2 class="text-2xl font-semibold mb-2.5">Welcome to the Creator Dashboard</h2>
-  <p class="text-base font-medium text-[#747474] mb-4">Add and manage files, metadata, pricing and specify ownership rules. Update product information and adjust pricing anytime.</p>
+  <p class="text-base font-medium text-[#747474] mb-4">
+    Add and manage files, metadata, pricing and specify ownership rules. Update product information and adjust pricing
+    anytime.
+  </p>
   {#if !items.length}
     <div class="text-center py-8">
       <p class="text-gray-500">No files found</p>
@@ -46,7 +48,9 @@
         <tbody>
           {#each items as item, i (item.id)}
             <tr
-              class="text-[13px] text-[#707070] cursor-pointer hover:bg-gray-100 transition-colors {i % 2 !== 0 ? 'bg-[#f9fafa]' : ''}"
+              class="text-[13px] text-[#707070] cursor-pointer hover:bg-gray-100 transition-colors {i % 2 !== 0
+                ? 'bg-[#f9fafa]'
+                : ''}"
               role="button"
             >
               {#await fetchContentTokenMeta(data.contentContract!, item.tokenId)}
