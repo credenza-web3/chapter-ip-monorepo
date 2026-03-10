@@ -24,12 +24,16 @@ import {
   mintContentNftTokenOutputSchema,
   type TMintContentNftTokenOutput,
 } from './publisher.dto'
+import { CommonEvmService } from '../common/evm/evm.service'
 
 @Router({ alias: 'publishers' })
 export class PublisherRouter {
   private logger = new Logger(this.constructor.name)
 
-  constructor(private readonly publisherService: PublisherService) {}
+  constructor(
+    private readonly publisherService: PublisherService,
+    private readonly commonEvmService: CommonEvmService,
+  ) {}
 
   @UseMiddlewares(AuthMiddleware)
   @Mutation({
@@ -40,11 +44,14 @@ export class PublisherRouter {
     @Ctx() ctx: TAppContextWithTokenPayload,
     @Input() input: TSetPublisherInput,
   ): Promise<TSetPublisherOutput> {
+    const evmAddress = await this.commonEvmService.getUserEvmAddressBySub(ctx.authTokenPayload.sub)
+
     const publisher = await this.publisherService.getModel().findOneAndUpdate(
       { sub: ctx.authTokenPayload.sub },
       {
         title: input.title,
         ...(input.avatarUrl !== undefined && { avatarUrl: input.avatarUrl }),
+        evmAddress,
       },
       { new: true, upsert: true },
     )
@@ -70,7 +77,6 @@ export class PublisherRouter {
     if (!publisher) {
       throw new TRPCError({ message: 'Publisher not found', code: 'NOT_FOUND' })
     }
-
     return publisher.toJSON()
   }
 

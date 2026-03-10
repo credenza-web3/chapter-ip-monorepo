@@ -36,12 +36,14 @@ export const getPublisherDataOutputSchema = z.object({
   avatarUrl: z.string().optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
+  evmAddress: z.string().optional(),
 })
 export type TGetPublisherDataOutput = z.infer<typeof getPublisherDataOutputSchema>
 
 export const findPublishersInputSchema = paginatedRequestWithCursorSchema.extend({
   title: z.string().optional(),
   sub: z.string().optional(),
+  addresses: z.array(z.string()).optional(),
 })
 export type TFindPublishersInput = z.infer<typeof findPublishersInputSchema>
 

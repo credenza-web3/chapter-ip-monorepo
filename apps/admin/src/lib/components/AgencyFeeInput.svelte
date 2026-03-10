@@ -8,7 +8,7 @@
 </script>
 
 <div class="w-full">
-  <label for="agency-fee" class="block text-sm text-gray-700 mb-2">Agency Share Fee</label>
+  <label for="agency-fee" class="block text-sm mb-2 font-medium">Set Agency Fee (%)</label>
   <input
     id="agency-fee"
     type="number"
@@ -18,7 +18,7 @@
     min="0"
     max="100"
     step="0.01"
-    class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 transition-colors {!feeTouched ||
+    class="w-1/5 text-xs px-4 py-3 border bg-white border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 transition-colors {!feeTouched ||
     agencyStore.isFeeValid
       ? 'border-gray-300 focus:border-gray-900'
       : 'border-red-500 focus:border-red-600'}"
