@@ -3,24 +3,14 @@
   import SubscriptionPriceInput from '$lib/components/SubscriptionPriceInput.svelte'
   import EditPublisher from './components/EditPublisher.svelte'
   import { useProfileSave } from '$lib/hooks/useProfileSave.svelte'
+  import { useClipboard } from '$lib/hooks/useClipboard.svelte'
   import blockIcon from '$lib/assets/block.svg'
-  import copyIcon from '$lib/assets/copy.svg'
-  import { notify, ToastType } from '@repo/ui-components'
+  import CopyIcon from '$lib/components/icons/CopyIcon.svelte'
 
   let { data } = $props()
 
   let profileSave = $state(useProfileSave(data.trpcClient, data.contentContract!, data.userAddress as string))
-
-  async function copyAddress() {
-    try {
-      if (data.userAddress) {
-        await navigator.clipboard.writeText(data.userAddress)
-        notify('Address copied to clipboard', ToastType.SUCCESS)
-      }
-    } catch (err) {
-      console.error('Failed to copy address:', err)
-    }
-  }
+  const { copyToClipboard } = useClipboard()
 
   $effect(() => {
     if (data.trpcClient && data.contentContract && data.userAddress) {
@@ -47,11 +37,11 @@
           </div>
 
           <button
-            onclick={copyAddress}
+            onclick={() => copyToClipboard(data.userAddress!, 'Address copied to clipboard')}
             class="w-8 h-8 inline-block ml-2 cursor-pointer hover:opacity-70 border-0 bg-transparent p-0"
             title="Copy address"
           >
-            <img src={copyIcon} alt="copy" class="w-8 h-8" />
+            <CopyIcon />
           </button>
         </div>
       </div>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { uploadStore } from '../stores/upload-store'
-  import UploadIcon from '$lib/components/UploadIcon.svelte'
+  import UploadIcon from '$lib/components/icons/UploadIcon.svelte'
 
   let isOver = $state(false)
   let fileInput: HTMLInputElement | null = $state(null)

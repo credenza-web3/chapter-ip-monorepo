@@ -3,8 +3,8 @@
   import favicon from '$lib/assets/credenza.png'
   import { Toast, Header, Footer } from '@repo/ui-components'
   import { authStore } from '$lib'
-  import DashboardIcon from '$lib/components/DashboardIcon.svelte'
-  import UploadIcon from '$lib/components/UploadIcon.svelte'
+  import DashboardIcon from '$lib/components/icons/DashboardIcon.svelte'
+  import UploadIcon from '$lib/components/icons/UploadIcon.svelte'
   import NavLink from '$lib/components/NavLink.svelte'
   import { publisherStore } from '$lib/stores/publisher.svelte'
 
