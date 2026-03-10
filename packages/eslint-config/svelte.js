@@ -7,7 +7,7 @@ import ts from 'typescript-eslint'
 
 import { config as baseConfig } from './base.js'
 
-export const getConfig = ({ svelteConfig }) => {
+export const getConfig = ({ svelteConfig, tsconfigRootDir }) => {
   return ts.config(
     ...baseConfig,
     js.configs.recommended,
@@ -18,6 +18,12 @@ export const getConfig = ({ svelteConfig }) => {
     {
       languageOptions: {
         globals: { ...globals.browser, ...globals.node },
+        parserOptions: {
+          projectService: {
+            allowDefaultProject: ['*.js', '*.config.js', 'vitest-setup-client.ts'],
+          },
+          ...(tsconfigRootDir ? { tsconfigRootDir } : {}),
+        },
       },
       rules: {
         // typescript-eslint strongly recommend that you do not use the no-undef lint rule on TypeScript projects.
@@ -30,10 +36,13 @@ export const getConfig = ({ svelteConfig }) => {
       files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
       languageOptions: {
         parserOptions: {
-          projectService: true,
+          projectService: {
+            allowDefaultProject: ['*.js', '*.config.js', 'vitest-setup-client.ts'],
+          },
           extraFileExtensions: ['.svelte'],
           parser: ts.parser,
           svelteConfig,
+          ...(tsconfigRootDir ? { tsconfigRootDir } : {}),
         },
       },
     },

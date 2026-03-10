@@ -6,32 +6,40 @@ import tseslint from 'typescript-eslint'
 
 import { config as baseConfig } from './base.js'
 
-export default tseslint.config(
-  ...baseConfig,
-  {
-    ignores: ['eslint.config.mjs'],
-  },
-  eslint.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
-  eslintPluginPrettierRecommended,
-  {
-    languageOptions: {
-      globals: {
-        ...globals.node,
-        ...globals.jest,
-      },
-      sourceType: 'commonjs',
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
+/** @param {{ tsconfigRootDir?: string }} options */
+export const getConfig = ({ tsconfigRootDir }) => {
+  return tseslint.config(
+    ...baseConfig,
+    eslint.configs.recommended,
+    ...tseslint.configs.recommendedTypeChecked,
+    eslintPluginPrettierRecommended,
+    {
+      languageOptions: {
+        globals: {
+          ...globals.node,
+          ...globals.jest,
+        },
+        sourceType: 'commonjs',
+        parserOptions: {
+          projectService: {
+            allowDefaultProject: ['*.js', '*.mjs', '*.config.mjs', '*.config.js', '*.config.ts'],
+          },
+          ...(tsconfigRootDir ? { tsconfigRootDir } : {}),
+        },
       },
     },
-  },
-  {
-    rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn',
+    {
+      files: ['*.mjs', '*.js', '*.config.mjs', '*.config.js'],
+      ...tseslint.configs.disableTypeChecked,
     },
-  },
-)
+    {
+      rules: {
+        '@typescript-eslint/no-explicit-any': 'off',
+        '@typescript-eslint/no-floating-promises': 'warn',
+        '@typescript-eslint/no-unsafe-argument': 'warn',
+      },
+    },
+  )
+}
+
+export default getConfig({ tsconfigRootDir: import.meta.dirname })
