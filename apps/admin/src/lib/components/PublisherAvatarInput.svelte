@@ -7,6 +7,7 @@
 </script>
 
 <div>
+  <label for="avatar-url" class="block text-sm mb-2 font-medium">Publisher profile picture</label>
   <label class="input validator mb-0 p-0 pt-2 w-full">
     <input
       id="avatar-url"

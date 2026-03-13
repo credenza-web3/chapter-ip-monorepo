@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { publisherStore } from '$lib/stores/publisher.svelte'
   import AgencyControls from './components/AgencyControls.svelte'
   import SubscriptionPriceInput from '$lib/components/SubscriptionPriceInput.svelte'
   import EditPublisher from './components/EditPublisher.svelte'
@@ -8,6 +9,7 @@
   import CopyIcon from '$lib/components/icons/CopyIcon.svelte'
 
   let { data } = $props()
+  let avatarUrl = $derived(publisherStore.avatarUrl || '')
 
   let profileSave = $state(useProfileSave(data.trpcClient, data.contentContract!, data.userAddress as string))
   const { copyToClipboard } = useClipboard()
@@ -19,7 +21,7 @@
   })
 </script>
 
-<div class="min-h-xl flex items-center justify-center bg-white p-[40px] w-full">
+<div class="min-h-xl flex items-center justify-center bg-white p-10 w-full">
   <div class="w-full">
     <div class="mb-12 text-left">
       <h1 class="text-2xl font-semibold">Profile</h1>
@@ -45,8 +47,19 @@
           </button>
         </div>
       </div>
-
-      <div class="flex flex-col items-end gap-2 w-1/2 mt-10">
+      <div class="text-base font-semibold text-[#202225] mt-12.5">
+        <span>Profile image</span>
+        {#if !!avatarUrl}
+          <img src={avatarUrl} alt="avatar" class="w-25 h-25 object-cover mt-2.5 rounded-[50px] border-2" />
+        {:else}
+          <div
+            class="w-25 h-25 mt-2.5 rounded-[50px] border-2 flex items-center justify-center bg-[#6e4ff7] text-white font-semibold text-[56px]"
+          >
+            {publisherStore.title?.[0]?.toUpperCase() || 'U'}
+          </div>
+        {/if}
+      </div>
+      <div class="flex flex-col items-end gap-2 w-1/2 mt-6.25">
         <EditPublisher onUpdate={profileSave.updatePublisherData} />
         <SubscriptionPriceInput onUpdate={profileSave.updateSubscriptionPrice} hideSaveButton={true} />
       </div>
@@ -59,7 +72,7 @@
 
       <div class="flex justify-start py-6">
         <button
-          class="btn btn-outline w-[220px] text-white bg-[#6e4ff7] disabled:bg-[#f9fafb] disabled:text-black/10 disabled:border-[#6e4ff7]/20"
+          class="btn btn-outline w-55 text-white bg-[#6e4ff7] disabled:bg-[#f9fafb] disabled:text-black/10 disabled:border-[#6e4ff7]/20"
           onclick={profileSave.handleSaveAll}
           disabled={!profileSave.hasChanges || profileSave.loading}
         >

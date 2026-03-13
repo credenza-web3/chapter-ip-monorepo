@@ -51,7 +51,7 @@
 
 <div class="flex flex-col w-full">
   <div class="flex flex-col items-start w-full">
-    <label for="subscription-price" class="block text-sm font-medium text-gray-700"> Subscription Price ($) </label>
+    <label for="subscription-price" class="block text-gray-700 text-sm mb-2 font-medium"> Subscription Price ($) </label>
     <div class="relative w-full">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         <span class="text-gray-500 sm:text-sm">$</span>

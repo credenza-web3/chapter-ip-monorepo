@@ -56,7 +56,7 @@
   }
 </script>
 
-<div class="p-10 min-h-xl card bg-base-100 shadow-md rounded-[24px]">
+<div class="p-10 min-h-xl card bg-base-100 shadow-md rounded-3xl">
   <div class="mb-12 text-left">
     <h1 class="text-2xl font-semibold text-[#202225]">Upload</h1>
   </div>
@@ -75,7 +75,7 @@
       id="description"
       bind:value={$uploadStore.description}
       placeholder="Description"
-      class="input w-full mb-3 h-[100px] py-2 px-3 focus:border-[#988cff] focus:outline-none focus:ring-0"
+      class="input w-full mb-3 h-25 py-2 px-3 focus:border-[#988cff] focus:outline-none focus:ring-0"
     ></textarea>
     <ImageUpload />
   </div>
@@ -86,7 +86,7 @@
 
     <div class="flex gap-10 mt-10">
       <button
-        class="btn btn-outline w-[220px] text-white bg-[#6e4ff7] disabled:bg-[#f9fafb] disabled:text-black/10 disabled:border-[#6e4ff7]/20"
+        class="btn btn-outline w-55 text-white bg-[#6e4ff7] disabled:bg-[#f9fafb] disabled:text-black/10 disabled:border-[#6e4ff7]/20"
         onclick={onSubmitClick}
         disabled={$uploadStore.loading || !$isFormValid || !$uploadStore.uploaded}
       >
