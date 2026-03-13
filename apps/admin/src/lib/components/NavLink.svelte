@@ -26,7 +26,7 @@
 
 <a
   {href}
-  class="flex py-2 px-8 gap-3 font-semibold"
+  class="flex items-center py-2 md:px-8 px-2 gap-3 font-semibold rounded-[5px] text-xs md:text-sm text-[#353e47]"
   style:background-color={isActive ? 'transparent' : inactiveBg}
   style:color={textColor}
 >

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
-  import { formatDate } from '$lib/services/formatDate.js'
   import { onMount } from 'svelte'
   import { loadRecentFiles } from './helper'
+  import CodeImg from '$lib/assets/code.svg'
 
   interface RecentFile {
     id: string
@@ -21,11 +21,14 @@
 
 {#if recentFiles.length > 0}
   <div class="mt-12 mb-6">
-    <h2 class="text-[18px] font-semibold mb-2.5">Recents</h2>
+    <div class="flex gap-2.5 items-center mb-2.5">
+      <h2 class="text-[18px] xfont-semibold">Recents</h2>
+      <img src={CodeImg} alt="" class="" />
+    </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {#each recentFiles as file, index (file.id)}
+      {#each recentFiles as file (file.id)}
         <div
-          class="card bg-white border border-red-50 cursor-pointer flex flex-row"
+          class="card bg-white border border-red-50 cursor-pointer flex flex-row rounded-md"
           role="button"
           tabindex="0"
           onclick={() => goto(`/authed/files/${file.id}`)}
@@ -36,11 +39,11 @@
             }
           }}
         >
-          <div class="h-25 min-w-25 w-25 p-2.5 flex items-center justify-center">
+          <div class="w-25 h-25 m-5 flex items-center justify-center rounded-md">
             {#if file.image}
-              <img src={file.image} alt={file.title} class="w-full h-full object-cover rounded-md" />
+              <img src={file.image.replace('+xml', '')} alt={file.title} class="w-full h-full object-contain" />
             {:else}
-              <div class="text-gray-400 rounded-md">
+              <div class="text-gray-400 rounded-md flex items-center justify-center w-full h-full">
                 <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     stroke-linecap="round"
