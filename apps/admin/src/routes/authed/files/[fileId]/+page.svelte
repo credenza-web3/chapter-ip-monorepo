@@ -83,7 +83,7 @@
   <div class="mb-12 text-left">
     <h1 class="text-2xl font-semibold text-[#202225]">File Details</h1>
   </div>
-  <div class="flex flex-col lg:flex-row justify-between gap-6 md:px-7">
+  <div class="flex flex-col lg:flex-row gap-6 md:px-7">
     {#if items?.length > 0}
       <div class="max-w-120">
         {#each items as item (item.id)}
@@ -180,7 +180,7 @@
             <button
               onclick={handleUpdateOnetimeLicensePrice}
               disabled={isOnetimeLicensePriceLoading || isFulltimeLicensePriceLoading}
-              class="btn btn-primary  bg-[#E4E8EB]"
+              class="btn btn-primary bg-[#E4E8EB]"
             >
               {#if isOnetimeLicensePriceLoading}
                 <span class="loading loading-spinner loading-sm mr-2"></span>

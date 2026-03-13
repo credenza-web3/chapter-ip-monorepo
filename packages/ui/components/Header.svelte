@@ -6,8 +6,8 @@
   let { authStore, children, menuItems, pathname } = $props<{
     authStore: any
     children?: () => any
-    menuItems?: { text: string; href: string }[],
-    pathname?: string  
+    menuItems?: { text: string; href: string }[]
+    pathname?: string
   }>()
   const { state: authState } = $derived(authStore)
   let menuOpen = $state(false)
@@ -58,7 +58,7 @@
             href={item.href}
             class="px-4 py-2.5 text-sm font-medium rounded-md mx-2 transition-all
             hover:bg-[#f3f4f6] hover:text-[#6e4ff7]
-            {pathname === item.href ? 'text-[#6e4ff7] underline underline-offset-4 font-semibold' : ''}" 
+            {pathname === item.href ? 'text-[#6e4ff7] underline underline-offset-4 font-semibold' : ''}"
           >
             {item.text}
           </a>

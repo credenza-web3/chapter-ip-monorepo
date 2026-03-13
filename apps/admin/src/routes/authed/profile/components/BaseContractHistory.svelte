@@ -83,7 +83,7 @@
           </tr>
         </thead>
         <tbody>
-          {#each events as event}
+          {#each events as event (event.transactionHash)}
             <tr>
               <td>
                 {event.fragment?.name}
@@ -101,7 +101,7 @@
   {/if}
 
   <button
-    class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+    class="px-4 py-2 bg-[#6F4EF7] text-white rounded disabled:opacity-50"
     onclick={loadUntilFound}
     disabled={isLoading}
   >
