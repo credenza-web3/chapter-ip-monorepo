@@ -73,7 +73,7 @@
 <div class="space-y-4">
   {#if events.length > 0}
     <div class="overflow-x-auto w-full">
-      <table class="table table-zebra w-full text-sm ">
+      <table class="table table-zebra w-full text-sm">
         <thead>
           <tr>
             <th>Event</th>

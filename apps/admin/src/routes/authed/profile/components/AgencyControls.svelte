@@ -3,9 +3,7 @@
   import { agencyStore } from '$lib/stores/agency.svelte.js'
   import AgencyFeeInput from '$lib/components/AgencyFeeInput.svelte'
 
-  let {
-    hideSaveButtons = false,
-  } = $props<{
+  let { hideSaveButtons = false } = $props<{
     contentContract?: any
     userAddress: string
     hideSaveButtons?: boolean

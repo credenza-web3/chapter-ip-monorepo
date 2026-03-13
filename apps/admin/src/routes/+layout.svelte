@@ -26,7 +26,7 @@
 <div class="min-h-screen overflow-x-hidden flex flex-col bg-[#f9fafb] text-[#202225]">
   <Header {authStore} {menuItems} pathname={page.url.pathname}>
     <div class="flex items-center w-full justify-between md:pl-15 pl-2 md:pr-5 pr-2 space-x-2">
-        <NavLink href="/authed/files" icon={DashboardIcon}>Dashboard</NavLink>
+      <NavLink href="/authed/files" icon={DashboardIcon}>Dashboard</NavLink>
       <div class="flex items-center md:gap-4 gap-2">
         <NavLink href="/authed/upload" icon={UploadIcon}>Upload</NavLink>
         <a
