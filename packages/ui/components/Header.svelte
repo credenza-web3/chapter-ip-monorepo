@@ -30,7 +30,7 @@
 
 <header
   bind:this={headerRef}
-  class="mx-auto w-full flex items-center justify-between md:px-10 px-4 py-4 border-b border-[#eef2f6] bg-[#f9fafb] relative text-black"
+  class="mx-auto w-full flex items-center justify-between md:px-10 md:px-4 px-4 py-4 border-b border-[#eef2f6] bg-[#f9fafb] relative text-black"
 >
   <a href="/">
     <img src={Logo} alt="Logo" class="h-[32px]" />
@@ -45,7 +45,7 @@
         menuOpen = !menuOpen
       }}
     >
-      <img src={Dots} alt="Menu" class="size-4" />
+      <img src={Dots} alt="Menu" class="size-6" />
     </button>
   </div>
   {#if menuOpen}

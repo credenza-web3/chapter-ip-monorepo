@@ -73,7 +73,7 @@
 <div class="space-y-4">
   {#if events.length > 0}
     <div class="overflow-x-auto w-full">
-      <table class="table table-zebra w-full text-sm">
+      <table class="table table-zebra w-full text-sm ">
         <thead>
           <tr>
             <th>Event</th>
@@ -88,7 +88,7 @@
               <td>
                 {event.fragment?.name}
               </td>
-              <td class="break-all">{event.transactionHash}</td>
+              <td>{event.transactionHash}</td>
               <td>
                 {ethers.formatUnits(getAmount(event.args), 6)}
               </td>
@@ -109,7 +109,7 @@
   </button>
 
   <button
-    class="px-4 py-2 bg-red-700 text-white rounded"
+    class="px-4 py-2 border border-red-600 rounded text-red-600"
     onclick={() => (stopLoading = true)}
     class:hidden={stopLoading || !isLoading}
   >

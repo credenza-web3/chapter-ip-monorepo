@@ -1,20 +1,24 @@
-<div class=" text-gray-900 flex justify-center p-8">
-  <div class="w-full max-w-5xl bg-white border border-gray-200 rounded-3xl p-10 shadow-xl">
+<div class=" text-gray-900 flex justify-center">
+  <div class="w-full max-w-5xl bg-white border border-gray-200 rounded-3xl md:p-10 p-5 shadow-xl">
     <!-- Header -->
-    <header class="flex items-start gap-6 mb-10">
+    <header class="flex items-start gap-6 md:mb-10">
       <div
-        class="w-16 h-16 rounded-xl bg-linear-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg font-bold text-2xl text-white"
+        class="min-w-16 min-h-16 rounded-xl bg-linear-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg font-bold text-2xl text-white"
       >
         IP
       </div>
       <div>
-        <h1 class="text-3xl font-bold tracking-tight">Welcome to the Creator Dashboard</h1>
-        <p class="mt-2 text-gray-600 max-w-2xl">
+        <h1 class="md:text-3xl text-2xl font-bold tracking-tight">Welcome to the Creator Dashboard</h1>
+        <p class="mt-2 text-gray-600 max-w-2xl hidden">
           Manage your digital products: upload files, set pricing, define sale types. All tools are available from the
           navigation above.
         </p>
       </div>
     </header>
+    <p class=" text-gray-600 max-w-2xl md:hidden my-6">
+      Manage your digital products: upload files, set pricing, define sale types. All tools are available from the
+      navigation above.
+    </p>
 
     <!-- Cards -->
     <section class="grid grid-cols-1 sm:grid-cols-2 gap-6">

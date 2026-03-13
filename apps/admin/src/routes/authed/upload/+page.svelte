@@ -56,12 +56,12 @@
   }
 </script>
 
-<div class="p-10 min-h-xl card bg-base-100 shadow-md rounded-3xl">
+<div class="md:p-10 p-5 min-h-xl card bg-base-100 shadow-md rounded-3xl">
   <div class="mb-12 text-left">
     <h1 class="text-2xl font-semibold text-[#202225]">Upload</h1>
   </div>
 
-  <div class="mt-6 flex flex-col border-b-2 border-dashed border-gray-300 pb-6 w-1/2">
+  <div class="mt-6 flex flex-col border-b-2 border-dashed border-gray-300 pb-6 max-w-2xl">
     <h2 class="font-semibold mb-3">Details</h2>
 
     <input

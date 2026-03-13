@@ -21,14 +21,14 @@
   })
 </script>
 
-<div class="min-h-xl flex items-center justify-center bg-white p-10 w-full">
+<div class="min-h-xl flex items-center justify-center bg-white md:p-10 p-5 w-full">
   <div class="w-full">
     <div class="mb-12 text-left">
       <h1 class="text-2xl font-semibold">Profile</h1>
     </div>
 
     <div class="flex flex-col gap-6 w-full justify-between">
-      <div class="max-w-1/2 gap-2 bg-[#f9fafb] p-6 rounded-lg border-[#dddddd] border">
+      <div class="max-w-2xl gap-2 bg-[#f9fafb] p-6 rounded-lg border-[#dddddd] border">
         <h2 class="font-semibold mb-4">Your blockchain address</h2>
         <div
           class="flex justify-between items-center text-sm font-mono bg-white p-2 rounded break-all border-2 border-[#e5e5e5]"
@@ -59,7 +59,7 @@
           </div>
         {/if}
       </div>
-      <div class="flex flex-col items-end gap-2 w-1/2 mt-6.25">
+      <div class="flex flex-col items-end gap-2 max-w-2xl mt-6.25">
         <EditPublisher onUpdate={profileSave.updatePublisherData} />
         <SubscriptionPriceInput onUpdate={profileSave.updateSubscriptionPrice} hideSaveButton={true} />
       </div>
