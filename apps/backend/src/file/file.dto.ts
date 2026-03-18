@@ -18,6 +18,14 @@ export const uploadMetadataOutputSchema = z.object({
 })
 export type TUploadMetadataOutput = z.infer<typeof uploadMetadataOutputSchema>
 
+export const createUserFileUploadUrlInputSchema = z.object({
+  filename: z.string(),
+  mimetype: z.string(),
+  extension: z.string().optional(),
+  bucket: z.enum(['userfiles']).default('userfiles'),
+})
+export type TCreateUserFileUploadUrlInput = z.infer<typeof createUserFileUploadUrlInputSchema>
+
 export const createContentUploadUrlInputSchema = z.object({
   tokenId: z.string(),
   mimetype: z.string(),
