@@ -16,6 +16,8 @@ import {
   uploadMetadataOutputSchema,
   type TUploadMetadataInput,
   type TUploadMetadataOutput,
+  createUserFileUploadUrlInputSchema,
+  type TCreateUserFileUploadUrlInput,
   createContentUploadUrlInputSchema,
   createContentUploadUrlOutputSchema,
   type TCreateContentUploadUrlInput,
@@ -45,6 +47,29 @@ export class FileRouter {
     private readonly commonContentService: CommonContentService,
     private readonly commonLicenseService: CommonLicenseService,
   ) {}
+
+  @UseMiddlewares(AuthMiddleware)
+  @Mutation({
+    input: createUserFileUploadUrlInputSchema,
+    output: createContentUploadUrlOutputSchema,
+  })
+  async createUserFileUploadUrl(
+    @Ctx() ctx: TAppContextWithTokenPayload,
+    @Input() input: TCreateUserFileUploadUrlInput,
+  ): Promise<TCreateContentUploadUrlOutput> {
+    const ext = input.extension ? input.extension.replaceAll('.', '') : extension(input.mimetype)
+    if (!ext) {
+      throw new TRPCError({ message: 'Invalid mimetype', code: 'BAD_REQUEST' })
+    }
+
+    const key = `${ctx.authTokenPayload.sub}/${input.filename}.${ext}`
+    const url = await this.fileService.createUploadUrl({
+      Bucket: this.fileService.getBucketName(input.bucket),
+      Key: key,
+      ContentType: input.mimetype,
+    })
+    return { url, key }
+  }
 
   @UseMiddlewares(AuthMiddleware)
   @Mutation({
