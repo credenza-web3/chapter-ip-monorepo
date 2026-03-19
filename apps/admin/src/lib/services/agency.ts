@@ -25,7 +25,6 @@ export async function savePublisherAgencyFee(contentContract: ethers.Contract, u
     const agencyFee = agencyStore.agencyFee ?? 0
     const tx = await contentContract.setPublisherAgencyFee.populateTransaction(userAddress, agencyFee)
     await sendTx(tx)
-    notify('Agency fee saved successfully', ToastType.SUCCESS)
     return true
   } catch (error) {
     console.error(error)
