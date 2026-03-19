@@ -1,5 +1,6 @@
 <script lang="ts">
   import { uploadStore } from '../stores/upload-store'
+  import Img from '$lib/assets/img.svg'
 
   let imageInput: HTMLInputElement | null = $state(null)
   let imageUrl = $state<string | null>(null)
@@ -37,16 +38,19 @@
   </label>
   <span class="text-xs text-[#747474]"> 600px by 600px .jpg, .gif, .png images will work best </span>
   <div class="flex items-start gap-4 mt-5 flex-col">
-    {#if $uploadStore.uploadedImage}
-      <div class="flex flex-col gap-3">
-        <!-- Image Preview -->
-        {#if imageUrl}
-          <div class="relative w-32 h-32 rounded-lg overflow-hidden border border-gray-200">
-            <img src={imageUrl} alt="" class="w-full h-full object-cover" />
-          </div>
-        {/if}
-      </div>
-    {/if}
+    <!-- Image Preview -->
+    <div
+      class="relative w-32 h-32 rounded-lg overflow-hidden bg-white flex items-center justify-center"
+      class:border-2={!imageUrl}
+      class:border-dashed={!imageUrl}
+      class:border-[#dedede]={!imageUrl}
+    >
+      <img
+        src={imageUrl ? imageUrl : Img}
+        alt=""
+        class={imageUrl ? 'w-full h-full object-cover' : 'w-4.5 h-4.5 object-contain'}
+      />
+    </div>
     <button
       id="image-select"
       class="text-[#6e4ff7] text-xs font-medium cursor-pointer"

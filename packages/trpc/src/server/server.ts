@@ -15,7 +15,7 @@ const t = initTRPC.create();
 const publicProcedure = t.procedure;
 import { healthOutputSchema } from "../../../../apps/backend/src/app.dto";
 import { refreshTokenInputSchema, authTokenOutputSchema, exchangeCodeInputSchema } from "../../../../apps/backend/src/auth/auth.dto";
-import { createContentUploadUrlInputSchema, createContentUploadUrlOutputSchema, registerContentInputSchema, registerContentOutputSchema, findContentInputSchema, findContentOutputSchema, getContentLinkInputSchema, getContentLinkOutputSchema, uploadMetadataInputSchema, uploadMetadataOutputSchema } from "../../../../apps/backend/src/file/file.dto";
+import { createUserFileUploadUrlInputSchema, createContentUploadUrlOutputSchema, createContentUploadUrlInputSchema, registerContentInputSchema, registerContentOutputSchema, findContentInputSchema, findContentOutputSchema, getContentLinkInputSchema, getContentLinkOutputSchema, uploadMetadataInputSchema, uploadMetadataOutputSchema } from "../../../../apps/backend/src/file/file.dto";
 import { findBlockedLicensesInputSchema, findBlockedLicensesOutputSchema } from "../../../../apps/backend/src/license/../common/license/blocked-license/blocked-license.dto";
 import { setPublisherInputSchema, setPublisherOutputSchema, getPublisherDataInputSchema, getPublisherDataOutputSchema, findPublishersInputSchema, findPublishersOutputSchema, mintContentNftTokenInputSchema, mintContentNftTokenOutputSchema } from "../../../../apps/backend/src/publisher/publisher.dto";
 
@@ -42,6 +42,10 @@ const appRouter = t.router({
       .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
     }),
   files: t.router({
+    createUserFileUploadUrl: publicProcedure
+      .input(createUserFileUploadUrlInputSchema)
+      .output(createContentUploadUrlOutputSchema)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     createContentUploadUrl: publicProcedure
       .input(createContentUploadUrlInputSchema)
       .output(createContentUploadUrlOutputSchema)
