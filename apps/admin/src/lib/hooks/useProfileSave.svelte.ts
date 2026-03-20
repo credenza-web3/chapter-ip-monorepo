@@ -7,6 +7,7 @@ import { ethers, getSigner } from '@repo/fe-evm-provider'
 import { abi as membership_abi } from '@credenza3/contracts/artifacts/ChapterIpMembershipContract.json'
 import { authStore } from '$lib/auth'
 import { forwardTransaction } from '@repo/fe-services'
+import { uploadFileToBucket } from '../../routes/authed/upload/services'
 
 const FIAT_PRICE_MULTIPLIER = 100
 const TOKEN_PRICE_MULTIPLIER = 10 ** 6
@@ -71,10 +72,10 @@ export function useProfileSave(trpcClient: any, contentContract: ethers.Contract
   // Check if any fields have changed
   const hasChanges = $derived(
     profileData.publisherName !== originalData.publisherName ||
-      profileData.avatarUrl !== originalData.avatarUrl ||
-      profileData.subscriptionPrice !== originalData.subscriptionPrice ||
-      agencyStore.hasAddressChanged ||
-      agencyStore.hasFeeChanged,
+    profileData.avatarUrl !== originalData.avatarUrl ||
+    profileData.subscriptionPrice !== originalData.subscriptionPrice ||
+    agencyStore.hasAddressChanged ||
+    agencyStore.hasFeeChanged,
   )
 
   // Update functions for child components
@@ -97,26 +98,41 @@ export function useProfileSave(trpcClient: any, contentContract: ethers.Contract
 
     try {
       const savePromises: Promise<SaveResult>[] = []
-
       // Save publisher info if changed
       if (
         profileData.publisherName !== originalData.publisherName ||
         profileData.avatarUrl !== originalData.avatarUrl
       ) {
-        const publisherPromise = savePublisher(trpcClient, profileData.publisherName, profileData.avatarUrl)
-        savePromises.push(
-          publisherPromise.then((result: any) => {
-            if (result.success) {
-              publisherStore.setData({
-                title: profileData.publisherName,
-                avatarUrl: profileData.avatarUrl,
-              })
-              originalData.publisherName = profileData.publisherName
-              originalData.avatarUrl = profileData.avatarUrl
-            }
-            return result as SaveResult
-          }),
-        )
+        const publisherPromise = (async (): Promise<SaveResult> => {
+          let avatarUrl = profileData.avatarUrl
+
+          if (publisherStore.avatarFile) {
+            const file = publisherStore.avatarFile
+            const ext = file.name.split('.').pop() || ''
+
+            const { url, key } = await trpcClient.files.createUserFileUploadUrl.mutate({
+              filename: 'avatar',
+              mimetype: file.type,
+              extension: ext,
+              bucket: 'userfiles',
+            })
+            await uploadFileToBucket(file, url)
+
+            // avatarUrl = url.split('?')[0]
+
+            avatarUrl = `${import.meta.env.VITE_USERFILES_BUCKET_HOST}/${key}`
+          }
+          const result = await savePublisher(trpcClient, profileData.publisherName, avatarUrl)
+          if (result.success) {
+            publisherStore.setData({ title: profileData.publisherName, avatarUrl })
+            publisherStore.clearAvatarFile()
+            originalData.publisherName = profileData.publisherName
+            originalData.avatarUrl = avatarUrl
+            profileData.avatarUrl = avatarUrl
+          }
+          return result as SaveResult
+        })()
+        savePromises.push(publisherPromise)
       }
 
       // Save agency address if changed

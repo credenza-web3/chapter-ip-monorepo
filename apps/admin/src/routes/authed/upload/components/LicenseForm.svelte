@@ -13,7 +13,7 @@
   }
 </script>
 
-<fieldset class="fieldset bg-base-100 rounded-box p-4 max-w-lg">
+<fieldset class="fieldset bg-base-100 rounded-box p-4 max-w-md">
   <legend class="fieldset-legend">Choose license type and pricing</legend>
   <label class="label justify-between cursor-pointer">
     <div class="space-x-2 flex items-center">
@@ -22,7 +22,8 @@
     </div>
 
     <div
-      class="inline-flex items-center py-2.5 pr-2 pl-3 rounded-mb border border-gray-200 bg-gray-50 transition-all duration-200 w-20"
+      class="inline-flex items-center py-2.5 pr-2 pl-3 rounded border border-gray-200 bg-gray-50 transition-all duration-200 max-w-30 md:max-w-none"
+      class:opacity-40={!$uploadStore.isLifetimeLicense}
     >
       <input
         type="number"
@@ -41,14 +42,15 @@
       <span class="font-medium text-xs text-black">One Time License</span>
     </div>
     <div
-      class="inline-flex items-center py-2.5 pr-2 pl-3 rounded-mb border border-gray-200 bg-gray-50 transition-all duration-200 w-20"
+      class="inline-flex items-center py-2.5 pr-2 pl-3 rounded border border-gray-200 bg-gray-50 transition-all duration-200 max-w-30 md:max-w-none"
+      class:opacity-40={!$uploadStore.isOneTimeLicense}
     >
       <input
         type="number"
         value={$uploadStore.oneTimePrice}
         oninput={handleOneTimePriceChange}
         placeholder="100"
-        class="bg-transparent border-none outline-none w-full text-sm placeholder-gray-300"
+        class="bg-transparent outline-none w-full text-sm placeholder-gray-300"
         disabled={!$uploadStore.isOneTimeLicense}
       />
       <span class="text-[10px] font-medium text-gray-400 shrink-0 select-none"> USD </span>

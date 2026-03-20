@@ -13,7 +13,7 @@
     type="text"
     bind:value
     placeholder="Enter name"
-    class="input w-full mb-3 focus:border-[#988cff] focus:outline-none focus:ring-0"
+    class="input w-full focus:border-[#988cff] focus:outline-none focus:ring-0"
     required
   />
 </div>

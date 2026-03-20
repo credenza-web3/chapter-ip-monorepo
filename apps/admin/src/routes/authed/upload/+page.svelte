@@ -81,7 +81,7 @@
   </div>
   <FileUpload />
 
-  <div class="mt-8 space-y-4">
+  <div class="mt-8 space-y-4 md:space-y-17.5">
     <LicenseForm />
 
     <div class="flex gap-10 mt-10">

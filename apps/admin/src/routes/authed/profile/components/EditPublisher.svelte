@@ -1,6 +1,5 @@
 <script lang="ts">
   import PublisherNameInput from '$lib/components/PublisherNameInput.svelte'
-  import PublisherAvatarInput from '$lib/components/PublisherAvatarInput.svelte'
   import { publisherStore } from '$lib/stores/publisher.svelte'
 
   let { onUpdate, onPriceUpdate } = $props<{
@@ -9,7 +8,8 @@
   }>()
 
   let publisherName = $state(publisherStore.title || '')
-  let avatarUrl = $state(publisherStore.avatarUrl || '')
+
+  let avatarUrl = publisherStore.avatarUrl || ''
 
   // Notify parent of changes
   $effect(() => {
@@ -26,10 +26,9 @@
   })
 </script>
 
-<div class="mb-6 flex flex-col gap-2 w-full">
-  <h2 class="text-xl font-semibold text-gray-900">Details</h2>
+<div class="flex flex-col gap-2 w-full">
+  <h2 class="font-semibold text-base text-[#202225]">Details</h2>
   <div class="w-full">
     <PublisherNameInput bind:value={publisherName} />
-    <PublisherAvatarInput bind:value={avatarUrl} />
   </div>
 </div>

@@ -33,10 +33,10 @@
 
 <div class="mb-4 mt-10">
   <label for="image-select" class="block font-semibold"
-    >Select Cover Image
+    >Select Cover Image (optional)
     <span class="text-sm font-medium">(Optional)</span>
   </label>
-  <span class="text-xs text-[#747474]"> 600px by 600px .jpg, .gif, .png images will work best </span>
+  <span class="text-xs text-[#747474]">600px by 600px .jpg, .gif, .png images will work best</span>
   <div class="flex items-start gap-4 mt-5 flex-col">
     <!-- Image Preview -->
     <div
