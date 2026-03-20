@@ -5,7 +5,6 @@
   import { savePublisherAgencyAddress, savePublisherAgencyFee } from '$lib/services/agency'
   import AgencyFeeInput from '$lib/components/AgencyFeeInput.svelte'
   import PublisherNameInput from '$lib/components/PublisherNameInput.svelte'
-  import PublisherAvatarInput from '$lib/components/PublisherAvatarInput.svelte'
   import { savePublisher } from '$lib/services/publisher'
   import { onMount } from 'svelte'
   import { publisherStore } from '$lib/stores/publisher.svelte.js'
@@ -59,7 +58,6 @@
 
     <form onsubmit={handleSubmit} class="space-y-6">
       <PublisherNameInput bind:value={publisherName} />
-      <PublisherAvatarInput bind:value={avatarUrl} />
 
       <div class="flex-1 max-w-md">
         <h2 class="text-lg font-medium text-gray-900 mb-4">Agency Settings</h2>
