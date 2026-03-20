@@ -1,6 +1,7 @@
 class PublisherStore {
   title = $state('')
   avatarUrl = $state('')
+  avatarFile = $state<File | null>(null)
   id = $state('')
   sub = $state('')
   evmAddress = $state('')
@@ -11,6 +12,18 @@ class PublisherStore {
     this.id = data.id || this.id
     this.sub = data.sub || this.sub
     this.evmAddress = data.evmAddress || this.evmAddress
+  }
+
+  setAvatarFile(file: File) {
+    this.avatarFile = file
+    this.avatarUrl = URL.createObjectURL(file)
+  }
+
+  clearAvatarFile() {
+    if (this.avatarUrl?.startsWith('blob:')) {
+      URL.revokeObjectURL(this.avatarUrl)
+    }
+    this.avatarFile = null
   }
 }
 
