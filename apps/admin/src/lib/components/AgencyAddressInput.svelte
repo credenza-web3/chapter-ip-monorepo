@@ -17,7 +17,7 @@
     onchange={handleAddressChange}
     placeholder="Enter agency address (0x...)"
     class="w-full bg-white px-4 py-3 border rounded-md placeholder-gray-400 focus:outline-none
-     transition-colors font-medium text-xs text-[#707070] {!addressTouched ||agencyStore.isValidAddress
+     transition-colors font-medium text-xs text-[#707070] {!addressTouched || agencyStore.isValidAddress
       ? 'border-gray-300 focus:border-gray-900'
       : 'border-red-500 focus:border-red-600'}"
   />

@@ -72,10 +72,10 @@ export function useProfileSave(trpcClient: any, contentContract: ethers.Contract
   // Check if any fields have changed
   const hasChanges = $derived(
     profileData.publisherName !== originalData.publisherName ||
-    profileData.avatarUrl !== originalData.avatarUrl ||
-    profileData.subscriptionPrice !== originalData.subscriptionPrice ||
-    agencyStore.hasAddressChanged ||
-    agencyStore.hasFeeChanged,
+      profileData.avatarUrl !== originalData.avatarUrl ||
+      profileData.subscriptionPrice !== originalData.subscriptionPrice ||
+      agencyStore.hasAddressChanged ||
+      agencyStore.hasFeeChanged,
   )
 
   // Update functions for child components
