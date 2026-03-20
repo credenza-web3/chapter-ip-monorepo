@@ -2,20 +2,15 @@
   import AgencyAddressInput from '$lib/components/AgencyAddressInput.svelte'
   import { agencyStore } from '$lib/stores/agency.svelte.js'
   import AgencyFeeInput from '$lib/components/AgencyFeeInput.svelte'
-  import type { ethers } from '@repo/fe-evm-provider'
 
-  let {
-    contentContract,
-    userAddress,
-    hideSaveButtons = false,
-  } = $props<{
+  let { hideSaveButtons = false } = $props<{
     contentContract?: any
     userAddress: string
     hideSaveButtons?: boolean
   }>()
 </script>
 
-<div class="w-1/2 mt-10 bg-[#f9fafb] p-6 rounded-lg border-[#dddddd] border">
+<div class="max-w-2xl mt-10 bg-[#f9fafb] p-6 rounded-lg border-[#dddddd] border">
   <h2 class="font-semibold mb-4">Agency</h2>
   <div class="flex flex-col gap-2 mt-8 w-full">
     <div class="flex items-end gap-2">

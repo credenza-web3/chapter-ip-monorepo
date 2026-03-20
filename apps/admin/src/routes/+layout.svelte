@@ -3,10 +3,11 @@
   import favicon from '$lib/assets/credenza.png'
   import { Toast, Header, Footer } from '@repo/ui-components'
   import { authStore } from '$lib'
-  import DashboardIcon from '$lib/components/DashboardIcon.svelte'
-  import UploadIcon from '$lib/components/UploadIcon.svelte'
+  import DashboardIcon from '$lib/components/icons/DashboardIcon.svelte'
+  import UploadIcon from '$lib/components/icons/UploadIcon.svelte'
   import NavLink from '$lib/components/NavLink.svelte'
   import { publisherStore } from '$lib/stores/publisher.svelte'
+  import { page } from '$app/state'
 
   let { children } = $props()
   const menuItems = [
@@ -23,13 +24,10 @@
 </svelte:head>
 <Toast />
 <div class="min-h-screen overflow-x-hidden flex flex-col bg-[#f9fafb] text-[#202225]">
-  <Header {authStore} {menuItems}>
-    <div class="flex items-center w-full justify-between pl-15 pr-5">
-      <div>
-        <NavLink href="/authed/files" icon={DashboardIcon}>Dashboard</NavLink>
-      </div>
-
-      <div class="flex items-center gap-4">
+  <Header {authStore} {menuItems} pathname={page.url.pathname}>
+    <div class="flex items-center w-full justify-between md:pl-15 pl-2 md:pr-5 pr-2 space-x-2">
+      <NavLink href="/authed/files" icon={DashboardIcon}>Dashboard</NavLink>
+      <div class="flex items-center md:gap-4 gap-2">
         <NavLink href="/authed/upload" icon={UploadIcon}>Upload</NavLink>
         <a
           href="/authed/profile"

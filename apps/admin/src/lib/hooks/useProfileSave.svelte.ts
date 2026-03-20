@@ -25,14 +25,14 @@ export function useProfileSave(trpcClient: any, contentContract: ethers.Contract
   let loading = $state(false)
 
   // Profile data state
-  let profileData = $state<ProfileData>({
+  const profileData = $state<ProfileData>({
     publisherName: publisherStore.title || '',
     avatarUrl: publisherStore.avatarUrl || '',
     subscriptionPrice: 0,
   })
 
   // Original values for change detection
-  let originalData = $state<ProfileData>({
+  const originalData = $state<ProfileData>({
     publisherName: publisherStore.title || '',
     avatarUrl: publisherStore.avatarUrl || '',
     subscriptionPrice: 0,
@@ -69,7 +69,7 @@ export function useProfileSave(trpcClient: any, contentContract: ethers.Contract
   }
 
   // Check if any fields have changed
-  let hasChanges = $derived(
+  const hasChanges = $derived(
     profileData.publisherName !== originalData.publisherName ||
       profileData.avatarUrl !== originalData.avatarUrl ||
       profileData.subscriptionPrice !== originalData.subscriptionPrice ||

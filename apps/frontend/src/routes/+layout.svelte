@@ -30,7 +30,7 @@
       </ul>
     </nav>
   </Header>
-  <main class="space-y-0 flex-1 md:p-6 p-2">
+  <main class="space-y-0 flex-1 p-6 p-2">
     {@render children?.()}
   </main>
   <Footer />

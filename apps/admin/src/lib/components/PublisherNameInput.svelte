@@ -7,6 +7,7 @@
 </script>
 
 <div>
+  <label for="publisher-name" class="block text-sm mb-2 font-medium">Publisher Name</label>
   <input
     id="publisher-name"
     type="text"

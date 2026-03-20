@@ -1,6 +1,6 @@
 <script lang="ts">
   import { uploadStore } from '../stores/upload-store'
-  import UploadIcon from '$lib/components/UploadIcon.svelte'
+  import UploadIcon from '$lib/components/icons/UploadIcon.svelte'
 
   let isOver = $state(false)
   let fileInput: HTMLInputElement | null = $state(null)
@@ -51,7 +51,7 @@
 </script>
 
 <div
-  class={`w-1/2 mt-10 bg-white h-50 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-gray-500 text-sm cursor-pointer transition ${
+  class={`max-w-2xl mt-10 bg-white h-50 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-gray-500 text-sm cursor-pointer transition ${
     isOver ? 'border-primary bg-white' : 'border-gray-300'
   }`}
   role="button"

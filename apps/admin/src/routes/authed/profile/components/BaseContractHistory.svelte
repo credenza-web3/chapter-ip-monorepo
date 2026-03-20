@@ -83,12 +83,12 @@
           </tr>
         </thead>
         <tbody>
-          {#each events as event}
+          {#each events as event (event.transactionHash)}
             <tr>
               <td>
                 {event.fragment?.name}
               </td>
-              <td class="break-all">{event.transactionHash}</td>
+              <td>{event.transactionHash}</td>
               <td>
                 {ethers.formatUnits(getAmount(event.args), 6)}
               </td>
@@ -101,7 +101,7 @@
   {/if}
 
   <button
-    class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+    class="px-4 py-2 bg-[#6F4EF7] text-white rounded disabled:opacity-50"
     onclick={loadUntilFound}
     disabled={isLoading}
   >
@@ -109,7 +109,7 @@
   </button>
 
   <button
-    class="px-4 py-2 bg-red-700 text-white rounded"
+    class="px-4 py-2 border border-red-600 rounded text-red-600"
     onclick={() => (stopLoading = true)}
     class:hidden={stopLoading || !isLoading}
   >
