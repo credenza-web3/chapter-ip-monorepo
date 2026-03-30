@@ -14,19 +14,19 @@
 
   let recentFiles = $state<RecentFile[]>([])
 
-  onMount(() => {
-    recentFiles = loadRecentFiles()
+  onMount(async () => {
+    recentFiles = await loadRecentFiles()
   })
 </script>
 
-{#if recentFiles.length > 0}
+{#if recentFiles?.length > 0}
   <div class="mt-12 mb-6">
     <div class="flex gap-2.5 items-center mb-2.5">
       <h2 class="text-[18px] xfont-semibold">Recents</h2>
       <img src={CodeImg} alt="" class="" />
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {#each recentFiles as file (file.id)}
+      {#each recentFiles as file, i (i)}
         <div
           class="card bg-white border border-red-50 cursor-pointer flex flex-row rounded-md"
           role="button"

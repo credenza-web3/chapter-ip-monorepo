@@ -42,7 +42,7 @@
 
       notify('File uploaded successfully', ToastType.SUCCESS)
       uploadStore.reset()
-      goto('/authed/files')
+      goto(`/authed/files`)
     } catch (error) {
       console.error('Error uploading file:', error)
       let errorMessage = 'Failed to upload file.'

@@ -18,7 +18,7 @@
     min="0"
     max="100"
     step="0.01"
-    class="w-1/5 text-xs font-poppins font-medium text-[#707070] px-4 py-3 border bg-white border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:border-gray-900 transition-colors {!feeTouched ||
+    class="w-1/5 text-xs font-poppins font-medium text-[#707070] px-2.5 py-3 border bg-white border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:border-gray-900 transition-colors {!feeTouched ||
     agencyStore.isFeeValid
       ? 'border-gray-300 focus:border-gray-900'
       : 'border-red-500 focus:border-red-600'}"
