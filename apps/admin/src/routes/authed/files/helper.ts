@@ -9,13 +9,7 @@ export interface RecentFile {
   image?: string
   openedAt: string
 }
-export const addToRecent = async (
-  fileId: string,
-  title: string,
-  description: string,
-  image?: string
-) => {
-
+export const addToRecent = async (fileId: string, title: string, description: string, image?: string) => {
   if (typeof localStorage === 'undefined') {
     return
   }
@@ -33,7 +27,7 @@ export const addToRecent = async (
   }
 
   let existing: RecentFile[] = JSON.parse(localStorage.getItem('recentFiles') || '[]')
-  existing = existing.filter(f => !(f.id === fileId && f.publisherId === publisherId))
+  existing = existing.filter((f) => !(f.id === fileId && f.publisherId === publisherId))
   existing.unshift(recent)
   existing = existing.slice(0, 3)
 
@@ -48,7 +42,7 @@ export const loadRecentFiles = async () => {
   if (!publisherId) return [] as RecentFile[]
 
   const all: RecentFile[] = JSON.parse(stored)
-  return all.filter(f => f.publisherId === publisherId)
+  return all.filter((f) => f.publisherId === publisherId)
 }
 
 export const getFilePricing = async (contentContract: ethers.Contract, tokenId: string) => {

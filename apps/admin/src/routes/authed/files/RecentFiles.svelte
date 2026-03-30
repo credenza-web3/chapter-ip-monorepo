@@ -14,7 +14,7 @@
 
   let recentFiles = $state<RecentFile[]>([])
 
-  onMount(async() => {
+  onMount(async () => {
     recentFiles = await loadRecentFiles()
   })
 </script>
