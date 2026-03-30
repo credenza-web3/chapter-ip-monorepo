@@ -8,7 +8,7 @@
     if (target.value === '') return
     const value = Math.max(1, Number(target.value))
     target.value = String(value)
-    if (target) uploadStore.setLifetimePrice(value)
+    uploadStore.setLifetimePrice(value)
   }
 
   function handleOneTimePriceChange(e: Event) {
