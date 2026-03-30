@@ -4,22 +4,21 @@
 
   function handleLifetimePriceChange(e: Event) {
     const target = e.target as HTMLInputElement
-    if (!target) return
-    let num = Number(target.value)
-    if (isNaN(num)) num = 1
-    const value = Math.max(1, num)
+  if (!target) return
+  if (target.value === '') return
+  const value = Math.max(1, Number(target.value))
+  target.value = String(value)
     if (target) uploadStore.setLifetimePrice(value)
   }
 
   function handleOneTimePriceChange(e: Event) {
-    const target = e.target as HTMLInputElement
-    if (!target) return
-    let num = Number(target.value)
-    if (isNaN(num)) num = 1
-    const value = Math.max(1, num)
-    target.value = String(value)
-    uploadStore.setOneTimePrice(value)
-  }
+  const target = e.target as HTMLInputElement
+  if (!target) return
+  if (target.value === '') return
+  const value = Math.max(1, Number(target.value))
+  target.value = String(value)
+  uploadStore.setOneTimePrice(value)
+}
 </script>
 
 <fieldset class="fieldset bg-base-100 rounded-box p-4 max-w-md">
