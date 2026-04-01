@@ -167,7 +167,7 @@
                 class="input input-bordered w-full"
                 bind:value={fulltimeLicensePrice}
                 min="1"
-                oninput={handlePriceChange(v => fulltimeLicensePrice = v)}
+                oninput={handlePriceChange((v) => (fulltimeLicensePrice = v))}
               />
             </label>
             <button
@@ -196,7 +196,7 @@
                 class="input input-bordered w-full"
                 bind:value={onetimeLicensePrice}
                 min="1"
-                oninput={handlePriceChange(v => onetimeLicensePrice = v)}
+                oninput={handlePriceChange((v) => (onetimeLicensePrice = v))}
               />
             </label>
             <button
