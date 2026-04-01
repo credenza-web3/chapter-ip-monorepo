@@ -21,16 +21,18 @@
     isFulltimeLicensePriceLoading = true
     try {
       const tokenId = data.tokenId
-      await sendTx(
-        await data.contentContract?.setLicensePriceFiat?.populateTransaction(tokenId, '0', fulltimeLicensePrice * 100)!,
+      const fiatTx = await data.contentContract?.setLicensePriceFiat?.populateTransaction(
+        tokenId,
+        '0',
+        fulltimeLicensePrice * 100,
       )
-      await sendTx(
-        await data.contentContract?.setLicensePriceToken?.populateTransaction(
-          tokenId,
-          '0',
-          fulltimeLicensePrice * 10 ** 6,
-        )!,
+      if (fiatTx) await sendTx(fiatTx)
+      const tokenTx = await data.contentContract?.setLicensePriceToken?.populateTransaction(
+        tokenId,
+        '0',
+        fulltimeLicensePrice * 10 ** 6,
       )
+      if (tokenTx) await sendTx(tokenTx)
       notify('Full-time license price updated', ToastType.SUCCESS)
     } catch {
       notify('Failed to update license prices', ToastType.FAIL)
@@ -43,21 +45,31 @@
     isOnetimeLicensePriceLoading = true
     try {
       const tokenId = data.tokenId
-      await sendTx(
-        await data.contentContract?.setLicensePriceFiat?.populateTransaction(tokenId, '2', onetimeLicensePrice * 100)!,
+      const fiatTx = await data.contentContract?.setLicensePriceFiat?.populateTransaction(
+        tokenId,
+        '2',
+        onetimeLicensePrice * 100,
       )
-      await sendTx(
-        await data.contentContract?.setLicensePriceToken?.populateTransaction(
-          tokenId,
-          '2',
-          onetimeLicensePrice * 10 ** 6,
-        )!,
+      if (fiatTx) await sendTx(fiatTx)
+      const tokenTx = await data.contentContract?.setLicensePriceToken?.populateTransaction(
+        tokenId,
+        '2',
+        onetimeLicensePrice * 10 ** 6,
       )
+      if (tokenTx) await sendTx(tokenTx)
       notify('One-time license price updated', ToastType.SUCCESS)
     } catch {
       notify('Failed to update license prices', ToastType.FAIL)
     } finally {
       isOnetimeLicensePriceLoading = false
+    }
+  }
+
+  function handlePriceChange(setter: (v: number) => void) {
+    return (e: Event) => {
+      const target = e.target as HTMLInputElement
+      if (!target?.value) return
+      setter(Math.max(1, Number(target.value)))
     }
   }
 
@@ -154,8 +166,8 @@
                 placeholder="Enter full-time price"
                 class="input input-bordered w-full"
                 bind:value={fulltimeLicensePrice}
-                step="0.01"
-                min="0"
+                min="1"
+                oninput={handlePriceChange((v) => (fulltimeLicensePrice = v))}
               />
             </label>
             <button
@@ -183,8 +195,8 @@
                 placeholder="Enter one-time price"
                 class="input input-bordered w-full"
                 bind:value={onetimeLicensePrice}
-                step="0.01"
-                min="0"
+                min="1"
+                oninput={handlePriceChange((v) => (onetimeLicensePrice = v))}
               />
             </label>
             <button
