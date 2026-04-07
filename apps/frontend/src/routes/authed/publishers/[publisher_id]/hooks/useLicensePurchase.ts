@@ -37,15 +37,19 @@ export const useLicensePurchase = () => {
         data: { hash: string }
         results: { items: Array<{ outcome: { voucher: string; sig: string } }> }
       }) => {
-        if (data.type !== 'STRIPE') {
+        if (data.type !== 'STRIPE' && data.type !== 'CARD') {
           goto('/authed/purchases')
           openConfirm(data.data.hash)
           return
         }
 
         try {
-          if (!data.results.items[0].outcome) return
-          const { voucher, sig } = data.results.items[0].outcome
+          const outcome = data.results?.items?.[0]?.outcome
+          if (!outcome) {
+            goto('/authed/purchases')
+            return
+          }
+          const { voucher, sig } = outcome
 
           const provider = await initProvider(authStore.state.accessToken!)
           const signer = await getSigner()
