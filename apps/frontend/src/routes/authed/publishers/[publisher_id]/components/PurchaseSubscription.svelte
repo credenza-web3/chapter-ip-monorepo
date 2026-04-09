@@ -35,10 +35,12 @@
 
 {#if !hasMembership}
   {#await getMembershipPrice(publisherAddress) then price}
-    <div class="flex items-center w-full justify-between border border-gray-200 p-2 rounded-md my-2">
-      <span>Purchase a subscription to have access to all files.</span>
-      <button class="btn btn-primary" onclick={purchaseSubscription}>Subscribe for ${price}</button>
-    </div>
+    {#if price}
+      <div class="flex items-center w-full justify-between border border-gray-200 p-2 rounded-md my-2">
+        <span>Purchase a subscription to have access to all files.</span>
+        <button class="btn btn-primary" onclick={purchaseSubscription}>Subscribe for ${price}</button>
+      </div>
+    {/if}
   {/await}
 {:else}
   <div class="flex items-center w-full justify-between border border-green-200 p-2 rounded-md my-2">
