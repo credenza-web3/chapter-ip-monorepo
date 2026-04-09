@@ -13,8 +13,8 @@
 
   let fulltimeLicensePrice = $state(0)
   let onetimeLicensePrice = $state(0)
-  let isFulltimeLoaded = $state(true)
-  let isOnetimeLoaded = $state(true)
+  let isFulltimeLoaded = $state(false)
+  let isOnetimeLoaded = $state(false)
   let title = $state(metadata?.title ?? '')
   let description = $state(metadata?.description ?? '')
 
