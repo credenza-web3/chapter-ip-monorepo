@@ -3,18 +3,32 @@
   import InlineEditField from './InlineEditField.svelte'
   import { UploadService } from '../../upload/services/upload.service.js'
   import PricesPanel from './PricesPanel.svelte'
+  import { onMount } from 'svelte'
 
   let { data } = $props()
+  console.log('FileDetails data:', data)
   const { items } = data.paginatedResponse ?? { items: [] }
   const { metadata } = data
   const uploadService = new UploadService()
 
   let fulltimeLicensePrice = $state(0)
   let onetimeLicensePrice = $state(0)
-  let isFulltimeLoaded = $state(false)
-  let isOnetimeLoaded = $state(false)
+  let isFulltimeLoaded = $state(true)
+  let isOnetimeLoaded = $state(true)
   let title = $state(metadata?.title ?? '')
   let description = $state(metadata?.description ?? '')
+
+  onMount(async () => {
+    if (data.contentContract && data.tokenId) {
+      const ft = await data.contentContract.getLicensePriceFiat(data.tokenId, '0')
+      fulltimeLicensePrice = Number(ft) / 100
+      isFulltimeLoaded = true
+
+      const ot = await data.contentContract.getLicensePriceFiat(data.tokenId, '2')
+      onetimeLicensePrice = Number(ot) / 100
+      isOnetimeLoaded = true
+    }
+  })
 
   const CONTENT_CONTRACT = import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS
   const EXPLORER_LINK = 'https://testnet.snowtrace.io/nft'
