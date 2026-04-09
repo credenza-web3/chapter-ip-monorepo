@@ -6,7 +6,6 @@
   import { onMount } from 'svelte'
 
   let { data } = $props()
-  console.log('FileDetails data:', data)
   const { items } = data.paginatedResponse ?? { items: [] }
   const { metadata } = data
   const uploadService = new UploadService()
