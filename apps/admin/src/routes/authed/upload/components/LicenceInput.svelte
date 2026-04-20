@@ -11,7 +11,7 @@
   aria-checked={checked}
   onclick={handleClick}
   class="relative inline-flex items-center w-12 h-5 rounded-full transition-colors duration-300 ease-in-out focus:outline-none {checked
-    ? 'bg-[#6e4ff7]'
+    ? 'bg-primary'
     : 'bg-gray-200'}"
   title="Toggle license type"
 >

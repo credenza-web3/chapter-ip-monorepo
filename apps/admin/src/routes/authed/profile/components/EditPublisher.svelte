@@ -27,7 +27,7 @@
 </script>
 
 <div class="flex flex-col gap-2 w-full">
-  <h2 class="font-semibold text-base text-[#202225]">Details</h2>
+  <h2 class="font-semibold text-base text-dark">Details</h2>
   <div class="w-full">
     <PublisherNameInput bind:value={publisherName} />
   </div>

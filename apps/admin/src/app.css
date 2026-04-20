@@ -9,8 +9,42 @@
     wireframe;
 }
 
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/fonts/DM_Sans/DMSans-VariableFont_opsz,wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/fonts/DM_Sans/DMSans-Italic-VariableFont_opsz,wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Sora';
+  src: url('/fonts/Sora/Sora-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
 @theme {
-  --font-family-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  --color-primary: #6734ff;
+  --color-cream: #f5f1ec;
+  --color-dark: #1a1a2e;
+
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Sora', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* DaisyUI primary override */
+[data-theme='light'],
+[data-theme='dark'],
+[data-theme='wireframe'] {
+  --color-primary: #6734ff;
+  --color-primary-content: #ffffff;
 }
 
 .input.validator:focus-within {
@@ -29,4 +63,22 @@ input[type='number']::-webkit-inner-spin-button {
 
 input[type='number'] {
   -moz-appearance: textfield;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-dark);
+  font-family: var(--font-sans);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading);
+}
+
+button,
+.btn {
+  font-family: var(--font-heading);
 }

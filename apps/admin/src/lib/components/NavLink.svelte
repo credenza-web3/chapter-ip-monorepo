@@ -5,7 +5,7 @@
     children,
     activeColor = '#6e4ff7',
     inactiveBg = '#e4e8eb',
-    inactiveTextColor = '#202225',
+    inactiveTextColor = '#1A1A2E',
     iconSize = '22px',
   } = $props<{
     href: string

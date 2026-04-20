@@ -1,6 +1,5 @@
 <script lang="ts">
   import '../app.css'
-  import favicon from '$lib/assets/credenza.png'
   import { Toast, Header, Footer } from '@repo/ui-components'
   import { authStore } from '$lib'
   import { Modals } from 'svelte-modals'
@@ -14,7 +13,6 @@
 </script>
 
 <svelte:head>
-  <link rel="icon" href={favicon} />
   <title>chapter ip</title>
 </svelte:head>
 <Toast />

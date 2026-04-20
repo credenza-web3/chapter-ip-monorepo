@@ -38,11 +38,11 @@
 <div class="min-h-xl flex items-center justify-center bg-white md:p-10 p-5 w-full">
   <div class="w-full">
     <div class="mb-8.25 text-left">
-      <h1 class="text-[22px] text-[#202225] font-semibold">Profile</h1>
+      <h1 class="text-[22px] text-dark font-semibold">Profile</h1>
     </div>
 
     <div class="flex flex-col gap-6 w-full justify-between">
-      <div class="max-w-2xl gap-2 bg-[#f9fafb] p-6 rounded-lg border-[#dddddd] border">
+      <div class="max-w-2xl gap-2 bg-cream p-6 rounded-lg border-[#dddddd] border">
         <h2 class="font-semibold mb-4">Your blockchain address</h2>
         <div
           class="flex justify-between items-center text-sm font-mono bg-white p-2 rounded break-all border-2 border-[#e5e5e5]"
@@ -61,13 +61,13 @@
           </button>
         </div>
       </div>
-      <div class="text-base font-semibold text-[#202225] mt-12.5">
+      <div class="text-base font-semibold text-dark mt-12.5">
         <span class="block mb-2.5">Profile image</span>
         {#if !!avatarUrl}
           <img src={avatarUrl} alt="avatar" class="w-25 h-25 object-contain" />
           <button
             id="image-select"
-            class="text-[#6e4ff7] text-xs font-medium cursor-pointer"
+            class="text-primary text-xs font-medium cursor-pointer"
             onclick={() => imageInput?.click()}
             type="button"
           >
@@ -76,7 +76,7 @@
         {:else}
           <div class="relative mt-2.5">
             <div
-              class="w-25 h-25 rounded-full border-2 flex items-center justify-center bg-[#6e4ff7] text-white font-semibold text-[56px]"
+              class="w-25 h-25 rounded-full border-2 flex items-center justify-center bg-primary text-white font-semibold text-[56px]"
             >
               {publisherStore.title?.[0]?.toUpperCase() || 'U'}
             </div>
@@ -105,7 +105,7 @@
 
       <div class="flex justify-start py-6">
         <button
-          class="btn btn-outline w-55 text-white bg-[#6e4ff7] disabled:bg-[#f9fafb] disabled:text-black/10 disabled:border-[#6e4ff7]/20"
+          class="btn btn-outline w-55 text-white bg-primary disabled:bg-cream disabled:text-black/10 disabled:border-primary/20"
           onclick={profileSave.handleSaveAll}
           disabled={!profileSave.hasChanges || profileSave.loading}
         >

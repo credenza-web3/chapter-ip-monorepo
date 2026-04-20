@@ -44,7 +44,7 @@
 <div class="relative">
   <button
     type="button"
-    class="{displayClass} cursor-pointer hover:text-[#6e4ff7] transition-colors {isEditing ? 'invisible' : ''} {!value
+    class="{displayClass} cursor-pointer hover:text-primary transition-colors {isEditing ? 'invisible' : ''} {!value
       ? 'text-gray-400'
       : ''} bg-transparent border-none p-0 text-left"
     title="Click to edit"
@@ -55,7 +55,7 @@
 
   {#if isEditing}
     <div
-      class="absolute top-0 left-0 min-w-87.5 w-max z-10 bg-white rounded-lg shadow-lg border border-[#6e4ff7] p-2 flex {multiline
+      class="absolute top-0 left-0 min-w-87.5 w-max z-10 bg-white rounded-lg shadow-lg border border-primary p-2 flex {multiline
         ? 'flex-col'
         : 'items-center'} gap-2"
     >
@@ -69,7 +69,7 @@
         <input type="text" class="input input-bordered input-sm w-full" bind:value={editValue} />
       {/if}
       <div class="flex gap-2">
-        <button class="btn btn-sm bg-[#6e4ff7] border-none text-white w-13" onclick={handleSave} disabled={isSaving}>
+        <button class="btn btn-sm bg-primary border-none text-white w-13" onclick={handleSave} disabled={isSaving}>
           {#if isSaving}
             <span class="loading loading-spinner loading-xs"></span>
           {:else}

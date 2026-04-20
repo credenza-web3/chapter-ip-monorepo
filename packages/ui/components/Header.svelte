@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
-  import Logo from '../assets/ch-logo-light.png'
+  import Logo from '../assets/chapterip-full-logo-dark.svg'
   import Dots from '../assets/dots.svg'
 
   let { authStore, children, menuItems, pathname } = $props<{
@@ -33,7 +33,7 @@
   class="mx-auto w-full flex items-center justify-between md:px-10 md:px-4 px-4 py-4 border-b border-[#eef2f6] bg-[#f9fafb] relative text-black"
 >
   <a href="/" class="flex-shrink-0">
-    <img src={Logo} alt="Logo" class="h-[32px]" />
+    <img src={Logo} alt="Logo" class="w-[130px]" />
   </a>
   {#if authState.accessToken}
     {@render children?.()}

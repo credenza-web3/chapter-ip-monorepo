@@ -58,7 +58,7 @@
 
 <div class="md:p-10 p-5 min-h-xl card bg-base-100 shadow-md rounded-3xl">
   <div class="mb-12 text-left">
-    <h1 class="text-2xl font-semibold text-[#202225]">Upload</h1>
+    <h1 class="text-2xl font-semibold text-dark">Upload</h1>
   </div>
 
   <div class="mt-6 flex flex-col border-b-2 border-dashed border-gray-300 pb-6 max-w-2xl">
@@ -86,7 +86,7 @@
 
     <div class="flex gap-10 mt-10">
       <button
-        class="btn btn-outline w-55 text-white bg-[#6e4ff7] disabled:bg-[#f9fafb] disabled:text-black/10 disabled:border-[#6e4ff7]/20"
+        class="btn btn-outline w-55 text-white bg-primary disabled:bg-cream disabled:text-black/10 disabled:border-primary/20"
         onclick={onSubmitClick}
         disabled={$uploadStore.loading || !$isFormValid || !$uploadStore.uploaded}
       >
