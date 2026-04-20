@@ -30,7 +30,7 @@
         <NavLink href="/authed/upload" icon={UploadIcon}>Upload</NavLink>
         <a
           href="/authed/profile"
-          class="flex items-center justify-center rounded-full btn-primary text-white font-semibold w-7 h-7"
+          class="flex items-center justify-center rounded-full bg-primary text-white font-semibold w-7 h-7"
         >
           {publisherStore.title?.slice(0, 1)?.toUpperCase() || 'U'}
         </a>
