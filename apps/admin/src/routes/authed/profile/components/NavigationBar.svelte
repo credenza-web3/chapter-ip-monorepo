@@ -5,7 +5,7 @@
 </script>
 
 <header class="bg-[#F7F7F7] w-full max-w-2xl">
-  <nav class="flex gap-12 text-xs font-medium text-[#202225] mx-6.25">
+  <nav class="flex gap-12 text-xs font-medium text-dark mx-6.25">
     <button
       type="button"
       class={`cursor-pointer py-3.25 ${activeTab === 'cred' ? active : ''}`}

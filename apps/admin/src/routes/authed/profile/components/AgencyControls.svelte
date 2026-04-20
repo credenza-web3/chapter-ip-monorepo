@@ -10,7 +10,7 @@
   }>()
 </script>
 
-<div class="max-w-2xl bg-[#f9fafb] p-6 rounded-lg border-[#dddddd] border">
+<div class="max-w-2xl bg-cream p-6 rounded-lg border-[#dddddd] border">
   <h2 class="font-semibold mb-4">Agency</h2>
   <div class="flex flex-col gap-2 mt-8 w-full">
     <div class="flex items-end gap-2">

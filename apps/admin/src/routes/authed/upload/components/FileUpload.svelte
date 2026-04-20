@@ -77,7 +77,7 @@
       <span class="mb-2">📄 {$uploadStore.uploaded.name}</span>
     </div>
   {:else}
-    <button class="btn bg-[#6e4ff7] text-white px-2 w-50 mb-2"> Add file </button>
+    <button class="btn bg-primary text-white px-2 w-50 mb-2"> Add file </button>
     <span class="text-xs text-[#707070] font-medium"
       >Max. file size: 1gb | File types supported: .txt, .docx, .mov, .mp4, .nil, and .zip</span
     >

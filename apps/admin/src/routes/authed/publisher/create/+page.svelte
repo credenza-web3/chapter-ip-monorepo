@@ -91,13 +91,13 @@
 
     <form onsubmit={handleSubmit} class="space-y-6">
       <PublisherNameInput bind:value={publisherName} />
-      <div class="text-base font-semibold text-[#202225]">
+      <div class="text-base font-semibold text-dark">
         <span class="block mb-2.5">Profile image</span>
         {#if !!avatarUrl}
           <img src={avatarUrl} alt="avatar" class="w-25 h-25 object-contain" />
           <button
             id="image-select"
-            class="text-[#6e4ff7] text-xs font-medium cursor-pointer"
+            class="text-primary text-xs font-medium cursor-pointer"
             onclick={() => imageInput?.click()}
             type="button"
           >
@@ -106,7 +106,7 @@
         {:else}
           <div class="relative mt-2.5">
             <div
-              class="w-25 h-25 rounded-full border-2 flex items-center justify-center bg-[#6e4ff7] text-white font-semibold text-[56px]"
+              class="w-25 h-25 rounded-full border-2 flex items-center justify-center bg-primary text-white font-semibold text-[56px]"
             >
               {publisherName?.[0]?.toUpperCase() || 'U'}
             </div>

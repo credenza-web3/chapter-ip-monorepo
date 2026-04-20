@@ -50,7 +50,7 @@
 </script>
 
 <div class="flex flex-col w-full mt-16.75">
-  <h1 class="font-semibold text-[22px] text-[#202225] mb-1">Subscription price</h1>
+  <h1 class="font-semibold text-[22px] text-dark mb-1">Subscription price</h1>
   <div class="flex flex-col items-start w-full">
     <label for="subscription-price" class="font-normal text-sm leading-6 text-[#747474] mb-6.25">
       Set a subscription price

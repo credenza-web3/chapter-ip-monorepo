@@ -43,7 +43,7 @@
 
 <div class="p-10 min-h-xl card bg-base-100 shadow-md rounded-3xl">
   <div class="mb-12 text-left">
-    <h1 class="text-2xl font-semibold text-[#202225]">File Details</h1>
+    <h1 class="text-2xl font-semibold text-dark">File Details</h1>
   </div>
   <div class="flex flex-col lg:flex-row gap-6 md:px-7">
     {#if items?.length > 0}
@@ -102,7 +102,7 @@
               <div class="flex justify-between gap-3">
                 <span class="text-gray-500">Explorer</span>
                 <a
-                  class="text-[#6e4ff7] hover:underline truncate max-w-45"
+                  class="text-primary hover:underline truncate max-w-45"
                   href={`${EXPLORER_LINK}/${CONTENT_CONTRACT}/${item.tokenId}`}
                   target="_blank"
                 >

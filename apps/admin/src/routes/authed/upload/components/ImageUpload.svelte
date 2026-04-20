@@ -53,7 +53,7 @@
     </div>
     <button
       id="image-select"
-      class="text-[#6e4ff7] text-xs font-medium cursor-pointer"
+      class="text-primary text-xs font-medium cursor-pointer"
       onclick={() => imageInput?.click()}
       type="button"
     >
