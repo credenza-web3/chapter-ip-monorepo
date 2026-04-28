@@ -20,22 +20,22 @@ export class File extends Document<ObjectId> {
   declare id: string
 
   @Prop({ required: true })
-  sub: string
+  declare sub: string
 
   @Prop({ required: true })
-  bucket: string
+  declare bucket: string
 
   @Prop({ required: true })
-  key: string
+  declare key: string
 
   @Prop({ required: true })
-  tokenId: string
+  declare tokenId: string
 
   @Prop({ required: true, lowercase: true, trim: true })
-  contractAddress: string
+  declare contractAddress: string
 
-  createdAt: Date
-  updatedAt: Date
+  declare createdAt: Date
+  declare updatedAt: Date
 }
 
 export const FileSchema = SchemaFactory.createForClass(File)
