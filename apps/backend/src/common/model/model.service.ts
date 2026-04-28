@@ -19,18 +19,20 @@ export class CommonModelService<T> {
     const sortOrder = opts.order === 'asc' ? 1 : -1
     const cursorDirection = opts.order === 'asc' ? '$gt' : '$lt'
 
+    const query: TBuiltPaginationOptions['query'] = {
+      ...(opts.cursor && { [sortBy]: { [cursorDirection]: Buffer.from(opts.cursor, 'hex').toString('utf8') } }),
+      ...(opts.id && { _id: opts.id }),
+      ...(opts.startCreatedAt && { createdAt: { $gte: opts.startCreatedAt } }),
+      ...(opts.endCreatedAt && { createdAt: { $lte: opts.endCreatedAt } }),
+      ...(opts.startUpdatedAt && { createdAt: { $gte: opts.startUpdatedAt } }),
+      ...(opts.endUpdatedAt && { createdAt: { $lte: opts.endUpdatedAt } }),
+    }
+
     return {
       currentCursor: opts.cursor || null,
       sort: { [sortBy]: sortOrder },
       limit,
-      query: <TBuiltPaginationOptions['query']>{
-        ...(opts.cursor && { [sortBy]: { [cursorDirection]: Buffer.from(opts.cursor, 'hex').toString('utf8') } }),
-        ...(opts.id && { _id: opts.id }),
-        ...(opts.startCreatedAt && { createdAt: { $gte: opts.startCreatedAt } }),
-        ...(opts.endCreatedAt && { createdAt: { $lte: opts.endCreatedAt } }),
-        ...(opts.startUpdatedAt && { createdAt: { $gte: opts.startUpdatedAt } }),
-        ...(opts.endUpdatedAt && { createdAt: { $lte: opts.endUpdatedAt } }),
-      },
+      query,
     }
   }
 
