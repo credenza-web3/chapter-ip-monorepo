@@ -20,16 +20,16 @@ export class BlockedLicense extends Document<ObjectId> {
   declare id: string
 
   @Prop({ required: true })
-  tokenId: string
+  declare tokenId: string
 
   @Prop({ required: true })
-  subEvmAddress: string
+  declare subEvmAddress: string
 
   @Prop({ required: true })
-  sub: string
+  declare sub: string
 
-  createdAt: Date
-  updatedAt: Date
+  declare createdAt: Date
+  declare updatedAt: Date
 }
 
 export const BlockedLicenseSchema = SchemaFactory.createForClass(BlockedLicense)

@@ -20,19 +20,19 @@ export class Publisher extends Document<ObjectId> {
   declare id: string
 
   @Prop({ required: true })
-  sub: string
+  declare sub: string
 
   @Prop({ required: true })
-  title: string
+  declare title: string
 
   @Prop({ required: false })
-  evmAddress: string
+  declare evmAddress: string
 
   @Prop({ required: false })
-  avatarUrl?: string
+  declare avatarUrl?: string
 
-  createdAt: Date
-  updatedAt: Date
+  declare createdAt: Date
+  declare updatedAt: Date
 }
 
 export const PublisherSchema = SchemaFactory.createForClass(Publisher)
