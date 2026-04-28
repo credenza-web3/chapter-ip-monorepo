@@ -12,6 +12,7 @@ import { LicenseModule } from './license/license.module'
 import { TrpcPanelController } from './trpc-ui.controller'
 import { AppRouter } from './app.router'
 import { AppContext } from './app.context'
+import { EvmListenerModule } from './evm-listener/evm-listener.module'
 
 const trpcErrorLogger = new Logger('TRPC Error')
 
@@ -43,6 +44,7 @@ const trpcErrorLogger = new Logger('TRPC Error')
     FileModule,
     PublisherModule,
     LicenseModule,
+    EvmListenerModule,
   ],
   controllers: [TrpcPanelController],
   providers: [AppContext, AppRouter],
