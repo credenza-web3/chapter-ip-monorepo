@@ -17,7 +17,7 @@ export class CommonLicenseService {
     private readonly blockedLicenseService: BlockedLicenseService,
   ) {
     const provider = this.commonEvmService.getProvider()
-    const licenceContractAddress = this.configService.get<string>('EVM_LICENSE_NTF_CONTRACT_ADDRESS')
+    const licenceContractAddress = this.configService.get<string>('evm.licenseNftContractAddress')
     if (!licenceContractAddress) {
       throw new Error('Missing EVM_LICENSE_NTF_CONTRACT_ADDRESS')
     }

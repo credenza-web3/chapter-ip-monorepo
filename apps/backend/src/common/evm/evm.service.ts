@@ -7,7 +7,7 @@ export class CommonEvmService {
   private provider!: JsonRpcProvider
 
   constructor(private readonly configService: ConfigService) {
-    const rpcUrl = this.configService.get<string>('EVM_RPC_URL')
+    const rpcUrl = this.configService.get<string>('evm.rpcUrl')
     if (!rpcUrl) {
       throw new Error('Missing EVM_RPC_URL')
     }
@@ -19,12 +19,12 @@ export class CommonEvmService {
   }
 
   public async getUserEvmAddressBySub(sub: string) {
-    const evmUrl = this.configService.get<string>('EVM_URL')
+    const evmUrl = this.configService.get<string>('credenza3.evmUrl')
     if (!evmUrl) {
       throw new Error('Missing EVM_URL')
     }
-    const clientId = this.configService.get<string>('CLIENT_ID')
-    const clientSecret = this.configService.get<string>('CLIENT_SECRET')
+    const clientId = this.configService.get<string>('credenza3.clientId')
+    const clientSecret = this.configService.get<string>('credenza3.clientSecret')
     const result = await fetch(`${evmUrl}/accounts/${sub}/address`, {
       headers: {
         Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,

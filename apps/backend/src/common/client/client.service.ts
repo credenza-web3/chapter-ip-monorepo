@@ -7,8 +7,8 @@ import { TClientInfo } from './client.types'
 export class CommonClientService {
   constructor(private readonly configService: ConfigService) {}
   getClientIdAndSecret(): { clientId: string; clientSecret: string } {
-    const clientId = this.configService.get<string>('CLIENT_ID')
-    const clientSecret = this.configService.get<string>('CLIENT_SECRET')
+    const clientId = this.configService.get<string>('credenza3.clientId')
+    const clientSecret = this.configService.get<string>('credenza3.clientSecret')
     if (!clientId || !clientSecret) {
       throw new Error('Missing CLIENT_ID or CLIENT_SECRET')
     }
@@ -24,7 +24,7 @@ export class CommonClientService {
   }
 
   async getActiveClient() {
-    const accountsUrl = this.configService.get<string>('ACCOUNTS_URL')
+    const accountsUrl = this.configService.get<string>('credenza3.accountsUrl')
 
     const response = await fetch(`${accountsUrl}/clients/current`, {
       method: 'GET',
