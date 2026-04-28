@@ -72,12 +72,14 @@ export class EvmListenerService implements OnModuleInit, OnModuleDestroy {
 
       this.contracts = contractsToListen.map(({ address, abi }) => {
         const contract = new Contract(address, abi, provider)
-        contract.on('*', (...args: unknown[]) => void this.handleEvent(args))
+        void contract.on('*', (...args: unknown[]) => void this.handleEvent(args))
         return contract
       })
 
       this.reconnectAttempts = 0
-      this.logger.log(`Listening for events on [${contractsToListen.map(({ address }) => address).join(', ')}] via ${url}`)
+      this.logger.log(
+        `Listening for events on [${contractsToListen.map(({ address }) => address).join(', ')}] via ${url}`,
+      )
     } catch (error) {
       this.logger.error(`Connection to ${url} failed: ${this.formatError(error)}`)
       await this.disconnect()
@@ -87,7 +89,7 @@ export class EvmListenerService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async disconnect() {
-    this.contracts.forEach((contract) => contract.removeAllListeners().catch(this.logger.error))
+    this.contracts.forEach((contract) => void contract.removeAllListeners().catch((e: unknown) => this.logger.error(e)))
     this.contracts = []
 
     const provider = this.provider
@@ -223,8 +225,8 @@ export class EvmListenerService implements OnModuleInit, OnModuleDestroy {
     const licenseNft = this.requireEnv('EVM_LICENSE_NTF_CONTRACT_ADDRESS')
 
     return [
-      { address: contentNft, abi: contentAbi as InterfaceAbi },
-      { address: licenseNft, abi: licenseAbi as InterfaceAbi },
+      { address: contentNft, abi: contentAbi },
+      { address: licenseNft, abi: licenseAbi },
     ]
   }
 
@@ -237,14 +239,16 @@ export class EvmListenerService implements OnModuleInit, OnModuleDestroy {
     return typeof candidate.on === 'function' ? (ws as SocketEmitter) : null
   }
 
-  private findEventLog(args): EventLog | null {
+  private findEventLog(args: unknown[]): EventLog | null {
     const last = args[args.length - 1]
-    return this.isEventLog(last['log']) ? last['log'] : null
+    if (!last || typeof last !== 'object') return null
+    const log = (last as Record<string, unknown>)['log']
+    return this.isEventLog(log) ? log : null
   }
 
   private isEventLog(value: unknown): value is EventLog {
     return (
-      !!value &&
+      value !== null &&
       typeof value === 'object' &&
       'fragment' in value &&
       'transactionHash' in value &&
@@ -258,7 +262,7 @@ export class EvmListenerService implements OnModuleInit, OnModuleDestroy {
       !!error &&
       typeof error === 'object' &&
       'code' in error &&
-      (error as { code: unknown }).code === MONGO_DUPLICATE_KEY_CODE
+      (error as Record<string, unknown>)['code'] === MONGO_DUPLICATE_KEY_CODE
     )
   }
 
