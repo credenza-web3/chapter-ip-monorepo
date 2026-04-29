@@ -15,7 +15,7 @@ export function withEnvOverrides<T>(config: T, prefix = ''): T {
 
     if (Array.isArray(value)) return envValue.split(',').map((v) => v.trim())
     if (typeof value === 'number') return Number(envValue)
-    if (typeof value === 'boolean') return envValue === 'true'
+    if (typeof value === 'boolean') return envValue === 'true' || envValue === '1'
 
     return envValue
   }) as T
