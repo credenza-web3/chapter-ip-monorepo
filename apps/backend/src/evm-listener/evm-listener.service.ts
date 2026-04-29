@@ -6,11 +6,6 @@ import { abi as licenseAbi } from '@credenza3/contracts/artifacts/LicenseNftCont
 
 import { EvmEventService } from './evm-event.service'
 
-const NETWORK_URLS = {
-  mainnet: ['wss://api.avax.network/ext/bc/C/ws', 'wss://avalanche-c-chain-rpc.publicnode.com'],
-  testnet: ['wss://api.avax-test.network/ext/bc/C/ws', 'wss://avalanche-fuji-c-chain-rpc.publicnode.com'],
-} as const
-
 const RECONNECT_BASE_DELAY_MS = 2_000
 const RECONNECT_MAX_DELAY_MS = 30_000
 const MONGO_DUPLICATE_KEY_CODE = 11000
@@ -44,7 +39,11 @@ export class EvmListenerService implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   async onModuleInit() {
-    this.wsUrls = this.resolveNetworkUrls()
+    this.wsUrls = this.configService.get<string[]>('evm.wsUrls')!
+    if (!this.wsUrls.length) {
+      this.logger.warn('No EVM websocket URLs configured')
+      return
+    }
     await this.connect()
   }
 
@@ -197,11 +196,6 @@ export class EvmListenerService implements OnModuleInit, OnModuleDestroy {
         `Failed to persist event tx=${eventLog.transactionHash} index=${eventLog.index}: ${this.formatError(error)}`,
       )
     }
-  }
-
-  private resolveNetworkUrls(): readonly string[] {
-    const isStaging = ['staging', 'local'].includes(this.configService.get<string>('NODE_ENV') as string)
-    return isStaging ? NETWORK_URLS.testnet : NETWORK_URLS.mainnet
   }
 
   private currentUrl() {

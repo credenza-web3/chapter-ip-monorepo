@@ -37,8 +37,8 @@ export class FileService extends CommonModelService<File> {
   ) {
     super(fileModel)
 
-    const accessKeyId: string = this.configService.get<string>('R2_ACCESS_KEY') as string
-    const secretAccessKey: string = this.configService.get<string>('R2_SECRET_KEY') as string
+    const accessKeyId: string = this.configService.get<string>('cloudflare.r2.accessKeyId') as string
+    const secretAccessKey: string = this.configService.get<string>('cloudflare.r2.secretAccessKey') as string
 
     this.r2 = new S3Client({
       region: 'auto', // required for R2
@@ -65,7 +65,7 @@ export class FileService extends CommonModelService<File> {
 
   getBucketName(type: 'metadata' | 'content' | 'preview' | 'userfiles') {
     let bucketName = `chapter-ip-${type}`
-    const env = this.configService.get<string>('NODE_ENV')
+    const env = this.configService.get<string>('env')
     if (env !== 'prod') {
       bucketName += `-test`
     }

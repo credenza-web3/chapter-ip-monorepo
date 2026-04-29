@@ -14,7 +14,20 @@
     "backend#dev": {
       "with": ["//#trpc:watch"],
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "env": [
+        "MONGO_URI",
+        "EVM_URL",
+        "ACCOUNTS_URL",
+        "CLIENT_ID",
+        "CLIENT_SECRET",
+        "EVM_RPC_URL",
+        "EVM_CONTENT_NFT_CONTRACT_ADDRESS",
+        "EVM_LICENSE_NTF_CONTRACT_ADDRESS",
+        "R2_ACCESS_KEY",
+        "R2_SECRET_KEY",
+        "R2_METADATA_BUCKET_HOST"
+      ]
     },
     "dev": {
       "cache": false,
@@ -22,7 +35,7 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "env": ["PORT", "NODE_ENV", "ACCOUNTS_URL"],
+      "env": ["PORT", "NODE_ENV"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "cache": false
     },

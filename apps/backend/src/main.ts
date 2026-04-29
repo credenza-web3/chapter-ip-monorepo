@@ -3,6 +3,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'local'
 import { NestFactory } from '@nestjs/core'
 import { ConsoleLogger, Logger } from '@nestjs/common'
 import { json } from 'body-parser'
+import { ConfigService } from '@nestjs/config'
 
 import { AppModule } from './app.module'
 
@@ -19,7 +20,9 @@ async function bootstrap() {
   app.use(json({ limit: '10mb' }))
   app.enableCors()
 
-  const port = process.env.PORT ?? 8060
+  const configService = app.get(ConfigService)
+  const port = configService.get<number>('port')!
+
   await app.listen(port, () => {
     logger.log(`🚀 Running at "${port}" in "${env}" mode`)
   })

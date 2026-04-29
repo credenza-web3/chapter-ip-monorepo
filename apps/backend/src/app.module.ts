@@ -14,16 +14,24 @@ import { AppRouter } from './app.router'
 import { AppContext } from './app.context'
 import { EvmListenerModule } from './evm-listener/evm-listener.module'
 
+import defaultConfig, { getEnv, ENV } from './app.config/default'
+import stagingConfig from './app.config/staging'
+import prodConfig from './app.config/prod'
+
 const trpcErrorLogger = new Logger('TRPC Error')
+const env: string = getEnv()
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [defaultConfig, ...(env === ENV.STAGING ? [stagingConfig] : []), ...(env === ENV.PROD ? [prodConfig] : [])],
+    }),
     CommonModule,
     MongooseModule.forRootAsync({
       imports: [],
       useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGO_URI'),
+        uri: configService.get<string>('mongo.uri'),
         heartbeatFrequencyMS: 5000,
         retryAttempts: Number.MAX_VALUE,
         retryDelay: 2000,

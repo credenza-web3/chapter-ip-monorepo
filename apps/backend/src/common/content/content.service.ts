@@ -16,12 +16,12 @@ export class CommonContentService {
     private readonly commonEvmService: CommonEvmService,
   ) {
     const provider = this.commonEvmService.getProvider()
-    const contentContractAddress = this.configService.get<string>('EVM_CONTENT_NFT_CONTRACT_ADDRESS')
+    const contentContractAddress = this.configService.get<string>('evm.contentNftContractAddress')
     if (!contentContractAddress) {
       throw new Error('Missing EVM_CONTENT_NFT_CONTRACT_ADDRESS')
     }
     this.contentNftContract = new Contract(contentContractAddress, contentAbi, provider)
-    const membershipContractAddress = this.configService.get<string>('EVM_MEMBERSHIP_CONTRACT_ADDRESS')
+    const membershipContractAddress = this.configService.get<string>('evm.membershipContractAddress')
     if (membershipContractAddress) {
       this.membershipContract = new Contract(membershipContractAddress, membershipAbi, provider)
     }
