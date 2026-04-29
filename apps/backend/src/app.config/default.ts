@@ -1,3 +1,5 @@
+import { withEnvOverrides } from '../common/utils/utils'
+
 export const ENV = {
   LOCAL: 'local',
   STAGING: 'staging',
@@ -8,15 +10,15 @@ export function getEnv(): string {
   return process.env.NODE_ENV || ENV.LOCAL
 }
 
-export default () => ({
+const config = {
   env: getEnv(),
-  port: process.env.PORT || 8060,
+  port: 8060,
   mongo: {
-    uri: process.env.MONGO_URI || 'mongodb://localhost:27017/chapter_ip_local?replicaSet=rs0',
+    uri: 'mongodb://localhost:27017/chapter_ip_local?replicaSet=rs0',
   },
   credenza3: {
-    clientId: process.env.CLIENT_ID || '66a36001a7152aa7d6f9e135',
-    clientSecret: process.env.CLIENT_SECRET,
+    clientId: '66a36001a7152aa7d6f9e135',
+    clientSecret: '',
     accountsUrl: 'https://accounts.staging.credenza3.com',
     evmUrl: 'https://evm.staging.credenza3.com',
   },
@@ -29,9 +31,11 @@ export default () => ({
   },
   cloudflare: {
     r2: {
-      accessKey: process.env.R2_ACCESS_KEY,
-      secretKey: process.env.R2_SECRET_KEY,
-      metadataBucketHost: process.env.R2_METADATA_BUCKET_HOST || 'https://pub-5c9112f4549643409ad80de98438b4c7.r2.dev',
+      accessKey: '',
+      secretKey: '',
+      metadataBucketHost: 'https://pub-5c9112f4549643409ad80de98438b4c7.r2.dev',
     },
   },
-})
+}
+
+export default () => withEnvOverrides(config)
