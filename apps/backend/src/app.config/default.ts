@@ -31,8 +31,8 @@ const config = {
   },
   cloudflare: {
     rtwo: {
-      accessKey: '',
-      secretKey: '',
+      accessKeyId: '',
+      secretAccessKey: '',
       metadataBucketHost: 'https://pub-5c9112f4549643409ad80de98438b4c7.r2.dev',
     },
   },
