@@ -8,9 +8,12 @@ export class CommonClientService {
   constructor(private readonly configService: ConfigService) {}
   getClientIdAndSecret(): { clientId: string; clientSecret: string } {
     const clientId = this.configService.get<string>('credenza.clientId')
+    if (!clientId) {
+      throw new Error('Missing CREDENZA_CLIENT_ID')
+    }
     const clientSecret = this.configService.get<string>('credenza.clientSecret')
-    if (!clientId || !clientSecret) {
-      throw new Error('Missing CREDENZA_CLIENT_ID or CREDENZA_CLIENT_SECRET')
+    if (!clientSecret) {
+      throw new Error('Missing CREDENZA_CLIENT_SECRET')
     }
     return { clientId, clientSecret }
   }
