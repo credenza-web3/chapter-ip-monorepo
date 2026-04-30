@@ -215,8 +215,8 @@ export class EvmListenerService implements OnModuleInit, OnModuleDestroy {
   }
 
   private getContractsToListen(): ListenerContractConfig[] {
-    const contentNft = this.requireEnv('EVM_CONTENT_NFT_CONTRACT_ADDRESS')
-    const licenseNft = this.requireEnv('EVM_LICENSE_NTF_CONTRACT_ADDRESS')
+    const contentNft = this.requireEnv('evm.contentNftContractAddress')
+    const licenseNft = this.requireEnv('evm.licenseNftContractAddress')
 
     return [
       { address: contentNft, abi: contentAbi },

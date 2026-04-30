@@ -21,7 +21,7 @@ export class AuthService {
       refresh_token: payload.refreshToken,
     })
 
-    const accountsUrl = this.configService.get<string>('credenza3.accountsUrl')
+    const accountsUrl = this.configService.get<string>('credenza.accountsUrl')
 
     const response = await fetch(`${accountsUrl}/oauth2/token`, {
       method: 'POST',
@@ -55,7 +55,7 @@ export class AuthService {
       redirect_uri: payload.redirectUri,
     })
 
-    const accountsUrl = this.configService.get<string>('credenza3.accountsUrl')
+    const accountsUrl = this.configService.get<string>('credenza.accountsUrl')
 
     const response = await fetch(`${accountsUrl}/oauth2/token`, {
       method: 'POST',

@@ -19,12 +19,12 @@ export class CommonEvmService {
   }
 
   public async getUserEvmAddressBySub(sub: string) {
-    const evmUrl = this.configService.get<string>('credenza3.evmUrl')
+    const evmUrl = this.configService.get<string>('credenza.evmUrl')
     if (!evmUrl) {
       throw new Error('Missing EVM_URL')
     }
-    const clientId = this.configService.get<string>('credenza3.clientId')
-    const clientSecret = this.configService.get<string>('credenza3.clientSecret')
+    const clientId = this.configService.get<string>('credenza.clientId')
+    const clientSecret = this.configService.get<string>('credenza.clientSecret')
     const result = await fetch(`${evmUrl}/accounts/${sub}/address`, {
       headers: {
         Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,

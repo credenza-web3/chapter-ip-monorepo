@@ -21,6 +21,8 @@ async function bootstrap() {
   app.enableCors()
 
   const configService = app.get(ConfigService)
+  // @ts-ignore
+  console.log(configService.internalConfig)
   const port = configService.get<number>('port')!
 
   await app.listen(port, () => {

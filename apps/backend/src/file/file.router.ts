@@ -216,7 +216,7 @@ export class FileRouter {
       Key: metadataKey,
     })
 
-    const metadataBucketHost = this.configService.get<string>('cloudflare.r2.metadataBucketHost')
+    const metadataBucketHost = this.configService.get<string>('cloudflare.rtwo.metadataBucketHost')
     return { url: `${metadataBucketHost}/${metadataKey}` }
   }
 }

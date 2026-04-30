@@ -16,7 +16,7 @@ const config = {
   mongo: {
     uri: 'mongodb://localhost:27017/chapter_ip_local?replicaSet=rs0',
   },
-  credenza3: {
+  credenza: {
     clientId: '66a36001a7152aa7d6f9e135',
     clientSecret: '',
     accountsUrl: 'https://accounts.staging.credenza3.com',
@@ -30,7 +30,7 @@ const config = {
     membershipContractAddress: '0xCbE52ed30E0841429262d5876a1d4eB9a7f1ED46',
   },
   cloudflare: {
-    r2: {
+    rtwo: {
       accessKey: '',
       secretKey: '',
       metadataBucketHost: 'https://pub-5c9112f4549643409ad80de98438b4c7.r2.dev',

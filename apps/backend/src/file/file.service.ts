@@ -37,8 +37,8 @@ export class FileService extends CommonModelService<File> {
   ) {
     super(fileModel)
 
-    const accessKeyId: string = this.configService.get<string>('cloudflare.r2.accessKeyId') as string
-    const secretAccessKey: string = this.configService.get<string>('cloudflare.r2.secretAccessKey') as string
+    const accessKeyId: string = this.configService.get<string>('cloudflare.rtwo.accessKeyId') as string
+    const secretAccessKey: string = this.configService.get<string>('cloudflare.rtwo.secretAccessKey') as string
 
     this.r2 = new S3Client({
       region: 'auto', // required for R2

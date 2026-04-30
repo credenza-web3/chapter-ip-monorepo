@@ -37,7 +37,7 @@ export class CommonAuthService {
     },
   ) {
     const { jwtVerify, createRemoteJWKSet } = await import('jose')
-    const accountsUrl = this.configService.get<string>('credenza3.accountsUrl')
+    const accountsUrl = this.configService.get<string>('credenza.accountsUrl')
     const JWKS = createRemoteJWKSet(new URL(`${accountsUrl}/jwks`))
 
     const { payload } = await jwtVerify(token, JWKS, {
