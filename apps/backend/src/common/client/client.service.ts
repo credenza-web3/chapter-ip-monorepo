@@ -10,7 +10,7 @@ export class CommonClientService {
     const clientId = this.configService.get<string>('credenza.clientId')
     const clientSecret = this.configService.get<string>('credenza.clientSecret')
     if (!clientId || !clientSecret) {
-      throw new Error('Missing CLIENT_ID or CLIENT_SECRET')
+      throw new Error('Missing CREDENZA_CLIENT_ID or CREDENZA_CLIENT_SECRET')
     }
     return { clientId, clientSecret }
   }
