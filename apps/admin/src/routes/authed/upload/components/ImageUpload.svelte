@@ -31,7 +31,7 @@
   // }
 </script>
 
-<div class="mb-4 mt-10">
+<div>
   <label for="image-select" class="block font-semibold"
     >Select Cover Image (optional)
     <span class="text-sm font-medium">(Optional)</span>

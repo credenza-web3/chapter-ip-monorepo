@@ -3,14 +3,23 @@
   import { notify, ToastType } from '@repo/ui-components'
   import { UploadService } from './services/upload.service'
   import { uploadStore, isFormValid } from './stores/upload-store'
-  import FileUpload from './components/FileUpload.svelte'
-  import ImageUpload from './components/ImageUpload.svelte'
-  import LicenseForm from './components/LicenseForm.svelte'
+  import UploadStepHeader from './components/UploadStepHeader.svelte'
+  import UploadLikenessStep from './components/UploadLikenessStep.svelte'
+  import UploadLicensingStep from './components/UploadLicensingStep.svelte'
 
   const uploadService = new UploadService()
+  let currentStep = $state(1)
 
   beforeNavigate(() => uploadStore.setLoading(true))
   afterNavigate(() => uploadStore.setLoading(false))
+
+  const canContinueFromStepOne = $derived(
+    Boolean($uploadStore.title.trim() && $uploadStore.description.trim() && $uploadStore.uploaded),
+  )
+
+  function goToStep(step: number) {
+    currentStep = step
+  }
 
   const onSubmitClick = async () => {
     if (!$uploadStore.uploaded) {
@@ -56,37 +65,35 @@
   }
 </script>
 
-<div class="md:p-10 p-5 min-h-xl card bg-base-100 shadow-md rounded-3xl">
-  <div class="mb-12 text-left">
-    <h1 class="text-2xl font-semibold text-dark">Upload</h1>
-  </div>
+<div class="min-h-xl rounded-[32px] bg-base-100 p-5 shadow-md md:p-10">
+  <UploadStepHeader {currentStep} />
 
-  <div class="mt-6 flex flex-col border-b-2 border-dashed border-gray-300 pb-6 max-w-2xl">
-    <h2 class="font-semibold mb-3">Details</h2>
+  {#if currentStep === 1}
+    <UploadLikenessStep />
+  {:else}
+    <UploadLicensingStep />
+  {/if}
 
-    <input
-      id="title"
-      type="text"
-      bind:value={$uploadStore.title}
-      placeholder="Title"
-      class="input w-full mb-3 focus:border-[#988cff] focus:outline-none focus:ring-0"
-    />
-    <textarea
-      id="description"
-      bind:value={$uploadStore.description}
-      placeholder="Description"
-      class="input w-full mb-3 h-25 py-2 px-3 focus:border-[#988cff] focus:outline-none focus:ring-0"
-    ></textarea>
-    <ImageUpload />
-  </div>
-  <FileUpload />
+  <div class="mt-8 flex flex-col gap-3 border-t border-[#e6dfd8] pt-6 md:flex-row md:justify-between">
+    <button
+      class="btn h-12 rounded-full border border-[#d8d0c8] bg-white px-6 text-dark hover:bg-[#f7f2ed] disabled:border-[#ece6e1] disabled:bg-[#f7f2ed] disabled:text-[#b6aaa0]"
+      onclick={() => goToStep(1)}
+      disabled={currentStep === 1 || $uploadStore.loading}
+    >
+      Back
+    </button>
 
-  <div class="mt-8 space-y-4 md:space-y-17.5">
-    <LicenseForm />
-
-    <div class="flex gap-10 mt-10">
+    {#if currentStep === 1}
       <button
-        class="btn btn-outline w-55 text-white bg-primary disabled:bg-cream disabled:text-black/10 disabled:border-primary/20"
+        class="btn h-12 rounded-full border-none bg-primary px-6 text-white disabled:bg-[#d9d1ff]"
+        onclick={() => goToStep(2)}
+        disabled={!canContinueFromStepOne || $uploadStore.loading}
+      >
+        Continue to licensing
+      </button>
+    {:else}
+      <button
+        class="btn h-12 rounded-full border-none bg-primary px-6 text-white disabled:bg-[#d9d1ff]"
         onclick={onSubmitClick}
         disabled={$uploadStore.loading || !$isFormValid || !$uploadStore.uploaded}
       >
@@ -96,6 +103,6 @@
           Upload file
         {/if}
       </button>
-    </div>
+    {/if}
   </div>
 </div>

@@ -51,7 +51,7 @@
 </script>
 
 <div
-  class={`max-w-2xl mt-10 bg-white h-50 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-gray-500 text-sm cursor-pointer transition ${
+  class={`bg-white h-50 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-gray-500 text-sm cursor-pointer transition ${
     isOver ? 'border-primary bg-white' : 'border-gray-300'
   }`}
   role="button"
@@ -78,8 +78,8 @@
     </div>
   {:else}
     <button class="btn bg-primary text-white px-2 w-50 mb-2"> Add file </button>
-    <span class="text-xs text-[#707070] font-medium"
-      >Max. file size: 1gb | File types supported: .txt, .docx, .mov, .mp4, .nil, and .zip</span
+    <span class="text-center text-xs text-[#707070] font-medium"
+      >Max. file size: 1gb | File types supported: .txt, .docx, .mov, .mp4, and .zip</span
     >
   {/if}
 
