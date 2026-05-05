@@ -21,7 +21,10 @@
   <div class="mb-6 flex flex-wrap items-center gap-3">
     {#each steps as step}
       <div class="flex items-center gap-3">
-        <div class="flex items-center gap-3 rounded-full border px-4 py-2" class:border-primary={currentStep === step.id}>
+        <div
+          class="flex items-center gap-3 rounded-full border px-4 py-2"
+          class:border-primary={currentStep === step.id}
+        >
           <span
             class="flex size-7 items-center justify-center rounded-full text-xs font-semibold"
             class:bg-primary={currentStep >= step.id}

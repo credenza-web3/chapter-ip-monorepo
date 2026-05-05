@@ -9,7 +9,9 @@
     <section class="rounded-[28px] border border-[#e6dfd8] bg-white p-6 shadow-sm">
       <div class="mb-6">
         <h2 class="mb-2 text-lg font-semibold text-dark">Likeness details</h2>
-        <p class="text-sm text-[#6f655d]">Describe the asset clearly so the next licensing step has the right context.</p>
+        <p class="text-sm text-[#6f655d]">
+          Describe the asset clearly so the next licensing step has the right context.
+        </p>
       </div>
 
       <div class="space-y-4">

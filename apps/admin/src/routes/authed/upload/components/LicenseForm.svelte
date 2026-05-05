@@ -23,7 +23,9 @@
 
 <fieldset class="fieldset rounded-box p-0">
   <legend class="mb-5 text-sm font-medium text-[#6f655d]">Choose license type and pricing</legend>
-  <div class="label mb-3 flex flex-col items-start justify-between gap-3 rounded-2xl border border-[#e6dfd8] bg-[#fcfaf8] p-4 md:flex-row md:items-center">
+  <div
+    class="label mb-3 flex flex-col items-start justify-between gap-3 rounded-2xl border border-[#e6dfd8] bg-[#fcfaf8] p-4 md:flex-row md:items-center"
+  >
     <label class="space-x-2 flex items-center cursor-pointer">
       <LicenceInput bind:checked={$uploadStore.isLifetimeLicense} />
       <span class="font-medium text-xs text-black">Lifetime License</span>
@@ -44,7 +46,9 @@
       <span class="text-[10px] font-medium text-gray-400 shrink-0 select-none"> USD </span>
     </div>
   </div>
-  <div class="label flex flex-col items-start justify-between gap-3 rounded-2xl border border-[#e6dfd8] bg-[#fcfaf8] p-4 md:flex-row md:items-center">
+  <div
+    class="label flex flex-col items-start justify-between gap-3 rounded-2xl border border-[#e6dfd8] bg-[#fcfaf8] p-4 md:flex-row md:items-center"
+  >
     <label class="space-x-2 flex items-center cursor-pointer">
       <LicenceInput bind:checked={$uploadStore.isOneTimeLicense} />
       <span class="font-medium text-xs text-black">One Time License</span>
