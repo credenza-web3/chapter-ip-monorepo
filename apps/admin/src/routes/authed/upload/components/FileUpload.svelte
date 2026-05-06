@@ -72,9 +72,9 @@
     <UploadIcon />
   </div>
   <span class="text-center mb-2 font-medium text-sm">Upload or drag a file</span>
-  {#if $uploadStore.uploaded}
+  {#if $uploadStore.files.source}
     <div class="flex flex-col items-center mt-4">
-      <span class="mb-2">📄 {$uploadStore.uploaded.name}</span>
+      <span class="mb-2">📄 {$uploadStore.files.source.name}</span>
     </div>
   {:else}
     <button class="btn bg-primary text-white px-2 w-50 mb-2"> Add file </button>

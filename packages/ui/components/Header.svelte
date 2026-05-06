@@ -30,7 +30,7 @@
 
 <header
   bind:this={headerRef}
-  class="mx-auto w-full flex items-center justify-between md:px-10 md:px-4 px-4 py-4 border-b border-[#eef2f6] bg-[#f9fafb] relative text-black"
+  class="mx-auto w-full flex items-center justify-between md:px-10 md:px-4 px-4 py-4 border-b relative text-black border-[rgba(26,26,46,0.05)] bg-[#f8f5f1]"
 >
   <a href="/" class="flex-shrink-0">
     <img src={Logo} alt="Logo" class="w-[130px]" />

@@ -16,26 +16,7 @@
       </div>
 
       <LicenseForm />
-    </section>
-
-    <section class="rounded-[28px] border border-[#e6dfd8] bg-[#f8f4ef] p-6 shadow-sm">
-      <div class="mb-4">
-        <div class="mb-2 text-[11px] uppercase tracking-[0.18em] text-[#8f8378]">Before publishing</div>
-        <h2 class="text-lg font-semibold text-dark">Review the asset</h2>
-      </div>
-
-      <div class="grid gap-4 md:grid-cols-2">
-        <div class="rounded-2xl bg-white p-4">
-          <div class="mb-1 text-xs uppercase tracking-[0.12em] text-[#8f8378]">Title</div>
-          <div class="font-medium text-dark">{$uploadStore.title || 'Untitled likeness'}</div>
-        </div>
-
-        <div class="rounded-2xl bg-white p-4">
-          <div class="mb-1 text-xs uppercase tracking-[0.12em] text-[#8f8378]">Uploaded file</div>
-          <div class="font-medium text-dark">{$uploadStore.uploaded?.name || 'No file selected yet'}</div>
-        </div>
-      </div>
-    </section>
+    </section> 
   </div>
 
   <aside class="rounded-[28px] border border-[#e6dfd8] bg-dark p-6 text-white shadow-sm">
@@ -48,14 +29,14 @@
       <div class="rounded-2xl bg-white/8 p-4">
         <div class="mb-1 text-xs uppercase tracking-[0.12em] text-white/50">Lifetime</div>
         <div class="text-base font-medium">
-          {$uploadStore.isLifetimeLicense ? formatPrice($uploadStore.lifetimePrice) : 'Disabled'}
+          {$uploadStore.licensing ? formatPrice($uploadStore.licensing.lifetimePrice) : 'Disabled'}
         </div>
       </div>
 
       <div class="rounded-2xl bg-white/8 p-4">
         <div class="mb-1 text-xs uppercase tracking-[0.12em] text-white/50">One-time</div>
         <div class="text-base font-medium">
-          {$uploadStore.isOneTimeLicense ? formatPrice($uploadStore.oneTimePrice) : 'Disabled'}
+          {$uploadStore.licensing ? formatPrice($uploadStore.licensing.oneTimePrice) : 'Disabled'}
         </div>
       </div>
     </div>

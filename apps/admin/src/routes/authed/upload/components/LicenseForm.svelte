@@ -27,18 +27,18 @@
     class="label mb-3 flex flex-col items-start justify-between gap-3 rounded-2xl border border-[#e6dfd8] bg-[#fcfaf8] p-4 md:flex-row md:items-center"
   >
     <label class="space-x-2 flex items-center cursor-pointer">
-      <LicenceInput bind:checked={$uploadStore.isLifetimeLicense} />
+      <LicenceInput bind:checked={$uploadStore.licensing.isLifetime} />
       <span class="font-medium text-xs text-black">Lifetime License</span>
     </label>
     <div
       class="inline-flex items-center py-2.5 pr-2 pl-3 rounded border border-gray-200 bg-gray-50 transition-all duration-200 max-w-30 md:max-w-none"
-      class:opacity-40={!$uploadStore.isLifetimeLicense}
+      class:opacity-40={!$uploadStore.licensing.isLifetime}
     >
       <input
         type="number"
-        bind:value={$uploadStore.lifetimePrice}
+        bind:value={$uploadStore.licensing.lifetimePrice}
         oninput={handleLifetimePriceChange}
-        disabled={!$uploadStore.isLifetimeLicense}
+        disabled={!$uploadStore.licensing.isLifetime}
         placeholder="100"
         min="1"
         class="bg-transparent border-none outline-none w-full text-sm placeholder-gray-300"
@@ -50,21 +50,21 @@
     class="label flex flex-col items-start justify-between gap-3 rounded-2xl border border-[#e6dfd8] bg-[#fcfaf8] p-4 md:flex-row md:items-center"
   >
     <label class="space-x-2 flex items-center cursor-pointer">
-      <LicenceInput bind:checked={$uploadStore.isOneTimeLicense} />
+      <LicenceInput bind:checked={$uploadStore.licensing.isOneTime} />
       <span class="font-medium text-xs text-black">One Time License</span>
     </label>
     <div
       class="inline-flex items-center py-2.5 pr-2 pl-3 rounded border border-gray-200 bg-gray-50 transition-all duration-200 max-w-30 md:max-w-none"
-      class:opacity-40={!$uploadStore.isOneTimeLicense}
+      class:opacity-40={!$uploadStore.licensing.isOneTime}
     >
       <input
         type="number"
-        bind:value={$uploadStore.oneTimePrice}
+        bind:value={$uploadStore.licensing.oneTimePrice}
         oninput={handleOneTimePriceChange}
         placeholder="100"
         min="1"
         class="bg-transparent outline-none w-full text-sm placeholder-gray-300"
-        disabled={!$uploadStore.isOneTimeLicense}
+        disabled={!$uploadStore.licensing.isOneTime}
       />
       <span class="text-[10px] font-medium text-gray-400 shrink-0 select-none"> USD </span>
     </div>

@@ -1,28 +1,87 @@
 import { writable, derived } from 'svelte/store'
 
 interface UploadState {
-  uploaded: File | null
-  uploadedImage: File | null
-  isLifetimeLicense: boolean
-  isOneTimeLicense: boolean
-  lifetimePrice: number
-  oneTimePrice: number
-  loading: boolean
-  title: string
-  description: string
+  files: {
+    source: File | null
+    preview: File | null
+  }
+
+  profile: {
+    fullLegalName: string
+    stageName: string
+    bio: string
+
+    attributes: {
+      ethnicity: string
+      heightFt: string
+      heightIn: string
+      weight: string
+      eyeColor: string
+      hairColor: string
+    }
+
+    affiliations: {
+      union: string
+      memberId: string
+    }[]
+  }
+
+  licensing: {
+    isLifetime: boolean
+    isOneTime: boolean
+    lifetimePrice: number
+    oneTimePrice: number
+  }
+
+  confirmations: {
+    rightsConfirmed: boolean
+  }
+
+  ui: {
+    loading: boolean
+  }
 }
 
 function createUploadStore() {
   const { subscribe, set, update } = writable<UploadState>({
-    uploaded: null,
-    uploadedImage: null,
-    isLifetimeLicense: false,
-    isOneTimeLicense: false,
-    lifetimePrice: 0,
-    oneTimePrice: 0,
-    loading: false,
-    title: '',
-    description: '',
+    files: {
+      source: null,
+      preview: null,
+    },
+
+    profile: {
+      fullLegalName: '',
+      stageName: '',
+      bio: '',
+
+      attributes: {
+        ethnicity: '',
+        heightFt: '',
+        heightIn: '',
+        weight: '',
+        eyeColor: '',
+        hairColor: '',
+      },
+
+      affiliations: [
+        { union: '', memberId: '' }
+      ],
+    },
+
+    licensing: {
+      isLifetime: false,
+      isOneTime: false,
+      lifetimePrice: 0,
+      oneTimePrice: 0,
+    },
+
+    confirmations: {
+      rightsConfirmed: false,
+    },
+
+    ui: {
+      loading: false,
+    },
   })
 
   return {
@@ -30,71 +89,171 @@ function createUploadStore() {
     set,
 
     setUploaded: (file: File | null) =>
-      update((state) => ({
-        ...state,
-        uploaded: file,
-        // Reset license state when new file is selected
-        isLifetimeLicense: false,
-        isOneTimeLicense: false,
-        lifetimePrice: 0,
-        oneTimePrice: 0,
+      update((s) => ({
+        ...s,
+        files: {
+          ...s.files,
+          source: file,
+        },
+        licensing: {
+          isLifetime: false,
+          isOneTime: false,
+          lifetimePrice: 0,
+          oneTimePrice: 0,
+        },
       })),
 
     setUploadedImage: (file: File | null) =>
-      update((state) => ({
-        ...state,
-        uploadedImage: file,
+      update((s) => ({
+        ...s,
+        files: {
+          ...s.files,
+          preview: file,
+        },
+      })),
+
+    setFullLegalName: (value: string) =>
+      update((s) => ({
+        ...s,
+        profile: { ...s.profile, fullLegalName: value },
+      })),
+
+    setStageName: (value: string) =>
+      update((s) => ({
+        ...s,
+        profile: { ...s.profile, stageName: value },
+      })),
+
+    setBio: (value: string) =>
+      update((s) => ({
+        ...s,
+        profile: { ...s.profile, bio: value },
+      })),
+
+    setAttribute: (key: keyof UploadState['profile']['attributes'], value: string) =>
+      update((s) => ({
+        ...s,
+        profile: {
+          ...s.profile,
+          attributes: {
+            ...s.profile.attributes,
+            [key]: value,
+          },
+        },
+      })),
+
+    addAffiliation: () =>
+      update((s) => ({
+        ...s,
+        profile: {
+          ...s.profile,
+          affiliations: [
+            ...s.profile.affiliations,
+            { union: '', memberId: '' },
+          ],
+        },
+      })),
+
+    removeAffiliation: (index: number) =>
+      update((s) => ({
+        ...s,
+        profile: {
+          ...s.profile,
+          affiliations: s.profile.affiliations.filter((_, i) => i !== index),
+        },
+      })),
+
+    updateAffiliation: (index: number, key: 'union' | 'memberId', value: string) =>
+      update((s) => ({
+        ...s,
+        profile: {
+          ...s.profile,
+          affiliations: s.profile.affiliations.map((a, i) =>
+            i === index ? { ...a, [key]: value } : a
+          ),
+        },
       })),
 
     setLifetimeLicense: (value: boolean) =>
-      update((state) => ({
-        ...state,
-        isLifetimeLicense: value,
-        lifetimePrice: value ? state.lifetimePrice : 0,
+      update((s) => ({
+        ...s,
+        licensing: {
+          ...s.licensing,
+          isLifetime: value,
+          lifetimePrice: value ? s.licensing.lifetimePrice : 0,
+        },
       })),
 
     setOneTimeLicense: (value: boolean) =>
-      update((state) => ({
-        ...state,
-        isOneTimeLicense: value,
-        oneTimePrice: value ? state.oneTimePrice : 0,
+      update((s) => ({
+        ...s,
+        licensing: {
+          ...s.licensing,
+          isOneTime: value,
+          oneTimePrice: value ? s.licensing.oneTimePrice : 0,
+        },
       })),
 
     setLifetimePrice: (price: number) =>
-      update((state) => ({
-        ...state,
-        lifetimePrice: price,
+      update((s) => ({
+        ...s,
+        licensing: { ...s.licensing, lifetimePrice: price },
       })),
 
     setOneTimePrice: (price: number) =>
-      update((state) => ({
-        ...state,
-        oneTimePrice: price,
+      update((s) => ({
+        ...s,
+        licensing: { ...s.licensing, oneTimePrice: price },
       })),
 
-    setLoading: (loading: boolean) => update((state) => ({ ...state, loading })),
+    setRightsConfirmed: (value: boolean) =>
+      update((s) => ({
+        ...s,
+        confirmations: { ...s.confirmations, rightsConfirmed: value },
+      })),
+
+    setLoading: (loading: boolean) =>
+      update((s) => ({
+        ...s,
+        ui: { ...s.ui, loading },
+      })),
 
     reset: () =>
       set({
-        uploaded: null,
-        uploadedImage: null,
-        isLifetimeLicense: false,
-        isOneTimeLicense: false,
-        lifetimePrice: 0,
-        oneTimePrice: 0,
-        loading: false,
-        title: '',
-        description: '',
+        files: { source: null, preview: null },
+        profile: {
+          fullLegalName: '',
+          stageName: '',
+          bio: '',
+          attributes: {
+            ethnicity: '',
+            heightFt: '',
+            heightIn: '',
+            weight: '',
+            eyeColor: '',
+            hairColor: '',
+          },
+          affiliations: [{ union: '', memberId: '' }],
+        },
+        licensing: {
+          isLifetime: false,
+          isOneTime: false,
+          lifetimePrice: 0,
+          oneTimePrice: 0,
+        },
+        confirmations: {
+          rightsConfirmed: false,
+        },
+        ui: { loading: false },
       }),
   }
 }
 
 export const uploadStore = createUploadStore()
 
-// Derived store for form validation
 export const isFormValid = derived(
   uploadStore,
-  ($uploadStore) =>
-    ($uploadStore.isLifetimeLicense && $uploadStore.lifetimePrice > 0) ||
-    ($uploadStore.isOneTimeLicense && $uploadStore.oneTimePrice > 0),
+  ($s) =>
+    ($s.licensing.isLifetime && $s.licensing.lifetimePrice > 0) ||
+    ($s.licensing.isOneTime && $s.licensing.oneTimePrice > 0)
 )

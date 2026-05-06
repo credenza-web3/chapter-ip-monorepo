@@ -14,7 +14,12 @@
   afterNavigate(() => uploadStore.setLoading(false))
 
   const canContinueFromStepOne = $derived(
-    Boolean($uploadStore.title.trim() && $uploadStore.description.trim() && $uploadStore.uploaded),
+    Boolean(
+      $uploadStore.profile.fullLegalName.trim() &&
+        $uploadStore.profile.bio.trim() &&
+        $uploadStore.files.source &&
+        $uploadStore.confirmations.rightsConfirmed,
+    ),
   )
 
   function goToStep(step: number) {
@@ -22,8 +27,13 @@
   }
 
   const onSubmitClick = async () => {
-    if (!$uploadStore.uploaded) {
+    if (!$uploadStore.files.source) {
       notify('No file selected', ToastType.FAIL)
+      return
+    }
+
+    if (!$uploadStore.confirmations.rightsConfirmed) {
+      notify('Please confirm that you have the legal right to license this content.', ToastType.FAIL)
       return
     }
 
@@ -32,20 +42,20 @@
       const trpcClient = uploadService.createTrpcClient()
 
       const { tokenId, imageUrl, key } = await uploadService.uploadContent(
-        $uploadStore.uploaded!,
-        $uploadStore.uploadedImage,
-        $uploadStore.lifetimePrice,
-        $uploadStore.oneTimePrice,
+        $uploadStore.files.source!,
+        $uploadStore.files.preview,
+        $uploadStore.licensing.lifetimePrice,
+        $uploadStore.licensing.oneTimePrice,
         trpcClient,
       )
 
       await uploadService.saveMetadata({
         tokenId,
-        uploaded: $uploadStore.uploaded!,
+        uploaded: $uploadStore.files.source!,
         imageUrl,
         key,
-        title: $uploadStore.title,
-        description: $uploadStore.description,
+        title: $uploadStore.profile.fullLegalName,
+        description: $uploadStore.profile.bio,
         trpcClient,
       })
 
@@ -65,7 +75,7 @@
   }
 </script>
 
-<div class="min-h-xl rounded-[32px] bg-base-100 p-5 shadow-md md:p-10">
+<div class="min-h-xl rounded-3xl p-5 shadow-md md:p-10 bg-[#f8f5f1]">
   <UploadStepHeader {currentStep} />
 
   {#if currentStep === 1}
@@ -74,30 +84,30 @@
     <UploadLicensingStep />
   {/if}
 
-  <div class="mt-8 flex flex-col gap-3 border-t border-[#e6dfd8] pt-6 md:flex-row md:justify-between">
+  <div class="flex justify-end gap-1.5 mt-12.5">
     <button
-      class="btn h-12 rounded-full border border-[#d8d0c8] bg-white px-6 text-dark hover:bg-[#f7f2ed] disabled:border-[#ece6e1] disabled:bg-[#f7f2ed] disabled:text-[#b6aaa0]"
+      class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary  disabled:bg-[#e1dddb] text-cream"
       onclick={() => goToStep(1)}
-      disabled={currentStep === 1 || $uploadStore.loading}
+      disabled={currentStep === 1 || $uploadStore.ui.loading}
     >
-      Back
+      Save as Draft
     </button>
 
     {#if currentStep === 1}
       <button
-        class="btn h-12 rounded-full border-none bg-primary px-6 text-white disabled:bg-[#d9d1ff]"
+        class="text-sm font-medium rounded-sm h-9.5 px-7.5  bg-primary  disabled:bg-[#e1dddb] text-cream"
         onclick={() => goToStep(2)}
-        disabled={!canContinueFromStepOne || $uploadStore.loading}
+        disabled={!canContinueFromStepOne || $uploadStore.ui.loading}
       >
-        Continue to licensing
+        Save and Continue
       </button>
     {:else}
       <button
-        class="btn h-12 rounded-full border-none bg-primary px-6 text-white disabled:bg-[#d9d1ff]"
+        class="text-sm font-medium rounded-sm h-9.5 px-7.5  bg-primary  disabled:bg-[#e1dddb] text-cream"
         onclick={onSubmitClick}
-        disabled={$uploadStore.loading || !$isFormValid || !$uploadStore.uploaded}
+        disabled={$uploadStore.ui.loading || !$isFormValid || !$uploadStore.files.source}
       >
-        {#if $uploadStore.loading}
+        {#if $uploadStore.ui.loading}
           <div class="loading loading-spinner"></div>
         {:else}
           Upload file

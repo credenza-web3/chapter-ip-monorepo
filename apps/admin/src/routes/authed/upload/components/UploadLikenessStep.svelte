@@ -2,82 +2,83 @@
   import { uploadStore } from '../stores/upload-store'
   import FileUpload from './FileUpload.svelte'
   import ImageUpload from './ImageUpload.svelte'
+  import LikenessDetails from './LikenessDetails.svelte'
 </script>
 
-<div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
-  <div class="space-y-6">
-    <section class="rounded-[28px] border border-[#e6dfd8] bg-white p-6 shadow-sm">
-      <div class="mb-6">
-        <h2 class="mb-2 text-lg font-semibold text-dark">Likeness details</h2>
-        <p class="text-sm text-[#6f655d]">
-          Describe the asset clearly so the next licensing step has the right context.
-        </p>
-      </div>
-
-      <div class="space-y-4">
-        <label class="block">
-          <span class="mb-2 block text-sm font-medium text-dark">Title</span>
-          <input
-            id="title"
-            type="text"
-            bind:value={$uploadStore.title}
-            placeholder="Studio portrait of..."
-            class="input h-13 w-full rounded-2xl border border-[#ddd4cc] bg-[#fcfaf8] px-4 focus:border-primary focus:outline-none focus:ring-0"
-          />
-        </label>
-
-        <label class="block">
-          <span class="mb-2 block text-sm font-medium text-dark">Description</span>
-          <textarea
-            id="description"
-            bind:value={$uploadStore.description}
-            placeholder="Add usage notes, scene details, wardrobe, or anything helpful for future licensing."
-            class="w-full rounded-2xl border border-[#ddd4cc] bg-[#fcfaf8] px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-0"
-            rows="5"
-          ></textarea>
-        </label>
-      </div>
-    </section>
-
-    <section class="rounded-[28px] border border-[#e6dfd8] bg-white p-6 shadow-sm">
-      <ImageUpload />
-    </section>
-
-    <section class="rounded-[28px] border border-[#e6dfd8] bg-white p-6 shadow-sm">
-      <div class="mb-4">
-        <h2 class="mb-2 text-lg font-semibold text-dark">Source file</h2>
-        <p class="text-sm text-[#6f655d]">Upload the original content package that should be minted and listed.</p>
-      </div>
-      <FileUpload />
-    </section>
+<div class="space-y-12 mt-7.25 text-dark">
+  <div class="pb-6">
+    <h2 class="mb-2 text-[28px] font-medium text-left text-dark">Upload your likeness</h2>
+    <p class="mt-3 text-basetext-left text-[#72717b]">
+      Describe the asset clearly so the next licensing step has the right context.
+    </p>
   </div>
 
-  <aside class="rounded-[28px] border border-[#e6dfd8] bg-[#f8f4ef] p-6 shadow-sm">
-    <div class="mb-6">
-      <div class="mb-2 text-[11px] uppercase tracking-[0.18em] text-[#8f8378]">Preview</div>
-      <h2 class="text-lg font-semibold text-dark">Submission summary</h2>
+  <div class="space-y-6">
+    <h3 class="text-base font-semibold text-left">General Information</h3>
+    <label class="block space-y-3">
+      <span class="mb-2 block text-sm text-[#71707a]">Full Legal Name<span class="text-[#ff0000] pl-0.5">*</span></span>
+      <input
+        id="full-legal-name"
+        type="text"
+        bind:value={$uploadStore.profile.fullLegalName}
+        placeholder="Your legal name"
+        class="w-full max-w-137.5 h-11.75 bg-white rounded-sm border border-[#ddd4cc] p-3.75 focus:border-primary focus:outline-none
+         opacity-0.3 text-sm font-medium text-left text-[#71707a]"
+      />
+    </label>
+
+    <label class="block space-y-3">
+      <span class="mb-2 block text-sm text-[#71707a]">Stage Name</span>
+      <input
+        id="stage-name"
+        type="text"
+        bind:value={$uploadStore.profile.stageName}
+        placeholder="Your stage name"
+        class="w-full max-w-137.5 h-11.75 bg-white rounded-sm border border-[#ddd4cc] p-3.75 focus:border-primary focus:outline-none
+         opacity-0.3 text-sm font-medium text-left text-[#71707a]"
+      />
+    </label>
+
+    <label class="block space-y-3">
+      <span class="mb-2 block text-sm text-[#71707a]">Bio<span class="text-[#ff0000] pl-0.5">*</span></span>
+      <textarea
+        id="bio"
+        bind:value={$uploadStore.profile.bio}
+        placeholder="Bio"
+        class="w-full max-w-137.5 h-25 bg-white rounded-sm border border-[#ddd4cc] p-3.75 focus:border-primary focus:outline-none
+         opacity-0.3 text-sm font-medium text-left text-[#71707a]"
+      ></textarea>
+    </label>
+  </div>
+  <div class="border-t border-[#ddd] mb-12.25 mx-10"></div>
+  <LikenessDetails />
+  <div class="border-t border-[#ddd] mb-12.25 mx-10"></div>
+  <div>
+    <h3 class="text-base font-semibold text-left">Media Types</h3>
+    <p class="mt-3 text-basetext-left text-[#72717b]">
+      Morbi in tempor magna, eu semper urna. Nam vel ex non ex accumsan viverra. Vivamus hendrerit, neque et feugiat
+      tempus, tortor libero congue ipsum, ac venenatis nunc erat sit amet mi. Quisque non aliquam eros, vitae feugiat
+      diam. Sed hendrerit libero vitae sem tristique auctor.
+    </p>
+    <ImageUpload label="Headshots" required={true} />
+  </div>
+  <div class="flex gap-3.25">
+    <ImageUpload label="Body Shots" />
+    <ImageUpload label="Voice samples" />
+    <ImageUpload label="Video reels" />
+  </div>
+  <div>
+    <h3 class="text-base font-semibold text-left">Source File</h3>
+    <p class="mt-3 text-[#72717b]">Upload the original file package for this likeness.</p>
+    <div class="mt-4">
+      <FileUpload />
     </div>
-
-    <div class="space-y-4 text-sm text-[#4f463f]">
-      <div class="rounded-2xl bg-white p-4">
-        <div class="mb-1 text-xs uppercase tracking-[0.12em] text-[#8f8378]">Title</div>
-        <div class="font-medium text-dark">{$uploadStore.title || 'Untitled likeness'}</div>
-      </div>
-
-      <div class="rounded-2xl bg-white p-4">
-        <div class="mb-1 text-xs uppercase tracking-[0.12em] text-[#8f8378]">Description</div>
-        <div class="line-clamp-5 min-h-16">{$uploadStore.description || 'No description yet.'}</div>
-      </div>
-
-      <div class="rounded-2xl bg-white p-4">
-        <div class="mb-1 text-xs uppercase tracking-[0.12em] text-[#8f8378]">Cover image</div>
-        <div>{$uploadStore.uploadedImage ? $uploadStore.uploadedImage.name : 'Optional, not selected yet'}</div>
-      </div>
-
-      <div class="rounded-2xl bg-dark p-4 text-white">
-        <div class="mb-1 text-xs uppercase tracking-[0.12em] text-white/60">Source file</div>
-        <div class="font-medium">{$uploadStore.uploaded ? $uploadStore.uploaded.name : 'No file selected yet'}</div>
-      </div>
-    </div>
-  </aside>
+  </div>
+  <div class="flex gap-5 justify-center items-center">
+    <input type="checkbox" class="checkbox" bind:checked={$uploadStore.confirmations.rightsConfirmed} />
+    <p class="text-sm font-medium text-left text-[#747474]">
+      By uploading this content, you confirm that you are the author or rights holder and have the legal right to
+      license it.<span class="text-[#ff0000] pl-0.5">*</span>
+    </p>
+  </div>
 </div>
