@@ -16,7 +16,7 @@
       </div>
 
       <LicenseForm />
-    </section> 
+    </section>
   </div>
 
   <aside class="rounded-[28px] border border-[#e6dfd8] bg-dark p-6 text-white shadow-sm">

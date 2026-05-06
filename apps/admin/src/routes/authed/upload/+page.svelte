@@ -16,9 +16,9 @@
   const canContinueFromStepOne = $derived(
     Boolean(
       $uploadStore.profile.fullLegalName.trim() &&
-        $uploadStore.profile.bio.trim() &&
-        $uploadStore.files.source &&
-        $uploadStore.confirmations.rightsConfirmed,
+      $uploadStore.profile.bio.trim() &&
+      $uploadStore.files.source &&
+      $uploadStore.confirmations.rightsConfirmed,
     ),
   )
 
@@ -86,7 +86,7 @@
 
   <div class="flex justify-end gap-1.5 mt-12.5">
     <button
-      class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary  disabled:bg-[#e1dddb] text-cream"
+      class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary disabled:bg-[#e1dddb] text-cream"
       onclick={() => goToStep(1)}
       disabled={currentStep === 1 || $uploadStore.ui.loading}
     >
@@ -95,7 +95,7 @@
 
     {#if currentStep === 1}
       <button
-        class="text-sm font-medium rounded-sm h-9.5 px-7.5  bg-primary  disabled:bg-[#e1dddb] text-cream"
+        class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary disabled:bg-[#e1dddb] text-cream"
         onclick={() => goToStep(2)}
         disabled={!canContinueFromStepOne || $uploadStore.ui.loading}
       >
@@ -103,7 +103,7 @@
       </button>
     {:else}
       <button
-        class="text-sm font-medium rounded-sm h-9.5 px-7.5  bg-primary  disabled:bg-[#e1dddb] text-cream"
+        class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary disabled:bg-[#e1dddb] text-cream"
         onclick={onSubmitClick}
         disabled={$uploadStore.ui.loading || !$isFormValid || !$uploadStore.files.source}
       >

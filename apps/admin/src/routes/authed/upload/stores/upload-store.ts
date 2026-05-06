@@ -63,9 +63,7 @@ function createUploadStore() {
         hairColor: '',
       },
 
-      affiliations: [
-        { union: '', memberId: '' }
-      ],
+      affiliations: [{ union: '', memberId: '' }],
     },
 
     licensing: {
@@ -147,10 +145,7 @@ function createUploadStore() {
         ...s,
         profile: {
           ...s.profile,
-          affiliations: [
-            ...s.profile.affiliations,
-            { union: '', memberId: '' },
-          ],
+          affiliations: [...s.profile.affiliations, { union: '', memberId: '' }],
         },
       })),
 
@@ -168,9 +163,7 @@ function createUploadStore() {
         ...s,
         profile: {
           ...s.profile,
-          affiliations: s.profile.affiliations.map((a, i) =>
-            i === index ? { ...a, [key]: value } : a
-          ),
+          affiliations: s.profile.affiliations.map((a, i) => (i === index ? { ...a, [key]: value } : a)),
         },
       })),
 
@@ -255,5 +248,5 @@ export const isFormValid = derived(
   uploadStore,
   ($s) =>
     ($s.licensing.isLifetime && $s.licensing.lifetimePrice > 0) ||
-    ($s.licensing.isOneTime && $s.licensing.oneTimePrice > 0)
+    ($s.licensing.isOneTime && $s.licensing.oneTimePrice > 0),
 )
