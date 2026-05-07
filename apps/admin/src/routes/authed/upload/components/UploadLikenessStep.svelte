@@ -60,12 +60,12 @@
       tempus, tortor libero congue ipsum, ac venenatis nunc erat sit amet mi. Quisque non aliquam eros, vitae feugiat
       diam. Sed hendrerit libero vitae sem tristique auctor.
     </p>
-    <ImageUpload label="Headshots" required={true} />
+    <ImageUpload label="Headshots" required={true} fileKey="headshots" />
   </div>
   <div class="flex gap-3.25">
-    <ImageUpload label="Body Shots" />
-    <ImageUpload label="Voice samples" />
-    <ImageUpload label="Video reels" />
+    <ImageUpload label="Body Shots" fileKey="bodyShots" />
+    <ImageUpload label="Voice samples" fileKey="voiceSamples" />
+    <ImageUpload label="Video reels" fileKey="videoReels" />
   </div>
   <div>
     <h3 class="text-base font-semibold text-left">Source File</h3>

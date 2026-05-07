@@ -85,14 +85,6 @@
   {/if}
 
   <div class="flex justify-end gap-1.5 mt-12.5">
-    <button
-      class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary disabled:bg-[#e1dddb] text-cream"
-      onclick={() => goToStep(1)}
-      disabled={currentStep === 1 || $uploadStore.ui.loading}
-    >
-      Save as Draft
-    </button>
-
     {#if currentStep === 1}
       <button
         class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary disabled:bg-[#e1dddb] text-cream"
@@ -102,6 +94,14 @@
         Save and Continue
       </button>
     {:else}
+      <button
+        class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary disabled:bg-[#e1dddb] text-cream"
+        onclick={() => goToStep(1)}
+        disabled={$uploadStore.ui.loading}
+      >
+        Go back
+      </button>
+
       <button
         class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary disabled:bg-[#e1dddb] text-cream"
         onclick={onSubmitClick}

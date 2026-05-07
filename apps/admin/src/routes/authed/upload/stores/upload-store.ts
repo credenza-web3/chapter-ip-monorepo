@@ -1,9 +1,15 @@
 import { writable, derived } from 'svelte/store'
 
+type YesNo = 'yes' | 'no' | null
+
 interface UploadState {
   files: {
     source: File | null
     preview: File | null
+    headshots: File | null
+    bodyShots: File | null
+    voiceSamples: File | null
+    videoReels: File | null
   }
 
   profile: {
@@ -31,6 +37,14 @@ interface UploadState {
     isOneTime: boolean
     lifetimePrice: number
     oneTimePrice: number
+    licenseTypes: Record<string, boolean>
+    licensePrices: Record<string, string>
+    licenseDropdowns: Record<string, string>
+    permittedUses: Record<string, boolean>
+    territories: string[]
+    allowRetouching: YesNo
+    approveFinalUse: YesNo
+    agreedToFee: boolean
   }
 
   confirmations: {
@@ -47,6 +61,10 @@ function createUploadStore() {
     files: {
       source: null,
       preview: null,
+      headshots: null,
+      bodyShots: null,
+      voiceSamples: null,
+      videoReels: null,
     },
 
     profile: {
@@ -71,6 +89,30 @@ function createUploadStore() {
       isOneTime: false,
       lifetimePrice: 0,
       oneTimePrice: 0,
+      licenseTypes: {
+        'single-use': true,
+        'time-limited': false,
+        perpetual: false,
+        'ai-digital': false,
+        bulk: false,
+      },
+      licensePrices: {
+        'single-use': '0',
+        'time-limited': '0',
+        perpetual: '0',
+        'ai-digital': '0',
+        bulk: '0',
+      },
+      licenseDropdowns: {
+        'time-limited': '1 Year',
+        perpetual: 'Annual',
+        bulk: 'Member',
+      },
+      permittedUses: {},
+      territories: ['United States only'],
+      allowRetouching: null,
+      approveFinalUse: null,
+      agreedToFee: false,
     },
 
     confirmations: {
@@ -98,6 +140,33 @@ function createUploadStore() {
           isOneTime: false,
           lifetimePrice: 0,
           oneTimePrice: 0,
+          licenseTypes: {
+            ...s.licensing.licenseTypes,
+            'single-use': true,
+            'time-limited': false,
+            perpetual: false,
+            'ai-digital': false,
+            bulk: false,
+          },
+          licensePrices: {
+            ...s.licensing.licensePrices,
+            'single-use': '0',
+            'time-limited': '0',
+            perpetual: '0',
+            'ai-digital': '0',
+            bulk: '0',
+          },
+          licenseDropdowns: {
+            ...s.licensing.licenseDropdowns,
+            'time-limited': '1 Year',
+            perpetual: 'Annual',
+            bulk: 'Member',
+          },
+          permittedUses: {},
+          territories: ['United States only'],
+          allowRetouching: null,
+          approveFinalUse: null,
+          agreedToFee: false,
         },
       })),
 
@@ -107,6 +176,18 @@ function createUploadStore() {
         files: {
           ...s.files,
           preview: file,
+        },
+      })),
+
+    setMediaFile: (
+      key: 'preview' | 'headshots' | 'bodyShots' | 'voiceSamples' | 'videoReels',
+      file: File | null,
+    ) =>
+      update((s) => ({
+        ...s,
+        files: {
+          ...s.files,
+          [key]: file,
         },
       })),
 
@@ -199,6 +280,126 @@ function createUploadStore() {
         licensing: { ...s.licensing, oneTimePrice: price },
       })),
 
+    setLicenseTypeEnabled: (id: string, value: boolean) =>
+      update((s) => {
+        const nextLicensing = {
+          ...s.licensing,
+          licenseTypes: {
+            ...s.licensing.licenseTypes,
+            [id]: value,
+          },
+        }
+
+        if (id === 'single-use') {
+          nextLicensing.isOneTime = value
+          nextLicensing.oneTimePrice = value ? Number(nextLicensing.licensePrices[id] || 0) : 0
+        }
+
+        if (id === 'perpetual') {
+          nextLicensing.isLifetime = value
+          nextLicensing.lifetimePrice = value ? Number(nextLicensing.licensePrices[id] || 0) : 0
+        }
+
+        return {
+          ...s,
+          licensing: nextLicensing,
+        }
+      }),
+
+    setLicenseTypePrice: (id: string, value: string) =>
+      update((s) => {
+        const safeValue = value.replace(/[^\d.]/g, '')
+        const nextLicensing = {
+          ...s.licensing,
+          licensePrices: {
+            ...s.licensing.licensePrices,
+            [id]: safeValue,
+          },
+        }
+
+        if (id === 'single-use') {
+          nextLicensing.oneTimePrice = Number(safeValue || 0)
+        }
+
+        if (id === 'perpetual') {
+          nextLicensing.lifetimePrice = Number(safeValue || 0)
+        }
+
+        return {
+          ...s,
+          licensing: nextLicensing,
+        }
+      }),
+
+    setLicenseTypeDropdown: (id: string, value: string) =>
+      update((s) => ({
+        ...s,
+        licensing: {
+          ...s.licensing,
+          licenseDropdowns: {
+            ...s.licensing.licenseDropdowns,
+            [id]: value,
+          },
+        },
+      })),
+
+    setPermittedUse: (id: string, value: boolean) =>
+      update((s) => ({
+        ...s,
+        licensing: {
+          ...s.licensing,
+          permittedUses: {
+            ...s.licensing.permittedUses,
+            [id]: value,
+          },
+        },
+      })),
+
+    setAllPermittedUses: (ids: string[], value: boolean) =>
+      update((s) => ({
+        ...s,
+        licensing: {
+          ...s.licensing,
+          permittedUses: Object.fromEntries(ids.map((id) => [id, value])),
+        },
+      })),
+
+    setTerritories: (territories: string[]) =>
+      update((s) => ({
+        ...s,
+        licensing: {
+          ...s.licensing,
+          territories,
+        },
+      })),
+
+    setAllowRetouching: (value: YesNo) =>
+      update((s) => ({
+        ...s,
+        licensing: {
+          ...s.licensing,
+          allowRetouching: value,
+        },
+      })),
+
+    setApproveFinalUse: (value: YesNo) =>
+      update((s) => ({
+        ...s,
+        licensing: {
+          ...s.licensing,
+          approveFinalUse: value,
+        },
+      })),
+
+    setAgreedToFee: (value: boolean) =>
+      update((s) => ({
+        ...s,
+        licensing: {
+          ...s.licensing,
+          agreedToFee: value,
+        },
+      })),
+
     setRightsConfirmed: (value: boolean) =>
       update((s) => ({
         ...s,
@@ -213,7 +414,14 @@ function createUploadStore() {
 
     reset: () =>
       set({
-        files: { source: null, preview: null },
+        files: {
+          source: null,
+          preview: null,
+          headshots: null,
+          bodyShots: null,
+          voiceSamples: null,
+          videoReels: null,
+        },
         profile: {
           fullLegalName: '',
           stageName: '',
@@ -233,6 +441,30 @@ function createUploadStore() {
           isOneTime: false,
           lifetimePrice: 0,
           oneTimePrice: 0,
+          licenseTypes: {
+            'single-use': true,
+            'time-limited': false,
+            perpetual: false,
+            'ai-digital': false,
+            bulk: false,
+          },
+          licensePrices: {
+            'single-use': '0',
+            'time-limited': '0',
+            perpetual: '0',
+            'ai-digital': '0',
+            bulk: '0',
+          },
+          licenseDropdowns: {
+            'time-limited': '1 Year',
+            perpetual: 'Annual',
+            bulk: 'Member',
+          },
+          permittedUses: {},
+          territories: ['United States only'],
+          allowRetouching: null,
+          approveFinalUse: null,
+          agreedToFee: false,
         },
         confirmations: {
           rightsConfirmed: false,
@@ -246,7 +478,22 @@ export const uploadStore = createUploadStore()
 
 export const isFormValid = derived(
   uploadStore,
-  ($s) =>
-    ($s.licensing.isLifetime && $s.licensing.lifetimePrice > 0) ||
-    ($s.licensing.isOneTime && $s.licensing.oneTimePrice > 0),
+  ($s) => {
+    const enabledLicenseTypes = Object.entries($s.licensing.licenseTypes).filter(([, enabled]) => enabled)
+    const hasLicenseType = enabledLicenseTypes.length > 0
+    const hasValidLicensePrice = enabledLicenseTypes.some(
+      ([id]) => Number($s.licensing.licensePrices[id] || 0) > 0,
+    )
+    const hasPermittedUse = Object.values($s.licensing.permittedUses).some(Boolean)
+
+    return (
+      hasLicenseType &&
+      hasValidLicensePrice &&
+      hasPermittedUse &&
+      $s.licensing.territories.length > 0 &&
+      $s.licensing.allowRetouching !== null &&
+      $s.licensing.approveFinalUse !== null &&
+      $s.licensing.agreedToFee
+    )
+  },
 )

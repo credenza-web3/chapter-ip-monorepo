@@ -2,9 +2,17 @@
   import { uploadStore } from '../stores/upload-store'
   import Img from '$lib/assets/img.svg'
 
+  type MediaFileKey = 'preview' | 'headshots' | 'bodyShots' | 'voiceSamples' | 'videoReels'
+
   let imageInput: HTMLInputElement | null = $state(null)
   let imageUrl = $state<string | null>(null)
-  let { label, required = false } = $props<{ label: string; required?: boolean }>()
+  let { label, required = false, fileKey = 'preview' } = $props<{
+    label: string
+    required?: boolean
+    fileKey?: MediaFileKey
+  }>()
+
+  const selectedFile = $derived($uploadStore.files[fileKey as MediaFileKey])
 
   function handleImageInput(event: Event) {
     const target = event?.target as HTMLInputElement
@@ -17,7 +25,7 @@
       return
     }
 
-    uploadStore.setUploadedImage(file)
+    uploadStore.setMediaFile(fileKey, file)
     imageUrl = URL.createObjectURL(file)
   }
 
@@ -40,17 +48,17 @@
     class="border border-dashed min-h-62.5 rounded-lg border-[#1A1A2E33] p-3 bg-cream flex flex-col items-center justify-center gap-4"
     id="image-upload"
   >
-    {#if $uploadStore.files.preview}
+    {#if selectedFile}
       <div class="relative w-full min-h-62.5 flex items-center justify-center">
         <img
-          src={URL.createObjectURL($uploadStore.files.preview)}
+          src={URL.createObjectURL(selectedFile)}
           alt="Preview"
           class="max-h-50 max-w-full rounded object-contain"
         />
 
         <button
           type="button"
-          onclick={() => uploadStore.setUploadedImage(null)}
+          onclick={() => uploadStore.setMediaFile(fileKey, null)}
           class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white border border-[#ddd4cc] text-[#71707a] hover:text-red-500 flex items-center justify-center text-xs transition-colors"
         >
           ✕
