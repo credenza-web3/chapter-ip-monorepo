@@ -179,10 +179,7 @@ function createUploadStore() {
         },
       })),
 
-    setMediaFile: (
-      key: 'preview' | 'headshots' | 'bodyShots' | 'voiceSamples' | 'videoReels',
-      file: File | null,
-    ) =>
+    setMediaFile: (key: 'preview' | 'headshots' | 'bodyShots' | 'voiceSamples' | 'videoReels', file: File | null) =>
       update((s) => ({
         ...s,
         files: {
@@ -476,24 +473,19 @@ function createUploadStore() {
 
 export const uploadStore = createUploadStore()
 
-export const isFormValid = derived(
-  uploadStore,
-  ($s) => {
-    const enabledLicenseTypes = Object.entries($s.licensing.licenseTypes).filter(([, enabled]) => enabled)
-    const hasLicenseType = enabledLicenseTypes.length > 0
-    const hasValidLicensePrice = enabledLicenseTypes.some(
-      ([id]) => Number($s.licensing.licensePrices[id] || 0) > 0,
-    )
-    const hasPermittedUse = Object.values($s.licensing.permittedUses).some(Boolean)
+export const isFormValid = derived(uploadStore, ($s) => {
+  const enabledLicenseTypes = Object.entries($s.licensing.licenseTypes).filter(([, enabled]) => enabled)
+  const hasLicenseType = enabledLicenseTypes.length > 0
+  const hasValidLicensePrice = enabledLicenseTypes.some(([id]) => Number($s.licensing.licensePrices[id] || 0) > 0)
+  const hasPermittedUse = Object.values($s.licensing.permittedUses).some(Boolean)
 
-    return (
-      hasLicenseType &&
-      hasValidLicensePrice &&
-      hasPermittedUse &&
-      $s.licensing.territories.length > 0 &&
-      $s.licensing.allowRetouching !== null &&
-      $s.licensing.approveFinalUse !== null &&
-      $s.licensing.agreedToFee
-    )
-  },
-)
+  return (
+    hasLicenseType &&
+    hasValidLicensePrice &&
+    hasPermittedUse &&
+    $s.licensing.territories.length > 0 &&
+    $s.licensing.allowRetouching !== null &&
+    $s.licensing.approveFinalUse !== null &&
+    $s.licensing.agreedToFee
+  )
+})

@@ -6,7 +6,11 @@
 
   let imageInput: HTMLInputElement | null = $state(null)
   let imageUrl = $state<string | null>(null)
-  let { label, required = false, fileKey = 'preview' } = $props<{
+  let {
+    label,
+    required = false,
+    fileKey = 'preview',
+  } = $props<{
     label: string
     required?: boolean
     fileKey?: MediaFileKey
@@ -50,11 +54,7 @@
   >
     {#if selectedFile}
       <div class="relative w-full min-h-62.5 flex items-center justify-center">
-        <img
-          src={URL.createObjectURL(selectedFile)}
-          alt="Preview"
-          class="max-h-50 max-w-full rounded object-contain"
-        />
+        <img src={URL.createObjectURL(selectedFile)} alt="Preview" class="max-h-50 max-w-full rounded object-contain" />
 
         <button
           type="button"
