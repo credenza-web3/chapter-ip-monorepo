@@ -160,12 +160,9 @@ function createLikenessStore() {
         ...s,
         files: { ...s.files, [key]: file },
       })),
-    setFullLegalName: (value: string) =>
-      update((s) => ({ ...s, profile: { ...s.profile, fullLegalName: value } })),
-    setStageName: (value: string) =>
-      update((s) => ({ ...s, profile: { ...s.profile, stageName: value } })),
-    setBio: (value: string) =>
-      update((s) => ({ ...s, profile: { ...s.profile, bio: value } })),
+    setFullLegalName: (value: string) => update((s) => ({ ...s, profile: { ...s.profile, fullLegalName: value } })),
+    setStageName: (value: string) => update((s) => ({ ...s, profile: { ...s.profile, stageName: value } })),
+    setBio: (value: string) => update((s) => ({ ...s, profile: { ...s.profile, bio: value } })),
     setAttribute: (key: keyof LikenessState['profile']['attributes'], value: string) =>
       update((s) => ({
         ...s,
@@ -240,18 +237,15 @@ function createLikenessStore() {
         ...s,
         licensing: { ...s.licensing, permittedUses: Object.fromEntries(ids.map((id) => [id, value])) },
       })),
-    setTerritories: (territories: string[]) =>
-      update((s) => ({ ...s, licensing: { ...s.licensing, territories } })),
+    setTerritories: (territories: string[]) => update((s) => ({ ...s, licensing: { ...s.licensing, territories } })),
     setAllowRetouching: (value: YesNo) =>
       update((s) => ({ ...s, licensing: { ...s.licensing, allowRetouching: value } })),
     setApproveFinalUse: (value: YesNo) =>
       update((s) => ({ ...s, licensing: { ...s.licensing, approveFinalUse: value } })),
-    setAgreedToFee: (value: boolean) =>
-      update((s) => ({ ...s, licensing: { ...s.licensing, agreedToFee: value } })),
+    setAgreedToFee: (value: boolean) => update((s) => ({ ...s, licensing: { ...s.licensing, agreedToFee: value } })),
     setRightsConfirmed: (value: boolean) =>
       update((s) => ({ ...s, confirmations: { ...s.confirmations, rightsConfirmed: value } })),
-    setLoading: (loading: boolean) =>
-      update((s) => ({ ...s, ui: { ...s.ui, loading } })),
+    setLoading: (loading: boolean) => update((s) => ({ ...s, ui: { ...s.ui, loading } })),
     reset: () =>
       set({
         files: {

@@ -19,9 +19,7 @@
   }>()
 
   const selectedFile = $derived($likenessStore.files[fileKey as MediaFileKey])
-  const accept = $derived(
-    mediaKind === 'image' ? 'image/*' : mediaKind === 'audio' ? 'audio/*' : 'video/*',
-  )
+  const accept = $derived(mediaKind === 'image' ? 'image/*' : mediaKind === 'audio' ? 'audio/*' : 'video/*')
   const helperText = $derived(
     mediaKind === 'image'
       ? '.avif, .gif, .jpg, .png, .svg, .webp files accepted'
@@ -30,7 +28,9 @@
         : '.mp4, .mov, .webm files accepted',
   )
   const emptyStateText = $derived(
-    mediaKind === 'image' ? `Upload or drag your ${label.toLowerCase()}` : `Upload or drag your ${label.toLowerCase()} file`,
+    mediaKind === 'image'
+      ? `Upload or drag your ${label.toLowerCase()}`
+      : `Upload or drag your ${label.toLowerCase()} file`,
   )
 
   function handleImageInput(event: Event) {
@@ -64,7 +64,11 @@
     {#if selectedFile}
       <div class="relative w-full min-h-62.5 flex items-center justify-center">
         {#if mediaKind === 'image'}
-          <img src={URL.createObjectURL(selectedFile)} alt="Preview" class="max-h-50 max-w-full rounded object-contain" />
+          <img
+            src={URL.createObjectURL(selectedFile)}
+            alt="Preview"
+            class="max-h-50 max-w-full rounded object-contain"
+          />
         {:else}
           <div class="flex flex-col items-center gap-2 text-center">
             <div class="text-4xl">{mediaKind === 'audio' ? '🎵' : '🎬'}</div>
@@ -91,7 +95,7 @@
       </button>
     {/if}
 
-    <input type="file" class="hidden" bind:this={imageInput} onchange={handleImageInput} accept={accept} />
+    <input type="file" class="hidden" bind:this={imageInput} onchange={handleImageInput} {accept} />
   </div>
   <span class="text-[10px] text-right text-[#747474] w-full block">{helperText}</span>
 </div>

@@ -17,9 +17,9 @@
   const canContinueFromStepOne = $derived(
     Boolean(
       $likenessStore.profile.fullLegalName.trim() &&
-        $likenessStore.profile.bio.trim() &&
-        $likenessStore.files.headshots &&
-        $likenessStore.confirmations.rightsConfirmed,
+      $likenessStore.profile.bio.trim() &&
+      $likenessStore.files.headshots &&
+      $likenessStore.confirmations.rightsConfirmed,
     ),
   )
 
