@@ -3,37 +3,18 @@
   import { notify, ToastType } from '@repo/ui-components'
   import { UploadService } from './services/upload.service'
   import { uploadStore, isFormValid } from './stores/upload-store'
-  import UploadStepHeader from './components/UploadStepHeader.svelte'
-  import UploadLikenessStep from './components/UploadLikenessStep.svelte'
-  import UploadLicensingStep from './components/UploadLicensingStep.svelte'
+  import FileUpload from './components/FileUpload.svelte'
+  import ImageUpload from './components/ImageUpload.svelte'
+  import LicenseForm from './components/LicenseForm.svelte'
 
   const uploadService = new UploadService()
-  let currentStep = $state(1)
 
   beforeNavigate(() => uploadStore.setLoading(true))
   afterNavigate(() => uploadStore.setLoading(false))
 
-  const canContinueFromStepOne = $derived(
-    Boolean(
-      $uploadStore.profile.fullLegalName.trim() &&
-      $uploadStore.profile.bio.trim() &&
-      $uploadStore.files.source &&
-      $uploadStore.confirmations.rightsConfirmed,
-    ),
-  )
-
-  function goToStep(step: number) {
-    currentStep = step
-  }
-
   const onSubmitClick = async () => {
-    if (!$uploadStore.files.source) {
+    if (!$uploadStore.uploaded) {
       notify('No file selected', ToastType.FAIL)
-      return
-    }
-
-    if (!$uploadStore.confirmations.rightsConfirmed) {
-      notify('Please confirm that you have the legal right to license this content.', ToastType.FAIL)
       return
     }
 
@@ -42,20 +23,20 @@
       const trpcClient = uploadService.createTrpcClient()
 
       const { tokenId, imageUrl, key } = await uploadService.uploadContent(
-        $uploadStore.files.source!,
-        $uploadStore.files.preview,
-        $uploadStore.licensing.lifetimePrice,
-        $uploadStore.licensing.oneTimePrice,
+        $uploadStore.uploaded!,
+        $uploadStore.uploadedImage,
+        $uploadStore.lifetimePrice,
+        $uploadStore.oneTimePrice,
         trpcClient,
       )
 
       await uploadService.saveMetadata({
         tokenId,
-        uploaded: $uploadStore.files.source!,
+        uploaded: $uploadStore.uploaded!,
         imageUrl,
         key,
-        title: $uploadStore.profile.fullLegalName,
-        description: $uploadStore.profile.bio,
+        title: $uploadStore.title,
+        description: $uploadStore.description,
         trpcClient,
       })
 
@@ -75,44 +56,46 @@
   }
 </script>
 
-<div class="min-h-xl rounded-3xl p-5 shadow-md md:p-10 bg-[#f8f5f1]">
-  <UploadStepHeader {currentStep} />
+<div class="md:p-10 p-5 min-h-xl card bg-base-100 shadow-md rounded-3xl">
+  <div class="mb-12 text-left">
+    <h1 class="text-2xl font-semibold text-dark">Upload</h1>
+  </div>
 
-  {#if currentStep === 1}
-    <UploadLikenessStep />
-  {:else}
-    <UploadLicensingStep />
-  {/if}
+  <div class="mt-6 flex flex-col border-b-2 border-dashed border-gray-300 pb-6 max-w-2xl">
+    <h2 class="font-semibold mb-3">Details</h2>
 
-  <div class="flex justify-end gap-1.5 mt-12.5">
-    {#if currentStep === 1}
-      <button
-        class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary disabled:bg-[#e1dddb] text-cream"
-        onclick={() => goToStep(2)}
-        disabled={!canContinueFromStepOne || $uploadStore.ui.loading}
-      >
-        Save and Continue
-      </button>
-    {:else}
-      <button
-        class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary disabled:bg-[#e1dddb] text-cream"
-        onclick={() => goToStep(1)}
-        disabled={$uploadStore.ui.loading}
-      >
-        Go back
-      </button>
+    <input
+      id="title"
+      type="text"
+      bind:value={$uploadStore.title}
+      placeholder="Title"
+      class="input w-full mb-3 focus:border-[#988cff] focus:outline-none focus:ring-0"
+    />
+    <textarea
+      id="description"
+      bind:value={$uploadStore.description}
+      placeholder="Description"
+      class="input w-full mb-3 h-25 py-2 px-3 focus:border-[#988cff] focus:outline-none focus:ring-0"
+    ></textarea>
+    <ImageUpload />
+  </div>
+  <FileUpload />
 
+  <div class="mt-8 space-y-4 md:space-y-17.5">
+    <LicenseForm />
+
+    <div class="flex gap-10 mt-10">
       <button
-        class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary disabled:bg-[#e1dddb] text-cream"
+        class="btn btn-outline w-55 text-white bg-primary disabled:bg-cream disabled:text-black/10 disabled:border-primary/20"
         onclick={onSubmitClick}
-        disabled={$uploadStore.ui.loading || !$isFormValid || !$uploadStore.files.source}
+        disabled={$uploadStore.loading || !$isFormValid || !$uploadStore.uploaded}
       >
-        {#if $uploadStore.ui.loading}
+        {#if $uploadStore.loading}
           <div class="loading loading-spinner"></div>
         {:else}
           Upload file
         {/if}
       </button>
-    {/if}
+    </div>
   </div>
 </div>

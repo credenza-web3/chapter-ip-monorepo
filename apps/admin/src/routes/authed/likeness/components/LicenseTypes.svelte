@@ -1,6 +1,6 @@
 <script lang="ts">
   import { LICENSE_TYPES } from '../constants/constants'
-  import { uploadStore } from '../stores/upload-store'
+  import { likenessStore } from '../stores/likeness-store'
   import Toggle from './Toggle.svelte'
 </script>
 
@@ -15,9 +15,9 @@
       <div class="flex items-start justify-between gap-4">
         <div class="md:mt-2">
           <Toggle
-            checked={$uploadStore.licensing.licenseTypes[license.id]}
+            checked={$likenessStore.licensing.licenseTypes[license.id]}
             onToggle={() =>
-              uploadStore.setLicenseTypeEnabled(license.id, !$uploadStore.licensing.licenseTypes[license.id])}
+              likenessStore.setLicenseTypeEnabled(license.id, !$likenessStore.licensing.licenseTypes[license.id])}
           />
         </div>
 
@@ -27,16 +27,16 @@
 
             <div
               class="flex items-center gap-0.5 shrink-0 text-[#30364b] transition-opacity"
-              class:opacity-100={$uploadStore.licensing.licenseTypes[license.id]}
-              class:opacity-40={!$uploadStore.licensing.licenseTypes[license.id]}
-              class:pointer-events-none={!$uploadStore.licensing.licenseTypes[license.id]}
+              class:opacity-100={$likenessStore.licensing.licenseTypes[license.id]}
+              class:opacity-40={!$likenessStore.licensing.licenseTypes[license.id]}
+              class:pointer-events-none={!$likenessStore.licensing.licenseTypes[license.id]}
             >
               <div class="flex items-center border border-[#ddd4cc] rounded-sm bg-white overflow-hidden text-sm">
                 <span class="px-2">$</span>
                 <input
                   type="text"
-                  value={$uploadStore.licensing.licensePrices[license.id]}
-                  oninput={(e) => uploadStore.setLicenseTypePrice(license.id, e.currentTarget.value)}
+                  value={$likenessStore.licensing.licensePrices[license.id]}
+                  oninput={(e) => likenessStore.setLicenseTypePrice(license.id, e.currentTarget.value)}
                   placeholder="USD"
                   class="flex-1 h-10.5 w-20 font-medium focus:outline-none pr-2"
                 />
@@ -45,8 +45,8 @@
 
               {#if license.hasDropdown && license.dropdownOptions}
                 <select
-                  value={$uploadStore.licensing.licenseDropdowns[license.id]}
-                  onchange={(e) => uploadStore.setLicenseTypeDropdown(license.id, e.currentTarget.value)}
+                  value={$likenessStore.licensing.licenseDropdowns[license.id]}
+                  onchange={(e) => likenessStore.setLicenseTypeDropdown(license.id, e.currentTarget.value)}
                   class="select h-10.5 w-31.25 border border-[#ddd4cc] rounded-sm bg-white px-2 text-sm text-[#1A1A2E] focus:outline-none focus:border-primary"
                 >
                   {#each license.dropdownOptions as opt (opt)}

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { ETHNICITY_OPTIONS } from '../constants/constants'
-  import { uploadStore } from '../stores/upload-store'
+  import { EYE_COLOR_OPTIONS, ETHNICITY_OPTIONS, HAIR_COLOR_OPTIONS, UNION_OPTIONS } from '../constants/constants'
+  import { likenessStore } from '../stores/likeness-store'
 </script>
 
 <div class="space-y-6">
@@ -10,7 +10,7 @@
 
     <select
       id="ethnicity"
-      bind:value={$uploadStore.profile.attributes.ethnicity}
+      bind:value={$likenessStore.profile.attributes.ethnicity}
       class="select w-full max-w-67.5 h-11.75 bg-white rounded-sm border border-[#ddd4cc] p-3.75
        focus:border-primary focus:outline-none text-sm font-medium text-left text-[#71707a]"
     >
@@ -29,7 +29,7 @@
           <input
             id="heightFt"
             type="text"
-            bind:value={$uploadStore.profile.attributes.heightFt}
+            bind:value={$likenessStore.profile.attributes.heightFt}
             placeholder="0"
             class="w-full h-11.75 bg-white rounded-sm border border-[#ddd4cc]
             p-3.75 pr-10 focus:border-primary focus:outline-none
@@ -44,7 +44,7 @@
           <input
             id="heightIn"
             type="text"
-            bind:value={$uploadStore.profile.attributes.heightIn}
+            bind:value={$likenessStore.profile.attributes.heightIn}
             placeholder="0"
             class="w-full h-11.75 bg-white rounded-sm border border-[#ddd4cc]
             p-3.75 pr-10 focus:border-primary focus:outline-none
@@ -62,8 +62,8 @@
       <input
         id="weight"
         type="text"
-        bind:value={$uploadStore.profile.attributes.weight}
-        placeholder="0"
+        bind:value={$likenessStore.profile.attributes.weight}
+        placeholder="0 lbs"
         class="w-full h-11.75 bg-white rounded-sm border border-[#ddd4cc]
         p-3.75 pr-10 focus:border-primary focus:outline-none
         text-sm font-medium text-left text-[#71707a]"
@@ -73,32 +73,28 @@
   <div class="flex justify-between max-w-137.5 gap-2.5">
     <label class="block space-y-3 w-full">
       <span class="mb-2 block text-sm text-[#71707a]">Eye Color</span>
-
       <select
         id="eyeColor"
-        bind:value={$uploadStore.profile.attributes.eyeColor}
+        bind:value={$likenessStore.profile.attributes.eyeColor}
         class="select w-full max-w-67.5 h-11.75 bg-white rounded-sm border border-[#ddd4cc] p-3.75
        focus:border-primary focus:outline-none text-sm font-medium text-left text-[#71707a]"
       >
         <option value="" disabled>Select one</option>
-
-        {#each ETHNICITY_OPTIONS as opt (opt.value)}
+        {#each EYE_COLOR_OPTIONS as opt (opt.value)}
           <option value={opt.value}>{opt.label}</option>
         {/each}
       </select>
     </label>
     <label class="block space-y-3 w-full">
       <span class="mb-2 block text-sm text-[#71707a]">Hair Color</span>
-
       <select
         id="hairColor"
-        bind:value={$uploadStore.profile.attributes.hairColor}
+        bind:value={$likenessStore.profile.attributes.hairColor}
         class="select w-full max-w-67.5 h-11.75 bg-white rounded-sm border border-[#ddd4cc] p-3.75
        focus:border-primary focus:outline-none text-sm font-medium text-left text-[#71707a]"
       >
         <option value="" disabled>Select one</option>
-
-        {#each ETHNICITY_OPTIONS as opt (opt.value)}
+        {#each HAIR_COLOR_OPTIONS as opt (opt.value)}
           <option value={opt.value}>{opt.label}</option>
         {/each}
       </select>
@@ -108,25 +104,28 @@
   <div class="space-y-3">
     <h3 class="text-base font-semibold text-left">Union Affiliations</h3>
 
-    {#each $uploadStore.profile.affiliations as affiliation, i (i)}
+    {#each $likenessStore.profile.affiliations as affiliation, i (i)}
       <div class="flex items-center justify-between max-w-137.5 gap-2.5">
         <label class="block space-y-3 w-full">
           <span class="mb-2 block text-sm text-[#71707a]">Union</span>
-          <input
-            type="text"
+          <select
             value={affiliation.union}
-            oninput={(e) => uploadStore.updateAffiliation(i, 'union', e.currentTarget.value)}
-            placeholder="Select one"
-            class="w-full max-w-137.5 h-11.75 bg-white rounded-sm border border-[#ddd4cc] p-3.75 focus:border-primary focus:outline-none
-           opacity-0.3 text-sm font-medium text-left text-[#71707a]"
-          />
+            onchange={(e) => likenessStore.updateAffiliation(i, 'union', e.currentTarget.value)}
+            class="select w-full max-w-137.5 h-11.75 bg-white rounded-sm border border-[#ddd4cc] p-3.75 focus:border-primary focus:outline-none
+           text-sm font-medium text-left text-[#71707a]"
+          >
+            <option value="" disabled>Select one</option>
+            {#each UNION_OPTIONS as opt (opt.value)}
+              <option value={opt.value}>{opt.label}</option>
+            {/each}
+          </select>
         </label>
         <label class="block space-y-3 w-full">
           <span class="mb-2 block text-sm text-[#71707a]">Union Member ID</span>
           <input
             type="text"
             value={affiliation.memberId}
-            oninput={(e) => uploadStore.updateAffiliation(i, 'memberId', e.currentTarget.value)}
+            oninput={(e) => likenessStore.updateAffiliation(i, 'memberId', e.currentTarget.value)}
             placeholder="Member ID no"
             class="w-full max-w-137.5 h-11.75 bg-white rounded-sm border border-[#ddd4cc] p-3.75 focus:border-primary focus:outline-none
            opacity-0.3 text-sm font-medium text-left text-[#71707a]"
@@ -136,7 +135,7 @@
         {#if i > 0}
           <button
             type="button"
-            onclick={() => uploadStore.removeAffiliation(i)}
+            onclick={() => likenessStore.removeAffiliation(i)}
             class="mt-6 shrink-0 text-[#71707a] hover:text-red-500 transition-colors"
           >
             ✕
@@ -150,8 +149,8 @@
     <button
       type="button"
       onclick={() => {
-        const hasEmpty = $uploadStore.profile.affiliations.some((a) => !a.union.trim() || !a.memberId.trim())
-        if (!hasEmpty) uploadStore.addAffiliation()
+        const hasEmpty = $likenessStore.profile.affiliations.some((a) => !a.union.trim() || !a.memberId.trim())
+        if (!hasEmpty) likenessStore.addAffiliation()
       }}
       class="text-sm text-primary flex items-center gap-2.25"
     >

@@ -1,12 +1,12 @@
 <script lang="ts">
   import { PERMITTED_USES } from '../constants/constants'
-  import { uploadStore } from '../stores/upload-store'
+  import { likenessStore } from '../stores/likeness-store'
   import Toggle from './Toggle.svelte'
 
-  let allPermitted = $derived(PERMITTED_USES.every((u) => $uploadStore.licensing.permittedUses[u.id]))
+  let allPermitted = $derived(PERMITTED_USES.every((u) => $likenessStore.licensing.permittedUses[u.id]))
 
   function toggleAllUses() {
-    uploadStore.setAllPermittedUses(
+    likenessStore.setAllPermittedUses(
       PERMITTED_USES.map((u) => u.id),
       !allPermitted,
     )
@@ -29,7 +29,7 @@
           stroke-linejoin="round"
         />
       </svg>
-      {allPermitted ? 'Remove all' : 'Allow all'}
+      {allPermitted ? 'Deselect all' : 'Select all'}
     </button>
   </div>
 
@@ -37,8 +37,8 @@
     {#each PERMITTED_USES as use (use.id)}
       <div class="flex items-start gap-3">
         <Toggle
-          checked={$uploadStore.licensing.permittedUses[use.id]}
-          onToggle={() => uploadStore.setPermittedUse(use.id, !$uploadStore.licensing.permittedUses[use.id])}
+          checked={$likenessStore.licensing.permittedUses[use.id]}
+          onToggle={() => likenessStore.setPermittedUse(use.id, !$likenessStore.licensing.permittedUses[use.id])}
         />
         <div>
           <p class="text-sm font-semibold text-[#1A1A2E]">{use.label}</p>

@@ -1,28 +1,28 @@
 <script lang="ts">
   import { TERRITORIES } from '../constants/constants'
-  import { uploadStore } from '../stores/upload-store'
+  import { likenessStore } from '../stores/likeness-store'
 
   function toggleTerritory(territory: string) {
     if (territory === 'Select all') {
-      uploadStore.setTerritories(
-        $uploadStore.licensing.territories.length === TERRITORIES.length - 1
+      likenessStore.setTerritories(
+        $likenessStore.licensing.territories.length === TERRITORIES.length - 1
           ? []
           : TERRITORIES.filter((item) => item !== 'Select all'),
       )
       return
     }
 
-    if ($uploadStore.licensing.territories.includes(territory)) {
-      uploadStore.setTerritories($uploadStore.licensing.territories.filter((t) => t !== territory))
+    if ($likenessStore.licensing.territories.includes(territory)) {
+      likenessStore.setTerritories($likenessStore.licensing.territories.filter((t) => t !== territory))
     } else {
-      uploadStore.setTerritories([...$uploadStore.licensing.territories, territory])
+      likenessStore.setTerritories([...$likenessStore.licensing.territories, territory])
     }
   }
 
   function isSelected(territory: string) {
     return territory === 'Select all'
-      ? $uploadStore.licensing.territories.length === TERRITORIES.length - 1
-      : $uploadStore.licensing.territories.includes(territory)
+      ? $likenessStore.licensing.territories.length === TERRITORIES.length - 1
+      : $likenessStore.licensing.territories.includes(territory)
   }
 </script>
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { uploadStore } from '../stores/upload-store'
+  import { likenessStore } from '../stores/likeness-store'
 
   const questions = [
     { key: 'allowRetouching', label: 'Allow minor retouching?' },
@@ -18,15 +18,15 @@
               type="button"
               onclick={() => {
                 if (question.key === 'allowRetouching') {
-                  uploadStore.setAllowRetouching(option as 'yes' | 'no')
+                  likenessStore.setAllowRetouching(option as 'yes' | 'no')
                 } else {
-                  uploadStore.setApproveFinalUse(option as 'yes' | 'no')
+                  likenessStore.setApproveFinalUse(option as 'yes' | 'no')
                 }
               }}
               class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors
-                {$uploadStore.licensing[question.key] === option ? 'border-primary' : 'border-[#ddd4cc]'}"
+                {$likenessStore.licensing[question.key] === option ? 'border-primary' : 'border-[#ddd4cc]'}"
             >
-              {#if $uploadStore.licensing[question.key] === option}
+              {#if $likenessStore.licensing[question.key] === option}
                 <span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
               {/if}
             </button>

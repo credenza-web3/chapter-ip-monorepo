@@ -51,7 +51,7 @@
 </script>
 
 <div
-  class={`bg-white h-50 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-gray-500 text-sm cursor-pointer transition ${
+  class={`max-w-2xl mt-10 bg-white h-50 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-gray-500 text-sm cursor-pointer transition ${
     isOver ? 'border-primary bg-white' : 'border-gray-300'
   }`}
   role="button"
@@ -72,14 +72,14 @@
     <UploadIcon />
   </div>
   <span class="text-center mb-2 font-medium text-sm">Upload or drag a file</span>
-  {#if $uploadStore.files.source}
+  {#if $uploadStore.uploaded}
     <div class="flex flex-col items-center mt-4">
-      <span class="mb-2">📄 {$uploadStore.files.source.name}</span>
+      <span class="mb-2">📄 {$uploadStore.uploaded.name}</span>
     </div>
   {:else}
     <button class="btn bg-primary text-white px-2 w-50 mb-2"> Add file </button>
-    <span class="text-center text-xs text-[#707070] font-medium"
-      >Max. file size: 1gb | File types supported: .txt, .docx, .mov, .mp4, and .zip</span
+    <span class="text-xs text-[#707070] font-medium"
+      >Max. file size: 1gb | File types supported: .txt, .docx, .mov, .mp4, .nil, and .zip</span
     >
   {/if}
 

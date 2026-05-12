@@ -1,12 +1,12 @@
 <script lang="ts">
+  import { likenessStore } from '../stores/likeness-store'
   import ApprovalSettings from './ApprovalSettings.svelte'
   import LicenseTypes from './LicenseTypes.svelte'
   import PermittedUses from './PermittedUses.svelte'
   import TerritorySelector from './TerritorySelector.svelte'
-  import { uploadStore } from '../stores/upload-store'
 
   function toggleAgreement() {
-    uploadStore.setAgreedToFee(!$uploadStore.licensing.agreedToFee)
+    likenessStore.setAgreedToFee(!$likenessStore.licensing.agreedToFee)
   }
 </script>
 
@@ -19,8 +19,7 @@
     <h2 class="mb-2 text-[28px] font-medium text-left text-dark">Licensing</h2>
 
     <p class="mt-3 text-base text-[#72717b]">
-      Vestibulum mollis lacinia ligula in pellentesque. Sed eu justo ligula. Donec vel nisl sit amet orci condimentum
-      egestas nec euismod diam. Interdum et malesuada fames ac ante ipsum primis in faucibus.
+      Set licensing terms, permitted uses, territory, and approvals for this likeness before continuing.
     </p>
   </div>
 
@@ -39,10 +38,10 @@
         type="button"
         onclick={toggleAgreement}
         class={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
-          $uploadStore.licensing.agreedToFee ? 'bg-primary border-primary' : 'border-[#ddd4cc] bg-white'
+          $likenessStore.licensing.agreedToFee ? 'bg-primary border-primary' : 'border-[#ddd4cc] bg-white'
         }`}
       >
-        {#if $uploadStore.licensing.agreedToFee}
+        {#if $likenessStore.licensing.agreedToFee}
           <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
             <path
               d="M1 4L3.5 6.5L9 1"

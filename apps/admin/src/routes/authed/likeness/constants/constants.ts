@@ -1,8 +1,39 @@
 export const ETHNICITY_OPTIONS = [
-  { value: 0, label: '1' },
-  { value: 1, label: '2' },
-  { value: 2, label: '3' },
-  { value: 3, label: '4' },
+  { value: 'hispanic_or_latino', label: 'Hispanic or Latino' },
+  { value: 'white_or_caucasian', label: 'White or Caucasian' },
+  { value: 'black_or_african_american', label: 'Black or African American' },
+  { value: 'native_hawaiian_or_other_pacific_islander', label: 'Native Hawaiian or Other Pacific Islander' },
+  { value: 'asian', label: 'Asian' },
+  { value: 'american_indian_or_alaska_native', label: 'American Indian or Alaska Native' },
+  { value: 'other', label: 'Other (prefer to self-identify)' },
+] as const
+
+export const EYE_COLOR_OPTIONS = [
+  { value: 'gray', label: 'Gray' },
+  { value: 'blue', label: 'Blue' },
+  { value: 'green', label: 'Green' },
+  { value: 'hazel', label: 'Hazel' },
+  { value: 'amber', label: 'Amber' },
+  { value: 'brown', label: 'Brown' },
+] as const
+
+export const HAIR_COLOR_OPTIONS = [
+  { value: 'black', label: 'Black' },
+  { value: 'brown', label: 'Brown' },
+  { value: 'auburn', label: 'Auburn' },
+  { value: 'red', label: 'Red' },
+  { value: 'blonde', label: 'Blonde' },
+  { value: 'gray', label: 'Gray' },
+  { value: 'white', label: 'White' },
+] as const
+
+export const UNION_OPTIONS = [
+  { value: 'SAG-AFTRA', label: 'SAG-AFTRA' },
+  { value: 'AEA', label: 'AEA' },
+  { value: 'IATSE', label: 'IATSE' },
+  { value: 'AFM', label: 'AFM' },
+  { value: 'WGA', label: 'WGA' },
+  { value: 'DGA', label: 'DGA' },
 ] as const
 
 export const LICENSE_TYPES = [
@@ -19,7 +50,7 @@ export const LICENSE_TYPES = [
     description:
       'Sed hendrerit libero vitae sem tristique auctor. Etiam quis quam rhoncus, vehicula ligula ut, congue nibh. Nunc condimentum',
     hasDropdown: true,
-    dropdownOptions: ['1 Year', '2 Years', '3 Years'],
+    dropdownOptions: ['1 year', '6 months', '3 months', '1 month'],
   },
   {
     id: 'perpetual',
@@ -27,7 +58,7 @@ export const LICENSE_TYPES = [
     description:
       'Leo ipsum, fermentum eget sagittis eu, fermentum in est. Fusce gravida ipsum eget condimentum lacinia. Sed non efficitur risus.',
     hasDropdown: true,
-    dropdownOptions: ['Annual', 'Monthly'],
+    dropdownOptions: ['Ongoing', 'One brand', 'Annual', 'One-time fee'],
   },
   {
     id: 'ai-digital',
@@ -42,7 +73,7 @@ export const LICENSE_TYPES = [
     description:
       'Vivamus aliquet ultricies dolor, at feugiat libero ultricies quis. Nam convallis elit eget ipsum gravida, sed lobortis urna consequat.',
     hasDropdown: true,
-    dropdownOptions: ['Member', 'Non-member'],
+    dropdownOptions: ['Enterprise', 'Per-member', 'Flat-fee'],
   },
 ]
 

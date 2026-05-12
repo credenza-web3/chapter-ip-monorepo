@@ -17,6 +17,7 @@ export class TransactionService {
     return String(tokenId)
   }
 
+
   private async forwardMintTransaction(mintPopulatedTx: any): Promise<string> {
     return await forwardTransaction(mintPopulatedTx, {
       token: authStore.state.accessToken!,

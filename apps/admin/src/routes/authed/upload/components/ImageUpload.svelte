@@ -2,21 +2,8 @@
   import { uploadStore } from '../stores/upload-store'
   import Img from '$lib/assets/img.svg'
 
-  type MediaFileKey = 'preview' | 'headshots' | 'bodyShots' | 'voiceSamples' | 'videoReels'
-
   let imageInput: HTMLInputElement | null = $state(null)
   let imageUrl = $state<string | null>(null)
-  let {
-    label,
-    required = false,
-    fileKey = 'preview',
-  } = $props<{
-    label: string
-    required?: boolean
-    fileKey?: MediaFileKey
-  }>()
-
-  const selectedFile = $derived($uploadStore.files[fileKey as MediaFileKey])
 
   function handleImageInput(event: Event) {
     const target = event?.target as HTMLInputElement
@@ -29,7 +16,7 @@
       return
     }
 
-    uploadStore.setMediaFile(fileKey, file)
+    uploadStore.setUploadedImage(file)
     imageUrl = URL.createObjectURL(file)
   }
 
@@ -44,40 +31,34 @@
   // }
 </script>
 
-<div class="space-y-1.25 w-full">
-  <label class="text-sm text-[#707070]" for="image-upload"
-    >{label}{#if required}<span class="text-[#ff0000] pl-0.5">*</span>{/if}</label
-  >
-  <div
-    class="border border-dashed min-h-62.5 rounded-lg border-[#1A1A2E33] p-3 bg-cream flex flex-col items-center justify-center gap-4"
-    id="image-upload"
-  >
-    {#if selectedFile}
-      <div class="relative w-full min-h-62.5 flex items-center justify-center">
-        <img src={URL.createObjectURL(selectedFile)} alt="Preview" class="max-h-50 max-w-full rounded object-contain" />
-
-        <button
-          type="button"
-          onclick={() => uploadStore.setMediaFile(fileKey, null)}
-          class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white border border-[#ddd4cc] text-[#71707a] hover:text-red-500 flex items-center justify-center text-xs transition-colors"
-        >
-          ✕
-        </button>
-      </div>
-    {:else}
-      <p class="text-base font-semibold text-dark">Upload or drag your headshots</p>
-      <button
-        type="button"
-        onclick={() => imageInput?.click()}
-        class="w-10.5 h-10.5 rounded-full bg-primary text-white flex items-center justify-center text-4xl"
-      >
-        +
-      </button>
-    {/if}
-
-    <input type="file" class="hidden" bind:this={imageInput} onchange={handleImageInput} accept="image/*" />
+<div class="mb-4 mt-10">
+  <label for="image-select" class="block font-semibold"
+    >Select Cover Image (optional)
+    <span class="text-sm font-medium">(Optional)</span>
+  </label>
+  <span class="text-xs text-[#747474]">600px by 600px .jpg, .gif, .png images will work best</span>
+  <div class="flex items-start gap-4 mt-5 flex-col">
+    <!-- Image Preview -->
+    <div
+      class="relative w-32 h-32 rounded-lg overflow-hidden bg-white flex items-center justify-center"
+      class:border-2={!imageUrl}
+      class:border-dashed={!imageUrl}
+      class:border-[#dedede]={!imageUrl}
+    >
+      <img
+        src={imageUrl ? imageUrl : Img}
+        alt=""
+        class={imageUrl ? 'w-full h-full object-cover' : 'w-4.5 h-4.5 object-contain'}
+      />
+    </div>
+    <button
+      id="image-select"
+      class="text-primary text-xs font-medium cursor-pointer"
+      onclick={() => imageInput?.click()}
+      type="button"
+    >
+      Upload a new cover image
+    </button>
   </div>
-  <span class="text-[10px] text-right text-[#747474] w-full block">
-    .avif, .gif, .jpg, .png, .svg, .webp files accepted
-  </span>
+  <input type="file" class="hidden" bind:this={imageInput} onchange={handleImageInput} accept="image/*" />
 </div>
