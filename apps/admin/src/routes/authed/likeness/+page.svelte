@@ -1,13 +1,13 @@
 <script lang="ts">
   import { afterNavigate, beforeNavigate, goto } from '$app/navigation'
-  import { notify, ToastType } from '@repo/ui-components'
-  import { UploadService } from '../upload/services/upload.service'
   import { isFormValid, likenessStore } from './stores/likeness-store'
   import UploadStepHeader from './components/UploadStepHeader.svelte'
   import UploadLikenessStep from './components/UploadLikenessStep.svelte'
   import UploadLicensingStep from './components/UploadLicensingStep.svelte'
 
-  const uploadService = new UploadService()
+   let { data } = $props()
+   console.log('Likeness page data:', data) 
+
   let currentStep = $state(1)
   const primaryLikenessFile = $derived($likenessStore.files.headshots ?? $likenessStore.files.source)
 
@@ -26,7 +26,6 @@
   function onSaveDraftClick() {
     goto('/authed/files')
   }
-
   function onSaveLicensingDraftClick() {
     goto('/authed/files')
   }
@@ -36,51 +35,7 @@
   }
 
   const onSubmitClick = async () => {
-    if (!primaryLikenessFile) {
-      notify('No likeness asset selected', ToastType.FAIL)
-      return
-    }
-
-    if (!$likenessStore.confirmations.rightsConfirmed) {
-      notify('Please confirm that you have the legal right to license this content.', ToastType.FAIL)
-      return
-    }
-
-    try {
-      likenessStore.setLoading(true)
-      const trpcClient = uploadService.createTrpcClient()
-
-      const { tokenId, imageUrl, key } = await uploadService.uploadContent(
-        primaryLikenessFile!,
-        $likenessStore.files.headshots ?? $likenessStore.files.preview,
-        $likenessStore.licensing.lifetimePrice,
-        $likenessStore.licensing.oneTimePrice,
-        trpcClient,
-      )
-
-      await uploadService.saveMetadata({
-        tokenId,
-        uploaded: primaryLikenessFile!,
-        imageUrl,
-        key,
-        title: $likenessStore.profile.fullLegalName,
-        description: $likenessStore.profile.bio,
-        trpcClient,
-      })
-
-      notify('File uploaded successfully', ToastType.SUCCESS)
-      likenessStore.reset()
-      goto(`/authed/files`)
-    } catch (error) {
-      console.error('Error uploading file:', error)
-      let errorMessage = 'Failed to upload file.'
-      if (error instanceof Error && error.message.includes('duplicate key error')) {
-        errorMessage = errorMessage + ' This file already exists.'
-      }
-      notify(errorMessage, ToastType.FAIL)
-    } finally {
-      likenessStore.setLoading(false)
-    }
+    console.log($likenessStore, 'Submitting likeness with data')
   }
 </script>
 
