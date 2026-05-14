@@ -37,7 +37,7 @@
       </div>
     </div>
   </Header>
-  <main class="space-y-0 flex-1 p-6">
+  <main class="space-y-0 flex-1 p-6 pt-9.75">
     {@render children?.()}
   </main>
   <Footer />

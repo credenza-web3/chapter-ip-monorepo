@@ -75,7 +75,7 @@
       await saveAgencyAddress()
       await saveAgencyFee()
 
-      goto('/authed/upload')
+      goto('/authed/publisher/created')
     } finally {
       loading = false
     }
