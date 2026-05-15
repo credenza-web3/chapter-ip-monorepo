@@ -14,20 +14,16 @@
 
   const NewBrowseAndPurchaseItems = [
     {
-      text: 'Written Works',
+      text: 'New Written Works',
       href: '/authed/',
     },
     {
-      text: 'Location',
+      text: 'New Location',
       href: '/authed/location',
     },
     {
-      text: 'Likeness',
+      text: 'New Likeness',
       href: '/authed/likeness',
-    },
-    {
-      text: 'Upload',
-      href: '/authed/upload',
     },
   ]
 
