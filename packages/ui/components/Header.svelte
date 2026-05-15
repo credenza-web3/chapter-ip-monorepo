@@ -3,14 +3,13 @@
   import Logo from '../assets/chapterip-full-logo-dark.svg'
   import Dots from '../assets/dots.svg'
 
-  let { authStore, children, menuItems, pathname } = $props<{
+  let { authStore, children, menuItems } = $props<{
     authStore: any
     children?: () => any
     menuItems?: { text: string; href: string }[]
     pathname?: string
   }>()
   const { state: authState } = $derived(authStore)
-  let menuOpen = $state(false)
   let headerRef: HTMLElement
 
   const NewBrowseAndPurchaseItems = [
@@ -33,8 +32,7 @@
   ]
 
   function handleClickOutside(event: MouseEvent) {
-    if (menuOpen && headerRef && !headerRef.contains(event.target as Node)) {
-      menuOpen = false
+    if (headerRef && !headerRef.contains(event.target as Node)) {
     }
   }
 
@@ -57,15 +55,58 @@
   {#if authState.accessToken}
     {@render children?.()}
   {/if}
-  <button class="cursor-pointer flex-shrink-0" onclick={() => (menuOpen = !menuOpen)}>
-    <img src={Dots} alt="Menu" class="w-5 h-5 flex-shrink-0" />
-  </button>
+
+  <div class="dropdown dropdown-bottom flex-shrink-0 bg-transparent">
+    <div
+      tabindex="0"
+      role="button"
+      class="btn bg-transparent border-0 shadow-none hover:bg-transparent active:bg-transparent flex items-center
+      gap-2 text-[15px] font-medium text-[#767682] px-0"
+    >
+      <img src={Dots} alt="Menu" class="w-5 h-5 flex-shrink-0" />
+    </div>
+    <ul
+      tabindex="-1"
+      class="dropdown-content menu z-50 mt-2 w-35 rounded-md border border-[#1A1A2E1A]
+        bg-cream p-2 text-left text-sm font-medium text-[#1A1A2E99]
+        shadow-[3px_6px_8px_0_rgba(21,34,50,0.08)] right-0 top-10 whitespace-normal break-words md:w-52"
+    >
+      {#if authState.accessToken}
+        {#each menuItems as item}
+          <li>
+            <a href={item.href} class="px-4 py-2 mx-2 rounded-md transition-all hover:bg-[#E0DBD6]">
+              {item.text}
+            </a>
+          </li>
+        {/each}
+
+        <li>
+          <button
+            onclick={() => authStore.logout()}
+            class="text-left px-4 py-2.5 mx-2 rounded-md transition-all hover:text-red-600 text-sm font-medium text-[#1A1A2E99]"
+          >
+            Logout
+          </button>
+        </li>
+      {:else}
+        <li>
+          <button
+            onclick={() => authStore.startLogin()}
+            class="mx-2 mt-1 px-4 py-2.5 rounded-md transition-all hover:bg-[#5b3ff0] text-sm font-medium text-white bg-[#6e4ff7]"
+          >
+            Login
+          </button>
+        </li>
+      {/if}
+    </ul>
+  </div>
 
   <div class="dropdown dropdown-bottom bg-transparent flex-shrink-0">
     <div
       tabindex="0"
       role="button"
-      class="btn bg-transparent border-0 shadow-none hover:bg-transparent active:bg-transparent flex items-center gap-2 text-[15px] font-medium text-[#767682] px-0"
+      class="btn bg-transparent border-0 shadow-none hover:bg-transparent active:bg-transparent flex items-center
+      gap-2 text-[15px] font-medium text-[#767682] px-0"
     >
       <div
         class="flex items-center justify-center rounded-full bg-primary text-white
@@ -80,50 +121,11 @@
       class="dropdown-content menu rounded-box z-1 md:w-52 w-35 p-2 rounded-md
       shadow-[3px_6px_8px_0_rgba(21,34,50,0.08)]
       border border-[#1A1A2E1A]
-      bg-cream text-sm font-medium text-left text-[#1A1A2E99] right-0"
+      bg-cream text-sm font-medium text-left text-[#1A1A2E99] right-0 top-12"
     >
       {#each NewBrowseAndPurchaseItems as item (item)}
         <li><a href={item.href}>{item.text}</a></li>
       {/each}
     </ul>
   </div>
-
-  {#if menuOpen}
-    <div
-      class="absolute top-full right-3 mt-2 w-60 flex flex-col z-50 rounded-md shadow-[3px_6px_8px_0_rgba(21,34,50,0.08)]
-      border border-[#1A1A2E1A] bg-cream text-sm font-medium
-      text-[#1A1A2E99] py-2 md:w-52 w-35"
-    >
-      {#if authState.accessToken}
-        {#each menuItems as item}
-          <a
-            href={item.href}
-            class="px-4 py-2 mx-2 rounded-md transition-all
-            hover:hover:bg-[#E0DBD6]
-            {pathname === item.href ? 'text-[#6e4ff7] underline underline-offset-4 font-semibold' : ''}"
-          >
-            {item.text}
-          </a>
-        {/each}
-
-        <button
-          onclick={() => authStore.logout()}
-          class="text-left px-4 py-2.5 mx-2 rounded-md transition-all
-          hover:text-red-600 text-sm font-medium
-          text-[#1A1A2E99]"
-        >
-          Logout
-        </button>
-      {:else}
-        <button
-          onclick={() => authStore.startLogin()}
-          class="mx-2 mt-1 px-4 py-2.5 text-sm font-semibold text-white
-          bg-[#6e4ff7] rounded-md transition-all hover:bg-[#5b3ff0] text-sm font-medium
-          text-[#1A1A2E99]"
-        >
-          Login
-        </button>
-      {/if}
-    </div>
-  {/if}
 </header>
