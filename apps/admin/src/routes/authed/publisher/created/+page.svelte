@@ -24,7 +24,7 @@
       title: 'Likeness',
       description: 'Image, voice and identity licensing.',
       icon: LikenessIcon,
-      path: '/authed/upload',
+      path: '/authed/likeness',
     },
   ]
 </script>
