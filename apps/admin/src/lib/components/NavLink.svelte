@@ -4,12 +4,11 @@
     icon: IconComponent,
     children,
     activeColor = '#6e4ff7',
-    inactiveBg = '#e4e8eb',
-    inactiveTextColor = '#1A1A2E',
+    inactiveTextColor = '#767682',
     iconSize = '22px',
   } = $props<{
     href: string
-    icon: any
+    icon?: any
     children: any
     activeColor?: string
     inactiveBg?: string
@@ -27,7 +26,7 @@
 <a
   {href}
   class="flex items-center py-2 md:px-8 px-2 gap-3 font-semibold rounded-[5px] text-xs md:text-sm text-[#353e47]"
-  style:background-color={isActive ? 'transparent' : inactiveBg}
+  style:background-color={isActive ? 'transparent' : ''}
   style:color={textColor}
 >
   <IconComponent class="w-[{iconSize}]" color={iconColor} />
