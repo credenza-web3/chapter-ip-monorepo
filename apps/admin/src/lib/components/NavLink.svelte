@@ -3,8 +3,8 @@
     href,
     icon: IconComponent,
     children,
-    activeColor = '#6734ff',
-    inactiveTextColor = '#1A1A2E',
+    activeColor = '#6e4ff7',
+    inactiveTextColor = '#767682',
     iconSize = '22px',
   } = $props<{
     href: string
@@ -25,7 +25,8 @@
 
 <a
   {href}
-  class="relative flex items-center py-2 md:px-3.5 px-2 gap-3 font-semibold rounded-[5px] text-xs md:text-[13px] text-[#353e47] text-[15px]"
+  class="flex items-center py-2 md:px-8 px-2 gap-3 font-semibold rounded-[5px] text-xs md:text-sm text-[#353e47]"
+  style:background-color={isActive ? 'transparent' : ''}
   style:color={textColor}
 >
   <IconComponent class="w-[{iconSize}]" color={iconColor} />
