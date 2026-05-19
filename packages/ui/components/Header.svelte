@@ -96,32 +96,33 @@
       {/if}
     </ul>
   </div>
-
-  <div class="dropdown dropdown-bottom bg-transparent flex-shrink-0">
-    <div
-      tabindex="0"
-      role="button"
-      class="btn bg-transparent border-0 shadow-none hover:bg-transparent active:bg-transparent flex items-center
-      gap-2 text-[15px] font-medium text-[#767682] px-0"
-    >
+  {#if authState.accessToken}
+    <div class="dropdown dropdown-bottom bg-transparent flex-shrink-0">
       <div
-        class="flex items-center justify-center rounded-full bg-primary text-white
-        w-7 h-7 text-sm leading-none flex-shrink-0 md:ml-[26px] ml-3"
+        tabindex="0"
+        role="button"
+        class="btn bg-transparent border-0 shadow-none hover:bg-transparent active:bg-transparent flex items-center
+      gap-2 text-[15px] font-medium text-[#767682] px-0"
       >
-        <span class="font-normal text-3xl">+</span>
+        <div
+          class="flex items-center justify-center rounded-full bg-primary text-white
+        w-7 h-7 text-sm leading-none flex-shrink-0 md:ml-[26px] ml-3"
+        >
+          <span class="font-normal text-3xl">+</span>
+        </div>
       </div>
-    </div>
 
-    <ul
-      tabindex="-1"
-      class="dropdown-content menu rounded-box z-1 md:w-52 w-35 p-2 rounded-md
+      <ul
+        tabindex="-1"
+        class="dropdown-content menu rounded-box z-1 md:w-52 w-35 p-2 rounded-md
       shadow-[3px_6px_8px_0_rgba(21,34,50,0.08)]
       border border-[#1A1A2E1A]
       bg-cream text-sm font-medium text-left text-[#1A1A2E99] right-0 top-12"
-    >
-      {#each NewBrowseAndPurchaseItems as item (item)}
-        <li><a href={item.href}>{item.text}</a></li>
-      {/each}
-    </ul>
-  </div>
+      >
+        {#each NewBrowseAndPurchaseItems as item (item)}
+          <li><a href={item.href}>{item.text}</a></li>
+        {/each}
+      </ul>
+    </div>
+  {/if}
 </header>
