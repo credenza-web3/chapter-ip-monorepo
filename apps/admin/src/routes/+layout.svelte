@@ -30,7 +30,7 @@
   const BrowseAndPurchaseItems = [
     {
       text: 'Written Works',
-      href: '/authed/',
+      href: '/authed/upload',
     },
     {
       text: 'Location',
@@ -39,10 +39,6 @@
     {
       text: 'Likeness',
       href: '/authed/likeness',
-    },
-    {
-      text: 'Upload',
-      href: '/authed/upload',
     },
   ]
   let requests = [1, 2, 3]
