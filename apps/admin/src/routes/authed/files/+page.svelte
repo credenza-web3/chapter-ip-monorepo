@@ -3,6 +3,7 @@
   import { formatDate, formatKM } from '$lib/services/formatDate.js'
   import { fetchContentTokenMeta } from '@repo/fe-services'
   import RecentFiles from './RecentFiles.svelte'
+  import PublisherCreated from './PublisherCreated.svelte'
   import { getFilePricing } from './helper'
   import { useClipboard } from '$lib/hooks/useClipboard.svelte'
   import CopyIcon from '$lib/components/icons/CopyIcon.svelte'
@@ -28,9 +29,7 @@
     anytime.
   </p>
   {#if !items.length}
-    <div class="text-center py-8">
-      <p class="text-gray-500">No files found</p>
-    </div>
+    <PublisherCreated />
   {:else}
     <div class="overflow-x-auto">
       <table class="table border rounded-t-md border-[#e2e9f0]">

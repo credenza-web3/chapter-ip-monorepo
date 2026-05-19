@@ -58,7 +58,7 @@
     >{label}{#if required}<span class="text-[#ff0000] pl-0.5">*</span>{/if}</label
   >
   <div
-    class="border border-dashed h-62.5 rounded-lg border-[#1A1A2E33] p-3 bg-cream flex flex-col items-center justify-center gap-4"
+    class="border border-dashed h-62.5 rounded-lg border-[#1A1A2E33] p-4 bg-cream flex flex-col items-center justify-center gap-4"
     id="image-upload"
   >
     {#if selectedFile}
