@@ -36,7 +36,13 @@ export const UNION_OPTIONS = [
   { value: 'DGA', label: 'DGA' },
 ] as const
 
-export const LICENSE_TYPES = [
+export const LICENSE_TYPES: {
+  id: string
+  label: string
+  description: string
+  hasDropdown?: boolean
+  dropdownOptions?: string[]
+}[] = [
   {
     id: 'single-use',
     label: 'Single-use campaign',
@@ -44,14 +50,14 @@ export const LICENSE_TYPES = [
       'Morbi in tempor magna, eu semper urna. Nam vel ex non ex accumsan viverra. Vivamus hendrerit, neque et feugiat tempus, tortor libero congue ipsum.',
     hasDropdown: false,
   },
-  {
-    id: 'time-limited',
-    label: 'Time-limited commercial',
-    description:
-      'Sed hendrerit libero vitae sem tristique auctor. Etiam quis quam rhoncus, vehicula ligula ut, congue nibh. Nunc condimentum',
-    hasDropdown: true,
-    dropdownOptions: ['1 year', '6 months', '3 months', '1 month'],
-  },
+  // {
+  //   id: 'time-limited',
+  //   label: 'Time-limited commercial',
+  //   description:
+  //     'Sed hendrerit libero vitae sem tristique auctor. Etiam quis quam rhoncus, vehicula ligula ut, congue nibh. Nunc condimentum',
+  //   hasDropdown: true,
+  //   dropdownOptions: ['1 year', '6 months', '3 months', '1 month'],
+  // },
   {
     id: 'perpetual',
     label: 'Perpetual brand ambassador',

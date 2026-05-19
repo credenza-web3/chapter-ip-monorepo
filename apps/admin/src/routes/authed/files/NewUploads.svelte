@@ -29,21 +29,14 @@
   ]
 </script>
 
-<div class="min-h-xl p-8 border border-[#eef2f6] rounded-3xl bg-[#f8f5f1]">
-  <div class="w-full max-w-5xl">
-    <!-- Header -->
-    <div class="mb-6.25">
-      <h1 class="text-lg font-semibold text-left text-dark">Getting started with ChapterIP</h1>
-      <p class=" text-sm font-medium text-left text-[#767682]">What do you want to license today?</p>
-    </div>
-
+<div class="min-h-xl p-8 bg-[#f8f5f1]">
+  <div class="w-full">
     <!-- Cards Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.25 w-full">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 w-full">
       {#each categories as category (category.id)}
         <div
           class="
            rounded-lg w-full mx-auto
-           max-w-87.5
            aspect-square
             border-2 border-dashed border-[#c8c4bc]
             flex flex-col items-center justify-center
