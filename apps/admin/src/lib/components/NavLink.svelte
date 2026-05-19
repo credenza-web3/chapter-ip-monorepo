@@ -30,5 +30,11 @@
   style:color={textColor}
 >
   <IconComponent class="w-[{iconSize}]" color={iconColor} />
-  {@render children()}
+
+  <span class="relative md:text-[15px] text-[12px]">
+    {@render children()}
+    {#if isActive}
+      <div class="absolute -bottom-7.75 left-0 right-0 h-1 rounded-full" style:background-color={activeColor}></div>
+    {/if}
+  </span>
 </a>

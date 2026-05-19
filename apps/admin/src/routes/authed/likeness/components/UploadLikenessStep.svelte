@@ -57,7 +57,7 @@
     <p class="mt-3 text-base text-[#72717b]">Upload by dragging files onto the page or clicking to browse.</p>
     <ImageUpload label="Headshots" required={true} fileKey="headshots" mediaKind="image" />
   </div>
-  <div class="flex gap-3.25">
+  <div class="flex md:flex-row flex-col gap-3.25">
     <ImageUpload label="Full body" fileKey="bodyShots" mediaKind="image" />
     <ImageUpload label="Voice samples" fileKey="voiceSamples" mediaKind="audio" />
     <ImageUpload label="Video reels" fileKey="videoReels" mediaKind="video" />
