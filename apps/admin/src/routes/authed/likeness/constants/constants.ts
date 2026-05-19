@@ -57,24 +57,24 @@ export const LICENSE_TYPES = [
     label: 'Perpetual brand ambassador',
     description:
       'Leo ipsum, fermentum eget sagittis eu, fermentum in est. Fusce gravida ipsum eget condimentum lacinia. Sed non efficitur risus.',
-    hasDropdown: true,
-    dropdownOptions: ['Ongoing', 'One brand', 'Annual', 'One-time fee'],
-  },
-  {
-    id: 'ai-digital',
-    label: 'AI/Digital twin',
-    description:
-      'Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Phasellus lorem Leo, porttitor id cursus vel, aliquet vel orci.',
     hasDropdown: false,
+    // dropdownOptions: ['Ongoing', 'One brand', 'Annual', 'One-time fee'],
   },
-  {
-    id: 'bulk',
-    label: 'Bulk clean list',
-    description:
-      'Vivamus aliquet ultricies dolor, at feugiat libero ultricies quis. Nam convallis elit eget ipsum gravida, sed lobortis urna consequat.',
-    hasDropdown: true,
-    dropdownOptions: ['Enterprise', 'Per-member', 'Flat-fee'],
-  },
+  // {
+  //   id: 'ai-digital',
+  //   label: 'AI/Digital twin',
+  //   description:
+  //     'Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Phasellus lorem Leo, porttitor id cursus vel, aliquet vel orci.',
+  //   hasDropdown: false,
+  // },
+  // {
+  //   id: 'bulk',
+  //   label: 'Bulk clean list',
+  //   description:
+  //     'Vivamus aliquet ultricies dolor, at feugiat libero ultricies quis. Nam convallis elit eget ipsum gravida, sed lobortis urna consequat.',
+  //   hasDropdown: true,
+  //   dropdownOptions: ['Enterprise', 'Per-member', 'Flat-fee'],
+  // },
 ]
 
 export const PERMITTED_USES = [
@@ -100,11 +100,11 @@ export const PERMITTED_USES = [
     label: 'Film/TV',
     description: 'Morbi in tempor magna, eu semper urna. Nam vel ex non ex accumsan viverra.',
   },
-  {
-    id: 'print',
-    label: 'Print',
-    description: 'Integer velit tortor, bibendum sit amet efficitur vitae, tristique a nibh.',
-  },
+  // {
+  //   id: 'print',
+  //   label: 'Print',
+  //   description: 'Integer velit tortor, bibendum sit amet efficitur vitae, tristique a nibh.',
+  // },
 ]
 
 export const TERRITORIES = [
