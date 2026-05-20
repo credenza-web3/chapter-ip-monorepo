@@ -89,7 +89,11 @@
                 {@const mockSales = [3, 0, 12, 0, null][i] ?? null}
                 {@const mockRev = [15000, 0, 14400, 0, null][i] ?? null}
 
-                <tr class="border-b border-[#ddd] last:border-0 bg-[#f8f5f1] hover:bg-[#f5f4f1]">
+                <tr
+                  class="border-b border-[#ddd] last:border-0 hover:bg-[#f5f4f1] {i % 2 === 0
+                    ? 'bg-[#f8f5f1]'
+                    : 'bg-cream'}"
+                >
                   <td class="px-4 py-1.5">{formatDate(item.createdAt)}</td>
                   <td class="px-4 py-1.5">{meta.title || 'N/A'}</td>
                   <td class="px-4 py-1.5">{meta.type || 'Likeness'}</td>
