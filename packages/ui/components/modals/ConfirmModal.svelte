@@ -1,18 +1,32 @@
 <script lang="ts">
   import Base from './Base.svelte'
 
-  let { text, redirectTo, onClose } = $props()
+  let {
+    title,
+    description,
+    onClose,
+    submitText,
+    onSubmit,
+  }: {
+    title: string
+    submitText?: string
+    description?: string
+    onClose: () => void
+    onSubmit: () => void
+  } = $props()
 </script>
 
-<Base {onClose}>
-  <div class="flex flex-col gap-3 items-center">
-    <h3 class="text-xl font-semibold">{text}</h3>
-    <div class="w-full border-t border-gray-200 mt-4"></div>
-    <div class="flex space-x-4 mt-8 justify-between md:justify-start">
-      <button class="btn bg-black text-white px-6 md:px-12 rounded-md text-xs" onclick={onClose}>Cancel</button>
-      <a href={redirectTo} class="btn bg-green-600 text-white px-6 md:px-12 rounded-md text-xs hover:bg-green-700">
-        Confirm
-      </a>
+<Base {onClose} isBack={true}>
+  <div class="flex flex-col gap-3 items-start">
+    <h3 class="text-[22px] font-semibold">{title}</h3>
+    {#if description}
+      <p class="text-base font-normal text-[#747474]">{description}</p>
+    {/if}
+
+    <div class="flex space-x-4 mt-8 w-full justify-center">
+      <button class="btn bg-[#6734ff] text-white px-12 py-6 rounded-md text-base w-[350px]" onclick={onSubmit}
+        >{submitText}</button
+      >
     </div>
   </div>
 </Base>

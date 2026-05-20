@@ -6,9 +6,6 @@
   import UploadLicensingStep from './components/UploadLicensingStep.svelte'
   import ConfirmLikenessStep from './components/ConfirmLikenessStep.svelte'
 
-  let { data } = $props()
-  console.log('Likeness page data:', data)
-
   let currentStep = $state(1)
 
   beforeNavigate(() => likenessStore.setLoading(true))
@@ -23,6 +20,6 @@
   {:else if currentStep === 2}
     <UploadLicensingStep bind:currentStep />
   {:else}
-    <ConfirmLikenessStep />
+    <ConfirmLikenessStep bind:currentStep />
   {/if}
 </div>

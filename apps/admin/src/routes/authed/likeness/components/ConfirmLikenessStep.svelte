@@ -2,8 +2,40 @@
   import Checkmark from '$lib/assets/Checkmark.svelte'
   import Cross from '$lib/assets/Cross.svelte'
   import { likenessStore } from '../stores/likeness-store'
+  import { modals } from 'svelte-modals'
+  import { ConfirmModal } from '@repo/ui-components'
 
-  console.log($likenessStore)
+  let { currentStep = $bindable() } = $props()
+
+  const allFiles = $derived([...$likenessStore.files.headshots, ...$likenessStore.files.bodyShots])
+
+  const mainPhoto = $derived(allFiles[0] ?? null)
+  const rest = $derived(allFiles.slice(1))
+
+  const thumbsToShow = $derived(rest.slice(0, 3))
+  const remaining = $derived(rest.length > 3 ? rest.length - 3 : 0)
+
+  const lbsToKg = () => +(+$likenessStore.profile.attributes.weight * 0.453592).toFixed(1)
+
+  const feetInchesToCm = () =>
+    +((+$likenessStore.profile.attributes.heightFt * 12 + +$likenessStore.profile.attributes.heightIn) * 2.54).toFixed(
+      1,
+    )
+
+  const onSubmit = () => {
+    modals.open(ConfirmModal, {
+      title: 'Confirming your Likeness',
+      description:
+        'By publishing, you confirm that you have the legal right to license your likeness, that the terms you’ve set are accurate, and that a Content NFT will be minted on-chain representing this listing. This action is irreversible.',
+      submitText: 'I understand and will continue',
+      onSubmit: () => {
+        modals.close()
+      },
+      onClose: () => {
+        modals.close()
+      },
+    })
+  }
 </script>
 
 <div class="space-y-12 mt-7.25 text-dark">
@@ -22,6 +54,7 @@
       <!-- Edit button -->
       <div class="flex justify-end mb-6">
         <button
+          onclick={() => (currentStep = 1)}
           class="bg-primary text-white rounded-sm px-5 py-2.5 text-sm font-medium hover:bg-[#5a4bd1] transition-colors"
         >
           Edit details
@@ -33,37 +66,49 @@
         <div class="flex items-center w-111 justify-center mb-3">
           <div class="flex-1 h-px bg-[#c8c4bc]"></div>
           <div class="w-24 h-24 rounded-full overflow-hidden mx-4 shrink-0">
-            <img src={'avala.jpg'} alt="" class="w-full h-full object-cover" />
+            <img src={URL.createObjectURL(mainPhoto)} alt="" class="w-full h-full object-cover" />
           </div>
           <div class="flex-1 h-px bg-[#c8c4bc]"></div>
         </div>
-        <h1 class="text-[28px] font-semibold text-dark tracking-tight mt-1">{$likenessStore.profile.stageName}</h1>
+        <h1 class="text-[28px] font-semibold text-dark tracking-tight mt-1">{$likenessStore.profile.fullLegalName}</h1>
       </div>
 
       <!-- Main content -->
       <div class="flex gap-6 mx-auto flex-wrap">
         <!-- Left: photo + thumbnails -->
-        <div class="flex-1 max-w-100">
-          <div class="rounded-xl overflow-hidden mb-2.5">
-            <img src="main-photo.jpg" alt="Chad Bowser" class="w-full object-cover" style="height: 340px;" />
-          </div>
-          <div class="grid grid-cols-4 gap-1.5">
-            <div class="rounded-lg overflow-hidden aspect-square">
-              <img src="thumb1.jpg" alt="" class="w-full h-full object-cover" />
+        {#if mainPhoto}
+          <div class="flex-1 max-w-100">
+            <div class="rounded-xl overflow-hidden mb-2.5">
+              <img src={URL.createObjectURL(mainPhoto)} class="w-full object-cover" style="height: 340px;" />
             </div>
-            <div class="rounded-lg overflow-hidden aspect-square">
-              <img src="thumb2.jpg" alt="" class="w-full h-full object-cover" />
-            </div>
-            <div class="rounded-lg overflow-hidden aspect-square">
-              <img src="thumb3.jpg" alt="" class="w-full h-full object-cover" />
-            </div>
-            <div class="rounded-lg overflow-hidden aspect-square relative bg-[#c4beb6]">
-              <img src="thumb4.jpg" alt="" class="w-full h-full object-cover opacity-60" />
-              <span class="absolute inset-0 flex items-center justify-center text-[#1a1a1a] font-bold text-sm">+16</span
+
+            {#if thumbsToShow.length > 0}
+              <div
+                class="grid gap-1.5"
+                style="grid-template-columns: repeat({thumbsToShow.length + (remaining > 0 ? 1 : 0)}, 1fr)"
               >
-            </div>
+                {#each thumbsToShow as file, i (file.name + i)}
+                  <div class="rounded-lg overflow-hidden aspect-square">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt=""
+                      class="w-full max-w-1/2 h-full max-h-1/2 object-cover"
+                    />
+                  </div>
+                {/each}
+
+                {#if remaining > 0}
+                  <div class="rounded-lg overflow-hidden aspect-square relative bg-[#c4beb6]">
+                    <img src={URL.createObjectURL(rest[3])} alt="" class="w-full h-full object-cover opacity-60" />
+                    <span class="absolute inset-0 flex items-center justify-center text-[#1a1a1a] font-bold text-sm">
+                      +{remaining}
+                    </span>
+                  </div>
+                {/if}
+              </div>
+            {/if}
           </div>
-        </div>
+        {/if}
 
         <!-- Right: info -->
         <div class="flex-[1.1] min-w-64 flex flex-col gap-6">
@@ -87,12 +132,13 @@
                 <tr>
                   <td class="py-1 font-semibold">Height:</td>
                   <td class="py-1"
-                    >{$likenessStore.profile.attributes.heightFt}' {$likenessStore.profile.attributes.heightIn}"</td
+                    >{$likenessStore.profile.attributes.heightFt}' {$likenessStore.profile.attributes.heightIn}" ({feetInchesToCm()}
+                    cm)</td
                   >
                 </tr>
                 <tr>
                   <td class="py-1 font-semibold">Weight:</td>
-                  <td class="py-1">{$likenessStore.profile.attributes.weight} lbs</td>
+                  <td class="py-1">{$likenessStore.profile.attributes.weight} lbs ({lbsToKg()} kg)</td>
                 </tr>
                 <tr>
                   <td class="py-1 font-semibold">Eye color:</td>
@@ -107,19 +153,21 @@
           </div>
 
           <!-- Union affiliations -->
-          <div>
-            <h2 class="text-base font-semibold text-[#202225] mb-2">Union affiliations</h2>
-            <table class="w-full text-base text-[#72717b]">
-              <tbody>
-                {#each $likenessStore.profile.affiliations as aff (aff.memberId)}
-                  <tr>
-                    <td class="py-1 font-semibold w-1/5">{aff.union}</td>
-                    <td class="py-1">{aff.memberId}</td>
-                  </tr>
-                {/each}
-              </tbody>
-            </table>
-          </div>
+          {#if $likenessStore.profile.affiliations[0].union}
+            <div>
+              <h2 class="text-base font-semibold text-[#202225] mb-2">Union affiliations</h2>
+              <table class="w-full text-base text-[#72717b]">
+                <tbody>
+                  {#each $likenessStore.profile.affiliations as aff (aff.memberId)}
+                    <tr>
+                      <td class="py-1 font-semibold w-1/5">{aff.union}</td>
+                      <td class="py-1">{aff.memberId}</td>
+                    </tr>
+                  {/each}
+                </tbody>
+              </table>
+            </div>
+          {/if}
         </div>
       </div>
     </div>
@@ -128,6 +176,7 @@
       <!-- Edit button -->
       <div class="flex justify-end mb-8">
         <button
+          onclick={() => (currentStep = 2)}
           class="bg-primary text-white rounded-sm px-5 py-2.5 text-sm font-medium hover:bg-[#5a4bd1] transition-colors"
         >
           Edit licensing
@@ -236,6 +285,7 @@
   <button
     class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary disabled:bg-[#e1dddb] text-cream"
     disabled={$likenessStore.ui.loading}
+    onclick={onSubmit}
   >
     Save and Publish
   </button>

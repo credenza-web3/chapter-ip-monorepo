@@ -78,7 +78,7 @@ function createLikenessStore() {
       lifetimePrice: 0,
       oneTimePrice: 0,
       licenseTypes: {
-        'single-use': true,
+        'single-use': false,
         'time-limited': false,
         perpetual: false,
         'ai-digital': false,
