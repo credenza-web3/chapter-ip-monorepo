@@ -1,5 +1,5 @@
 <script lang="ts">
-	import NewUploads from './NewUploads.svelte';
+  import NewUploads from './NewUploads.svelte'
   import { formatKM } from '$lib/services/formatDate.js'
   import { fetchContentTokenMeta } from '@repo/fe-services'
   import { formatDate, getFilePricing } from './helper'
