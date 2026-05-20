@@ -91,7 +91,7 @@
         </div>
       </div>
       <div class="flex items-center md:gap-7.25 gap-4">
-        <a href="/authed/files" class="inline-flex">
+        <a href="/authed/notifications" class="inline-flex">
           <div class="relative cursor-pointer">
             <img src={BellIcon} alt="notifications" class="h-5.75" />
             {#if requests.length > 0}
@@ -106,8 +106,10 @@
       </div>
     </div>
   </Header>
-  <main class="space-y-0 flex-1 p-6 pt-9.75">
+  <main class="space-y-0 flex-1 px-6 pt-9.75 bg-cream">
     {@render children?.()}
+    <div class="mt-auto p-8 md:p-12.5">
+      <Footer />
+    </div>
   </main>
-  <Footer />
 </div>
