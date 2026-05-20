@@ -91,7 +91,7 @@
         </div>
       </div>
       <div class="flex items-center md:gap-7.25 gap-4">
-        <a href="/authed/files" class="inline-flex">
+        <a href="/authed/notifications" class="inline-flex">
           <div class="relative cursor-pointer">
             <img src={BellIcon} alt="notifications" class="h-5.75" />
             {#if requests.length > 0}
