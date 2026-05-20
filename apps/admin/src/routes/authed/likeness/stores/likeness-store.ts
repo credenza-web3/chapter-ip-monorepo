@@ -2,15 +2,14 @@ import { writable, derived } from 'svelte/store'
 
 type YesNo = 'yes' | 'no' | null
 type MediaFileKey = 'preview' | 'headshots' | 'bodyShots' | 'voiceSamples' | 'videoReels'
+type MultipleFileKey = 'headshots' | 'bodyShots' | 'voiceSamples' | 'videoReels'
 
 interface LikenessState {
   files: {
-    source: File | null
-    preview: File | null
-    headshots: File | null
-    bodyShots: File | null
-    voiceSamples: File | null
-    videoReels: File | null
+    headshots: File[] // multiple
+    bodyShots: File[] // multiple
+    voiceSamples: File[] // multiple
+    videoReels: File[] // multiple
   }
   profile: {
     fullLegalName: string
@@ -54,12 +53,10 @@ interface LikenessState {
 function createLikenessStore() {
   const { subscribe, set, update } = writable<LikenessState>({
     files: {
-      source: null,
-      preview: null,
-      headshots: null,
-      bodyShots: null,
-      voiceSamples: null,
-      videoReels: null,
+      headshots: [],
+      bodyShots: [],
+      voiceSamples: [],
+      videoReels: [],
     },
     profile: {
       fullLegalName: '',
@@ -81,7 +78,7 @@ function createLikenessStore() {
       lifetimePrice: 0,
       oneTimePrice: 0,
       licenseTypes: {
-        'single-use': true,
+        'single-use': false,
         'time-limited': false,
         perpetual: false,
         'ai-digital': false,
@@ -160,6 +157,24 @@ function createLikenessStore() {
         ...s,
         files: { ...s.files, [key]: file },
       })),
+    appendMediaFiles(key: MultipleFileKey, newFiles: File[]) {
+      update((s) => ({
+        ...s,
+        files: {
+          ...s.files,
+          [key]: [...(s.files[key] as File[]), ...newFiles],
+        },
+      }))
+    },
+    removeMediaFile(key: MultipleFileKey, index: number) {
+      update((s) => ({
+        ...s,
+        files: {
+          ...s.files,
+          [key]: (s.files[key] as File[]).filter((_, i) => i !== index),
+        },
+      }))
+    },
     setFullLegalName: (value: string) => update((s) => ({ ...s, profile: { ...s.profile, fullLegalName: value } })),
     setStageName: (value: string) => update((s) => ({ ...s, profile: { ...s.profile, stageName: value } })),
     setBio: (value: string) => update((s) => ({ ...s, profile: { ...s.profile, bio: value } })),
@@ -249,12 +264,10 @@ function createLikenessStore() {
     reset: () =>
       set({
         files: {
-          source: null,
-          preview: null,
-          headshots: null,
-          bodyShots: null,
-          voiceSamples: null,
-          videoReels: null,
+          headshots: [],
+          bodyShots: [],
+          voiceSamples: [],
+          videoReels: [],
         },
         profile: {
           fullLegalName: '',

@@ -1,7 +1,18 @@
 <script lang="ts">
   import { likenessStore } from '../stores/likeness-store'
-  import ImageUpload from './ImageUpload.svelte'
+  import MediaUpload from './MediaUpload.svelte'
   import LikenessDetails from './LikenessDetails.svelte'
+
+  let { currentStep = $bindable() } = $props()
+
+  const canContinueFromStepOne = $derived(
+    Boolean(
+      $likenessStore.profile.fullLegalName.trim() &&
+      $likenessStore.profile.bio.trim() &&
+      $likenessStore.files.headshots &&
+      $likenessStore.confirmations.rightsConfirmed,
+    ),
+  )
 </script>
 
 <div class="space-y-12 mt-7.25 text-dark">
@@ -55,12 +66,12 @@
   <div>
     <h3 class="text-base font-semibold text-left">Upload assets</h3>
     <p class="mt-3 text-base text-[#72717b]">Upload by dragging files onto the page or clicking to browse.</p>
-    <ImageUpload label="Headshots" required={true} fileKey="headshots" mediaKind="image" />
+    <MediaUpload label="Headshots" required={true} fileKey="headshots" mediaKind="image" />
   </div>
   <div class="flex md:flex-row flex-col gap-3.25">
-    <ImageUpload label="Full body" fileKey="bodyShots" mediaKind="image" />
-    <ImageUpload label="Voice samples" fileKey="voiceSamples" mediaKind="audio" />
-    <ImageUpload label="Video reels" fileKey="videoReels" mediaKind="video" />
+    <MediaUpload label="Full body" fileKey="bodyShots" mediaKind="image" />
+    <MediaUpload label="Voice samples" fileKey="voiceSamples" mediaKind="audio" />
+    <MediaUpload label="Video reels" fileKey="videoReels" mediaKind="video" />
   </div>
   <div class="flex gap-5 justify-center items-center">
     <input type="checkbox" class="checkbox" bind:checked={$likenessStore.confirmations.rightsConfirmed} />
@@ -69,4 +80,16 @@
       license it.<span class="text-[#ff0000] pl-0.5">*</span>
     </p>
   </div>
+</div>
+
+<div class="flex justify-end gap-1.5 mt-12.5">
+  {#if canContinueFromStepOne}
+    <button
+      class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary disabled:bg-[#e1dddb] text-cream"
+      onclick={() => (currentStep = 2)}
+      disabled={$likenessStore.ui.loading}
+    >
+      Save and Continue
+    </button>
+  {/if}
 </div>

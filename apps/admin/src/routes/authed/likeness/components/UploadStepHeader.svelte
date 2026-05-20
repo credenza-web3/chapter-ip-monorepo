@@ -1,7 +1,7 @@
 <script lang="ts">
   let { currentStep = 1 } = $props<{ currentStep: number }>()
 
-  const steps = [1, 2]
+  const steps = [1, 2, 3]
 </script>
 
 <div class="mt-12.5">

@@ -3,7 +3,7 @@
   import { formatDate, formatKM } from '$lib/services/formatDate.js'
   import { fetchContentTokenMeta } from '@repo/fe-services'
   import RecentFiles from './RecentFiles.svelte'
-  import PublisherCreated from './PublisherCreated.svelte'
+  import NewUploads from './NewUploads.svelte'
   import { getFilePricing } from './helper'
   import { useClipboard } from '$lib/hooks/useClipboard.svelte'
   import CopyIcon from '$lib/components/icons/CopyIcon.svelte'
@@ -22,14 +22,11 @@
 
 <RecentFiles />
 
-<div class="min-h-xl p-8 border border-[#eef2f6] rounded-3xl bg-white">
-  <h2 class=" mb-2.5 font-semibold text-2xl leading-7.25 text-[#202025]">Creator Dashboard</h2>
-  <p class=" mb-4 font-normal text-sm leading-6 text-[#747474]">
-    Add and manage files, metadata, pricing and specify ownership rules. Update product information and adjust pricing
-    anytime.
-  </p>
-  {#if !items.length}
-    <PublisherCreated />
+<div class="min-h-xl p-8 border border-[#eef2f6] rounded-3xl bg-[#f8f5f1]">
+  <h2 class="mb-2.5 font-semibold text-2xl leading-7.25 text-[#202025]">Getting started with ChapterIP</h2>
+  <p class="mb-4 font-normal text-sm leading-6 text-[#747474]">What do you want to license today?</p>
+  {#if items.length}
+    <NewUploads />
   {:else}
     <div class="overflow-x-auto">
       <table class="table border rounded-t-md border-[#e2e9f0]">

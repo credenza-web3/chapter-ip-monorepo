@@ -7,7 +7,7 @@
 <div class="space-y-4">
   <div>
     <p class="text-sm font-medium text-[#747474]">A minimum of one must be selected</p>
-    <h3 class="text-base font-semibold text-[#1A1A2E]">License types<span class="text-[#ff0000]">*</span></h3>
+    <h3 class="text-base font-semibold text-[#1A1A2E]">License types <span class="text-[#ff0000]">*</span></h3>
   </div>
 
   <div class="space-y-4">
