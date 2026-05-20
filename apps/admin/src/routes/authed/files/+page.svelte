@@ -6,73 +6,12 @@
   import Arrow from '$lib/assets/arrow-narrow-up.svg'
   import Code from '$lib/assets/code.svg'
   import Edit from '$lib/assets/edit.svg'
+  import { menuItems } from './constants'
 
   let { data } = $props()
   let { items } = data.paginatedResponse
 
-  const menuItems = [
-    {
-      text: 'View listing',
-      href: '/authed/files',
-    },
-    {
-      text: 'Edit listing',
-      href: '/authed/files',
-    },
-    {
-      text: 'Set as draft',
-      href: '/authed/files',
-    },
-    {
-      text: 'Deactivate listing',
-      href: '/authed/files',
-    },
-    {
-      text: 'View history',
-      href: '/authed/history',
-    },
-  ]
-
-  const purchaseHistory = [
-    {
-      date: '2026-04-14T10:23:11.000Z',
-      fileName: 'Chadwick Bowser',
-      licenseType: 'Time-limited',
-      org: 'Netflix',
-      amount: 1200,
-    },
-    {
-      date: '2026-04-14T14:05:47.000Z',
-      fileName: 'Madison Square Gardens',
-      licenseType: 'Time-limited',
-      org: 'Hulu',
-      amount: 1200,
-    },
-    {
-      date: '2026-04-10T09:18:33.000Z',
-      fileName: 'Madison Square Gardens',
-      licenseType: 'Time-limited',
-      org: 'Disney',
-      amount: 1200,
-    },
-    {
-      date: '2026-03-06T16:44:02.000Z',
-      fileName: 'Chadwick Bowser',
-      licenseType: 'Single use',
-      org: 'Netflix',
-      amount: 15000,
-    },
-    {
-      date: '2026-01-03T08:30:59.000Z',
-      fileName: 'Chadwick Bowser',
-      licenseType: 'Time-limited',
-      org: 'Paramount',
-      amount: 1200,
-    },
-  ]
-
-  type FilterKey = 'All' | 'Written works' | 'Locations' | 'Likeness'
-  let activeFilter = $state<FilterKey>('All')
+  let activeFilter = $state('All')
 </script>
 
 {#if !items.length}
@@ -107,7 +46,7 @@
           <span class="text-[13px] font-medium text-[#1A1A2E]/60">Written works: 1 | Locations: 1 | Likeness: 3</span>
         </div>
         <div class="flex gap-1">
-          {#each ['All', 'Written works', 'Locations', 'Likeness'] as FilterKey[] as f (f)}
+          {#each ['All', 'Written works', 'Locations', 'Likeness'] as f (f)}
             <button
               onclick={() => (activeFilter = f)}
               class="px-5.25 py-1 rounded-full text-[13px] font-medium {activeFilter === f
