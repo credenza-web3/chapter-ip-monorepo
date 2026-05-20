@@ -106,8 +106,10 @@
       </div>
     </div>
   </Header>
-  <main class="space-y-0 flex-1 p-6 pt-9.75 bg-cream">
+  <main class="space-y-0 flex-1 px-6 pt-9.75 bg-cream">
     {@render children?.()}
+    <div class="mt-auto p-8 md:p-12.5">
+      <Footer />
+    </div>
   </main>
-  <Footer />
 </div>
