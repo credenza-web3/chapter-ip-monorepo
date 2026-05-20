@@ -20,7 +20,6 @@
   {#if !items.length}
     <NewUploads />
   {:else}
-
     <div class="mt-9.75">
       <div class="flex items-center justify-between py-4 border-b border-[#f0ede6]">
         <div class="flex items-center gap-2.5">
