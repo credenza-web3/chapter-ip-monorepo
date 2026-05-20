@@ -45,6 +45,7 @@
 [data-theme='wireframe'] {
   --color-primary: #6734ff;
   --color-primary-content: #ffffff;
+  --color-disabled: #6d6b76;
 }
 
 .input.validator:focus-within {

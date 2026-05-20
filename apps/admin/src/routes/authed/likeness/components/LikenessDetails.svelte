@@ -28,7 +28,7 @@
         <div class="relative w-full max-w-25">
           <input
             id="heightFt"
-            type="text"
+            type="number"
             bind:value={$likenessStore.profile.attributes.heightFt}
             placeholder="0"
             class="w-full h-11.75 bg-white rounded-sm border border-[#ddd4cc]
@@ -43,7 +43,7 @@
         <div class="relative w-full max-w-25">
           <input
             id="heightIn"
-            type="text"
+            type="number"
             bind:value={$likenessStore.profile.attributes.heightIn}
             placeholder="0"
             class="w-full h-11.75 bg-white rounded-sm border border-[#ddd4cc]
@@ -61,7 +61,7 @@
       <span class="mb-2 block text-sm text-[#71707a]">Weight</span>
       <input
         id="weight"
-        type="text"
+        type="number"
         bind:value={$likenessStore.profile.attributes.weight}
         placeholder="0 lbs"
         class="w-full h-11.75 bg-white rounded-sm border border-[#ddd4cc]

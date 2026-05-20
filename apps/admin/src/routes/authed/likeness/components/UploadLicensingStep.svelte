@@ -1,9 +1,13 @@
 <script lang="ts">
-  import { likenessStore } from '../stores/likeness-store'
+  import { likenessStore, isFormValid } from '../stores/likeness-store'
   import ApprovalSettings from './ApprovalSettings.svelte'
   import LicenseTypes from './LicenseTypes.svelte'
   import PermittedUses from './PermittedUses.svelte'
   import TerritorySelector from './TerritorySelector.svelte'
+
+  let { currentStep = $bindable() } = $props()
+
+  const primaryLikenessFile = $derived($likenessStore.files.headshots ?? $likenessStore.files.source)
 
   function toggleAgreement() {
     likenessStore.setAgreedToFee(!$likenessStore.licensing.agreedToFee)
@@ -26,8 +30,6 @@
   <LicenseTypes />
   {@render divider('mx-10')}
   <PermittedUses />
-  {@render divider()}
-  <TerritorySelector />
   {@render divider()}
   <ApprovalSettings />
   {@render divider()}
@@ -60,4 +62,23 @@
       </span>
     </label>
   </div>
+</div>
+
+<div class="flex justify-end gap-1.5 mt-12.5">
+  <button
+    class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary disabled:bg-[#e1dddb] text-cream"
+    onclick={() => (currentStep = 1)}
+    disabled={$likenessStore.ui.loading}
+  >
+    Go back
+  </button>
+  {#if $isFormValid}
+    <button
+      class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary disabled:bg-[#e1dddb] text-cream"
+      onclick={() => (currentStep = 3)}
+      disabled={$likenessStore.ui.loading || !primaryLikenessFile}
+    >
+      Save and Continue
+    </button>
+  {/if}
 </div>

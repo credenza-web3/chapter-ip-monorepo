@@ -11,6 +11,7 @@
       description: 'Scripts, articles and written works.',
       icon: WrittenWorksIcon,
       path: '/authed/upload',
+      disabled: true,
     },
     {
       id: 'location',
@@ -18,6 +19,7 @@
       description: '3D scans of real-world locations for virtual production.',
       icon: LocationIcon,
       path: '/authed/upload',
+      disabled: true,
     },
     {
       id: 'likeness',
@@ -25,25 +27,19 @@
       description: 'Image, voice and identity licensing.',
       icon: LikenessIcon,
       path: '/authed/likeness',
+      disabled: false,
     },
   ]
 </script>
 
-<div class="min-h-xl p-8 border border-[#eef2f6] rounded-3xl bg-[#f8f5f1] flex justify-center">
-  <div class="w-full max-w-5xl">
-    <!-- Header -->
-    <div class="mb-6.25">
-      <h1 class="text-lg font-semibold text-left text-dark">Getting started with ChapterIP</h1>
-      <p class=" text-sm font-medium text-left text-[#767682]">What do you want to license today?</p>
-    </div>
-
+<div class="min-h-xl p-8 bg-[#f8f5f1]">
+  <div class="w-full">
     <!-- Cards Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.25 w-full">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 w-full">
       {#each categories as category (category.id)}
         <div
-          class="
+          class="relative
            rounded-lg w-full mx-auto
-           max-w-87.5
            aspect-square
             border-2 border-dashed border-[#c8c4bc]
             flex flex-col items-center justify-center
@@ -52,6 +48,11 @@
             bg-cream pt-5 pb-7.5 px-5
           "
         >
+          {#if category.disabled}
+            <div class="absolute top-2.5 right-2.5 rounded-sm bg-[#e6dee9] text-primary text-xs px-5 py-1">
+              coming soon
+            </div>
+          {/if}
           <!-- Icon -->
           <div class="flex flex-col items-center justify-center">
             <div class="text-dark opacity-80 group-hover:opacity-100 transition-opacity">
@@ -72,10 +73,8 @@
           <!-- Button -->
           <button
             onclick={() => goto(category.path)}
-            class="
-              rounded-sm bg-primary
-              hover:-translate-y-0.5
-              text-sm font-medium text-center text-cream px-7.5 py-2.5"
+            class="rounded-sm hover:-translate-y-0.5 text-sm font-medium text-center text-cream px-7.5 py-2.5
+               {category.disabled ? 'bg-[#6d6b76] pointer-events-none opacity-25' : 'bg-primary'}"
           >
             Get Started
           </button>

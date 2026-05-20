@@ -29,7 +29,7 @@
 <div class="space-y-4">
   <div>
     <p class="text-xs text-[#71707a]">A minimum of one must be selected</p>
-    <h3 class="text-base font-semibold text-[#1A1A2E]">Territory<span class="text-[#ff0000]">*</span></h3>
+    <h3 class="text-base font-semibold text-[#1A1A2E]">Territory <span class="text-[#ff0000]">*</span></h3>
   </div>
   <div class="flex flex-wrap gap-2">
     {#each TERRITORIES as territory (territory)}
