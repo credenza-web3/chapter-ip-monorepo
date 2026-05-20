@@ -29,7 +29,7 @@
   ]
 </script>
 
-<div class="min-h-xl p-8 border border-[#eef2f6] rounded-3xl bg-[#f8f5f1]">
+<div class="min-h-xl p-8 border border-[#eef2f6] rounded-3xl bg-[#f8f5f1] flex justify-center">
   <div class="w-full max-w-5xl">
     <!-- Header -->
     <div class="mb-6.25">

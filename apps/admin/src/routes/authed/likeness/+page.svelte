@@ -6,7 +6,6 @@
   import UploadLicensingStep from './components/UploadLicensingStep.svelte'
 
   let { data } = $props()
-  console.log('Likeness page data:', data)
 
   let currentStep = $state(1)
   const primaryLikenessFile = $derived($likenessStore.files.headshots ?? $likenessStore.files.source)

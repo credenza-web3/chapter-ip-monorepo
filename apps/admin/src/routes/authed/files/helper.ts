@@ -50,3 +50,12 @@ export const getFilePricing = async (contentContract: ethers.Contract, tokenId: 
   const onetimeLicensePrice = Number(await contentContract.getLicensePriceFiat(tokenId, '2')) / 100
   return { fulltimeLicensePrice, onetimeLicensePrice }
 }
+
+export function formatDate(date: string | Date): string {
+  const d = new Date(date)
+  const month = d.toLocaleString('en-US', { month: 'short' })
+  const day = d.getDate()
+  const year = String(d.getFullYear()).slice(2)
+
+  return `${month} ${day} '${year}`
+}
