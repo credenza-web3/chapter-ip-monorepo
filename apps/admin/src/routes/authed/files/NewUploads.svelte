@@ -11,6 +11,7 @@
       description: 'Scripts, articles and written works.',
       icon: WrittenWorksIcon,
       path: '/authed/upload',
+      disabled: true,
     },
     {
       id: 'location',
@@ -18,6 +19,7 @@
       description: '3D scans of real-world locations for virtual production.',
       icon: LocationIcon,
       path: '/authed/upload',
+      disabled: true,
     },
     {
       id: 'likeness',
@@ -25,6 +27,7 @@
       description: 'Image, voice and identity licensing.',
       icon: LikenessIcon,
       path: '/authed/likeness',
+      disabled: false,
     },
   ]
 </script>
@@ -35,7 +38,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 w-full">
       {#each categories as category (category.id)}
         <div
-          class="
+          class="relative
            rounded-lg w-full mx-auto
            aspect-square
             border-2 border-dashed border-[#c8c4bc]
@@ -45,6 +48,11 @@
             bg-cream pt-5 pb-7.5 px-5
           "
         >
+          {#if category.disabled}
+            <div class="absolute top-2.5 right-2.5 rounded-sm bg-[#e6dee9] text-primary text-xs px-5 py-1">
+              coming soon
+            </div>
+          {/if}
           <!-- Icon -->
           <div class="flex flex-col items-center justify-center">
             <div class="text-dark opacity-80 group-hover:opacity-100 transition-opacity">
@@ -65,10 +73,8 @@
           <!-- Button -->
           <button
             onclick={() => goto(category.path)}
-            class="
-              rounded-sm bg-primary
-              hover:-translate-y-0.5
-              text-sm font-medium text-center text-cream px-7.5 py-2.5"
+            class="rounded-sm hover:-translate-y-0.5 text-sm font-medium text-center text-cream px-7.5 py-2.5
+               {category.disabled ? 'bg-[#6d6b76] pointer-events-none opacity-25' : 'bg-primary'}"
           >
             Get Started
           </button>

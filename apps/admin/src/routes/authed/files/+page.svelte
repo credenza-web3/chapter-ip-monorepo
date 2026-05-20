@@ -25,7 +25,7 @@
 <div class="min-h-xl p-8 border border-[#eef2f6] rounded-3xl bg-[#f8f5f1]">
   <h2 class="mb-2.5 font-semibold text-2xl leading-7.25 text-[#202025]">Getting started with ChapterIP</h2>
   <p class="mb-4 font-normal text-sm leading-6 text-[#747474]">What do you want to license today?</p>
-  {#if !items.length}
+  {#if items.length}
     <NewUploads />
   {:else}
     <div class="overflow-x-auto">
