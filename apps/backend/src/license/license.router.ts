@@ -27,6 +27,6 @@ export class LicenseRouter {
     @Input() input: TFindBlockedLicensesInput,
   ): Promise<TFindBlockedLicensesOutput> {
     const paginationOptions = this.blockedLicenseService.buildPaginationOptions(input)
-    return await this.blockedLicenseService.paginate<TFindBlockedLicensesOutput['items'][0]>(paginationOptions)
+    return await this.blockedLicenseService.paginate(paginationOptions)
   }
 }

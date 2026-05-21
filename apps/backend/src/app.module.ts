@@ -5,7 +5,7 @@ import { TRPCModule } from 'nestjs-trpc'
 
 import { CommonModule } from './common/common.module'
 import { AuthModule } from './auth/auth.module'
-import { FileModule } from './file/file.module'
+import { ContentModule } from './content/content.module'
 import { PublisherModule } from './publisher/publisher.module'
 import { LicenseModule } from './license/license.module'
 
@@ -49,7 +49,7 @@ const env: string = getEnv()
       },
     }),
     AuthModule,
-    FileModule,
+    ContentModule,
     PublisherModule,
     LicenseModule,
     EvmListenerModule,

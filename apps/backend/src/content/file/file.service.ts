@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { ConfigService } from '@nestjs/config'
-import type { TBuiltPaginationOptions } from '../common/model/model.dto'
 import {
   S3Client,
   PutObjectCommandInput,
@@ -22,17 +21,16 @@ import {
 } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
-import { CommonModelService } from '../common/model/model.service'
+import { CommonModelService } from '../../common/model/model.service'
 
-import { File } from './file.schema'
-import type { TFindContentInput } from './file.dto'
+import { ContentFile } from './file.schema'
 
 @Injectable()
-export class FileService extends CommonModelService<File> {
+export class FileService extends CommonModelService<ContentFile> {
   private r2: S3Client
 
   constructor(
-    @InjectModel(File.name) private fileModel: Model<File>,
+    @InjectModel(ContentFile.name) private fileModel: Model<ContentFile>,
     private readonly configService: ConfigService,
   ) {
     super(fileModel)
@@ -43,26 +41,14 @@ export class FileService extends CommonModelService<File> {
     if (!secretAccessKey) throw new Error('cloudflare.rtwo.secretAccessKey is not set')
 
     this.r2 = new S3Client({
-      region: 'auto', // required for R2
+      region: 'auto',
       endpoint: 'https://3153ffc48832224f2ff5e71db72075f1.r2.cloudflarestorage.com',
       credentials: {
         accessKeyId,
         secretAccessKey,
       },
-      forcePathStyle: false, // important for R2
+      forcePathStyle: false,
     })
-  }
-
-  buildPaginationOptions(opts: TFindContentInput): TBuiltPaginationOptions {
-    const result = super.buildPaginationOptions(opts)
-    result.query = {
-      ...result.query,
-      ...(opts.sub && { sub: opts.sub }),
-      ...(opts.key && { key: opts.key }),
-      ...(opts.tokenId && { tokenId: opts.tokenId }),
-      ...(opts.contractAddress && { contractAddress: opts.contractAddress.toLowerCase().trim() }),
-    }
-    return result
   }
 
   getBucketName(type: 'metadata' | 'content' | 'preview' | 'userfiles') {
@@ -74,24 +60,24 @@ export class FileService extends CommonModelService<File> {
     return bucketName
   }
 
-  async removeFile(data: DeleteObjectCommandInput) {
+  async removeObject(data: DeleteObjectCommandInput) {
     const delete_file_command = new DeleteObjectCommand(data)
     return await this.r2.send(delete_file_command)
   }
 
-  async getFileUrl(opts: GetObjectCommandInput): Promise<string> {
+  async getSignedObjectUrl(opts: GetObjectCommandInput): Promise<string> {
     const url = await getSignedUrl(
       this.r2,
       new GetObjectCommand({
         Bucket: opts.Bucket,
         Key: opts.Key,
       }),
-      { expiresIn: 3600 }, // 1 hour
+      { expiresIn: 3600 },
     )
     return url
   }
 
-  async uploadFile(data: PutObjectCommandInput) {
+  async putObject(data: PutObjectCommandInput) {
     const command = new PutObjectCommand({
       Bucket: data.Bucket,
       Key: data.Key,
@@ -110,7 +96,7 @@ export class FileService extends CommonModelService<File> {
     return await getSignedUrl(this.r2, command, { expiresIn: 60 * 5 })
   }
 
-  async checkFileExists(data: HeadObjectCommandInput) {
+  async objectExists(data: HeadObjectCommandInput) {
     const command = new HeadObjectCommand(data)
     try {
       await this.r2.send(command)
