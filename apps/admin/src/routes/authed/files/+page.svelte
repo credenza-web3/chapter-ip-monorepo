@@ -11,11 +11,13 @@
   let { data } = $props()
   let activeFilter = $state('All')
   let activeMenuRow = $state<string | null>(null)
+  let currentPage = $state(1)
+
+  const pageSize = 5
 
   const filters = ['All', 'Written works', 'Locations', 'Likeness'] as const
 
-
-  const loadRows = async (items: (typeof data.paginatedResponse.items)) =>
+  const loadRows = async (items: typeof data.paginatedResponse.items) =>
     Promise.all(
       items.map(async (item, i) => {
         const [meta, { onetimeLicensePrice, fulltimeLicensePrice }] = await Promise.all([
@@ -53,6 +55,9 @@
         <div class="py-6 text-center text-sm text-[#1A1A2E]/60">Loading listings...</div>
       {:then rows}
         {@const filteredRows = activeFilter === 'All' ? rows : rows.filter((row) => row.fileType === activeFilter)}
+        {@const totalPages = Math.max(1, Math.ceil(filteredRows.length / pageSize))}
+        {@const safeCurrentPage = Math.min(currentPage, totalPages)}
+        {@const paginatedRows = filteredRows.slice((safeCurrentPage - 1) * pageSize, safeCurrentPage * pageSize)}
         {@const writtenWorksCount = rows.filter((row) => row.fileType === 'Written works').length}
         {@const locationsCount = rows.filter((row) => row.fileType === 'Locations').length}
         {@const likenessCount = rows.filter((row) => row.fileType === 'Likeness').length}
@@ -69,7 +74,10 @@
           <div class="flex md:gap-1">
             {#each filters as f (f)}
               <button
-                onclick={() => (activeFilter = f)}
+                onclick={() => {
+                  activeFilter = f
+                  currentPage = 1
+                }}
                 class="md:px-5.25 px-3 py-1 rounded-full md:text-[13px] text-[11px] font-medium {activeFilter === f
                   ? 'bg-[#6d6b76] text-[#f8f5f1]'
                   : 'text-dark rounded-full'}"
@@ -101,8 +109,8 @@
                 </tr>
               </thead>
               <tbody>
-                {#if filteredRows.length}
-                  {#each filteredRows as row, i (row.id)}
+                {#if paginatedRows.length}
+                  {#each paginatedRows as row, i (row.id)}
                     <tr
                       class="border-b border-[#ddd] last:border-0 {activeMenuRow === row.id
                         ? 'bg-[#ece7df]'
@@ -162,12 +170,29 @@
         </div>
 
         <div class="pt-2.75 text-[13px] font-medium text-[#b6b4b7] flex justify-between">
-          <span class="text-[#1A1A2E]/60">Showing {filteredRows.length} of {rows.length} listings</span>
+          <span class="text-[#1A1A2E]/60">
+            Showing {paginatedRows.length ? (safeCurrentPage - 1) * pageSize + 1 : 0}-
+            {Math.min(safeCurrentPage * pageSize, filteredRows.length)} of {filteredRows.length} listings
+          </span>
           <div class="flex items-center gap-1.5">
-            <img src={Code} alt="Previous" class="h-3 rotate-180 inline-block mr-1" />
-            <span class="cursor-pointer hover:text-[#555] mr-4.75">Previous</span>
-            <span class="cursor-pointer hover:text-[#555]">Next</span>
-            <img src={Code} alt="Next" class="size-3 inline-block ml-1" />
+            <button
+              type="button"
+              class="inline-flex items-center mr-4.75 disabled:opacity-40 disabled:cursor-not-allowed"
+              onclick={() => (currentPage = Math.max(1, safeCurrentPage - 1))}
+              disabled={safeCurrentPage === 1}
+            >
+              <img src={Code} alt="Previous" class="h-3 rotate-180 inline-block mr-1" />
+              <span class="cursor-pointer hover:text-[#555]">Previous</span>
+            </button>
+            <button
+              type="button"
+              class="inline-flex items-center disabled:opacity-40 disabled:cursor-not-allowed"
+              onclick={() => (currentPage = Math.min(totalPages, safeCurrentPage + 1))}
+              disabled={safeCurrentPage === totalPages}
+            >
+              <span class="cursor-pointer hover:text-[#555]">Next</span>
+              <img src={Code} alt="Next" class="size-3 inline-block ml-1" />
+            </button>
           </div>
         </div>
       {/await}
