@@ -15,13 +15,17 @@
 </script>
 
 <div class="min-h-xl md:p-8 p-y-6 border border-[#eef2f6] rounded-3xl bg-[#f8f5f1]">
-  <h2 class="md:mb-2.5 font-semibold md:text-2xl text-xl leading-7.25 text-[#202025]">Getting started with ChapterIP</h2>
+  <h2 class="md:mb-2.5 font-semibold md:text-2xl text-xl leading-7.25 text-[#202025]">
+    Getting started with ChapterIP
+  </h2>
   <p class="mb-4 font-normal text-sm leading-6 text-[#747474]">What do you want to license today?</p>
   {#if !items.length}
     <NewUploads />
   {:else}
     <div class="md:mt-9.75">
-      <div class="flex flex-col md:flex-row md:items-center justify-between py-4 border-b border-[#f0ede6] gap-4 md:gap-0">
+      <div
+        class="flex flex-col md:flex-row md:items-center justify-between py-4 border-b border-[#f0ede6] gap-4 md:gap-0"
+      >
         <div class="flex flex-col md:flex-row md:items-center md:gap-2.5">
           <h2 class="md:text-base text-sm font-semibold">My Listings</h2>
           <span class="text-[13px] font-medium text-[#1A1A2E]/60">Written works: 1 | Locations: 1 | Likeness: 3</span>
