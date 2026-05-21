@@ -14,23 +14,23 @@
   let activeMenuRow = $state<string | null>(null)
 </script>
 
-<div class="min-h-xl p-8 border border-[#eef2f6] rounded-3xl bg-[#f8f5f1]">
-  <h2 class="mb-2.5 font-semibold text-2xl leading-7.25 text-[#202025]">Getting started with ChapterIP</h2>
+<div class="min-h-xl md:p-8 p-y-6 border border-[#eef2f6] rounded-3xl bg-[#f8f5f1]">
+  <h2 class="md:mb-2.5 font-semibold md:text-2xl text-xl leading-7.25 text-[#202025]">Getting started with ChapterIP</h2>
   <p class="mb-4 font-normal text-sm leading-6 text-[#747474]">What do you want to license today?</p>
   {#if !items.length}
     <NewUploads />
   {:else}
-    <div class="mt-9.75">
-      <div class="flex items-center justify-between py-4 border-b border-[#f0ede6]">
-        <div class="flex items-center gap-2.5">
-          <h2 class="text-base font-semibold">My Listings</h2>
+    <div class="md:mt-9.75">
+      <div class="flex flex-col md:flex-row md:items-center justify-between py-4 border-b border-[#f0ede6] gap-4 md:gap-0">
+        <div class="flex flex-col md:flex-row md:items-center md:gap-2.5">
+          <h2 class="md:text-base text-sm font-semibold">My Listings</h2>
           <span class="text-[13px] font-medium text-[#1A1A2E]/60">Written works: 1 | Locations: 1 | Likeness: 3</span>
         </div>
-        <div class="flex gap-1">
+        <div class="flex md:gap-1">
           {#each ['All', 'Written works', 'Locations', 'Likeness'] as f (f)}
             <button
               onclick={() => (activeFilter = f)}
-              class="px-5.25 py-1 rounded-full text-[13px] font-medium {activeFilter === f
+              class="md:px-5.25 px-3 py-1 rounded-full md:text-[13px] text-[11px] font-medium {activeFilter === f
                 ? 'bg-[#6d6b76] text-[#f8f5f1]'
                 : 'text-dark rounded-full'}"
             >
