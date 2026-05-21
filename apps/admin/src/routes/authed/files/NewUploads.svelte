@@ -52,10 +52,8 @@
             <div class="absolute top-2.5 right-2.5 rounded-sm bg-[#e6dee9] text-primary text-xs px-5 py-1">
               coming soon
             </div>
-            {:else}
-            <div class="absolute top-2.5 right-2.5 rounded-sm bg-[#e6dee9] text-primary text-xs px-5 py-1">
-              Beta
-            </div>
+          {:else}
+            <div class="absolute top-2.5 right-2.5 rounded-sm bg-[#e6dee9] text-primary text-xs px-5 py-1">Beta</div>
           {/if}
           <!-- Icon -->
           <div class="flex flex-col items-center justify-center">
