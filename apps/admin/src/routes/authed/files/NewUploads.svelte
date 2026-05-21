@@ -35,7 +35,7 @@
 <div class="min-h-xl p-8 bg-[#f8f5f1]">
   <div class="w-full">
     <!-- Cards Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 w-full">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.25 w-full">
       {#each categories as category (category.id)}
         <div
           class="relative
@@ -51,6 +51,10 @@
           {#if category.disabled}
             <div class="absolute top-2.5 right-2.5 rounded-sm bg-[#e6dee9] text-primary text-xs px-5 py-1">
               coming soon
+            </div>
+            {:else}
+            <div class="absolute top-2.5 right-2.5 rounded-sm bg-[#e6dee9] text-primary text-xs px-5 py-1">
+              Beta
             </div>
           {/if}
           <!-- Icon -->
