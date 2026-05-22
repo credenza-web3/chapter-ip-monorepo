@@ -49,7 +49,7 @@
 </svelte:head>
 
 <Toast />
-<div class="min-h-screen overflow-x-hidden flex flex-col bg-cream text-dark">
+<div class="flex min-h-screen flex-col overflow-x-hidden bg-cream text-dark">
   <Header {authStore} {menuItems} pathname={page.url.pathname}>
     <div class="flex h-full items-stretch w-full justify-between md:pl-15 pl-2">
       <div class="flex items-stretch">
@@ -106,9 +106,11 @@
       </div>
     </div>
   </Header>
-  <main class="space-y-0 flex-1 px-6 pt-9.75 bg-cream">
-    {@render children?.()}
-    <div class="mt-auto p-8 md:p-12.5">
+  <main class="flex flex-1 flex-col bg-cream px-6 pt-9.75">
+    <div class="flex-1">
+      {@render children?.()}
+    </div>
+    <div class="p-8 md:p-12.5">
       <Footer />
     </div>
   </main>
