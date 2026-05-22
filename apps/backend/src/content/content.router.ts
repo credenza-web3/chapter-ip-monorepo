@@ -13,8 +13,6 @@ import { CommonLicenseService } from '../common/license/license.service'
 
 import { ContentModelService } from './content-model.service'
 import { FileService } from './file/file.service'
-import { Content, type TContentDocument } from './content.schema'
-import { ContentFile } from './file/file.schema'
 import {
   uploadTokenMetadataInputSchema,
   uploadTokenMetadataOutputSchema,
@@ -38,14 +36,22 @@ import {
   registerContentFileOutputSchema,
   type TRegisterContentFileInput,
   type TRegisterContentFileOutput,
+  removeContentFileInputSchema,
+  removeContentFileOutputSchema,
+  type TRemoveContentFileInput,
+  type TRemoveContentFileOutput,
   findContentInputSchema,
   type TFindContentInput,
   findContentOutputSchema,
   type TFindContentOutput,
-  getContentLinkInputSchema,
-  getContentLinkOutputSchema,
-  type TGetContentLinkInput,
-  type TGetContentLinkOutput,
+  getContentByIdInputSchema,
+  getContentByIdOutputSchema,
+  type TGetContentByIdInput,
+  type TGetContentByIdOutput,
+  getContentFileLinkInputSchema,
+  getContentFileLinkOutputSchema,
+  type TGetContentFileLinkInput,
+  type TGetContentFileLinkOutput,
 } from './content.dto'
 
 @Router({ alias: 'contents' })
@@ -215,6 +221,39 @@ export class ContentRouter {
     return fileDoc
   }
 
+  @UseMiddlewares(AuthMiddleware)
+  @Mutation({
+    input: removeContentFileInputSchema,
+    output: removeContentFileOutputSchema,
+  })
+  async removeContentFile(
+    @Ctx() ctx: TAppContextWithTokenPayload,
+    @Input() input: TRemoveContentFileInput,
+  ): Promise<TRemoveContentFileOutput> {
+    const contentFile = await this.fileService.findById(input.fileId)
+
+    if (!contentFile) {
+      throw new TRPCError({ message: 'File is not found', code: 'NOT_FOUND' })
+    }
+
+    const [isOwner, message] = await this.commonContentService.verifyIsOwnerById(
+      ctx.authTokenPayload.sub,
+      contentFile.contentId,
+    )
+    if (!isOwner) {
+      throw new TRPCError({ message, code: 'FORBIDDEN' })
+    }
+
+    await this.fileService.removeObject({
+      Bucket: contentFile.bucket,
+      Key: contentFile.key,
+    })
+
+    await this.fileService.getModel().deleteOne({ _id: contentFile._id })
+
+    return { ok: true }
+  }
+
   @Query({
     input: findContentInputSchema,
     output: findContentOutputSchema,
@@ -225,32 +264,44 @@ export class ContentRouter {
     return await this.contentService.paginate(paginationOptions)
   }
 
+  @Query({
+    input: getContentByIdInputSchema,
+    output: getContentByIdOutputSchema,
+  })
+  async getContentById(@Input() input: TGetContentByIdInput): Promise<TGetContentByIdOutput> {
+    const content = await this.contentService.findById(input.id)
+    if (!content) {
+      throw new TRPCError({ message: 'Content is not found', code: 'NOT_FOUND' })
+    }
+
+    const files = await this.fileService.find({ contentId: content._id.toString() })
+    return {
+      ...content.toJSON(),
+      files,
+    }
+  }
+
   @UseMiddlewares(AuthMiddleware)
   @Query({
-    input: getContentLinkInputSchema,
-    output: getContentLinkOutputSchema,
+    input: getContentFileLinkInputSchema,
+    output: getContentFileLinkOutputSchema,
   })
-  async getContentLink(
+  async getContentFileLink(
     @Ctx() ctx: TAppContextWithTokenPayload,
-    @Input() input: TGetContentLinkInput,
-  ): Promise<TGetContentLinkOutput> {
+    @Input() input: TGetContentFileLinkInput,
+  ): Promise<TGetContentFileLinkOutput> {
     const fileQuery = {
       ...(input.key ? { key: input.key } : {}),
       ...(input.id ? { _id: input.id } : {}),
     }
-    const contentFile = await this.fileService.getModel().findOne(fileQuery).lean()
+    const contentFile = await this.fileService.findOne(fileQuery)
     if (!contentFile) {
       throw new TRPCError({ message: 'File is not found', code: 'NOT_FOUND' })
     }
-
-    const parent = await this.contentService.getModel().findById(contentFile.contentId).lean()
-    if (!parent) {
-      throw new TRPCError({ message: 'Content is not found', code: 'NOT_FOUND' })
-    }
-
+    const parent = await this.contentService.findById(contentFile.contentId)
     const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(ctx.authTokenPayload.sub)
 
-    const publisherAddress = await this.commonContentService.getOwner(parent.tokenId)
+    const publisherAddress = await this.commonContentService.getOwner(parent!.tokenId)
     const hasMembership = await this.commonContentService.verifyHasSubscription(publisherAddress, subEvmAddress)
 
     if (!hasMembership) {
@@ -259,11 +310,11 @@ export class ContentRouter {
           await this.commonLicenseService.verify(
             ctx.authTokenPayload.sub,
             subEvmAddress,
-            parent.tokenId,
+            parent!.tokenId,
             input.licenseTokenId,
           )
         } else {
-          await this.commonContentService.verifyIsOwner(subEvmAddress, parent.tokenId)
+          await this.commonContentService.verifyIsOwner(subEvmAddress, parent!.tokenId)
         }
       } catch (err) {
         throw new TRPCError({ message: (err as Error).message, code: 'FORBIDDEN' })
@@ -288,10 +339,11 @@ export class ContentRouter {
     @Input() input: TUploadTokenMetadataInput,
   ): Promise<TUploadTokenMetadataOutput> {
     const contractAddress = await this.commonContentService.getContentNftContractAddress()
-    const contentDoc = await this.contentService
-      .getModel()
-      .findOne({ contractAddress, tokenId: input.tokenId, sub: ctx.authTokenPayload.sub })
-      .lean()
+    const contentDoc = await this.contentService.findOne({
+      contractAddress,
+      tokenId: input.tokenId,
+      sub: ctx.authTokenPayload.sub,
+    })
     if (!contentDoc) {
       throw new TRPCError({ message: 'Content is not found or is not yours', code: 'NOT_FOUND' })
     }

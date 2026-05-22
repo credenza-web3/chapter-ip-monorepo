@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { paginatedRequestWithCursorSchema, createPaginatedResponseSchema } from '../common/model/model.dto'
 
-export const contentMetadataRecordSchema = z.record(z.string(), z.any())
+export const contentMetadataRecordSchema = z.record(z.string(), z.any()).optional()
 
 export const uploadTokenMetadataInputSchema = z.object({
   tokenId: z.string(),
@@ -94,6 +94,16 @@ export type TContentFileOutput = z.infer<typeof contentFileOutputSchema>
 export const registerContentFileOutputSchema = contentFileOutputSchema
 export type TRegisterContentFileOutput = z.infer<typeof registerContentFileOutputSchema>
 
+export const removeContentFileInputSchema = z.object({
+  fileId: z.string(),
+})
+export type TRemoveContentFileInput = z.infer<typeof removeContentFileInputSchema>
+
+export const removeContentFileOutputSchema = z.object({
+  ok: z.literal(true),
+})
+export type TRemoveContentFileOutput = z.infer<typeof removeContentFileOutputSchema>
+
 export const contentOutputSchema = registerContentOutputSchema.extend({
   files: z.array(contentFileOutputSchema),
 })
@@ -109,7 +119,15 @@ export type TFindContentInput = z.infer<typeof findContentInputSchema>
 export const findContentOutputSchema = createPaginatedResponseSchema(registerContentOutputSchema)
 export type TFindContentOutput = z.infer<typeof findContentOutputSchema>
 
-export const getContentLinkInputSchema = z
+export const getContentByIdInputSchema = z.object({
+  id: z.string(),
+})
+export type TGetContentByIdInput = z.infer<typeof getContentByIdInputSchema>
+
+export const getContentByIdOutputSchema = contentOutputSchema
+export type TGetContentByIdOutput = z.infer<typeof getContentByIdOutputSchema>
+
+export const getContentFileLinkInputSchema = z
   .object({
     key: z.string().optional(),
     id: z.string().optional(),
@@ -119,9 +137,9 @@ export const getContentLinkInputSchema = z
     message: 'Either `id` or `key` must be provided.',
     path: ['key'],
   })
-export type TGetContentLinkInput = z.infer<typeof getContentLinkInputSchema>
+export type TGetContentFileLinkInput = z.infer<typeof getContentFileLinkInputSchema>
 
-export const getContentLinkOutputSchema = z.object({
+export const getContentFileLinkOutputSchema = z.object({
   url: z.string(),
 })
-export type TGetContentLinkOutput = z.infer<typeof getContentLinkOutputSchema>
+export type TGetContentFileLinkOutput = z.infer<typeof getContentFileLinkOutputSchema>
