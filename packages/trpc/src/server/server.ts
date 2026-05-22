@@ -15,7 +15,7 @@ const t = initTRPC.create();
 const publicProcedure = t.procedure;
 import { healthOutputSchema } from "../../../../apps/backend/src/app.dto";
 import { refreshTokenInputSchema, authTokenOutputSchema, exchangeCodeInputSchema } from "../../../../apps/backend/src/auth/auth.dto";
-import { createUserFileUploadUrlInputSchema, createContentUploadUrlOutputSchema, createContentUploadUrlInputSchema, registerContentInputSchema, registerContentOutputSchema, findContentInputSchema, findContentOutputSchema, getContentLinkInputSchema, getContentLinkOutputSchema, uploadMetadataInputSchema, uploadMetadataOutputSchema } from "../../../../apps/backend/src/file/file.dto";
+import { createUserFileUploadUrlInputSchema, presignedPutOutputSchema, createContentFileUploadUrlInputSchema, registerContentInputSchema, registerContentOutputSchema, updateContentMetadataInputSchema, updateContentMetadataOutputSchema, registerContentFileInputSchema, registerContentFileOutputSchema, removeContentFileInputSchema, removeContentFileOutputSchema, findContentInputSchema, findContentOutputSchema, getContentByIdInputSchema, getContentByIdOutputSchema, getContentFileLinkInputSchema, getContentFileLinkOutputSchema, uploadTokenMetadataInputSchema, uploadTokenMetadataOutputSchema } from "../../../../apps/backend/src/content/content.dto";
 import { findBlockedLicensesInputSchema, findBlockedLicensesOutputSchema } from "../../../../apps/backend/src/license/../common/license/blocked-license/blocked-license.dto";
 import { setPublisherInputSchema, setPublisherOutputSchema, getPublisherDataInputSchema, getPublisherDataOutputSchema, findPublishersInputSchema, findPublishersOutputSchema, mintContentNftTokenInputSchema, mintContentNftTokenOutputSchema } from "../../../../apps/backend/src/publisher/publisher.dto";
 
@@ -41,30 +41,46 @@ const appRouter = t.router({
       .output(authTokenOutputSchema)
       .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
     }),
-  files: t.router({
+  contents: t.router({
     createUserFileUploadUrl: publicProcedure
       .input(createUserFileUploadUrlInputSchema)
-      .output(createContentUploadUrlOutputSchema)
+      .output(presignedPutOutputSchema)
       .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
-    createContentUploadUrl: publicProcedure
-      .input(createContentUploadUrlInputSchema)
-      .output(createContentUploadUrlOutputSchema)
+    createContentFileUploadUrl: publicProcedure
+      .input(createContentFileUploadUrlInputSchema)
+      .output(presignedPutOutputSchema)
       .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     registerContent: publicProcedure
       .input(registerContentInputSchema)
       .output(registerContentOutputSchema)
       .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    updateContentMetadata: publicProcedure
+      .input(updateContentMetadataInputSchema)
+      .output(updateContentMetadataOutputSchema)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    registerContentFile: publicProcedure
+      .input(registerContentFileInputSchema)
+      .output(registerContentFileOutputSchema)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    removeContentFile: publicProcedure
+      .input(removeContentFileInputSchema)
+      .output(removeContentFileOutputSchema)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     findContent: publicProcedure
       .input(findContentInputSchema)
       .output(findContentOutputSchema)
       .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
-    getContentLink: publicProcedure
-      .input(getContentLinkInputSchema)
-      .output(getContentLinkOutputSchema)
+    getContentById: publicProcedure
+      .input(getContentByIdInputSchema)
+      .output(getContentByIdOutputSchema)
       .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
-    uploadMetadata: publicProcedure
-      .input(uploadMetadataInputSchema)
-      .output(uploadMetadataOutputSchema)
+    getContentFileLink: publicProcedure
+      .input(getContentFileLinkInputSchema)
+      .output(getContentFileLinkOutputSchema)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    uploadTokenMetadata: publicProcedure
+      .input(uploadTokenMetadataInputSchema)
+      .output(uploadTokenMetadataOutputSchema)
       .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
     }),
   licenses: t.router({

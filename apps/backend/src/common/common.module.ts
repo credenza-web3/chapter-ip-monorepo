@@ -6,10 +6,7 @@ import { CommonModelModule } from './model/model.module'
 import { CommonClientModule } from './client/client.module'
 import { CommonAuthModule } from './auth/auth.module'
 import { CommonEvmModule } from './evm/evm.module'
-
 import { CommonLicenseModule } from './license/license.module'
-import { CommonContentModule } from './content/content.module'
-
 import { BaseErrorFilter } from './error/base-error.filter'
 
 @Global()
@@ -21,7 +18,6 @@ import { BaseErrorFilter } from './error/base-error.filter'
     CommonAuthModule,
     CommonEvmModule,
     CommonLicenseModule,
-    CommonContentModule,
   ],
   controllers: [],
   providers: [
@@ -37,7 +33,6 @@ import { BaseErrorFilter } from './error/base-error.filter'
     CommonAuthModule,
     CommonEvmModule,
     CommonLicenseModule,
-    CommonContentModule,
   ],
 })
 export class CommonModule {}

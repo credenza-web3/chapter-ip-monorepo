@@ -86,7 +86,7 @@ export class PublisherRouter {
   })
   async findPublishers(@Input() input: TFindPublishersInput): Promise<TFindPublishersOutput> {
     const paginationOptions = this.publisherService.buildPaginationOptions(input)
-    return await this.publisherService.paginate<TFindPublishersOutput['items'][0]>(paginationOptions)
+    return await this.publisherService.paginate(paginationOptions)
   }
 
   @UseMiddlewares(AuthMiddleware)

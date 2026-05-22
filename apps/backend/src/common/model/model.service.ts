@@ -1,13 +1,34 @@
-import type { Model } from 'mongoose'
+import type { Model, ProjectionType, QueryOptions, UpdateQuery, RootFilterQuery } from 'mongoose'
 import { BadRequestException } from '@nestjs/common'
 
 import type { TPaginatedRequestWithCursor, TPaginatedResponseWithCursor, TBuiltPaginationOptions } from './model.dto'
+import omit from 'lodash/omit'
 
 export class CommonModelService<T> {
   constructor(protected model: Model<T>) {}
 
   getModel() {
     return this.model
+  }
+
+  async find(params?: Partial<T> | RootFilterQuery<T>, projection?: ProjectionType<T>, opts?: QueryOptions) {
+    return await this.model.find(params as RootFilterQuery<T>, projection, opts)
+  }
+
+  async findOne(params?: Partial<T> | RootFilterQuery<T>, projection?: ProjectionType<T>, opts?: QueryOptions) {
+    return await this.model.findOne(params as RootFilterQuery<T>, projection, opts)
+  }
+
+  async findById(id: string, projection?: ProjectionType<T>) {
+    return await this.model.findById(id, projection)
+  }
+
+  async create(params: Partial<T>) {
+    return await this.model.create(params)
+  }
+
+  async updateById(id: string, params: Partial<T> | UpdateQuery<T>) {
+    return await this.model.findByIdAndUpdate(id, omit(params, ['_id']), { returnDocument: 'after' })
   }
 
   buildPaginationOptions(opts: TPaginatedRequestWithCursor): TBuiltPaginationOptions {
@@ -36,7 +57,7 @@ export class CommonModelService<T> {
     }
   }
 
-  async paginate<T>(opts: TBuiltPaginationOptions): Promise<TPaginatedResponseWithCursor<T>> {
+  async paginate(opts: TBuiltPaginationOptions): Promise<TPaginatedResponseWithCursor<T>> {
     const items = await this.model
       .find(opts.query)
       .sort(opts.sort)

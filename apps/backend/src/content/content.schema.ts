@@ -1,0 +1,42 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { HydratedDocument, Document, ObjectId, Schema as MongooseSchema } from 'mongoose'
+
+export type TContentDocument = HydratedDocument<Content>
+
+@Schema({
+  timestamps: {
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+  },
+  collection: 'contents',
+  toJSON: {
+    virtuals: true,
+  },
+  toObject: {
+    virtuals: true,
+  },
+})
+export class Content extends Document<ObjectId> {
+  declare id: string
+
+  @Prop({ required: true })
+  declare sub: string
+
+  @Prop({ required: true })
+  declare tokenId: string
+
+  @Prop({ required: true, lowercase: true, trim: true })
+  declare contractAddress: string
+
+  @Prop({ type: MongooseSchema.Types.Mixed, default: {} })
+  declare metadata: Record<string, unknown>
+
+  declare createdAt: Date
+  declare updatedAt: Date
+}
+
+export const ContentSchema = SchemaFactory.createForClass(Content)
+ContentSchema.index({ sub: 1 })
+ContentSchema.index({ contractAddress: 1, tokenId: 1 }, { unique: true })
+ContentSchema.index({ createdAt: 1 })
+ContentSchema.index({ updatedAt: 1 })

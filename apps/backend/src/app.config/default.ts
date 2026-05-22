@@ -25,8 +25,8 @@ const config = {
   evm: {
     rpcUrl: 'https://api.avax-test.network/ext/bc/C/rpc',
     wsUrls: ['wss://api.avax-test.network/ext/bc/C/ws', 'wss://avalanche-fuji-c-chain-rpc.publicnode.com'],
-    contentNftContractAddress: '0x16c52fe932247c699Df03FF9525aD5bc53055dec',
-    licenseNftContractAddress: '0x2e0D5e9F35EC0F92c5b56f2A32f18b85DB109A4D',
+    contentNftContractAddress: '0x5385DB7dCfc1A29D760ada161CcaFcd3eE5E331A',
+    licenseNftContractAddress: '0xAcaB0C49B399EE665Bd05B14ef6C434670700bb8',
     membershipContractAddress: '0xCbE52ed30E0841429262d5876a1d4eB9a7f1ED46',
   },
   cloudflare: {
