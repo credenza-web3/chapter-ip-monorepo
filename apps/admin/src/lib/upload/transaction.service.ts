@@ -17,7 +17,7 @@ export class TransactionService {
     return String(tokenId)
   }
 
-  private async forwardMintTransaction(mintPopulatedTx: any): Promise<string> {
+  private async forwardMintTransaction(mintPopulatedTx: ethers.ContractTransaction): Promise<string> {
     return await forwardTransaction(mintPopulatedTx, {
       token: authStore.state.accessToken!,
       client_id: import.meta.env.VITE_CLIENT_ID,

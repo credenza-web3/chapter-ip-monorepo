@@ -2,10 +2,16 @@
   import Checkmark from '$lib/assets/Checkmark.svelte'
   import Cross from '$lib/assets/Cross.svelte'
   import { likenessStore } from '../stores/likeness-store'
-  import { modals } from 'svelte-modals'
-  import { ConfirmModal } from '@repo/ui-components'
+  import { modals, type ModalProps } from 'svelte-modals'
+  import { ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
 
-  let { currentStep = $bindable() } = $props()
+  let {
+    currentStep = $bindable(),
+    onFormSubmit,
+  }: {
+    currentStep: number
+    onFormSubmit: () => Promise<void>
+  } = $props()
 
   const allFiles = $derived([...$likenessStore.files.headshots, ...$likenessStore.files.bodyShots])
 
@@ -23,13 +29,14 @@
     )
 
   const onSubmit = () => {
-    modals.open(ConfirmModal as any, {
+    modals.open<ModalProps & TConfirmModalProps>(ConfirmModal, {
       title: 'Confirming your Likeness',
       description:
         'By publishing, you confirm that you have the legal right to license your likeness, that the terms you’ve set are accurate, and that a Content NFT will be minted on-chain representing this listing. This action is irreversible.',
       submitText: 'I understand and will continue',
-      onSubmit: () => {
+      onSubmit: async () => {
         modals.close()
+        onFormSubmit()
       },
       onClose: () => {
         modals.close()
@@ -121,7 +128,7 @@
           <div>
             <h2 class="text-base font-semibold text-[#202225] mb-1.5">Bio</h2>
             <p class="text-base text-[#72717b] leading-relaxed">
-              {$likenessStore.profile.bio}
+              {$likenessStore.profile.bio || 'N/A'}
             </p>
           </div>
 
@@ -132,26 +139,36 @@
               <tbody>
                 <tr>
                   <td class="py-1 font-semibold w-1/5">Ethnicity:</td>
-                  <td class="py-1">{$likenessStore.profile.attributes.ethnicity}</td>
+                  <td class="py-1">{$likenessStore.profile.attributes.ethnicity || 'N/A'}</td>
                 </tr>
                 <tr>
                   <td class="py-1 font-semibold">Height:</td>
-                  <td class="py-1"
-                    >{$likenessStore.profile.attributes.heightFt}' {$likenessStore.profile.attributes.heightIn}" ({feetInchesToCm()}
-                    cm)</td
-                  >
+                  <td class="py-1">
+                    {#if $likenessStore.profile.attributes.heightFt}
+                      {$likenessStore.profile.attributes.heightFt}' {$likenessStore.profile.attributes.heightIn}" ({feetInchesToCm()}
+                      cm)
+                    {:else}
+                      N/A
+                    {/if}
+                  </td>
                 </tr>
                 <tr>
                   <td class="py-1 font-semibold">Weight:</td>
-                  <td class="py-1">{$likenessStore.profile.attributes.weight} lbs ({lbsToKg()} kg)</td>
+                  <td class="py-1">
+                    {#if $likenessStore.profile.attributes.weight}
+                      {$likenessStore.profile.attributes.weight} lbs ({lbsToKg()} kg)
+                    {:else}
+                      N/A
+                    {/if}
+                  </td>
                 </tr>
                 <tr>
                   <td class="py-1 font-semibold">Eye color:</td>
-                  <td class="py-1">{$likenessStore.profile.attributes.eyeColor}</td>
+                  <td class="py-1">{$likenessStore.profile.attributes.eyeColor || 'N/A'}</td>
                 </tr>
                 <tr>
                   <td class="py-1 font-semibold">Hair color:</td>
-                  <td class="py-1">{$likenessStore.profile.attributes.hairColor}</td>
+                  <td class="py-1">{$likenessStore.profile.attributes.hairColor || 'N/A'}</td>
                 </tr>
               </tbody>
             </table>
@@ -241,15 +258,16 @@
         <!-- Permitted uses -->
         <div>
           <h2 class="text-[18px] font-semibold text-dark mb-3">Permitted uses</h2>
-
-          {#each Object.keys($likenessStore.licensing.permittedUses) as j (j)}
-            <div class="flex items-center gap-2 mb-1.5">
-              <Checkmark />
-              <span class="font-semibold text-dark">{j}</span>
-            </div>
-            <p class=" text-[#747474] leading-relaxed pl-6">
-              Nunc erat elit, pulvinar ut accumsan id, pretium vel lectus. Etiam Leo ipsum, fermentum.
-            </p>
+          {#each Object.entries($likenessStore.licensing.permittedUses) as [key, val] (key)}
+            {#if val}
+              <div class="flex items-center gap-2 mb-1.5">
+                <Checkmark />
+                <span class="font-semibold text-dark">{key}</span>
+              </div>
+              <p class=" text-[#747474] leading-relaxed pl-6">
+                Nunc erat elit, pulvinar ut accumsan id, pretium vel lectus. Etiam Leo ipsum, fermentum.
+              </p>
+            {/if}
           {/each}
         </div>
 
@@ -292,6 +310,10 @@
     disabled={$likenessStore.ui.loading}
     onclick={onSubmit}
   >
-    Save and Publish
+    {#if $likenessStore.ui.loading}
+      <div class="loading loading-dots"></div>
+    {:else}
+      Save and Publish
+    {/if}
   </button>
 </div>

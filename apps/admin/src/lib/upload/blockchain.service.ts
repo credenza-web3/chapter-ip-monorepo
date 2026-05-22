@@ -2,7 +2,7 @@ import { ethers, initProvider, getSigner } from '@repo/fe-evm-provider'
 import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
 
 export class BlockchainService {
-  private getContentContract(signer: any) {
+  private getContentContract(signer: ethers.Signer) {
     return new ethers.Contract(import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS, content_abi, signer)
   }
 
@@ -31,16 +31,16 @@ export class BlockchainService {
     return new ethers.BrowserProvider(provider)
   }
 
-  parseTransferEvent(receipt: any, contentContract: any) {
+  parseTransferEvent(receipt: ethers.TransactionReceipt, contentContract: ethers.Contract) {
     return receipt.logs
-      .map((log: any) => {
+      .map((log) => {
         try {
           return contentContract.interface.parseLog(log)
         } catch {
           return null
         }
       })
-      .find((event: any) => event?.name === 'Transfer')
+      .find((event: ethers.LogDescription | null) => event?.name === 'Transfer')
   }
 
   async getUserAddress() {

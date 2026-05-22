@@ -7,7 +7,7 @@ import { ethers, getSigner } from '@repo/fe-evm-provider'
 import { abi as membership_abi } from '@credenza3/contracts/artifacts/ChapterIpMembershipContract.json'
 import { authStore } from '$lib/auth'
 import { forwardTransaction } from '@repo/fe-services'
-import { uploadFileToBucket } from '../../routes/authed/upload/services'
+import { uploadFileToBucket } from '$lib/upload'
 
 const FIAT_PRICE_MULTIPLIER = 100
 const TOKEN_PRICE_MULTIPLIER = 10 ** 6

@@ -1,11 +1,14 @@
-import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
+import { createTRPCProxyClient, httpBatchLink, type TRPCClient } from '@trpc/client'
 import type { AppRouter } from '../server/server' // e.g. copied from backend
+
+export { type TRPCClient } from '@trpc/client'
+export { type AppRouter } from '../server/server'
 
 export function createClient(opts: {
   trpcUrl?: string
   headers?: Record<string, string>
   getAccessTokenFn?: () => string
-}) {
+}): TRPCClient<AppRouter> {
   opts.trpcUrl = opts.trpcUrl || 'http://localhost:8060/trpc'
 
   return createTRPCProxyClient<AppRouter>({

@@ -3,11 +3,11 @@
   import ApprovalSettings from './ApprovalSettings.svelte'
   import LicenseTypes from './LicenseTypes.svelte'
   import PermittedUses from './PermittedUses.svelte'
-  import TerritorySelector from './TerritorySelector.svelte'
+  // import TerritorySelector from './TerritorySelector.svelte'
 
   let { currentStep = $bindable() } = $props()
 
-  const primaryLikenessFile = $derived($likenessStore.files.headshots[0] ?? $likenessStore.files.source)
+  const primaryLikenessFile = $derived($likenessStore.files.headshots)
 
   function toggleAgreement() {
     likenessStore.setAgreedToFee(!$likenessStore.licensing.agreedToFee)
