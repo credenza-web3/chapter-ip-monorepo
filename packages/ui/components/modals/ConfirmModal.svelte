@@ -1,22 +1,19 @@
 <script lang="ts">
   import Base from './Base.svelte'
 
-  let {
-    title,
-    description,
-    onClose,
-    submitText,
-    onSubmit,
-  }: {
+  export type TConfirmModalProps = {
     title: string
     submitText?: string
     description?: string
     onClose: () => void
     onSubmit: () => void
-  } = $props()
+    withBackButton?: boolean
+  }
+
+  let { title, description, onClose, submitText, onSubmit, withBackButton = true }: TConfirmModalProps = $props()
 </script>
 
-<Base {onClose} isBack={true}>
+<Base {onClose} isBack={withBackButton}>
   <div class="flex flex-col gap-3 items-start">
     <h3 class="text-[22px] font-semibold">{title}</h3>
     {#if description}
