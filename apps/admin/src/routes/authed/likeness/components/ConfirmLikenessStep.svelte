@@ -61,6 +61,7 @@
       <!-- Edit button -->
       <div class="flex justify-end mb-6">
         <button
+          disabled={$likenessStore.ui.loading}
           onclick={() => (currentStep = 1)}
           class="bg-primary text-white rounded-sm px-5 py-2.5 text-sm font-medium hover:bg-[#5a4bd1] transition-colors"
         >
@@ -193,6 +194,7 @@
       <!-- Edit button -->
       <div class="flex justify-end mb-8">
         <button
+          disabled={$likenessStore.ui.loading}
           onclick={() => (currentStep = 2)}
           class="bg-primary text-white rounded-sm px-5 py-2.5 text-sm font-medium hover:bg-[#5a4bd1] transition-colors"
         >
