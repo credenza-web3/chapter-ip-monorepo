@@ -22,7 +22,7 @@
       uploadStore.setLoading(true)
       const trpcClient = uploadService.createTrpcClient()
 
-      const { tokenId, imageUrl, key } = await uploadService.uploadContent(
+      const { contentId, tokenId, imageUrl, key } = await uploadService.uploadContent(
         $uploadStore.uploaded!,
         $uploadStore.uploadedImage,
         $uploadStore.lifetimePrice,
@@ -31,6 +31,7 @@
       )
 
       await uploadService.saveMetadata({
+        contentId,
         tokenId,
         uploaded: $uploadStore.uploaded!,
         imageUrl,

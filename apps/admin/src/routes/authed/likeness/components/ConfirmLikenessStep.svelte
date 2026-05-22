@@ -23,7 +23,7 @@
     )
 
   const onSubmit = () => {
-    modals.open(ConfirmModal, {
+    modals.open(ConfirmModal as any, {
       title: 'Confirming your Likeness',
       description:
         'By publishing, you confirm that you have the legal right to license your likeness, that the terms you’ve set are accurate, and that a Content NFT will be minted on-chain representing this listing. This action is irreversible.',
@@ -79,7 +79,7 @@
         {#if mainPhoto}
           <div class="flex-1 max-w-100">
             <div class="rounded-xl overflow-hidden mb-2.5">
-              <img src={URL.createObjectURL(mainPhoto)} class="w-full object-cover" style="height: 340px;" />
+              <img src={URL.createObjectURL(mainPhoto)} alt={mainPhoto.name} class="w-full object-cover" style="height: 340px;" />
             </div>
 
             {#if thumbsToShow.length > 0}

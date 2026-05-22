@@ -7,7 +7,7 @@
 
   let { currentStep = $bindable() } = $props()
 
-  const primaryLikenessFile = $derived($likenessStore.files.headshots ?? $likenessStore.files.source)
+  const primaryLikenessFile = $derived($likenessStore.files.headshots[0] ?? $likenessStore.files.source)
 
   function toggleAgreement() {
     likenessStore.setAgreedToFee(!$likenessStore.licensing.agreedToFee)

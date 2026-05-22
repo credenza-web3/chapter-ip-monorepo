@@ -5,7 +5,7 @@ export const load = async ({ params, parent }) => {
     id: params.publisher_id,
   })
 
-  const { items: contentItems } = await trpcClient!.files.findContent.query({
+  const { items: contentItems } = await trpcClient!.contents.findContent.query({
     sub: publisher.sub,
     contractAddress: import.meta.env.VITE_CONTENT_CONTRACT_ADDRESS,
   })

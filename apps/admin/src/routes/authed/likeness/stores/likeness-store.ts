@@ -1,11 +1,12 @@
 import { writable, derived } from 'svelte/store'
 
 type YesNo = 'yes' | 'no' | null
-type MediaFileKey = 'preview' | 'headshots' | 'bodyShots' | 'voiceSamples' | 'videoReels'
+type MediaFileKey = 'source' | 'headshots' | 'bodyShots' | 'voiceSamples' | 'videoReels'
 type MultipleFileKey = 'headshots' | 'bodyShots' | 'voiceSamples' | 'videoReels'
 
 interface LikenessState {
   files: {
+    source: File | null
     headshots: File[] // multiple
     bodyShots: File[] // multiple
     voiceSamples: File[] // multiple
@@ -53,6 +54,7 @@ interface LikenessState {
 function createLikenessStore() {
   const { subscribe, set, update } = writable<LikenessState>({
     files: {
+      source: null,
       headshots: [],
       bodyShots: [],
       voiceSamples: [],
@@ -264,6 +266,7 @@ function createLikenessStore() {
     reset: () =>
       set({
         files: {
+          source: null,
           headshots: [],
           bodyShots: [],
           voiceSamples: [],

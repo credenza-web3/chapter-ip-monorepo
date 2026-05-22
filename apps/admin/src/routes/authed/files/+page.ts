@@ -8,7 +8,7 @@ export const load = async () => {
   })
   const subRaw = await authStore.getSubFromToken()
   const sub = subRaw ?? undefined
-  const paginatedResponse = await trpcClient.files.findContent.query({
+  const paginatedResponse = await trpcClient.contents.findContent.query({
     sub,
     contractAddress: import.meta.env.VITE_CONTENT_CONTRACT_ADDRESS,
   })

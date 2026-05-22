@@ -7,7 +7,7 @@
   const onGetFileUrl = async () => {
     try {
       loading = true
-      const { url } = await trpcClient!.files.getContentLink.query({
+      const { url } = await trpcClient!.contents.getContentFileLink.query({
         ...(purchase.licenseTokenId ? { licenseTokenId: String(purchase.licenseTokenId) } : {}),
         key: purchase.metadata.key,
       })

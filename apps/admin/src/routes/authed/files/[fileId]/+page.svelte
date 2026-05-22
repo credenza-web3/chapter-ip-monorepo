@@ -6,9 +6,9 @@
   import { onMount } from 'svelte'
 
   let { data } = $props()
-  const { items } = data.paginatedResponse ?? { items: [] }
-  const { metadata } = data
   const uploadService = new UploadService()
+  const items = $derived(data.content?.files ?? [])
+  const metadata = $derived(data.metadata)
 
   let fulltimeLicensePrice = $state(0)
   let onetimeLicensePrice = $state(0)
@@ -34,9 +34,16 @@
 
   const handleSaveMetadata = (field: 'title' | 'description') => async (v: string) => {
     const trpcClient = uploadService.createTrpcClient()
-    await trpcClient.files.uploadMetadata.mutate({
+    const nextMetadata = { ...data.metadata, [field]: v }
+
+    await trpcClient.contents.updateContentMetadata.mutate({
+      contentId: data.contentId,
+      metadata: nextMetadata,
+    })
+
+    await trpcClient.contents.uploadTokenMetadata.mutate({
       tokenId: data.tokenId,
-      metadata: { ...data.metadata, [field]: v },
+      metadata: nextMetadata,
     })
   }
 </script>
@@ -97,13 +104,13 @@
               </div>
               <div class="flex justify-between gap-3">
                 <span class="text-gray-500">Token ID</span>
-                <span class="font-semibold">{item.tokenId}</span>
+                <span class="font-semibold">{data.tokenId}</span>
               </div>
               <div class="flex justify-between gap-3">
                 <span class="text-gray-500">Explorer</span>
                 <a
                   class="text-primary hover:underline truncate max-w-45"
-                  href={`${EXPLORER_LINK}/${CONTENT_CONTRACT}/${item.tokenId}`}
+                  href={`${EXPLORER_LINK}/${CONTENT_CONTRACT}/${data.tokenId}`}
                   target="_blank"
                 >
                   View
