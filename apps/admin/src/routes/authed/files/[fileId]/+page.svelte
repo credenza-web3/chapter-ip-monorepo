@@ -1,7 +1,7 @@
 <script lang="ts">
   import { formatDate } from '$lib/services/formatDate.js'
   import InlineEditField from './InlineEditField.svelte'
-  import { UploadService } from '../../upload/services/upload.service.js'
+  import { UploadService } from '$lib/upload'
   import PricesPanel from './PricesPanel.svelte'
   import { onMount } from 'svelte'
 

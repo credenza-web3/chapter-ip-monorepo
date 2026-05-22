@@ -8,7 +8,7 @@
   import { savePublisher } from '$lib/services/publisher'
   import { onMount } from 'svelte'
   import { publisherStore } from '$lib/stores/publisher.svelte.js'
-  import { uploadFileToBucket } from '../../upload/services/file-upload.service.js'
+  import { uploadFileToBucket } from '$lib/upload'
 
   let publisherName = $state('')
   let avatarUrl = $derived(publisherStore.avatarUrl || '')
