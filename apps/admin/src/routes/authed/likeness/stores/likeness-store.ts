@@ -1,7 +1,6 @@
 import { writable, derived } from 'svelte/store'
 
 type YesNo = 'yes' | 'no' | null
-type MediaFileKey = 'preview' | 'headshots' | 'bodyShots' | 'voiceSamples' | 'videoReels'
 type MultipleFileKey = 'headshots' | 'bodyShots' | 'voiceSamples' | 'videoReels'
 
 interface LikenessState {
@@ -113,50 +112,6 @@ function createLikenessStore() {
   return {
     subscribe,
     set,
-    setUploaded: (file: File | null) =>
-      update((s) => ({
-        ...s,
-        files: { ...s.files, source: file },
-        licensing: {
-          ...s.licensing,
-          isLifetime: false,
-          isOneTime: false,
-          lifetimePrice: 0,
-          oneTimePrice: 0,
-          licenseTypes: {
-            ...s.licensing.licenseTypes,
-            'single-use': true,
-            'time-limited': false,
-            perpetual: false,
-            'ai-digital': false,
-            bulk: false,
-          },
-          licensePrices: {
-            ...s.licensing.licensePrices,
-            'single-use': '0',
-            'time-limited': '0',
-            perpetual: '0',
-            'ai-digital': '0',
-            bulk: '0',
-          },
-          licenseDropdowns: {
-            ...s.licensing.licenseDropdowns,
-            'time-limited': '1 year',
-            perpetual: 'Ongoing',
-            bulk: 'Enterprise',
-          },
-          permittedUses: {},
-          territories: ['United States only'],
-          allowRetouching: null,
-          approveFinalUse: null,
-          agreedToFee: false,
-        },
-      })),
-    setMediaFile: (key: MediaFileKey, file: File | null) =>
-      update((s) => ({
-        ...s,
-        files: { ...s.files, [key]: file },
-      })),
     appendMediaFiles(key: MultipleFileKey, newFiles: File[]) {
       update((s) => ({
         ...s,

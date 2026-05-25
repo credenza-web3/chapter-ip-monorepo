@@ -54,7 +54,7 @@
         const file = publisherStore.avatarFile
         const ext = file.name.split('.').pop() || ''
 
-        const { url, key } = await data.trpcClient!.files.createUserFileUploadUrl.mutate({
+        const { url, key } = await data.trpcClient!.contents.createUserFileUploadUrl.mutate({
           filename: 'avatar',
           mimetype: file.type,
           extension: ext,

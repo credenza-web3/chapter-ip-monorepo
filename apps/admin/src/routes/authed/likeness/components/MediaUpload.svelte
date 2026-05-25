@@ -33,7 +33,7 @@
       : `Upload or drag your ${label.toLowerCase()} file`,
   )
 
-  const selectedFiles = $derived($likenessStore.files[fileKey] as File[])
+  const selectedFiles = $derived($likenessStore.files[fileKey as MediaFileKey] ?? [])
 
   function handleFileInput(event: Event) {
     const target = event?.target as HTMLInputElement

@@ -110,7 +110,7 @@ export function useProfileSave(trpcClient: any, contentContract: ethers.Contract
             const file = publisherStore.avatarFile
             const ext = file.name.split('.').pop() || ''
 
-            const { url, key } = await trpcClient.files.createUserFileUploadUrl.mutate({
+            const { url, key } = await trpcClient.contents.createUserFileUploadUrl.mutate({
               filename: 'avatar',
               mimetype: file.type,
               extension: ext,
