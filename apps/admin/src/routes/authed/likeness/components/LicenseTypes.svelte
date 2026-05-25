@@ -34,7 +34,9 @@
               <div class="flex items-center border border-[#ddd4cc] rounded-sm bg-white overflow-hidden text-sm">
                 <span class="px-2">$</span>
                 <input
-                  type="text"
+                  type="number"
+                  min="0"
+                  step="0.01"
                   value={$likenessStore.licensing.licensePrices[license.id]}
                   oninput={(e) => likenessStore.setLicenseTypePrice(license.id, e.currentTarget.value)}
                   placeholder="USD"

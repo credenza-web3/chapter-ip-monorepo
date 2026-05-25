@@ -79,6 +79,9 @@
           <div class="flex-1 h-px bg-[#c8c4bc]"></div>
         </div>
         <h1 class="text-[28px] font-semibold text-dark tracking-tight mt-1">{$likenessStore.profile.fullLegalName}</h1>
+        <span class="text-sm font-mediumtext-[#7C7C8A]">
+          Stage Name: {$likenessStore.profile.stageName}
+        </span>
       </div>
 
       <!-- Main content -->
