@@ -1,7 +1,7 @@
 import { createClient, type TRPCClient, type AppRouter } from '@repo/trpc/client'
 import { authStore } from '$lib'
 import { uploadFileToBucket, TransactionService } from './index'
-// import { r2Config } from '@repo/fe-services'
+import { r2Config } from '@repo/fe-services'
 
 export class UploadService {
   transactionService: TransactionService
@@ -52,11 +52,11 @@ export class UploadService {
       })
     }
 
-    // Upload image if provided
+    // Upload preview image if provided
     // let imageUrl = r2Config.url
     // if (uploadedImage) {
-    //   const { url: imageUrlResponse } = await trpcClient.files.createContentUploadUrl.mutate({
-    //     tokenId,
+    //   const { url: imageUrlResponse } = await trpcClient.files.createContentFileUploadUrl.mutate({
+    //     contentId: id,
     //     mimetype: uploadedImage.type,
     //     bucket: 'preview',
     //   })
@@ -91,6 +91,7 @@ export class UploadService {
         title,
         description,
         keys,
+        image: r2Config.url + r2Config.defaultImage,
       },
     })
   }
