@@ -91,7 +91,7 @@ export class UploadService {
         title,
         description,
         keys,
-        image: r2Config.defaultImage,
+        image: r2Config.url + r2Config.defaultImage,
       },
     })
   }
