@@ -35,9 +35,7 @@
 
   const selectedFiles = $derived($likenessStore.files[fileKey as MediaFileKey] ?? [])
 
-  function handleFileInput(event: Event) {
-    const target = event?.target as HTMLInputElement
-    const files = Array.from(target?.files ?? [])
+  function appendFiles(files: File[]) {
     if (!files.length) return
 
     const allValid = files.every(
@@ -49,12 +47,33 @@
 
     if (!allValid) {
       alert(`Please select valid ${mediaKind} files`)
-      target.value = ''
       return
     }
 
     likenessStore.appendMediaFiles(fileKey, files)
+  }
+
+  function handleFileInput(event: Event) {
+    const target = event?.target as HTMLInputElement
+    const files = Array.from(target?.files ?? [])
+    appendFiles(files)
     target.value = ''
+  }
+
+  function handleDragOver(event: DragEvent) {
+    event.preventDefault()
+  }
+
+  function handleDrop(event: DragEvent) {
+    event.preventDefault()
+    const files = Array.from(event.dataTransfer?.files ?? [])
+    appendFiles(files)
+  }
+
+  function handleKeyDown(event: KeyboardEvent) {
+    if (event.key !== 'Enter' && event.key !== ' ') return
+    event.preventDefault()
+    imageInput?.click()
   }
 
   function openFilePicker(e: MouseEvent) {
@@ -76,6 +95,12 @@
   <div
     class="border border-dashed min-h-62.5 rounded-lg border-[#1A1A2E33] p-4 bg-cream flex flex-col items-center justify-center gap-4"
     id={`upload-${fileKey}`}
+    role="button"
+    tabindex="0"
+    aria-label={`Upload ${label}`}
+    ondragover={handleDragOver}
+    ondrop={handleDrop}
+    onkeydown={handleKeyDown}
   >
     {#if selectedFiles?.length}
       <div class="w-full flex flex-wrap gap-2 justify-center py-2">

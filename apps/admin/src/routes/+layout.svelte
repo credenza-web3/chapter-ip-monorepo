@@ -64,7 +64,7 @@
             class="btn bg-transparent border-0 shadow-none hover:bg-transparent active:bg-transparent flex items-center
              gap-2 text-[15px] font-medium text-[#767682] px-none"
           >
-            <span class="hidden md:block">Browse and Purchase</span>
+            <span class="hidden md:block">Create and Upload</span>
 
             <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
