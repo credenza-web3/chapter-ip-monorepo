@@ -2,7 +2,9 @@
   import { privacyTerms, termsText } from './termsData'
   import TermsPrivacyText from './TermsPrivacyText.svelte'
 
-  let tab: 'privacy' | 'terms' = 'privacy'
+  let { activeTab = 'privacy' }: { activeTab?: 'privacy' | 'terms' } = $props()
+
+  let tab: 'privacy' | 'terms' = $state(activeTab)
 </script>
 
 <div class="min-h-screen py-16 px-4">
@@ -15,10 +17,10 @@
       </div>
 
       <div role="tablist" class="tabs tabs-lift">
-        <button role="tab" class="tab {tab === 'privacy' ? 'tab-active' : ''}" on:click={() => (tab = 'privacy')}>
+        <button role="tab" class="tab {tab === 'privacy' ? 'tab-active' : ''}" onclick={() => (tab = 'privacy')}>
           Privacy Policy
         </button>
-        <button role="tab" class="tab {tab === 'terms' ? 'tab-active' : ''}" on:click={() => (tab = 'terms')}>
+        <button role="tab" class="tab {tab === 'terms' ? 'tab-active' : ''}" onclick={() => (tab = 'terms')}>
           Terms & Conditions
         </button>
       </div>
