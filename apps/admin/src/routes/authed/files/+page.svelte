@@ -9,7 +9,6 @@
   import { menuItems } from './constants'
 
   let { data } = $props()
-  console.log('data', data)
   let activeFilter = $state('All')
   let activeMenuRow = $state<string | null>(null)
   let currentPage = $state(1)
@@ -23,24 +22,44 @@
     Likeness: 2,
   }
 
-  const getLicenseTypes = (metadata: TMetadata): string =>
-    Object.entries(metadata?.licensing?.licenseTypes ?? {})
-      .filter(([, value]) => value)
-      .map(([key]) => key)
-      .join(', ') || 'N/A'
+  const normalizeFileType = (type?: string) => {
+    const t = String(type ?? '')
+      .trim()
+      .toLowerCase()
+
+    if (t.includes('likeness')) return 'Likeness'
+    if (t.includes('location')) return 'Locations'
+    if (t.includes('written')) return 'Written works'
+
+    return 'Written works'
+  }
 
   const rows = $derived(
     data.paginatedResponse.items
-      .map((item) => ({
-        id: item.id,
-        item,
-        listingName: item?.metadata?.profile.fullLegalName || item?.metadata?.profile.stageName || 'Untitled',
-        fileType: item?.metadata?.type,
-        licenseType: getLicenseTypes(item.metadata as TMetadata),
-        status: 'active', // Placeholder, replace with actual status if available
-        sales: null,
-        revenue: null,
-      }))
+      .map((item) => {
+        const licensing = item.metadata?.licensing ?? {}
+        const licenseTypes = licensing.licenseTypes ?? {}
+        const licensePrices = licensing.licensePrices ?? {}
+        const getLicenseTypes = (metadata: TMetadata): string[] =>
+          Object.entries(metadata?.licensing?.licenseTypes ?? {})
+            .filter(([, value]) => value)
+            .map(([key]) => key)
+
+        const activePrices = Object.entries(licenseTypes)
+          .filter(([, enabled]) => enabled)
+          .map(([key]) => `$${licensePrices[key] ?? 0}`)
+
+        return {
+          id: item.id,
+          item,
+          listingName: item?.metadata?.profile.fullLegalName || item?.metadata?.profile.stageName || 'Untitled',
+          fileType: normalizeFileType(item?.metadata?.type),
+          licenseType: getLicenseTypes(item.metadata as TMetadata),
+          status: 'Active',
+          sales: activePrices.length ? activePrices : '–',
+          revenue: null,
+        }
+      })
       .sort(
         (a, b) =>
           (typeOrder[a.fileType as keyof typeof typeOrder] ?? 0) -
@@ -106,8 +125,8 @@
                 <th class="px-4 py-3.5">File name</th>
                 <th class="px-4 py-3.5">File type</th>
                 <th class="px-4 py-3.5">License type</th>
-                <th class="px-4 py-3.5">Status</th>
                 <th class="px-4 py-3.5">Sales</th>
+                <th class="px-4 py-3.5">Status</th>
                 <th class="px-4 py-3.5">Revenue</th>
                 <th class="px-4 py-3.5"></th>
               </tr>
@@ -125,7 +144,22 @@
                     <td class="px-4 py-1.5">{formatDate(row.item.createdAt)}</td>
                     <td class="px-4 py-1.5">{row.listingName}</td>
                     <td class="px-4 py-1.5">{row.fileType}</td>
-                    <td class="px-4 py-1.5">{row.licenseType}</td>
+                    <td class="px-4 py-1.5">
+                      {#if row.licenseType.length}
+                        {#each row.licenseType as type, i (`${row.id}-lt-${i}`)}
+                          <div>{type}</div>
+                        {/each}
+                      {:else}
+                        N/A
+                      {/if}
+                    </td>
+                    <td class="px-4 py-1.5">
+                      {#if row.sales}
+                        {#each row.sales as price, i (`${row.id}-${i}`)}
+                          <div>{price}</div>
+                        {/each}
+                      {/if}
+                    </td>
                     <td class="px-4 py-1.5">
                       {#if row.status === 'Active'}
                         <span
@@ -150,7 +184,7 @@
                         </span>
                       {/if}
                     </td>
-                    <td class="px-4 py-1.5">{row.sales ?? '–'}</td>
+                    
                     <td class="px-4 py-1.5">
                       {row.revenue != null ? `$${formatKM(row.revenue)}` : '–'}
                     </td>
