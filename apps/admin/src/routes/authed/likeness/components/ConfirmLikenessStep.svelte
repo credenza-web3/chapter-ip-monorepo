@@ -97,11 +97,7 @@
               >
                 {#each thumbsToShow as file, i (file.name + i)}
                   <div class="rounded-lg overflow-hidden aspect-square">
-                    <img
-                      src={URL.createObjectURL(file)}
-                      alt=""
-                      class="w-full max-w-1/2 h-full max-h-1/2 object-cover"
-                    />
+                    <img src={URL.createObjectURL(file)} alt="" class="w-full h-full max-h-1/2 object-cover" />
                   </div>
                 {/each}
 
