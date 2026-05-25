@@ -96,14 +96,17 @@
         </div>
         <div class="flex md:gap-1">
           {#each filters as f (f)}
+            {@const isDisabled = f === 'Written works' || f === 'Locations'}
             <button
               onclick={() => {
+                if (isDisabled) return
                 activeFilter = f
                 currentPage = 1
               }}
+              disabled={isDisabled}
               class="md:px-5.25 px-3 py-1 rounded-full md:text-[13px] text-[11px] font-medium {activeFilter === f
                 ? 'bg-[#6d6b76] text-[#f8f5f1]'
-                : 'text-dark rounded-full'}"
+                : 'text-dark rounded-full'} {isDisabled ? 'opacity-30 cursor-not-allowed' : ''}"
             >
               {f}
             </button>
@@ -128,7 +131,7 @@
                 <th class="px-4 py-3.5">Sales</th>
                 <th class="px-4 py-3.5">Status</th>
                 <th class="px-4 py-3.5">Revenue</th>
-                <th class="px-4 py-3.5"></th>
+                <!-- <th class="px-4 py-3.5"></th> -->
               </tr>
             </thead>
             <tbody>
@@ -188,13 +191,13 @@
                     <td class="px-4 py-1.5">
                       {row.revenue != null ? `$${formatKM(row.revenue)}` : '–'}
                     </td>
-                    <td class="px-4 py-1.5 text-right">
+                    <!-- <td class="px-4 py-1.5 text-right">
                       <RowActionMenu
                         items={menuItems}
                         buttonLabel={`Open actions for ${row.listingName || 'listing'}`}
                         onOpenChange={(open) => (activeMenuRow = open ? row.id : null)}
                       />
-                    </td>
+                    </td> -->
                   </tr>
                 {/each}
               {:else}
