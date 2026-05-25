@@ -48,6 +48,7 @@ export class UploadService {
         key,
         filename: file.name,
         mimetype: file.type,
+        label: file.name,
       })
     }
 
