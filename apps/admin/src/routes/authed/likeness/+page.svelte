@@ -65,7 +65,7 @@
         submitText: 'Go to Dashboard',
         onSubmit: async () => {
           likenessStore.reset()
-          modals.close()  
+          modals.close()
           goto(`/authed/files`)
         },
         onClose: () => {
