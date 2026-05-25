@@ -35,7 +35,7 @@
   }
 
   const rows = $derived(
-    data.paginatedResponse.items
+    data.items
       .map((item) => {
         const licensing = item.metadata?.licensing ?? {}
         const licenseTypes = licensing.licenseTypes ?? {}
@@ -184,7 +184,7 @@
                         </span>
                       {/if}
                     </td>
-                    
+
                     <td class="px-4 py-1.5">
                       {row.revenue != null ? `$${formatKM(row.revenue)}` : '–'}
                     </td>
