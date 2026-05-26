@@ -35,11 +35,7 @@
         'By publishing, you confirm that you have the legal right to license your likeness, that the terms you’ve set are accurate, and that a Content NFT will be minted on-chain representing this listing. This action is irreversible.',
       submitText: 'I understand and will continue',
       onSubmit: async () => {
-        modals.close()
-        onFormSubmit()
-      },
-      onClose: () => {
-        modals.close()
+        await onFormSubmit()
       },
     })
   }

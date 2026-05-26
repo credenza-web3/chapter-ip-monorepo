@@ -64,13 +64,12 @@
           'Vestibulum mollis lacinia ligula in pellentesque. Sed eu justo ligula. Donec vel nisl sit amet orci condimentum egestas nec euismod diam. Interdum et malesuada fames ac ante ipsum. Sed hendrerit libero vitae sem tristique auctor. Etiam quis quam rhoncus, vehicula ligula ut.',
         submitText: 'Go to Dashboard',
         onSubmit: async () => {
+          await goto(`/authed/files`)
           likenessStore.reset()
-          modals.close()
-          goto(`/authed/files`)
         },
-        onClose: () => {
+        onClose: async () => {
+          await goto(`/authed/files`)
           likenessStore.reset()
-          goto(`/authed/files`)
         },
         withBackButton: false,
       })
