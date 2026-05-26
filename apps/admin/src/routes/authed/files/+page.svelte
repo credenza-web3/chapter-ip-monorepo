@@ -193,7 +193,7 @@
                     </td>
                     <td class="px-4 py-1.5 text-right">
                       <RowActionMenu
-                        items={getMenuItems(row.id)}
+                        items={getMenuItems(row.id, row.item.metadata?.type)}
                         buttonLabel={`Open actions for ${row.listingName || 'listing'}`}
                         onOpenChange={(open) => (activeMenuRow = open ? row.id : null)}
                       />

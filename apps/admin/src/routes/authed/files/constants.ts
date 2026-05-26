@@ -1,4 +1,10 @@
-export function getMenuItems(contentId: string) {
+export function getMenuItems(contentId: string, contentType?: string) {
+  const editHref = String(contentType ?? '')
+    .toLowerCase()
+    .includes('likeness')
+    ? `/authed/likeness/${contentId}`
+    : `/authed/files/${contentId}`
+
   return [
     // {
     //   text: 'View listing',
@@ -6,7 +12,7 @@ export function getMenuItems(contentId: string) {
     // },
     {
       text: 'Edit listing',
-      href: `/authed/files/${contentId}`,
+      href: editHref,
     },
     // {
     //   text: 'Set as draft',

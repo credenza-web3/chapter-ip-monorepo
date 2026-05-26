@@ -9,7 +9,7 @@
     Boolean(
       $likenessStore.profile.fullLegalName.trim() &&
       $likenessStore.profile.bio.trim() &&
-      $likenessStore.files.headshots &&
+      ($likenessStore.files.headshots.length || $likenessStore.existingFiles.headshots.length) &&
       $likenessStore.confirmations.rightsConfirmed,
     ),
   )

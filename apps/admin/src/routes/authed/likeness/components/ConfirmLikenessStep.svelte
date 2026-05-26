@@ -13,10 +13,23 @@
     onFormSubmit: () => Promise<void>
   } = $props()
 
-  const allFiles = $derived([...$likenessStore.files.headshots, ...$likenessStore.files.bodyShots])
+  type PreviewItem = { src: string; name: string }
 
-  const mainPhoto = $derived(allFiles[0] ?? null)
-  const rest = $derived(allFiles.slice(1))
+  const allPreviews = $derived.by(() => {
+    const items: PreviewItem[] = []
+
+    for (const file of [...$likenessStore.existingFiles.headshots, ...$likenessStore.existingFiles.bodyShots]) {
+      items.push({ src: file.url, name: file.name })
+    }
+    for (const file of [...$likenessStore.files.headshots, ...$likenessStore.files.bodyShots]) {
+      items.push({ src: URL.createObjectURL(file), name: file.name })
+    }
+
+    return items
+  })
+
+  const mainPhoto = $derived(allPreviews[0] ?? null)
+  const rest = $derived(allPreviews.slice(1))
 
   const thumbsToShow = $derived(rest.slice(0, 3))
   const remaining = $derived(rest.length > 3 ? rest.length - 3 : 0)
@@ -70,7 +83,9 @@
         <div class="flex items-center w-111 justify-center mb-3">
           <div class="flex-1 h-px bg-[#c8c4bc]"></div>
           <div class="w-24 h-24 rounded-full overflow-hidden mx-4 shrink-0">
-            <img src={URL.createObjectURL(mainPhoto)} alt="" class="w-full h-full object-cover" />
+            {#if mainPhoto}
+              <img src={mainPhoto.src} alt={mainPhoto.name} class="w-full h-full object-cover" />
+            {/if}
           </div>
           <div class="flex-1 h-px bg-[#c8c4bc]"></div>
         </div>
@@ -87,7 +102,7 @@
           <div class="flex-1 max-w-100">
             <div class="rounded-xl overflow-hidden mb-2.5">
               <img
-                src={URL.createObjectURL(mainPhoto)}
+                src={mainPhoto.src}
                 alt={mainPhoto.name}
                 class="w-full object-cover"
                 style="height: 340px;"
@@ -101,13 +116,13 @@
               >
                 {#each thumbsToShow as file, i (file.name + i)}
                   <div class="rounded-lg overflow-hidden aspect-square">
-                    <img src={URL.createObjectURL(file)} alt="" class="w-full h-full max-h-1/2 object-cover" />
+                    <img src={file.src} alt={file.name} class="w-full h-full max-h-1/2 object-cover" />
                   </div>
                 {/each}
 
                 {#if remaining > 0}
                   <div class="rounded-lg overflow-hidden aspect-square relative bg-[#c4beb6]">
-                    <img src={URL.createObjectURL(rest[3])} alt="" class="w-full h-full object-cover opacity-60" />
+                    <img src={rest[3].src} alt={rest[3].name} class="w-full h-full object-cover opacity-60" />
                     <span class="absolute inset-0 flex items-center justify-center text-[#1a1a1a] font-bold text-sm">
                       +{remaining}
                     </span>
