@@ -6,6 +6,16 @@ import { abi as membershipAbi } from '@credenza3/contracts/artifacts/ChapterIpMe
 import { CommonEvmService } from '../common/evm/evm.service'
 import { ContentModelService } from './content-model.service'
 
+const CONTENT_NFT_VOUCHER_EIP712_TYPE: Record<string, Array<{ name: string; type: string }>> = {
+  ContentNFTVoucher: [
+    { name: 'nonce', type: 'uint256' },
+    { name: 'price', type: 'uint256' },
+    { name: 'priceToken', type: 'uint256' },
+    { name: 'licenseInfo', type: 'string' },
+    { name: 'uri', type: 'string' },
+  ],
+}
+
 @Injectable()
 export class ContentService {
   private contentNftContract!: Contract
@@ -67,5 +77,44 @@ export class ContentService {
     }
     const res = (await this.membershipContract.confirmMembership(publisherAddress, subEvmAddress)) as boolean
     return res
+  }
+
+  public async requestLazyMintContentTokenVoucher(uri: string, licenseType: 0 | 2) {
+    const eip712Domain = (await this.contentNftContract.eip712Domain()) as [
+      string,
+      string,
+      string,
+      bigint,
+      string,
+      string,
+      bigint[],
+    ]
+    const verifyingContract = await this.getContentNftContractAddress()
+    const nowMs = BigInt(Date.now())
+    const randomPart = BigInt(Math.floor(Math.random() * 1_000_000))
+    const nonce = (nowMs * 1_000_000n + randomPart).toString()
+
+    const domain = {
+      name: eip712Domain[1],
+      version: eip712Domain[2],
+      chainId: Number(eip712Domain[3]),
+      verifyingContract,
+    }
+
+    const voucher = {
+      nonce,
+      price: '0',
+      priceToken: '0',
+      licenseInfo: String(licenseType),
+      uri,
+    }
+
+    const { sig } = await this.commonEvmService.signLazyMintToken({
+      domain,
+      type: CONTENT_NFT_VOUCHER_EIP712_TYPE,
+      voucher,
+    })
+
+    return { sig, domain, voucher }
   }
 }
