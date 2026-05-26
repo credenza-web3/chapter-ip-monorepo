@@ -28,9 +28,7 @@
       const contentId = data.id
       const buckets = ['headshots', 'bodyShots', 'voiceSamples', 'videoReels'] as const
 
-      const keptFileIds = new Set(
-        buckets.flatMap((bucket) => $likenessStore.existingFiles[bucket].map((f) => f.id)),
-      )
+      const keptFileIds = new Set(buckets.flatMap((bucket) => $likenessStore.existingFiles[bucket].map((f) => f.id)))
       for (const file of data.files ?? []) {
         if (!keptFileIds.has(file.id)) {
           await trpcClient.contents.removeContentFile.mutate({ fileId: file.id })

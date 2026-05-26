@@ -101,12 +101,7 @@
         {#if mainPhoto}
           <div class="flex-1 max-w-100">
             <div class="rounded-xl overflow-hidden mb-2.5">
-              <img
-                src={mainPhoto.src}
-                alt={mainPhoto.name}
-                class="w-full object-cover"
-                style="height: 340px;"
-              />
+              <img src={mainPhoto.src} alt={mainPhoto.name} class="w-full object-cover" style="height: 340px;" />
             </div>
 
             {#if thumbsToShow.length > 0}
