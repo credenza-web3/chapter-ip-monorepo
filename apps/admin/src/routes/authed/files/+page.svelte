@@ -6,7 +6,7 @@
   import Code from '$lib/assets/code.svg'
   import RowActionMenu from '$lib/components/RowActionMenu.svelte'
   import Edit from '$lib/assets/edit.svg'
-  import { menuItems } from './constants'
+  import { getMenuItems } from './constants'
 
   let { data } = $props()
   let activeFilter = $state('All')
@@ -131,7 +131,7 @@
                 <th class="px-4 py-3.5">Sales</th>
                 <th class="px-4 py-3.5">Status</th>
                 <th class="px-4 py-3.5">Revenue</th>
-                <!-- <th class="px-4 py-3.5"></th> -->
+                <th class="px-4 py-3.5"></th>
               </tr>
             </thead>
             <tbody>
@@ -191,13 +191,13 @@
                     <td class="px-4 py-1.5">
                       {row.revenue != null ? `$${formatKM(row.revenue)}` : '–'}
                     </td>
-                    <!-- <td class="px-4 py-1.5 text-right">
+                    <td class="px-4 py-1.5 text-right">
                       <RowActionMenu
-                        items={menuItems}
+                        items={getMenuItems(row.id)}
                         buttonLabel={`Open actions for ${row.listingName || 'listing'}`}
                         onOpenChange={(open) => (activeMenuRow = open ? row.id : null)}
                       />
-                    </td> -->
+                    </td>
                   </tr>
                 {/each}
               {:else}

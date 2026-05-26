@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { goto } from '$app/navigation'
   import Code from '$lib/assets/code.svg'
   import RowActionMenu from '$lib/components/RowActionMenu.svelte'
   import { formatDate } from '../files/helper'
