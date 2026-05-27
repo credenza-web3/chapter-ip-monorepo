@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { LIKENESS_FILE_BUCKETS } from '$lib/constants/likenessFileBuckets';
   import { afterNavigate, beforeNavigate, goto } from '$app/navigation'
   import { likenessStore } from '../stores/likeness-store'
   import UploadStepHeader from '../components/UploadStepHeader.svelte'
@@ -26,7 +27,7 @@
       likenessStore.setLoading(true)
       const trpcClient = uploadService.createTrpcClient()
       const contentId = data.id
-      const buckets = ['headshots', 'bodyShots', 'voiceSamples', 'videoReels'] as const
+      const buckets = LIKENESS_FILE_BUCKETS
 
       const keptFileIds = new Set(buckets.flatMap((bucket) => $likenessStore.existingFiles[bucket].map((f) => f.id)))
       for (const file of data.files ?? []) {

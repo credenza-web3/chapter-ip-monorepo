@@ -1,8 +1,8 @@
 import { writable, derived } from 'svelte/store'
 import type { AppRouter, TRPCClient } from '@repo/trpc/client'
+import { LIKENESS_FILE_BUCKETS, type MultipleFileKey } from '$lib/constants/likenessFileBuckets'
 
 type YesNo = 'yes' | 'no' | null
-type MultipleFileKey = 'headshots' | 'bodyShots' | 'voiceSamples' | 'videoReels'
 
 export type ExistingFile = { id: string; name: string; url: string }
 export type ExistingFilesByBucket = Record<MultipleFileKey, ExistingFile[]>
@@ -16,18 +16,18 @@ const emptyExistingFiles = (): ExistingFilesByBucket => ({
 
 type ContentFile = { id: string; filename: string; label: string; mimetype: string }
 
-function resolveBucket(file: ContentFile, uploadsByBucket: Record<string, unknown>): MultipleFileKey | null {
-  const buckets: MultipleFileKey[] = ['headshots', 'bodyShots', 'voiceSamples', 'videoReels']
-
-  for (const bucket of buckets) {
-    const names = uploadsByBucket[bucket]
-    if (!Array.isArray(names)) continue
-    if (names.some((name) => name === file.filename || name === file.label)) return bucket
-  }
-
-  if (file.mimetype.startsWith('audio/')) return 'voiceSamples'
-  if (file.mimetype.startsWith('video/')) return 'videoReels'
-  if (file.mimetype.startsWith('image/')) return 'headshots'
+function resolveBucket(
+  file: ContentFile,
+  uploadsByBucket: Record<MultipleFileKey, string[]>,
+): MultipleFileKey | null {
+  console.log('file', file)
+  console.log('uploadsByBucket', uploadsByBucket)
+  const bucket = LIKENESS_FILE_BUCKETS.find((bucket) =>
+    uploadsByBucket[bucket]?.some(
+      (name) => name === file.filename || name === file.label,
+    ),
+  )
+  if (bucket) return bucket
 
   return null
 }
@@ -37,7 +37,7 @@ export async function loadExistingFiles(
   trpcClient: TRPCClient<AppRouter>,
 ): Promise<ExistingFilesByBucket> {
   const existingFiles = emptyExistingFiles()
-  const uploadsByBucket = (content.metadata?.uploadsByBucket ?? {}) as Record<string, unknown>
+  const uploadsByBucket = (content.metadata?.uploadsByBucket ?? {}) as Record<MultipleFileKey, string[]>
 
   for (const file of content.files ?? []) {
     const bucket = resolveBucket(file, uploadsByBucket)
