@@ -16,16 +16,11 @@ const emptyExistingFiles = (): ExistingFilesByBucket => ({
 
 type ContentFile = { id: string; filename: string; label: string; mimetype: string }
 
-function resolveBucket(
-  file: ContentFile,
-  uploadsByBucket: Record<MultipleFileKey, string[]>,
-): MultipleFileKey | null {
+function resolveBucket(file: ContentFile, uploadsByBucket: Record<MultipleFileKey, string[]>): MultipleFileKey | null {
   console.log('file', file)
   console.log('uploadsByBucket', uploadsByBucket)
   const bucket = LIKENESS_FILE_BUCKETS.find((bucket) =>
-    uploadsByBucket[bucket]?.some(
-      (name) => name === file.filename || name === file.label,
-    ),
+    uploadsByBucket[bucket]?.some((name) => name === file.filename || name === file.label),
   )
   if (bucket) return bucket
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { LIKENESS_FILE_BUCKETS } from '$lib/constants/likenessFileBuckets';
+  import { LIKENESS_FILE_BUCKETS } from '$lib/constants/likenessFileBuckets'
   import { afterNavigate, beforeNavigate, goto } from '$app/navigation'
   import { likenessStore } from '../stores/likeness-store'
   import UploadStepHeader from '../components/UploadStepHeader.svelte'
