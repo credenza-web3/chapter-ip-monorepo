@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { Contract, EventLog, InterfaceAbi, WebSocketProvider } from 'ethers'
+import { Contract, EventLog, EventFragment, Interface, InterfaceAbi, Log, WebSocketProvider } from 'ethers'
 import { abi as contentAbi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
 import { abi as licenseAbi } from '@credenza3/contracts/artifacts/LicenseNftContract.json'
 
@@ -22,6 +22,9 @@ interface ListenerContractConfig {
 @Injectable()
 export class EvmListenerService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(EvmListenerService.name)
+  private readonly listenerContractConfigs: ListenerContractConfig[] = []
+  private readonly contractInterfacesByAddress = new Map<string, Interface>()
+  private readonly eventFragmentByTopic = new Map<string, EventFragment>()
 
   private provider: WebSocketProvider | null = null
   private contracts: Contract[] = []
@@ -44,6 +47,7 @@ export class EvmListenerService implements OnModuleInit, OnModuleDestroy {
       this.logger.warn('No EVM websocket URLs configured')
       return
     }
+    this.initializeContractsAndEventTopics()
     await this.connect()
   }
 
@@ -60,7 +64,7 @@ export class EvmListenerService implements OnModuleInit, OnModuleDestroy {
     }
 
     const url = this.currentUrl()
-    const contractsToListen = this.getContractsToListen()
+    const contractsToListen = this.listenerContractConfigs
 
     this.logger.log(`Connecting to ${url}`)
 
@@ -224,6 +228,26 @@ export class EvmListenerService implements OnModuleInit, OnModuleDestroy {
     ]
   }
 
+  private initializeContractsAndEventTopics() {
+    this.listenerContractConfigs.length = 0
+    this.listenerContractConfigs.push(...this.getContractsToListen())
+    this.contractInterfacesByAddress.clear()
+    this.eventFragmentByTopic.clear()
+
+    for (const contractConfig of this.listenerContractConfigs) {
+      const contractInterface = new Interface(contractConfig.abi)
+      this.contractInterfacesByAddress.set(contractConfig.address.toLowerCase(), contractInterface)
+
+      for (const fragment of contractInterface.fragments) {
+        if (fragment.type !== 'event') {
+          continue
+        }
+        const eventFragment = EventFragment.from(fragment)
+        this.eventFragmentByTopic.set(eventFragment.topicHash, eventFragment)
+      }
+    }
+  }
+
   private getSocketEmitter(provider: WebSocketProvider): SocketEmitter | null {
     const ws = (provider as unknown as { websocket?: unknown }).websocket
     if (!ws || typeof ws !== 'object') {
@@ -234,10 +258,28 @@ export class EvmListenerService implements OnModuleInit, OnModuleDestroy {
   }
 
   private findEventLog(args: unknown[]): EventLog | null {
-    const last = args[args.length - 1]
-    if (!last || typeof last !== 'object') return null
-    const log = (last as Record<string, unknown>)['log']
-    return this.isEventLog(log) ? log : null
+    const candidates = [args[args.length - 1], ...args]
+    for (const candidate of candidates) {
+      if (!candidate || typeof candidate !== 'object') {
+        continue
+      }
+
+      const maybeLog = (candidate as Record<string, unknown>)['log']
+      if (this.isEventLog(maybeLog)) {
+        return maybeLog
+      }
+
+      const rawLog = this.extractLog(candidate)
+      if (!rawLog) {
+        continue
+      }
+
+      const parsed = this.parseRawLog(rawLog)
+      if (parsed) {
+        return parsed
+      }
+    }
+    return null
   }
 
   private isEventLog(value: unknown): value is EventLog {
@@ -249,6 +291,48 @@ export class EvmListenerService implements OnModuleInit, OnModuleDestroy {
       'blockNumber' in value &&
       'args' in value
     )
+  }
+
+  private extractLog(value: unknown): Log | null {
+    if (!value || typeof value !== 'object') {
+      return null
+    }
+    if (this.isLog(value)) {
+      return value
+    }
+    const maybeLog = (value as Record<string, unknown>)['log']
+    return this.isLog(maybeLog) ? maybeLog : null
+  }
+
+  private isLog(value: unknown): value is Log {
+    return (
+      value !== null &&
+      typeof value === 'object' &&
+      'address' in value &&
+      'topics' in value &&
+      'data' in value &&
+      'transactionHash' in value &&
+      'blockNumber' in value
+    )
+  }
+
+  private parseRawLog(log: Log): EventLog | null {
+    const topic = log.topics[0]
+    if (!topic || !this.eventFragmentByTopic.has(topic)) {
+      return null
+    }
+
+    const contractInterface = this.contractInterfacesByAddress.get(log.address.toLowerCase())
+    if (!contractInterface) {
+      return null
+    }
+
+    const parsedLog = contractInterface.parseLog(log)
+    if (!parsedLog) {
+      return null
+    }
+
+    return new EventLog(log, contractInterface, parsedLog.fragment)
   }
 
   private isDuplicateKeyError(error: unknown): boolean {

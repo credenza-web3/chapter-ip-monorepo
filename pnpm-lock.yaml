@@ -139,8 +139,8 @@ importers:
         specifier: ^3.1038.0
         version: 3.1038.0
       '@credenza3/contracts':
-        specifier: ^0.0.16
-        version: 0.0.16
+        specifier: ^0.0.19
+        version: 0.0.19
       '@nestjs/common':
         specifier: ^11.1.19
         version: 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -830,6 +830,10 @@ packages:
 
   '@credenza3/contracts@0.0.16':
     resolution: {integrity: sha512-Wlanc21kuKg7g68i9o5fLzicYf4vNU0qADYXVxTlG/603jMu8WSiSokaHLQNYirPk8OwKiMGtTPIzLAfnG0OEA==}
+    engines: {node: '>=22'}
+
+  '@credenza3/contracts@0.0.19':
+    resolution: {integrity: sha512-K6m2K5RpD7vn5g1uPHBgh+oDCXWMY5y4FrBmSUbEyzSoQfI1AU07HENn8ByXggk6OKxiBO7Dc3YIGWkpkxHy6A==}
     engines: {node: '>=22'}
 
   '@credenza3/core-web-evm-ext@0.0.13':
@@ -6660,6 +6664,12 @@ snapshots:
       '@openzeppelin/contracts-upgradeable': 4.9.6
 
   '@credenza3/contracts@0.0.16':
+    dependencies:
+      '@opengsn/contracts': 3.0.0-beta.6
+      '@openzeppelin/contracts': 4.9.6
+      '@openzeppelin/contracts-upgradeable': 4.9.6
+
+  '@credenza3/contracts@0.0.19':
     dependencies:
       '@opengsn/contracts': 3.0.0-beta.6
       '@openzeppelin/contracts': 4.9.6
