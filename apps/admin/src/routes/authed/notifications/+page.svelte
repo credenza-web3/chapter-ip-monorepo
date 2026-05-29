@@ -1,29 +1,13 @@
 <script lang="ts">
-  import { goto } from '$app/navigation'
   import Code from '$lib/assets/code.svg'
   import RowActionMenu from '$lib/components/RowActionMenu.svelte'
   import { formatDate } from '../files/helper'
-  import { NotificationsMenuItems } from './constantc'
+  import { notifications, notificationsMenuItems } from './constants'
 
   let activeMenuRow = $state<number | null>(null)
 
-  let notifications = $state([
-    {
-      id: 1,
-      date: '2026-04-14T10:23:11.000Z',
-      text: 'message1',
-      read: false,
-    },
-    {
-      id: 2,
-      date: '2026-04-14T14:05:47.000Z',
-      text: 'message2',
-      read: false,
-    },
-  ])
-
   function getMenuItems(read: boolean) {
-    return read ? NotificationsMenuItems.filter((item) => item.action !== 'mark-read') : NotificationsMenuItems
+    return read ? notificationsMenuItems.filter((item) => item.action !== 'mark-read') : notificationsMenuItems
   }
 
   function handleMenuSelect(index: number, action?: string) {
@@ -35,8 +19,8 @@
 {#if !notifications.length}
   <span class="text-sm font-medium text-[#1A1A2E]/60">You have no listings yet.</span>
 {:else}
-  <div class="min-h-screen border border-[#1a1a2e0d] rounded-3xl bg-[#f8f5f1] p-8 md:p-12.5">
-    <h1 class="text-lg font-semibold mb-4.5">Notifications</h1>
+  <div class="min-h-screen border border-[#1a1a2e0d] rounded-3xl bg-[#f8f5f1] p-2 py-6 md:p-12.5">
+    <h1 class="text-lg font-semibold pl-2 md:pl-0">Notifications</h1>
     <div class="border border-[#ddd] rounded-md overflow-visible">
       <div class="overflow-x-auto">
         <table class="w-full text-sm font-medium text-[#1A1A2E]/60 table-fixed">
@@ -80,7 +64,7 @@
       </div>
     </div>
 
-    <div class="pt-2.75 text-[13px] font-medium text-[#b6b4b7] flex justify-between">
+    <div class="pt-2.75 text-[13px] font-medium text-[#b6b4b7] flex justify-between px-2.5 md:px-0">
       <span class="text-[#1A1A2E]/60">Showing {notifications.length} of {notifications.length} listings</span>
       <div class="flex items-center gap-1.5">
         <img src={Code} alt="Previous" class="h-3 rotate-180 inline-block mr-1" />

@@ -108,7 +108,7 @@
           class="flex items-center justify-center rounded-full bg-primary text-white
         w-7 h-7 text-sm leading-none flex-shrink-0 md:ml-[26px] ml-3"
         >
-          <span class="font-normal text-3xl">+</span>
+          <span class="font-normal text-2xl">+</span>
         </div>
       </div>
 

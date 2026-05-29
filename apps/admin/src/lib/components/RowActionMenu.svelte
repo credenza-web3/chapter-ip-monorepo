@@ -36,6 +36,7 @@
   }
 
   function toggle(event: MouseEvent) {
+    event.stopPropagation()
     trigger = event.currentTarget as HTMLElement | null
     if (!trigger) return
 
@@ -83,7 +84,7 @@
     type="button"
     class="fixed inset-0 z-40 cursor-default bg-transparent"
     aria-label="Close menu"
-    onclick={closeMenu}
+    onclick={(e) => { e.stopPropagation(); closeMenu() }}
   ></button>
 
   <ul
