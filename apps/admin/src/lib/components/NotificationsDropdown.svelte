@@ -54,7 +54,9 @@
           <span class="absolute top-0 -right-1 block w-3 h-3 rounded-full bg-primary border-2 border-[#fef9ee]"></span>
         {/if}
       </div>
-      <spam class="my-auto flex items-center justify-center rounded-full bg-primary text-white font-semibold w-7 h-7 pt-0.5">
+      <spam
+        class="my-auto flex items-center justify-center rounded-full bg-primary text-white font-semibold w-7 h-7 pt-0.5"
+      >
         {publisherStore.title?.slice(0, 1)?.toUpperCase() || 'U'}
       </spam>
     </div>
@@ -68,9 +70,7 @@
   >
     <div class="flex items-center justify-between">
       <h2 class="text-[13px] font-semibold text-dark">Notifications</h2>
-      <button class="text-xs font-medium text-cream rounded-sm bg-primary px-3.75 py-2.5">
-        Mark 2 as read
-      </button>
+      <button class="text-xs font-medium text-cream rounded-sm bg-primary px-3.75 py-2.5"> Mark 2 as read </button>
     </div>
     <div class="pt-9">
       {#each notifications as tx, i (tx.id)}
