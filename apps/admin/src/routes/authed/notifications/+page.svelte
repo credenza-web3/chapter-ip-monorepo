@@ -5,6 +5,16 @@
   import { notifications, notificationsMenuItems } from './constants'
 
   let activeMenuRow = $state<number | null>(null)
+  let currentPage = $state(1)
+
+  const pageSize = 1
+  const totalPages = $derived(Math.max(1, Math.ceil(notifications.length / pageSize)))
+  const safeCurrentPage = $derived(Math.min(currentPage, totalPages))
+  const paginatedNotifications = $derived(
+    notifications
+      .map((notification, sourceIndex) => ({ notification, sourceIndex }))
+      .slice((safeCurrentPage - 1) * pageSize, safeCurrentPage * pageSize),
+  )
 
   function getMenuItems(read: boolean) {
     return read ? notificationsMenuItems.filter((item) => item.action !== 'mark-read') : notificationsMenuItems
@@ -37,9 +47,11 @@
             </tr>
           </thead>
           <tbody>
-            {#each notifications as tx, i (tx.id)}
+            {#each paginatedNotifications as item, i (item.notification.id)}
+              {@const tx = item.notification}
+              {@const notificationIndex = item.sourceIndex}
               <tr
-                class="border-b border-[#ddd] last:border-0 {activeMenuRow === i
+                class="border-b border-[#ddd] last:border-0 {activeMenuRow === notificationIndex
                   ? 'bg-[#ece7df]'
                   : tx.read
                     ? 'bg-[#f3f0ea] text-[#1A1A2E]/40'
@@ -53,8 +65,8 @@
                   <RowActionMenu
                     items={getMenuItems(tx.read)}
                     buttonLabel={`Open actions for ${tx.text}`}
-                    onOpenChange={(open) => (activeMenuRow = open ? i : null)}
-                    onSelect={(item) => handleMenuSelect(i, item.action)}
+                    onOpenChange={(open) => (activeMenuRow = open ? notificationIndex : null)}
+                    onSelect={(item) => handleMenuSelect(notificationIndex, item.action)}
                   />
                 </td>
               </tr>
@@ -65,12 +77,29 @@
     </div>
 
     <div class="pt-2.75 text-[13px] font-medium text-[#b6b4b7] flex justify-between px-2.5 md:px-0">
-      <span class="text-[#1A1A2E]/60">Showing {notifications.length} of {notifications.length} listings</span>
+      <span class="text-[#1A1A2E]/60">
+        Showing {paginatedNotifications.length ? (safeCurrentPage - 1) * pageSize + 1 : 0}-
+        {Math.min(safeCurrentPage * pageSize, notifications.length)} of {notifications.length} notifications
+      </span>
       <div class="flex items-center gap-1.5">
-        <img src={Code} alt="Previous" class="h-3 rotate-180 inline-block mr-1" />
-        <span class="cursor-pointer hover:text-[#555] mr-4.75">Previous</span>
-        <span class="cursor-pointer hover:text-[#555]">Next</span>
-        <img src={Code} alt="Next" class="size-3 inline-block ml-1" />
+        <button
+          type="button"
+          class="inline-flex items-center mr-4.75 disabled:opacity-40 disabled:cursor-not-allowed"
+          onclick={() => (currentPage = Math.max(1, safeCurrentPage - 1))}
+          disabled={safeCurrentPage === 1}
+        >
+          <img src={Code} alt="Previous" class="h-3 rotate-180 inline-block mr-1" />
+          <span class="cursor-pointer hover:text-[#555]">Previous</span>
+        </button>
+        <button
+          type="button"
+          class="inline-flex items-center disabled:opacity-40 disabled:cursor-not-allowed"
+          onclick={() => (currentPage = Math.min(totalPages, safeCurrentPage + 1))}
+          disabled={safeCurrentPage === totalPages}
+        >
+          <span class="cursor-pointer hover:text-[#555]">Next</span>
+          <img src={Code} alt="Next" class="size-3 inline-block ml-1" />
+        </button>
       </div>
     </div>
   </div>
