@@ -169,3 +169,19 @@ export const requestLazyMintContentTokenOutputSchema = z.object({
   voucher: contentNftLazyMintVoucherSchema,
 })
 export type TRequestLazyMintContentTokenOutput = z.infer<typeof requestLazyMintContentTokenOutputSchema>
+
+export const getContentStatisticInputSchema = z.object({
+  tokenId: z.string(),
+})
+export type TGetContentStatisticInput = z.infer<typeof getContentStatisticInputSchema>
+
+export const getContentStatisticOutputSchema = z.object({
+  tokenId: z.string(),
+  boughtLicensesAmount: z.number().int().nonnegative(),
+  revenue: z.object({
+    fiat: z.string(),
+    eth: z.string(),
+    token: z.string(),
+  }),
+})
+export type TGetContentStatisticOutput = z.infer<typeof getContentStatisticOutputSchema>

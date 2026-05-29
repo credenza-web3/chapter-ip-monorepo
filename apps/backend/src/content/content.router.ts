@@ -56,6 +56,10 @@ import {
   requestLazyMintContentTokenOutputSchema,
   type TRequestLazyMintContentTokenInput,
   type TRequestLazyMintContentTokenOutput,
+  getContentStatisticInputSchema,
+  getContentStatisticOutputSchema,
+  type TGetContentStatisticInput,
+  type TGetContentStatisticOutput,
 } from './content.dto'
 
 @Router({ alias: 'contents' })
@@ -283,6 +287,14 @@ export class ContentRouter {
       ...content.toJSON(),
       files,
     }
+  }
+
+  @Query({
+    input: getContentStatisticInputSchema,
+    output: getContentStatisticOutputSchema,
+  })
+  async getContentStatistic(@Input() input: TGetContentStatisticInput): Promise<TGetContentStatisticOutput> {
+    return await this.commonContentService.getContentStatistic(input.tokenId)
   }
 
   @UseMiddlewares(AuthMiddleware)

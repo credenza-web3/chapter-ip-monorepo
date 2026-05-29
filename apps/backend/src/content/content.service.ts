@@ -5,6 +5,8 @@ import { abi as contentAbi } from '@credenza3/contracts/artifacts/ContentNftCont
 import { abi as membershipAbi } from '@credenza3/contracts/artifacts/ChapterIpMembershipContract.json'
 import { CommonEvmService } from '../common/evm/evm.service'
 import { ContentModelService } from './content-model.service'
+import { EvmEventService } from '../evm-listener/evm-event.service'
+import type { TGetContentStatisticOutput } from './content.dto'
 
 const CONTENT_NFT_VOUCHER_EIP712_TYPE: Record<string, Array<{ name: string; type: string }>> = {
   ContentNFTVoucher: [
@@ -20,11 +22,13 @@ const CONTENT_NFT_VOUCHER_EIP712_TYPE: Record<string, Array<{ name: string; type
 export class ContentService {
   private contentNftContract!: Contract
   private membershipContract!: Contract
+  private licenseContractAddress!: string
 
   constructor(
     private readonly configService: ConfigService,
     private readonly commonEvmService: CommonEvmService,
     private readonly contentService: ContentModelService,
+    private readonly evmEventService: EvmEventService,
   ) {
     const provider = this.commonEvmService.getProvider()
     const contentContractAddress = this.configService.get<string>('evm.contentNftContractAddress')
@@ -36,6 +40,11 @@ export class ContentService {
     if (membershipContractAddress) {
       this.membershipContract = new Contract(membershipContractAddress, membershipAbi, provider)
     }
+    const licenseContractAddress = this.configService.get<string>('evm.licenseNftContractAddress')
+    if (!licenseContractAddress) {
+      throw new Error('Missing EVM_LICENSE_NFT_CONTRACT_ADDRESS')
+    }
+    this.licenseContractAddress = licenseContractAddress.toLowerCase()
   }
 
   public getContentNftContract() {
@@ -116,5 +125,73 @@ export class ContentService {
     })
 
     return { sig, domain, voucher }
+  }
+
+  public async getContentStatistic(tokenId: string): Promise<TGetContentStatisticOutput> {
+    const [aggregationResult] = await this.evmEventService.getModel().aggregate<{
+      tokenId: string
+      boughtLicensesAmount: number
+      revenueFiat: string
+      revenueEth: string
+      revenueToken: string
+    }>([
+      {
+        $match: {
+          contractAddress: this.licenseContractAddress,
+          eventName: 'LicenseBought',
+          'args.1': tokenId,
+        },
+      },
+      {
+        $facet: {
+          totals: [
+            {
+              $group: {
+                _id: null,
+                boughtLicensesAmount: { $sum: 1 },
+                revenueFiat: { $sum: { $toDecimal: { $ifNull: [{ $arrayElemAt: ['$args', 3] }, '0'] } } },
+                revenueEth: { $sum: { $toDecimal: { $ifNull: [{ $arrayElemAt: ['$args', 4] }, '0'] } } },
+                revenueToken: { $sum: { $toDecimal: { $ifNull: [{ $arrayElemAt: ['$args', 5] }, '0'] } } },
+              },
+            },
+          ],
+        },
+      },
+      {
+        $project: {
+          tokenId: tokenId,
+          totals: {
+            $ifNull: [
+              { $arrayElemAt: ['$totals', 0] },
+              {
+                boughtLicensesAmount: 0,
+                revenueFiat: { $toDecimal: '0' },
+                revenueEth: { $toDecimal: '0' },
+                revenueToken: { $toDecimal: '0' },
+              },
+            ],
+          },
+        },
+      },
+      {
+        $project: {
+          tokenId: 1,
+          boughtLicensesAmount: '$totals.boughtLicensesAmount',
+          revenueFiat: { $toString: '$totals.revenueFiat' },
+          revenueEth: { $toString: '$totals.revenueEth' },
+          revenueToken: { $toString: '$totals.revenueToken' },
+        },
+      },
+    ])
+
+    return {
+      tokenId,
+      boughtLicensesAmount: aggregationResult?.boughtLicensesAmount ?? 0,
+      revenue: {
+        fiat: aggregationResult?.revenueFiat ?? '0',
+        eth: aggregationResult?.revenueEth ?? '0',
+        token: aggregationResult?.revenueToken ?? '0',
+      },
+    }
   }
 }
