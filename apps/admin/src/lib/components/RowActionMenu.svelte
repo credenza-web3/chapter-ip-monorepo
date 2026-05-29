@@ -84,7 +84,10 @@
     type="button"
     class="fixed inset-0 z-40 cursor-default bg-transparent"
     aria-label="Close menu"
-    onclick={(e) => { e.stopPropagation(); closeMenu() }}
+    onclick={(e) => {
+      e.stopPropagation()
+      closeMenu()
+    }}
   ></button>
 
   <ul
