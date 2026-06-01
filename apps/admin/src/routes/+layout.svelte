@@ -4,6 +4,7 @@
   import { authStore } from '$lib'
   import NavLink from '$lib/components/NavLink.svelte'
   import NotificationsDropdown from '$lib/components/NotificationsDropdown.svelte'
+  import { publisherStore } from '$lib/stores/publisher.svelte'
   import { page } from '$app/state'
 
   let { children } = $props()
@@ -89,7 +90,16 @@
         </div>
       </div>
 
-      <NotificationsDropdown />
+      <div class="flex items-center md:gap-7.25 gap-4">
+        <NotificationsDropdown />
+        <a
+          href="/authed/profile"
+          aria-label="Open profile"
+          class="my-auto flex items-center justify-center rounded-full bg-primary text-white font-semibold w-7 h-7"
+        >
+          {publisherStore.title?.slice(0, 1)?.toUpperCase() || 'U'}
+        </a>
+      </div>
     </div>
   </Header>
   <main class="flex flex-1 flex-col bg-cream px-6 pt-9.75">

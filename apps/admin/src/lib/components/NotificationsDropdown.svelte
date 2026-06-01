@@ -1,7 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import BellIcon from '$lib/assets/bell.svg'
-  import { publisherStore } from '$lib/stores/publisher.svelte'
   import { notifications, notificationsMenuItems } from '../../routes/authed/notifications/constants'
 
   let requests = [1, 2, 3]
@@ -47,18 +46,11 @@
     class="btn bg-transparent border-0 shadow-none hover:bg-transparent active:bg-transparent flex items-center px-0
     text-[15px] font-medium text-[#767682] px-none flex-1"
   >
-    <div class="flex items-center md:gap-7.25 gap-4">
-      <div class="relative cursor-pointer">
-        <img src={BellIcon} alt="notifications" class="h-5.75" />
-        {#if requests.length > 0}
-          <span class="absolute top-0 -right-1 block w-3 h-3 rounded-full bg-primary border-2 border-[#fef9ee]"></span>
-        {/if}
-      </div>
-      <spam
-        class="my-auto flex items-center justify-center rounded-full bg-primary text-white font-semibold w-7 h-7 pt-0.5"
-      >
-        {publisherStore.title?.slice(0, 1)?.toUpperCase() || 'U'}
-      </spam>
+    <div class="relative cursor-pointer">
+      <img src={BellIcon} alt="notifications" class="h-5.75" />
+      {#if requests.length > 0}
+        <span class="absolute top-0 -right-1 block w-3 h-3 rounded-full bg-primary border-2 border-[#fef9ee]"></span>
+      {/if}
     </div>
   </div>
 
