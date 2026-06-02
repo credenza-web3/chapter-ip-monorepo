@@ -7,14 +7,19 @@ export const NOTIFICATION_TYPE = {
   WRITTEN_WORK_PURCHASED: 'WRITTEN_WORK_PURCHASED',
   LOCATION_DRAFT_SAVED: 'LOCATION_DRAFT_SAVED',
   LOCATION_PURCHASED: 'LOCATION_PURCHASED',
+  OTHER: 'OTHER',
 } as const
+export type TNotificationType = typeof NOTIFICATION_TYPE[keyof typeof NOTIFICATION_TYPE]
+export const NOTIFICATION_TYPE_VALUES = Object.values(NOTIFICATION_TYPE);
 
 export const notificationSchema = z.object({
-  type: z.enum(Object.values(NOTIFICATION_TYPE)),
-  payload: z.object({
-    message: z.string(),
-  }),
+  type: z.enum(NOTIFICATION_TYPE_VALUES),
+  sub: z.string(),
+  title: z.string(),
+  message: z.string(),
+  payload: z.looseObject({}),
+  createdAt: z.date(),
+  updatedAt: z.date(),
 })
 
-// export const notificationDataSchema = z.discriminatedUnion('type', [notificationSchema])
-// export type TNotificationData = z.infer<typeof notificationDataSchema>
+export type TNotification = z.infer<typeof notificationSchema>

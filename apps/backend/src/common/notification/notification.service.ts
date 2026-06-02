@@ -1,13 +1,19 @@
 import { Injectable } from '@nestjs/common'
 import { EventEmitter, on } from 'events'
 
-import type { TNotificationData } from '@credenza-tg-trivia/notifications'
+import type { TNotification } from '@repo/notifications'
+
+import { CommonModelService } from '../model/model.service'
+import type { TBuiltPaginationOptions } from '../model/model.dto'
+
+import { CommonNotification } from './notification.schema'
+import type { TFindCommonNotificationsInput } from './notification.dto'
 
 @Injectable()
-export class CommonNotificationService {
+export class CommonNotificationService extends CommonModelService<CommonNotification> {
   private readonly ee = new EventEmitter()
 
-  emit(eventName: string, data: TNotificationData) {
+  emit(eventName: string, data: TNotification) {
     this.ee.emit(eventName, data)
   }
 
@@ -17,5 +23,16 @@ export class CommonNotificationService {
     for await (const [event] of on(this.ee, eventName, { signal })) {
       yield event
     }
+  }
+
+  buildPaginationOptions(opts: TFindCommonNotificationsInput): TBuiltPaginationOptions {
+    const result = super.buildPaginationOptions(opts)
+    result.query = {
+      ...(opts.sub && { sub: opts.sub }),
+      ...(opts.type && { type: opts.type }),
+      ...(opts.isRead !== undefined && { readAt: { $ne: null, $exists: true } }),
+      ...(opts.isUnread !== undefined && { readAt: null }),
+    }
+    return result
   }
 }

@@ -159,6 +159,9 @@ importers:
       '@nestjs/throttler':
         specifier: ^6.5.0
         version: 6.5.0(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(reflect-metadata@0.2.2)
+      '@repo/notifications':
+        specifier: workspace:*
+        version: link:../../packages/notifications
       '@trpc/server':
         specifier: ^11.16.0
         version: 11.16.0(typescript@6.0.3)
@@ -418,6 +421,12 @@ importers:
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
+
+  packages/notifications:
+    dependencies:
+      zod:
+        specifier: ^4
+        version: 4.3.6
 
   packages/services:
     dependencies:
