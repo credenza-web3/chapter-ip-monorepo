@@ -28,7 +28,7 @@ export class NotificationRouter {
   @UseMiddlewares(AuthMiddleware)
   @Subscription()
   async *onMessage(@Ctx() ctx: TAppContextWithTokenPayload, @Options() opts: { signal?: AbortSignal }) {
-    const eventName = `notifications#${ctx.authTokenPayload.sub}`
+    const eventName = this.commonNotificationService.getNotificationEventNameForSub(ctx.authTokenPayload.sub)
     const iterable = this.commonNotificationService.listen(eventName, opts?.signal)
     for await (const event of iterable) {
       yield event

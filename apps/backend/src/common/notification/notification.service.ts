@@ -17,6 +17,15 @@ export class CommonNotificationService extends CommonModelService<CommonNotifica
     this.ee.emit(eventName, data)
   }
 
+  getNotificationEventNameForSub(sub: string) {
+    return `notifications#${sub}`
+  }
+
+  emitNotificationForSub(sub: string, data: TNotification) {
+    const eventName = this.getNotificationEventNameForSub(sub)
+    this.emit(eventName, data)
+  }
+
   async *listen(eventName: string, signal?: AbortSignal) {
     // 'on' turns the event emitter into an async iterator
     // Passing the 'signal' ensures the listener is destroyed if the client disconnects
