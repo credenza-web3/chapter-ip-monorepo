@@ -8,6 +8,7 @@ import { abi as membership_abi } from '@credenza3/contracts/artifacts/ChapterIpM
 import { authStore } from '$lib/auth'
 import { forwardTransaction } from '@repo/fe-services'
 import { uploadFileToBucket } from '$lib/upload'
+import { configStore } from '$lib/stores/config.svelte'
 
 const FIAT_PRICE_MULTIPLIER = 100
 const TOKEN_PRICE_MULTIPLIER = 10 ** 6
@@ -45,7 +46,9 @@ export function useProfileSave(trpcClient: any, contentContract: ethers.Contract
     }
 
     const signer = await getSigner()
-    const contract = new ethers.Contract(import.meta.env.VITE_EVM_MEMBERSHIP_CONTRACT_ADDRESS, membership_abi, signer)
+    const address = configStore.contractAddresses?.membership
+    if (!address) throw new Error('Membership contract address not initialized')
+    const contract = new ethers.Contract(address, membership_abi, signer)
 
     const tokenId = BigInt(ethers.getAddress(publisherStore.evmAddress))
 
@@ -72,10 +75,10 @@ export function useProfileSave(trpcClient: any, contentContract: ethers.Contract
   // Check if any fields have changed
   const hasChanges = $derived(
     profileData.publisherName !== originalData.publisherName ||
-      profileData.avatarUrl !== originalData.avatarUrl ||
-      profileData.subscriptionPrice !== originalData.subscriptionPrice ||
-      agencyStore.hasAddressChanged ||
-      agencyStore.hasFeeChanged,
+    profileData.avatarUrl !== originalData.avatarUrl ||
+    profileData.subscriptionPrice !== originalData.subscriptionPrice ||
+    agencyStore.hasAddressChanged ||
+    agencyStore.hasFeeChanged,
   )
 
   // Update functions for child components

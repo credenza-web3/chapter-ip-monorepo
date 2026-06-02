@@ -3,6 +3,7 @@
   import { abi as membership_abi } from '@credenza3/contracts/artifacts/ChapterIpMembershipContract.json'
   import { publisherStore } from '$lib/stores/publisher.svelte'
   import { onMount } from 'svelte'
+  import { configStore } from '$lib/stores/config.svelte'
 
   let { onUpdate, hideSaveButton = false } = $props<{
     onUpdate?: (price: number) => void
@@ -12,7 +13,9 @@
   let value = $state(0)
 
   function getMembershipContract(signer: any) {
-    return new ethers.Contract(import.meta.env.VITE_EVM_MEMBERSHIP_CONTRACT_ADDRESS, membership_abi, signer)
+    const address = configStore.contractAddresses?.membership
+    if (!address) throw new Error('Membership contract address not initialized')
+    return new ethers.Contract(address, membership_abi, signer)
   }
 
   async function handleInput(event: Event) {

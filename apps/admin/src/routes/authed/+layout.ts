@@ -6,6 +6,9 @@ import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftCon
 import { agencyStore } from '$lib/stores/agency.svelte'
 import { goto } from '$app/navigation'
 import { publisherStore } from '$lib/stores/publisher.svelte'
+import { configStore } from '$lib/stores/config.svelte'
+import type { ConfigResponse } from '$lib/types/config'
+
 
 export const prerender = false
 export const ssr = false
@@ -31,12 +34,20 @@ async function loadFunction({ url }: { url: URL }) {
     getAccessTokenFn: () => authStore.state.accessToken!,
   })
 
+  const config = await (
+  trpcClient.contents as unknown as {
+    config: { query: () => Promise<ConfigResponse> }
+  }
+).config.query()
+
+configStore.set(config)
+
   initProvider(accessToken)
   const signer = await getSigner()
   const userAddress = await signer.getAddress()
 
   const contentContract = new ethers.Contract(
-    import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS,
+    config.contractAddresses.contentNft,
     content_abi,
     signer,
   )

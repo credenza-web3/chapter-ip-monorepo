@@ -1,9 +1,12 @@
 import { ethers, initProvider, getSigner } from '@repo/fe-evm-provider'
 import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
+import { configStore } from '$lib/stores/config.svelte'
 
 export class BlockchainService {
   private getContentContract(signer: ethers.Signer) {
-    return new ethers.Contract(import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS, content_abi, signer)
+    const address = configStore.contractAddresses?.contentNft
+    if (!address) throw new Error('ContentNft contract address not initialized')
+    return new ethers.Contract(address, content_abi, signer)
   }
 
   async createMintTransaction(userAddress: string, lifetimePrice: number, onetimePrice: number) {
