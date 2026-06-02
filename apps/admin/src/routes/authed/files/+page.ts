@@ -1,5 +1,6 @@
 import { authStore } from '$lib'
 import { createClient } from '@repo/trpc/client'
+import type { TContentStatistic } from './types'
 
 export const load = async (): Promise<{
   cursor: { next: string | null; current: string | null }
@@ -11,6 +12,7 @@ export const load = async (): Promise<{
     createdAt: string
     updatedAt: string
     metadata?: Record<string, any> | undefined
+    statistic?: TContentStatistic
   }[]
 }> => {
   const trpcClient = createClient({
@@ -24,5 +26,15 @@ export const load = async (): Promise<{
     contractAddress: import.meta.env.VITE_CONTENT_CONTRACT_ADDRESS,
   })
 
-  return { ...paginatedResponse }
+  const items = await Promise.all(
+    paginatedResponse.items.map(async (item) => {
+      const statistic = await trpcClient.contents.getContentStatistic.query({
+        tokenId: item.tokenId,
+      })
+
+      return { ...item, statistic }
+    }),
+  )
+
+  return { ...paginatedResponse, items }
 }
