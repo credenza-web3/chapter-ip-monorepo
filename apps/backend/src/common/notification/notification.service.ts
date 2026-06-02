@@ -17,12 +17,12 @@ export class CommonNotificationService extends CommonModelService<CommonNotifica
     this.ee.emit(eventName, data)
   }
 
-  getNotificationEventNameForSub(sub: string) {
+  getSubNotificationEventName(sub: string) {
     return `notifications#${sub}`
   }
 
-  emitNotificationForSub(sub: string, data: TNotification) {
-    const eventName = this.getNotificationEventNameForSub(sub)
+  emitSubNotification(sub: string, data: TNotification) {
+    const eventName = this.getSubNotificationEventName(sub)
     this.emit(eventName, data)
   }
 
