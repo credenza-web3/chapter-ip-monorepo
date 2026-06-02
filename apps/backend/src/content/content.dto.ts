@@ -185,3 +185,14 @@ export const getContentStatisticOutputSchema = z.object({
   }),
 })
 export type TGetContentStatisticOutput = z.infer<typeof getContentStatisticOutputSchema>
+
+export const getContentConfigOutputSchema = z.object({
+  contractAddresses: z.object({
+    contentNft: z.string(),
+    licenseNft: z.string(),
+    membership: z.string(),
+  }),
+  chainId: z.number().int().positive(),
+  env: z.string(),
+})
+export type TGetContentConfigOutput = z.infer<typeof getContentConfigOutputSchema>
