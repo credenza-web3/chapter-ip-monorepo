@@ -4,10 +4,18 @@ function createConfigStore() {
   let data = $state<ConfigResponse | null>(null)
 
   return {
-    get state() { return data },
-    set(config: ConfigResponse) { data = config },
-    get contractAddresses() { return data?.contractAddresses },
-    get chainId() { return data?.chainId },
+    get state() {
+      return data
+    },
+    set(config: ConfigResponse) {
+      data = config
+    },
+    get contractAddresses() {
+      return data?.contractAddresses
+    },
+    get chainId() {
+      return data?.chainId
+    },
   }
 }
 

@@ -36,11 +36,7 @@ export class TransactionService {
     const signer = await (await import('@repo/fe-evm-provider')).getSigner()
     const address = configStore.contractAddresses?.contentNft
     if (!address) throw new Error('ContentNft contract address not initialized')
-    const contentContract = new ethers.Contract(
-      address,
-      content_abi,
-      signer,
-    )
+    const contentContract = new ethers.Contract(address, content_abi, signer)
 
     const transferEvent = this.blockchainService.parseTransferEvent(receipt, contentContract)
     const tokenId = Number(transferEvent?.args.tokenId)
