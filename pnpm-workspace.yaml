@@ -5,8 +5,8 @@ packages:
 # "onlyBuiltDependencies":
 #   - "esbuild"
 
-overrides: 
-  "zod": "^4.4.3"
+# overrides: 
+#   "zod": "^4.4.3"
     
 allowBuilds:
   '@credenza3/passport-evm': false
