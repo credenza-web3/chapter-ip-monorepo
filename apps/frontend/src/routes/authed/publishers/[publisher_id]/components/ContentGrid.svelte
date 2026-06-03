@@ -4,10 +4,9 @@
   interface Props {
     contentItems: any[]
     searchQuery: string
-    contentContract: any
   }
 
-  let { contentItems, searchQuery, contentContract }: Props = $props()
+  let { contentItems, searchQuery }: Props = $props()
 </script>
 
 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -21,7 +20,7 @@
     </div>
   {:else}
     {#each contentItems as item}
-      <ContentCard {item} {contentContract} />
+      <ContentCard {item} />
     {/each}
   {/if}
 </div>

@@ -7,7 +7,7 @@ import { playwright } from '@vitest/browser-playwright'
 export default defineConfig({
   plugins: [sveltekit(), devtoolsJson(), tailwindcss()],
   server: {
-    port: 8062,
+    port: 8063,
     host: '0.0.0.0',
   },
   test: {
