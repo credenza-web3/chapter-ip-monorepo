@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { HydratedDocument, Document, ObjectId, Schema as MongooseSchema } from 'mongoose'
+import { HydratedDocument, Document, ObjectId, Schema as Mongooseschema } from 'mongoose'
 
 import { NOTIFICATION_TYPE_VALUES, type TNotificationType } from '@repo/notifications'
 
@@ -33,7 +33,7 @@ export class CommonNotification extends Document<ObjectId> {
   @Prop({ required: false })
   declare message: string
 
-  @Prop({ required: false, type: MongooseSchema.Types.Mixed })
+  @Prop({ required: false, type: Mongooseschema.Types.Mixed })
   declare payload: Record<string, unknown>
 
   @Prop({ required: false, default: null, type: Date })
@@ -43,7 +43,7 @@ export class CommonNotification extends Document<ObjectId> {
   declare updatedAt: Date
 }
 
-export const CommonNotificationSchema = SchemaFactory.createForClass(CommonNotification)
+export const CommonNotificationSchema: Mongooseschema = SchemaFactory.createForClass(CommonNotification)
 CommonNotificationSchema.index({ sub: 1 })
 CommonNotificationSchema.index({ type: 1 })
 CommonNotificationSchema.index({ readAt: 1 })

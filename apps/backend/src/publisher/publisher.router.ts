@@ -68,7 +68,7 @@ export class PublisherRouter {
     output: getPublisherDataOutputSchema,
   })
   async getPublisher(@Input() input: TGetPublisherDataInput): Promise<TGetPublisherDataOutput> {
-    const query = {
+    const query: Record<string, any> = {
       ...(input.sub ? { sub: input.sub } : {}),
       ...(input.id ? { _id: input.id } : {}),
     }

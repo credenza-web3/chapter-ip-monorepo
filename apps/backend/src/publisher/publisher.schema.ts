@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { HydratedDocument, Document, ObjectId } from 'mongoose'
+import { HydratedDocument, Document, ObjectId, Schema as Mongooseschema } from 'mongoose'
 
 export type TPublisherDocument = HydratedDocument<Publisher>
 
@@ -35,7 +35,7 @@ export class Publisher extends Document<ObjectId> {
   declare updatedAt: Date
 }
 
-export const PublisherSchema = SchemaFactory.createForClass(Publisher)
+export const PublisherSchema: Mongooseschema = SchemaFactory.createForClass(Publisher)
 PublisherSchema.index({ sub: 1 }, { unique: true })
 PublisherSchema.index({ createdAt: 1 })
 PublisherSchema.index({ updatedAt: 1 })
