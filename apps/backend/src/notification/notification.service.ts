@@ -49,23 +49,19 @@ export class NotificationService implements OnModuleInit {
       void (async () => {
         try {
           const notification: Partial<TCommonNotificationDocument> = {
-            payload: { ...change.fullDocument },
+            payload: { ...change.fullDocument, _id: String(change.fullDocument._id) },
           }
           const eventName = change.fullDocument.eventName.toUpperCase()
-          console.log(eventName)
           switch (eventName) {
             case 'TRANSFER': {
               const args = change.fullDocument.args as string[]
               const tokenId = args[2]
               const toAddress = args[1]?.toLowerCase()
-              console.log('toAddr', toAddress)
               const toSub = await this.commonEvmService.getSubByEvmAddress(toAddress)
-              console.log('toSub', toSub)
               const content = await this.contentModelService.getModel().findOne({
                 contractAddress: change.fullDocument.contractAddress.toLowerCase(),
                 tokenId,
               })
-              console.log('content', content)
               if (!content) {
                 this.logger.warn(`Cannot find content for contract: ${change.fullDocument.contractAddress}`)
                 return
