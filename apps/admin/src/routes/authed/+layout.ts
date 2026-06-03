@@ -2,11 +2,10 @@ import { browser } from '$app/environment'
 import { authStore } from '$lib'
 import { getSigner, initProvider } from '@repo/fe-evm-provider'
 import { createClient } from '@repo/trpc/client'
-import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
 import { agencyStore } from '$lib/stores/agency.svelte'
 import { goto } from '$app/navigation'
 import { publisherStore } from '$lib/stores/publisher.svelte'
-import { configStore } from '$lib/stores/config.svelte'
+import { configStore, ContractName } from '$lib/stores/config.svelte'
 
 export const prerender = false
 export const ssr = false
@@ -38,7 +37,7 @@ async function loadFunction({ url }: { url: URL }) {
   const signer = await getSigner()
   const userAddress = await signer.getAddress()
 
-  const contentContract = configStore.getContract('contentNft', content_abi, signer)
+  const contentContract = configStore.getContract(ContractName.CONTENT_NFT, signer)
 
   const agencyAddress = await contentContract.publisherAgency(userAddress)
   const agencyFee = await contentContract.publisherAgencyFee(userAddress)

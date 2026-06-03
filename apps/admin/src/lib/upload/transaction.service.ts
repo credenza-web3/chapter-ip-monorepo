@@ -1,9 +1,8 @@
 import { forwardTransaction } from '@repo/fe-services'
 import { authStore } from '$lib'
 import { ethers } from '@repo/fe-evm-provider'
-import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
 import { BlockchainService } from './blockchain.service'
-import { configStore } from '$lib/stores/config.svelte'
+import { configStore, ContractName } from '$lib/stores/config.svelte'
 
 export class TransactionService {
   private blockchainService = new BlockchainService()
@@ -34,7 +33,7 @@ export class TransactionService {
       throw new Error('Transaction failed')
     }
     const signer = await (await import('@repo/fe-evm-provider')).getSigner()
-    const contentContract = configStore.getContract('contentNft', content_abi, signer)
+    const contentContract = configStore.getContract(ContractName.CONTENT_NFT, signer)
 
     const transferEvent = this.blockchainService.parseTransferEvent(receipt, contentContract)
     const tokenId = Number(transferEvent?.args.tokenId)
