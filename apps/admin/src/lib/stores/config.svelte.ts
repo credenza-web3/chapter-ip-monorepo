@@ -20,10 +20,7 @@ const contractAbis: Record<ContractName, ethers.InterfaceAbi> = {
 function createConfigStore() {
   let data = $state<ConfigResponse | null>(null)
 
-  function getContract(
-    contractName: ContractName,
-    runner: ethers.ContractRunner,
-  ) {
+  function getContract(contractName: ContractName, runner: ethers.ContractRunner) {
     const address = data?.contractAddresses[contractName]
 
     if (!address) {
