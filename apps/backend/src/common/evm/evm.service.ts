@@ -46,15 +46,21 @@ export class CommonEvmService {
   }
 
   public async getUserEvmAddressBySub(sub: string) {
-    const evmUrl = this.configService.get<string>('credenza.evmUrl')
-    if (!evmUrl) {
-      throw new Error('Missing EVM_URL')
-    }
+    const evmUrl = this.configService.getOrThrow<string>('credenza.evmUrl')
     const result = await fetch(`${evmUrl}/accounts/${sub}/address`, {
       headers: this.getCredenzaEvmAuthHeaders(),
     })
     const json = (await result.json()) as { address: string }
     return json.address
+  }
+
+  public async getSubByEvmAddress(address: string): Promise<string> {
+    const evmUrl = this.configService.getOrThrow<string>('credenza.evmUrl')
+    const result = await fetch(`${evmUrl}/accounts/${address}/sub`, {
+      headers: this.getCredenzaEvmAuthHeaders(),
+    })
+    const json = (await result.json()) as { sub: string }
+    return json.sub
   }
 
   public async signLazyMintToken(body: TSignLazyMintTokenRequest): Promise<TSignLazyMintTokenResponse> {
