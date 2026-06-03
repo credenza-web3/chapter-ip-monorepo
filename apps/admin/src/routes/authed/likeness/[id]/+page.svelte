@@ -13,8 +13,6 @@
 
   let { data } = $props()
 
-  console.log(data)
-
   onMount(() => {
     // likenessStore.set(data.content) check content if it fits likenessStore
     //

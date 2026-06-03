@@ -3,15 +3,9 @@ import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftCon
 import { configStore } from '$lib/stores/config.svelte'
 
 export class BlockchainService {
-  private getContentContract(signer: ethers.Signer) {
-    const address = configStore.contractAddresses?.contentNft
-    if (!address) throw new Error('ContentNft contract address not initialized')
-    return new ethers.Contract(address, content_abi, signer)
-  }
-
   async createMintTransaction(userAddress: string, lifetimePrice: number, onetimePrice: number) {
     const signer = await getSigner()
-    const contentContract = this.getContentContract(signer)
+    const contentContract = configStore.getContract('contentNft', content_abi, signer)
 
     return await contentContract.mintWithPrices.populateTransaction(
       userAddress,

@@ -46,9 +46,7 @@ export function useProfileSave(trpcClient: any, contentContract: ethers.Contract
     }
 
     const signer = await getSigner()
-    const address = configStore.contractAddresses?.membership
-    if (!address) throw new Error('Membership contract address not initialized')
-    const contract = new ethers.Contract(address, membership_abi, signer)
+    const contract = configStore.getContract('membership', membership_abi, signer)
 
     const tokenId = BigInt(ethers.getAddress(publisherStore.evmAddress))
 

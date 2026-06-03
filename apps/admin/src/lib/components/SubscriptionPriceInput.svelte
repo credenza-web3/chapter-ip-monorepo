@@ -13,9 +13,7 @@
   let value = $state(0)
 
   function getMembershipContract(signer: any) {
-    const address = configStore.contractAddresses?.membership
-    if (!address) throw new Error('Membership contract address not initialized')
-    return new ethers.Contract(address, membership_abi, signer)
+    return configStore.getContract('membership', membership_abi, signer)
   }
 
   async function handleInput(event: Event) {
