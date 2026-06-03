@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { HydratedDocument, Document, ObjectId, Schema as Mongooseschema } from 'mongoose'
+import { DateTime } from 'luxon'
 
 import { NOTIFICATION_TYPE_VALUES, type TNotificationType } from '@repo/notifications'
 
@@ -39,6 +40,9 @@ export class CommonNotification extends Document<ObjectId> {
   @Prop({ required: false, default: null, type: Date })
   declare readAt: Date | null
 
+  @Prop({ required: false, default: DateTime.utc().plus({ days: 90 }).toJSDate() })
+  declare expiresAt: Date
+
   declare createdAt: Date
   declare updatedAt: Date
 }
@@ -49,3 +53,4 @@ CommonNotificationSchema.index({ type: 1 })
 CommonNotificationSchema.index({ readAt: 1 })
 CommonNotificationSchema.index({ createdAt: 1 })
 CommonNotificationSchema.index({ updatedAt: 1 })
+CommonNotificationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 })
