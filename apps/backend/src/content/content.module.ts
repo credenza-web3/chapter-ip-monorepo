@@ -19,6 +19,6 @@ import { EvmListenerModule } from '../evm-listener/evm-listener.module'
   ],
   controllers: [],
   providers: [ContentModelService, ContentService, FileService, ContentRouter],
-  exports: [ContentModelService],
+  exports: [ContentModelService, ContentService],
 })
 export class ContentModule {}

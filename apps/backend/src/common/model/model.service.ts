@@ -11,12 +11,12 @@ export class CommonModelService<T> {
     return this.model
   }
 
-  async find(params?: Partial<T> | Record<string, any>, projection?: ProjectionType<T>, opts?: QueryOptions) {
-    return await this.model.find(params as Record<string, any>, projection, opts)
+  async find(params?: Partial<T> | Record<string, unknown>, projection?: ProjectionType<T>, opts?: QueryOptions) {
+    return await this.model.find(params as Record<string, unknown>, projection, opts)
   }
 
-  async findOne(params?: Partial<T> | Record<string, any>, projection?: ProjectionType<T>, opts?: QueryOptions) {
-    return await this.model.findOne(params as Record<string, any>, projection, opts)
+  async findOne(params?: Partial<T> | Record<string, unknown>, projection?: ProjectionType<T>, opts?: QueryOptions) {
+    return await this.model.findOne(params as Record<string, unknown>, projection, opts)
   }
 
   async findById(id: string, projection?: ProjectionType<T>) {
