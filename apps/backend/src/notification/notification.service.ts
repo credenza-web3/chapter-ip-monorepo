@@ -50,6 +50,7 @@ export class NotificationService implements OnModuleInit {
         try {
           const notification: Partial<TCommonNotificationDocument> = {
             payload: { ...change.fullDocument, _id: String(change.fullDocument._id) },
+            type: NOTIFICATION_TYPE.CONTENT_PURCHASED,
           }
           const eventName = change.fullDocument.eventName.toUpperCase()
           switch (eventName) {
@@ -66,18 +67,12 @@ export class NotificationService implements OnModuleInit {
                 this.logger.warn(`Cannot find content for contract: ${change.fullDocument.contractAddress}`)
                 return
               }
-              if (toSub === content.sub) {
-                await this.commonNotificationService.getModel().create({
-                  ...notification,
-                  sub: toSub,
-                  type: NOTIFICATION_TYPE.CONTENT_CREATED,
-                })
-              } else {
-                await this.commonNotificationService.getModel().insertMany([
-                  { ...notification, sub: toSub, type: NOTIFICATION_TYPE.CONTENT_PURCHASED },
-                  { ...notification, sub: content.sub, type: NOTIFICATION_TYPE.CONTENT_PURCHASED },
+              await this.commonNotificationService
+                .getModel()
+                .insertMany([
+                  { ...notification, sub: toSub },
+                  ...(toSub !== content.sub ? [{ ...notification, sub: content.sub }] : []),
                 ])
-              }
               break
             }
             default: {
