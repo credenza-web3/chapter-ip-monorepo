@@ -1,22 +1,111 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
+import { mongo } from 'mongoose'
+
+import { NOTIFICATION_TYPE } from '@repo/notifications'
 
 import { EvmEventService } from '../evm-listener/evm-event.service'
+import { EvmEvent } from '../evm-listener/evm-event.schema'
+import { ContentModelService } from '../content/content-model.service'
+import { CommonNotificationService } from '../common/notification/notification.service'
+import { type TCommonNotificationDocument } from '../common/notification/notification.schema'
+import { CommonEvmService } from '../common/evm/evm.service'
 
 @Injectable()
 export class NotificationService implements OnModuleInit {
   private logger = new Logger(this.constructor.name)
+  private evmEventsChangeStream!: mongo.ChangeStream<EvmEvent>
+  private evmEventsChangeStreamResumeToken: mongo.ResumeToken = undefined
 
-  constructor(private readonly evmEventService: EvmEventService) {}
+  constructor(
+    private readonly contentModelService: ContentModelService,
+    private readonly evmEventService: EvmEventService,
+    private readonly commonEvmService: CommonEvmService,
+    private readonly commonNotificationService: CommonNotificationService,
+  ) {}
 
-  async listenEvmEvents() {
-    console.log('NOTIF service')
-    const evmEventModel = this.evmEventService.getModel()
-    const stream = evmEventModel.watch([{ $match: { operationType: 'insert' } }])
-    console.log(stream)
-    return Promise.resolve()
+  private async restartEvmEventsChangeStream() {
+    if (this.evmEventsChangeStream) {
+      try {
+        this.evmEventsChangeStream.removeAllListeners()
+        await this.evmEventsChangeStream.close()
+      } catch {
+        this.logger.error('Failed to close change stream')
+      }
+    }
+
+    setTimeout(() => {
+      this.logger.log('Restarting change stream...')
+      this.startEvmEventsChangeStream()
+    }, 2000)
   }
 
-  async onModuleInit() {
-    await this.listenEvmEvents()
+  startEvmEventsChangeStream() {
+    this.evmEventsChangeStream = this.evmEventService.getModel().watch([{ $match: { operationType: 'insert' } }], {
+      resumeAfter: this.evmEventsChangeStreamResumeToken,
+    })
+    this.evmEventsChangeStream.on('change', (change: mongo.ChangeStreamDocument<EvmEvent>) => {
+      this.evmEventsChangeStreamResumeToken = change._id
+      if (change.operationType !== 'insert') return
+      void (async () => {
+        try {
+          const notification: Partial<TCommonNotificationDocument> = {
+            payload: { ...change.fullDocument },
+          }
+          const eventName = change.fullDocument.eventName.toUpperCase()
+          console.log(eventName)
+          switch (eventName) {
+            case 'TRANSFER': {
+              const args = change.fullDocument.args as string[]
+              const tokenId = args[2]
+              const toAddress = args[1]?.toLowerCase()
+              console.log('toAddr', toAddress)
+              const toSub = await this.commonEvmService.getSubByEvmAddress(toAddress)
+              console.log('toSub', toSub)
+              const content = await this.contentModelService.getModel().findOne({
+                contractAddress: change.fullDocument.contractAddress.toLowerCase(),
+                tokenId,
+              })
+              console.log('content', content)
+              if (!content) {
+                this.logger.warn(`Cannot find content for contract: ${change.fullDocument.contractAddress}`)
+                return
+              }
+              if (toSub === content.sub) {
+                await this.commonNotificationService.getModel().create({
+                  ...notification,
+                  sub: toSub,
+                  type: NOTIFICATION_TYPE.CONTENT_CREATED,
+                })
+              } else {
+                await this.commonNotificationService.getModel().insertMany([
+                  { ...notification, sub: toSub, type: NOTIFICATION_TYPE.CONTENT_PURCHASED },
+                  { ...notification, sub: content.sub, type: NOTIFICATION_TYPE.CONTENT_PURCHASED },
+                ])
+              }
+              break
+            }
+            default: {
+              this.logger.warn(`Unhandled event: ${change.fullDocument.eventName}`)
+              return
+            }
+          }
+        } catch (err) {
+          this.logger.error(err)
+        }
+      })()
+    })
+    this.evmEventsChangeStream.on('error', (err) => {
+      this.logger.error('Change stream error:', err)
+      void this.restartEvmEventsChangeStream()
+    })
+    this.evmEventsChangeStream.on('close', () => {
+      this.logger.warn('Change stream closed')
+      void this.restartEvmEventsChangeStream()
+    })
+    this.logger.log('Change stream started')
+  }
+
+  onModuleInit() {
+    this.startEvmEventsChangeStream()
   }
 }

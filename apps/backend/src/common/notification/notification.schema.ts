@@ -3,7 +3,7 @@ import { HydratedDocument, Document, ObjectId, Schema as Mongooseschema } from '
 
 import { NOTIFICATION_TYPE_VALUES, type TNotificationType } from '@repo/notifications'
 
-export type TPublisherDocument = HydratedDocument<CommonNotification>
+export type TCommonNotificationDocument = HydratedDocument<CommonNotification>
 
 @Schema({
   timestamps: {
@@ -27,7 +27,7 @@ export class CommonNotification extends Document<ObjectId> {
   @Prop({ required: true })
   declare sub: string
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   declare title: string
 
   @Prop({ required: false })
