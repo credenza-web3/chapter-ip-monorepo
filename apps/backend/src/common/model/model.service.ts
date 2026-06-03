@@ -71,7 +71,7 @@ export class CommonModelService<T> {
     const nextCursor = hasNextPage ? Buffer.from(String(lastItem[cursorField])).toString('hex') : null
 
     return {
-      items: results.map((item) => ({ ...item, id: String(item._id) })) as T[],
+      items: results.map((item) => ({ ...item, id: String(item._id) })),
       cursor: {
         current: opts.currentCursor,
         next: nextCursor,
