@@ -1,6 +1,5 @@
 import { authStore } from '$lib'
 import { ethers, getSigner, initProvider } from '@repo/fe-evm-provider'
-import { abi as license_abi } from '@credenza3/contracts/artifacts/LicenseNftContract.json'
 import { passportStore } from '$lib/passport.store'
 import { forwardTransaction } from '@repo/fe-services'
 import { get } from 'svelte/store'

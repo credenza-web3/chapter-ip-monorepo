@@ -52,7 +52,7 @@
           licenseType: getLicenseTypes(item.metadata as TMetadata),
           status: 'Active',
           sales: item.statistic?.boughtLicensesAmount ?? 0,
-          revenue: item.statistic?.revenue.fiat ?? '0',
+          revenue: item.statistic?.revenue ?? { fiat: '0', token: '0', eth: '0' },
         }
       })
       .sort(
@@ -180,7 +180,7 @@
                     </td>
 
                     <td class="px-4 py-1.5">
-                      ${formatKM(Number(row.revenue))}
+                      ${formatKM(Number(row.revenue.token) / 1e6)}
                     </td>
                     <!-- <td class="px-4 py-1.5 text-right">
                       <RowActionMenu
