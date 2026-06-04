@@ -91,7 +91,7 @@ export const getPurchasedMembershipContent = async (
       // Get content items for this publisher
       const { items: contentItems } = await trpcClient.contents.findContent.query({
         sub: publisher.sub,
-        contractAddress: import.meta.env.VITE_CONTENT_CONTRACT_ADDRESS,
+        contractAddress: configStore.getContractAddress(ContractName.CONTENT_NFT),
       })
 
       // Get tokens and metadata for each content item

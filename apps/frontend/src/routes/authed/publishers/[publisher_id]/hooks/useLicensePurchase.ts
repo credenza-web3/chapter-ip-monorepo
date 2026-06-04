@@ -8,11 +8,10 @@ import { goto } from '$app/navigation'
 import { Passport } from '@credenza3/passport-evm'
 import { configStore, ContractName } from '$lib/stores/config.svelte'
 
-const CONTENT_CONTRACT = configStore.getContractAddress(ContractName.CONTENT_NFT)
-const LICENSE_CONTRACT = configStore.getContractAddress(ContractName.LICENSE_NFT)
-
 export const useLicensePurchase = () => {
   const onBuyLicense = async (tokenId: string, licenseType: string, metadata: any) => {
+    const contentContractAddress = configStore.getContractAddress(ContractName.CONTENT_NFT)
+    const licenseContractAddress = configStore.getContractAddress(ContractName.LICENSE_NFT)
     const pass = get(passportStore)
     const licenseName = licenseType === '0' ? 'Fulltime' : 'Onetime'
     const itemtitle = metadata?.title || ''
@@ -22,8 +21,8 @@ export const useLicensePurchase = () => {
       title,
       licenses: [
         {
-          contractAddress: CONTENT_CONTRACT,
-          licenseContractAddress: LICENSE_CONTRACT,
+          contractAddress: contentContractAddress,
+          licenseContractAddress,
           licenseType,
           contentTokenId: tokenId,
           amount: 1,
@@ -55,7 +54,7 @@ export const useLicensePurchase = () => {
           const provider = await initProvider(authStore.state.accessToken!)
           const signer = await getSigner()
           const userAddress = await signer.getAddress()
-          const licenseContract = new ethers.Contract(LICENSE_CONTRACT, license_abi, signer)
+          const licenseContract = configStore.getContract(ContractName.LICENSE_NFT, signer)
 
           const tx = await licenseContract.redeem.populateTransaction(userAddress, voucher, sig)
 
