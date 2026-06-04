@@ -7,7 +7,8 @@ export const initProvider = async (accessToken: string): Promise<CredenzaProvide
   if (provider) return provider
 
   provider = new CredenzaProvider({
-    rpcUrl: 'https://avalanche-fuji-c-chain-rpc.publicnode.com',
+    // rpcUrl: 'https://avalanche-fuji-c-chain-rpc.publicnode.com',
+    rpcUrl: 'https://api.avax-test.network/ext/bc/C/rpc',
     accessToken,
     env: 'staging', // 'prod' | 'staging'
   })
