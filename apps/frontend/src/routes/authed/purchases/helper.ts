@@ -1,23 +1,16 @@
-import { ethers, initProvider, getSigner } from '@repo/fe-evm-provider'
-import { abi as license_abi } from '@credenza3/contracts/artifacts/LicenseNftContract.json'
+import { initProvider, getSigner } from '@repo/fe-evm-provider'
 import { createClient } from '@repo/trpc/client'
 import { fetchContentTokenMeta } from '@repo/fe-services'
 import { getMemberships } from '$lib/membership'
+import { configStore, ContractName } from '$lib/stores/config.svelte'
 
 export const getTokensWithMetadata = async (accessToken: string, trpcClient: ReturnType<typeof createClient>) => {
   await initProvider(accessToken)
   const signer = await getSigner()
-  const licenseContract = new ethers.Contract(
-    import.meta.env.VITE_EVM_LICENSE_NFT_CONTRACT_ADDRESS,
-    license_abi,
-    signer,
-  )
+  const licenseContract = configStore.getContract(ContractName.LICENSE_NFT, signer)
 
-  const contentContract = new ethers.Contract(
-    import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS,
-    license_abi,
-    signer,
-  )
+
+  const contentContract = configStore.getContract(ContractName.CONTENT_NFT, signer)
   const userAddress = await signer.getAddress()
   const balance = await licenseContract.balanceOf(userAddress)
   const balanceNum = Number(balance)
@@ -38,7 +31,7 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
     const licenseType = (await licenseContract.getTokenLicenseType(String(licenseTokenId))).toString()
 
     try {
-      let metadata: {
+      const metadata: {
         name: string
         size: number
         type: string
@@ -68,11 +61,7 @@ export const getPurchasedMembershipContent = async (
 ) => {
   await initProvider(accessToken)
   const signer = await getSigner()
-  const contentContract = new ethers.Contract(
-    import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS,
-    license_abi,
-    signer,
-  )
+  const contentContract = configStore.getContract(ContractName.CONTENT_NFT, signer)
   const userAddress = await signer.getAddress()
   const publisherAddressesConfirmed: string[] = await getMemberships(userAddress)
 

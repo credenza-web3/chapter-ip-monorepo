@@ -6,9 +6,10 @@ import { forwardTransaction } from '@repo/fe-services'
 import { get } from 'svelte/store'
 import { goto } from '$app/navigation'
 import { Passport } from '@credenza3/passport-evm'
+import { configStore, ContractName } from '$lib/stores/config.svelte'
 
-const CONTENT_CONTRACT = import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS
-const LICENSE_CONTRACT = import.meta.env.VITE_EVM_LICENSE_NFT_CONTRACT_ADDRESS
+const CONTENT_CONTRACT = configStore.getContractAddress(ContractName.CONTENT_NFT)
+const LICENSE_CONTRACT = configStore.getContractAddress(ContractName.LICENSE_NFT)
 
 export const useLicensePurchase = () => {
   const onBuyLicense = async (tokenId: string, licenseType: string, metadata: any) => {
@@ -55,6 +56,7 @@ export const useLicensePurchase = () => {
           const signer = await getSigner()
           const userAddress = await signer.getAddress()
           const licenseContract = new ethers.Contract(LICENSE_CONTRACT, license_abi, signer)
+
           const tx = await licenseContract.redeem.populateTransaction(userAddress, voucher, sig)
 
           const txHash = await forwardTransaction(tx, {

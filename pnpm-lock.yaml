@@ -51,6 +51,9 @@ importers:
       '@repo/fe-auth':
         specifier: workspace:*
         version: link:../../packages/fe-auth
+      '@repo/fe-config':
+        specifier: workspace:*
+        version: link:../../packages/fe-config
       '@repo/fe-evm-provider':
         specifier: workspace:*
         version: link:../../packages/fe-provider
@@ -287,6 +290,9 @@ importers:
       '@repo/fe-auth':
         specifier: workspace:*
         version: link:../../packages/fe-auth
+      '@repo/fe-config':
+        specifier: workspace:*
+        version: link:../../packages/fe-config
       '@repo/fe-evm-provider':
         specifier: workspace:*
         version: link:../../packages/fe-provider
@@ -405,6 +411,22 @@ importers:
       '@repo/trpc':
         specifier: workspace:*
         version: link:../trpc
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/fe-config:
+    dependencies:
+      '@credenza3/contracts':
+        specifier: ^0.0.16
+        version: 0.0.16
+      '@repo/fe-evm-provider':
+        specifier: workspace:*
+        version: link:../fe-provider
+      svelte:
+        specifier: ^5.39.5
+        version: 5.55.5(@typescript-eslint/types@8.59.1)
+    devDependencies:
       typescript:
         specifier: ^6.0.3
         version: 6.0.3

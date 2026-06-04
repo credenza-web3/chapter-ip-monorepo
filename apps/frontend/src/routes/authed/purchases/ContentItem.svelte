@@ -1,8 +1,9 @@
 <script lang="ts">
+  import { configStore, ContractName } from '$lib/stores/config.svelte'
+
   let { purchase, trpcClient } = $props()
-
   let isBlocked: boolean = $derived(purchase.isBlocked)
-
+  
   let loading = $state(false)
   const onGetFileUrl = async () => {
     try {
@@ -25,7 +26,7 @@
 
   const onGetTransactionReceipt = () => {
     window.open(
-      `https://testnet.snowtrace.io/nft/${import.meta.env.VITE_EVM_LICENSE_NFT_CONTRACT_ADDRESS}/${purchase.licenseTokenId}`,
+      `https://testnet.snowtrace.io/nft/${configStore.getContractAddress(ContractName.LICENSE_NFT)}/${purchase.licenseTokenId}`,
       '_blank',
     )
   }

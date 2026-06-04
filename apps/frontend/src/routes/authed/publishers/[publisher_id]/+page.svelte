@@ -1,12 +1,12 @@
 <script lang="ts">
   import { authStore } from '$lib'
   import { fetchContentTokenMeta } from '@repo/fe-services'
-  import { ethers, initProvider, getSigner } from '@repo/fe-evm-provider'
-  import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
+  import { initProvider, getSigner } from '@repo/fe-evm-provider'
   import SearchInput from '$lib/components/SearchInput.svelte'
   import PurchaseSubscription from './components/PurchaseSubscription.svelte'
   import PublisherHeader from './components/PublisherHeader.svelte'
   import ContentGrid from './components/ContentGrid.svelte'
+  import { configStore, ContractName } from '$lib/stores/config.svelte'
 
   let { data } = $props()
 
@@ -35,11 +35,7 @@
           if (!contentContract) {
             await initProvider(authStore.state.accessToken!)
             const signer = await getSigner()
-            contentContract = new ethers.Contract(
-              import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS,
-              content_abi,
-              signer,
-            )
+            contentContract = configStore.getContract(ContractName.CONTENT_NFT, signer)
           }
           const metadata = await fetchContentTokenMeta(contentContract, item.tokenId)
           cacheMetadata(item.tokenId, metadata)
