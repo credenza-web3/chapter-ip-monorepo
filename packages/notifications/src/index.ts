@@ -1,0 +1,22 @@
+import { z } from 'zod'
+
+export const NOTIFICATION_TYPE = {
+  CONTENT_DRAFT_SAVED: 'CONTENT_DRAFT_SAVED',
+  LICENSE_PURCHASED: 'LICENSE_PURCHASED',
+  CONTENT_CREATED: 'CONTENT_PURCHASED',
+  OTHER: 'OTHER',
+} as const
+export type TNotificationType = (typeof NOTIFICATION_TYPE)[keyof typeof NOTIFICATION_TYPE]
+export const NOTIFICATION_TYPE_VALUES = Object.values(NOTIFICATION_TYPE)
+
+export const notificationSchema = z.object({
+  type: z.enum(NOTIFICATION_TYPE_VALUES),
+  sub: z.string(),
+  title: z.string(),
+  message: z.string(),
+  payload: z.looseObject({}),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+})
+
+export type TNotification = z.infer<typeof notificationSchema>

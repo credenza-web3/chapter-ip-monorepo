@@ -8,11 +8,12 @@ import { AuthModule } from './auth/auth.module'
 import { ContentModule } from './content/content.module'
 import { PublisherModule } from './publisher/publisher.module'
 import { LicenseModule } from './license/license.module'
+import { EvmListenerModule } from './evm-listener/evm-listener.module'
+import { NotificationModule } from './notification/notification.module'
 
 import { TrpcPanelController } from './trpc-ui.controller'
 import { AppRouter } from './app.router'
 import { AppContext } from './app.context'
-import { EvmListenerModule } from './evm-listener/evm-listener.module'
 
 import defaultConfig, { getEnv, ENV } from './app.config/default'
 import stagingConfig from './app.config/staging'
@@ -53,6 +54,7 @@ const env: string = getEnv()
     PublisherModule,
     LicenseModule,
     EvmListenerModule,
+    NotificationModule,
   ],
   controllers: [TrpcPanelController],
   providers: [AppContext, AppRouter],

@@ -1,4 +1,4 @@
-import type { Model, ProjectionType, QueryOptions, UpdateQuery, RootFilterQuery } from 'mongoose'
+import type { Model, ProjectionType, QueryOptions, UpdateQuery } from 'mongoose'
 import { BadRequestException } from '@nestjs/common'
 
 import type { TPaginatedRequestWithCursor, TPaginatedResponseWithCursor, TBuiltPaginationOptions } from './model.dto'
@@ -11,12 +11,12 @@ export class CommonModelService<T> {
     return this.model
   }
 
-  async find(params?: Partial<T> | RootFilterQuery<T>, projection?: ProjectionType<T>, opts?: QueryOptions) {
-    return await this.model.find(params as RootFilterQuery<T>, projection, opts)
+  async find(params?: Partial<T> | Record<string, unknown>, projection?: ProjectionType<T>, opts?: QueryOptions) {
+    return await this.model.find(params as Record<string, unknown>, projection, opts)
   }
 
-  async findOne(params?: Partial<T> | RootFilterQuery<T>, projection?: ProjectionType<T>, opts?: QueryOptions) {
-    return await this.model.findOne(params as RootFilterQuery<T>, projection, opts)
+  async findOne(params?: Partial<T> | Record<string, unknown>, projection?: ProjectionType<T>, opts?: QueryOptions) {
+    return await this.model.findOne(params as Record<string, unknown>, projection, opts)
   }
 
   async findById(id: string, projection?: ProjectionType<T>) {
@@ -71,7 +71,7 @@ export class CommonModelService<T> {
     const nextCursor = hasNextPage ? Buffer.from(String(lastItem[cursorField])).toString('hex') : null
 
     return {
-      items: results.map((item) => ({ ...item, id: String(item._id) })) as T[],
+      items: results.map((item) => ({ ...item, id: String(item._id) })),
       cursor: {
         current: opts.currentCursor,
         next: nextCursor,

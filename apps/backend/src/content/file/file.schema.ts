@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { HydratedDocument, Document, ObjectId, Types } from 'mongoose'
+import { HydratedDocument, Document, ObjectId, Schema as Mongooseschema, Types } from 'mongoose'
 
 import { Content } from '../content.schema'
 
@@ -43,7 +43,7 @@ export class ContentFile extends Document<ObjectId> {
   declare updatedAt: Date
 }
 
-export const ContentFileSchema = SchemaFactory.createForClass(ContentFile)
+export const ContentFileSchema: Mongooseschema = SchemaFactory.createForClass(ContentFile)
 ContentFileSchema.index({ key: 1 }, { unique: true })
 ContentFileSchema.index({ contentId: 1 })
 ContentFileSchema.index({ createdAt: 1 })
