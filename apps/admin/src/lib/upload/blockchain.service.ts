@@ -6,7 +6,6 @@ export class BlockchainService {
   async createMintTransaction(userAddress: string, lifetimePrice: number, onetimePrice: number) {
     const signer = await getSigner()
     const contentContract = configStore.getContract(ContractName.CONTENT_NFT, signer)
-    console.log(contentContract.interface.fragments.map(f => f.format()))
     return await contentContract.mintWithPrices.populateTransaction(
       userAddress,
       '',
