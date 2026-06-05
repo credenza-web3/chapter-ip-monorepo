@@ -1,22 +1,9 @@
-import { initProvider, getSigner, type ethers } from '@repo/fe-evm-provider'
+import { initProvider, getSigner } from '@repo/fe-evm-provider'
 import { getMemberships } from '$lib/membership'
 import { configStore, ContractName } from '$lib/stores/config.svelte'
 import type { createClient } from '@repo/trpc/client'
 
 type ContentTokenMetadata = Record<string, unknown>
-
-const fetchContentTokenMeta = async (
-  contentContract: ethers.Contract,
-  tokenId: string,
-): Promise<ContentTokenMetadata> => {
-  const uri = (await contentContract.tokenURI(tokenId)) as string
-  const response = await fetch(uri)
-  if (!response.ok) {
-    throw new Error(`Failed to fetch metadata for token ${tokenId}: ${response.status}`)
-  }
-
-  return (await response.json()) as ContentTokenMetadata
-}
 
 export const getTokensWithMetadata = async (accessToken: string, trpcClient: ReturnType<typeof createClient>) => {
   await initProvider(accessToken)
@@ -76,8 +63,6 @@ export const getPurchasedMembershipContent = async (
 ) => {
   await initProvider(accessToken)
   const signer = await getSigner()
-
-  const contentContract = configStore.getContract(ContractName.CONTENT_NFT, signer)
 
   const userAddress = await signer.getAddress()
   const publisherAddressesConfirmed: string[] = await getMemberships(userAddress)
