@@ -2,8 +2,10 @@
   import { configStore, ContractName } from '$lib/stores/config.svelte'
 
   let { purchase, trpcClient } = $props()
-  let isBlocked: boolean = $derived(purchase.isBlocked)
+
+  $inspect(purchase)
   
+  let isBlocked: boolean = $derived(purchase.isBlocked)
   let loading = $state(false)
   const onGetFileUrl = async () => {
     try {

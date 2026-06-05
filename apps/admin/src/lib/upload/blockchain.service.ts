@@ -2,10 +2,11 @@ import { ethers, initProvider, getSigner } from '@repo/fe-evm-provider'
 import { configStore, ContractName } from '$lib/stores/config.svelte'
 
 export class BlockchainService {
+
   async createMintTransaction(userAddress: string, lifetimePrice: number, onetimePrice: number) {
     const signer = await getSigner()
     const contentContract = configStore.getContract(ContractName.CONTENT_NFT, signer)
-
+    console.log(contentContract.interface.fragments.map(f => f.format()))
     return await contentContract.mintWithPrices.populateTransaction(
       userAddress,
       '',
@@ -20,6 +21,7 @@ export class BlockchainService {
       onetimePrice * 10 ** 6, // cred decimals
       0,
     )
+
   }
 
   async getEthersProvider(accessToken: string) {

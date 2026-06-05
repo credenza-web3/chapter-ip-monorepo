@@ -1,138 +1,136 @@
-import { createClient } from '@repo/trpc/client'
+import { initProvider, getSigner, type ethers } from '@repo/fe-evm-provider'
+import { getMemberships } from '$lib/membership'
+import { configStore, ContractName } from '$lib/stores/config.svelte'
+import type { createClient } from '@repo/trpc/client'
+
+type ContentTokenMetadata = Record<string, unknown>
+
+const fetchContentTokenMeta = async (
+  contentContract: ethers.Contract,
+  tokenId: string,
+): Promise<ContentTokenMetadata> => {
+  const uri = (await contentContract.tokenURI(tokenId)) as string
+  const response = await fetch(uri)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch metadata for token ${tokenId}: ${response.status}`)
+  }
+
+  return (await response.json()) as ContentTokenMetadata
+}
 
 export const getTokensWithMetadata = async (accessToken: string, trpcClient: ReturnType<typeof createClient>) => {
-  return []
-  // TODO use new metadata
-  // await initProvider(accessToken)
-  // const signer = await getSigner()
-  // const licenseContract = new ethers.Contract(
-  //   import.meta.env.VITE_EVM_LICENSE_NFT_CONTRACT_ADDRESS,
-  //   license_abi,
-  //   signer,
-  // )
+  await initProvider(accessToken)
+  const signer = await getSigner()
 
-  // const contentContract = new ethers.Contract(
-  //   import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS,
-  //   license_abi,
-  //   signer,
-  // )
-  // const userAddress = await signer.getAddress()
-  // const balance = await licenseContract.balanceOf(userAddress)
-  // const balanceNum = Number(balance)
+  const licenseContract = configStore.getContract(ContractName.LICENSE_NFT, signer)
 
-  // const tokens = []
-  // const { items: blockedLicenses } = await trpcClient.licenses.findBlockedLicenses.query({
-  //   subEvmAddress: userAddress,
-  // })
+  const userAddress = await signer.getAddress()
+  const balance = await licenseContract.balanceOf(userAddress)
+  const balanceNum = Number(balance)
 
-  // const blockedLicensesIds = blockedLicenses.map((blockedLicense) => blockedLicense.tokenId)
+  const { items: blockedLicenses } = await trpcClient.licenses.findBlockedLicenses.query({
+    subEvmAddress: userAddress,
+  })
+  const blockedLicensesIds = blockedLicenses.map((b) => b.tokenId)
 
-  // for (let i = 0; i < balanceNum; i++) {
-  //   const licenseTokenId = await licenseContract.tokenOfOwnerByIndex(userAddress, i)
-  //   const contentTokenId = (await licenseContract.getTokenLicenseContentNftId(String(licenseTokenId))).toString()
-  //   if (!Number(contentTokenId)) {
-  //     continue
-  //   }
-  //   const licenseType = (await licenseContract.getTokenLicenseType(String(licenseTokenId))).toString()
+  const tokens = []
 
-  //   try {
-  //     let metadata: {
-  //       name: string
-  //       size: number
-  //       type: string
-  //       title: string
-  //       image: string
-  //       key: string
-  //     } = await fetchContentTokenMeta(contentContract, contentTokenId)
+  for (let i = 0; i < balanceNum; i++) {
+    const licenseTokenId = await licenseContract.tokenOfOwnerByIndex(userAddress, i)
+    const contentTokenId = await licenseContract.getTokenLicenseContentNftId(String(licenseTokenId))
 
-  //     tokens.push({
-  //       licenseTokenId,
-  //       isBlocked: blockedLicensesIds.includes(String(licenseTokenId)),
-  //       contentTokenId: Number(contentTokenId),
-  //       metadata,
-  //       licenseType,
-  //     })
-  //   } catch (error) {
-  //     console.error('Error fetching metadata for token', licenseTokenId, error)
-  //   }
-  // }
+    if (!Number(contentTokenId)) continue
 
-  // return tokens
+    const licenseType = await licenseContract.getTokenLicenseType(String(licenseTokenId))
+
+    try {
+      const { items } = await trpcClient.contents.findContent.query({
+        tokenId: contentTokenId.toString(),
+        contractAddress: configStore.getContractAddress(ContractName.CONTENT_NFT),
+      })
+
+      const content = items[0]
+      if (!content) continue
+
+      const contentWithFiles = await trpcClient.contents.getContentById.query({ id: content.id })
+
+      tokens.push({
+        licenseTokenId,
+        isBlocked: blockedLicensesIds.includes(String(licenseTokenId)),
+        contentTokenId: Number(contentTokenId),
+        metadata: content.metadata ?? {},
+        files: contentWithFiles.files ?? [],
+        licenseType: licenseType.toString(),
+      })
+    } catch (error) {
+      console.error('Error fetching content for token', licenseTokenId, error)
+    }
+  }
+
+  return tokens
 }
 
 export const getPurchasedMembershipContent = async (
   accessToken: string,
   trpcClient: ReturnType<typeof createClient>,
 ) => {
-  return {}
+  await initProvider(accessToken)
+  const signer = await getSigner()
 
-  // TODO: use new metadata
-  // await initProvider(accessToken)
-  // const signer = await getSigner()
-  // const contentContract = new ethers.Contract(
-  //   import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS,
-  //   license_abi,
-  //   signer,
-  // )
-  // const userAddress = await signer.getAddress()
-  // const publisherAddressesConfirmed: string[] = await getMemberships(userAddress)
+  const contentContract = configStore.getContract(ContractName.CONTENT_NFT, signer)
 
-  // if (publisherAddressesConfirmed.length === 0) {
-  //   return {}
-  // }
+  const userAddress = await signer.getAddress()
+  const publisherAddressesConfirmed: string[] = await getMemberships(userAddress)
 
-  // const groupedContent: Record<
-  //   string,
-  //   {
-  //     publisherId: string
-  //     publisherTitle: string
-  //     publisherSub: string
-  //     contentItems: Array<{
-  //       contentTokenId: number
-  //       metadata: any
-  //     }>
-  //   }
-  // > = {}
+  if (publisherAddressesConfirmed.length === 0) {
+    return {}
+  }
 
-  // const { items: publishers } = await trpcClient.publishers.findPublishers.query({
-  //   limit: '100',
-  //   addresses: publisherAddressesConfirmed,
-  // })
-  // for (const publisher of publishers) {
-  //   try {
-  //     // Get content items for this publisher
-  //     const { items: contentItems } = await trpcClient.contents.findContent.query({
-  //       sub: publisher.sub,
-  //       contractAddress: import.meta.env.VITE_CONTENT_CONTRACT_ADDRESS,
-  //     })
+  const groupedContent: Record<
+    string,
+    {
+      publisherId: string
+      publisherTitle: string
+      publisherSub: string
+      contentItems: Array<{
+        contentTokenId: number
+        metadata: ContentTokenMetadata
+      }>
+    }
+  > = {}
 
-  //     // Get tokens and metadata for each content item
-  //     const processedContentItems = []
-  //     for (const item of contentItems) {
-  //       try {
-  //         const metadata = await fetchContentTokenMeta(contentContract, item.tokenId)
+  const { items: publishers } = await trpcClient.publishers.findPublishers.query({
+    limit: '100',
+    addresses: publisherAddressesConfirmed,
+  })
 
-  //         processedContentItems.push({
-  //           contentTokenId: Number(item.tokenId),
-  //           metadata,
-  //         })
-  //       } catch (error) {
-  //         console.error(`Error fetching metadata for token ${item.tokenId}:`, error)
-  //       }
-  //     }
+  for (const publisher of publishers) {
+    try {
+      const { items: contentItems } = await trpcClient.contents.findContent.query({
+        sub: publisher.sub,
+        contractAddress: configStore.getContractAddress(ContractName.CONTENT_NFT),
+      })
+      const processedContentItems = []
+      for (const item of contentItems) {
+        const contentWithFiles = await trpcClient.contents.getContentById.query({ id: item.id })
+        processedContentItems.push({
+          contentTokenId: Number(item.tokenId),
+          metadata: item.metadata ?? {},
+          files: contentWithFiles.files ?? [],
+        })
+      }
+      if (processedContentItems.length > 0) {
+        groupedContent[publisher.id] = {
+          publisherId: publisher.id,
+          publisherTitle: publisher.title,
+          publisherSub: publisher.sub,
+          contentItems: processedContentItems,
+        }
+      }
+    } catch (error) {
+      console.error(`Error fetching content for publisher ${publisher.id}:`, error)
+    }
+  }
 
-  //     if (processedContentItems.length > 0) {
-  //       groupedContent[publisher.id] = {
-  //         publisherId: publisher.id,
-  //         publisherTitle: publisher.title,
-  //         publisherSub: publisher.sub,
-  //         contentItems: processedContentItems,
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error(`Error fetching content for publisher ${publisher.id}:`, error)
-  //   }
-  // }
-
-  // return groupedContent
+  return groupedContent
 }
