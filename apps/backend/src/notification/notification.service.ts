@@ -55,7 +55,7 @@ export class NotificationService implements OnModuleInit {
             payload: { ...change.fullDocument, _id: String(change.fullDocument._id) },
           }
           const eventName = change.fullDocument.eventName
-          const licenceNftContractAddress = await this.contentService.getContentNftContractAddress()
+          const contentNftContractAddress = await this.contentService.getContentNftContractAddress()
           const args = change.fullDocument.args as string[]
           switch (eventName) {
             case 'LicenseBought': {
@@ -64,7 +64,7 @@ export class NotificationService implements OnModuleInit {
               const toSub = await this.commonEvmService.getSubByEvmAddress(toAddress)
 
               const content = await this.contentModelService.getModel().findOne({
-                contractAddress: licenceNftContractAddress,
+                contractAddress: contentNftContractAddress,
                 tokenId,
               })
               if (!content) {
@@ -83,7 +83,7 @@ export class NotificationService implements OnModuleInit {
               break
             }
             case 'Transfer': {
-              if (change.fullDocument.contractAddress !== licenceNftContractAddress) return
+              if (change.fullDocument.contractAddress !== contentNftContractAddress) return
 
               const toAddress = args[1]?.toLowerCase()
               const toSub = await this.commonEvmService.getSubByEvmAddress(toAddress)
