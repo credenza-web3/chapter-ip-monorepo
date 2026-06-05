@@ -1,0 +1,11 @@
+import { z } from 'zod'
+
+import { paginatedRequestWithCursorSchema } from '../model/model.dto'
+
+export const findCommonNotificationsInputSchema = paginatedRequestWithCursorSchema.extend({
+  sub: z.string().optional(),
+  type: z.string().optional(),
+  isRead: z.boolean().optional(),
+  isUnread: z.boolean().optional(),
+})
+export type TFindCommonNotificationsInput = z.infer<typeof findCommonNotificationsInputSchema>

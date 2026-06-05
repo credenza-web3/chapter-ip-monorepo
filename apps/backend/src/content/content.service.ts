@@ -66,7 +66,7 @@ export class ContentService {
     try {
       const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(sub)
       const content = await this.contentService.findById(contentId)
-      const ownerEvmAddress = await this.contentNftContract.ownerOf(content!.tokenId)
+      const ownerEvmAddress = (await this.contentNftContract.ownerOf(content!.tokenId)) as string
       if (ownerEvmAddress.toLowerCase() !== subEvmAddress.toLowerCase()) {
         return [false, `${subEvmAddress} is not the owner of ${content!.tokenId} token ID`]
       }

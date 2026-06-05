@@ -2,17 +2,14 @@
   import { authStore } from '$lib'
   import { getTokenPrice } from '../hooks/useTokenPrice'
   import { useLicensePurchase } from '../hooks/useLicensePurchase'
-  import { fetchContentTokenMeta, r2Config } from '@repo/fe-services'
+  import { r2Config } from '@repo/fe-services'
   import { onMount } from 'svelte'
-  import type { ethers } from '@repo/fe-evm-provider'
 
   interface Props {
     item: any
-    contentContract: ethers.Contract
   }
 
-  let { item, contentContract }: Props = $props()
-  let metadata = $state<any>(null)
+  let { item }: Props = $props()
   let price = $state<any>(null)
   let loading = $state(false)
 
@@ -20,7 +17,6 @@
 
   onMount(async () => {
     try {
-      metadata = await fetchContentTokenMeta(contentContract, item.tokenId)
       price = await getTokenPrice(authStore.state.accessToken!, item.tokenId)
     } catch (error) {
       console.error('Error loading content data:', error)
@@ -29,13 +25,13 @@
 </script>
 
 <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow card-sm border border-gray-200">
-  {#if metadata}
-    <object data={metadata.image} type="image/jpeg" title="File" class="w-full object-contain">
+  {#if item.metadata}
+    <object data={item.metadata.image} type="image/jpeg" title="File" class="w-full object-contain">
       <img src={r2Config.url + r2Config.defaultImage} alt="File" />
     </object>
     <div class="card-body">
-      <h3 class="card-title">{metadata.title || 'UNTITLED'}</h3>
-      <h3 class="card-description">{metadata.description || ''}</h3>
+      <h3 class="card-title">{item.metadata.title || 'UNTITLED'}</h3>
+      <h3 class="card-description">{item.metadata.description || ''}</h3>
 
       {#if price}
         <div class="card-actions mt-4 flex flex-col">
@@ -45,7 +41,7 @@
               <span class="text-2xl font-bold text-primary">${price.fulltime}</span>
               <button
                 class="btn btn-primary"
-                onclick={() => onBuyLicense(item.tokenId, '0', metadata)}
+                onclick={() => onBuyLicense(item.tokenId, '0', item.metadata)}
                 disabled={loading}
               >
                 {loading ? 'Processing...' : 'Buy Now'}
@@ -59,7 +55,7 @@
                 <span class="text-2xl font-bold text-primary">${price.onetime}</span>
                 <button
                   class="btn btn-primary"
-                  onclick={() => onBuyLicense(item.tokenId, '2', metadata)}
+                  onclick={() => onBuyLicense(item.tokenId, '2', item.metadata)}
                   disabled={loading}
                 >
                   {loading ? 'Processing...' : 'Buy Now'}
