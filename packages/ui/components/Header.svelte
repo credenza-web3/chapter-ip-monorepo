@@ -3,7 +3,12 @@
   import Logo from '../assets/chapterip-full-logo-dark.svg'
   import Dots from '../assets/dots.svg'
 
-  let { authStore, children, menuItems, showCreateButton = false } = $props<{
+  let {
+    authStore,
+    children,
+    menuItems,
+    showCreateButton = false,
+  } = $props<{
     authStore: any
     children?: () => any
     menuItems?: { text: string; href: string }[]
