@@ -34,6 +34,8 @@
   )
 
   const selectedFiles = $derived($likenessStore.files[fileKey as MediaFileKey] ?? [])
+  const existingFiles = $derived($likenessStore.existingFiles[fileKey as MediaFileKey] ?? [])
+  const hasMedia = $derived(selectedFiles.length > 0 || existingFiles.length > 0)
 
   function appendFiles(files: File[]) {
     if (!files.length) return
@@ -85,6 +87,11 @@
     e.stopPropagation()
     likenessStore.removeMediaFile(fileKey, index)
   }
+
+  function removeExisting(e: MouseEvent, index: number) {
+    e.stopPropagation()
+    likenessStore.removeExistingFile(fileKey, index)
+  }
 </script>
 
 <div class="space-y-1.25 w-full">
@@ -102,8 +109,25 @@
     ondrop={handleDrop}
     onkeydown={handleKeyDown}
   >
-    {#if selectedFiles?.length}
+    {#if hasMedia}
       <div class="w-full flex flex-wrap gap-2 justify-center py-2">
+        {#each existingFiles as file, i (`existing-${file.id}`)}
+          <div class="relative">
+            {#if mediaKind === 'image'}
+              <img src={file.url} alt={file.name} class="h-20 w-20 rounded object-cover" />
+            {:else}
+              <div class="h-20 w-20 rounded bg-[#eee] flex items-center justify-center text-2xl">
+                {mediaKind === 'audio' ? '🎵' : '🎬'}
+              </div>
+            {/if}
+            <button
+              type="button"
+              onclick={(e) => removeExisting(e, i)}
+              class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white border border-[#ddd4cc] text-[#71707a] hover:text-red-500 flex items-center justify-center text-xs transition-colors"
+              >✕</button
+            >
+          </div>
+        {/each}
         {#each selectedFiles as file, i (file.name + i)}
           <div class="relative">
             {#if mediaKind === 'image'}

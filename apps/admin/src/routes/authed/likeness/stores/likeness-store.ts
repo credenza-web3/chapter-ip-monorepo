@@ -1,7 +1,47 @@
 import { writable, derived } from 'svelte/store'
+import type { AppRouter, TRPCClient } from '@repo/trpc/client'
+import { LIKENESS_FILE_BUCKETS, type MultipleFileKey } from '$lib/constants/likenessFileBuckets'
 
 type YesNo = 'yes' | 'no' | null
-type MultipleFileKey = 'headshots' | 'bodyShots' | 'voiceSamples' | 'videoReels'
+
+export type ExistingFile = { id: string; name: string; url: string }
+export type ExistingFilesByBucket = Record<MultipleFileKey, ExistingFile[]>
+
+const emptyExistingFiles = (): ExistingFilesByBucket => ({
+  headshots: [],
+  bodyShots: [],
+  voiceSamples: [],
+  videoReels: [],
+})
+
+type ContentFile = { id: string; filename: string; label: string; mimetype: string }
+
+function resolveBucket(file: ContentFile, uploadsByBucket: Record<MultipleFileKey, string[]>): MultipleFileKey | null {
+  const bucket = LIKENESS_FILE_BUCKETS.find((bucket) =>
+    uploadsByBucket[bucket]?.some((name) => name === file.filename || name === file.label),
+  )
+  if (bucket) return bucket
+
+  return null
+}
+
+export async function loadExistingFiles(
+  content: { files?: ContentFile[]; metadata?: Record<string, unknown> },
+  trpcClient: TRPCClient<AppRouter>,
+): Promise<ExistingFilesByBucket> {
+  const existingFiles = emptyExistingFiles()
+  const uploadsByBucket = (content.metadata?.uploadsByBucket ?? {}) as Record<MultipleFileKey, string[]>
+
+  for (const file of content.files ?? []) {
+    const bucket = resolveBucket(file, uploadsByBucket)
+    if (!bucket) continue
+
+    const { url } = await trpcClient.contents.getContentFileLink.query({ id: file.id })
+    existingFiles[bucket].push({ id: file.id, name: file.filename || file.label, url })
+  }
+
+  return existingFiles
+}
 
 interface LikenessState {
   files: {
@@ -44,6 +84,8 @@ interface LikenessState {
   confirmations: {
     rightsConfirmed: boolean
   }
+  existingFiles: ExistingFilesByBucket
+  isEditing: boolean
   ui: {
     loading: boolean
   }
@@ -104,6 +146,8 @@ function createLikenessStore() {
     confirmations: {
       rightsConfirmed: false,
     },
+    existingFiles: emptyExistingFiles(),
+    isEditing: false,
     ui: {
       loading: false,
     },
@@ -127,6 +171,15 @@ function createLikenessStore() {
         files: {
           ...s.files,
           [key]: (s.files[key] as File[]).filter((_, i) => i !== index),
+        },
+      }))
+    },
+    removeExistingFile(key: MultipleFileKey, index: number) {
+      update((s) => ({
+        ...s,
+        existingFiles: {
+          ...s.existingFiles,
+          [key]: s.existingFiles[key].filter((_, i) => i !== index),
         },
       }))
     },
@@ -216,6 +269,35 @@ function createLikenessStore() {
     setRightsConfirmed: (value: boolean) =>
       update((s) => ({ ...s, confirmations: { ...s.confirmations, rightsConfirmed: value } })),
     setLoading: (loading: boolean) => update((s) => ({ ...s, ui: { ...s.ui, loading } })),
+    hydrateFromContent(
+      content: { metadata?: Record<string, unknown> },
+      existingFiles: ExistingFilesByBucket = emptyExistingFiles(),
+    ) {
+      const metadata = content.metadata ?? {}
+      const profile = (metadata.profile ?? {}) as Partial<LikenessState['profile']>
+      const licensing = (metadata.licensing ?? {}) as Partial<LikenessState['licensing']>
+
+      update((s) => ({
+        ...s,
+        profile: {
+          ...s.profile,
+          ...profile,
+          attributes: { ...s.profile.attributes, ...(profile.attributes ?? {}) },
+          affiliations: profile.affiliations?.length ? profile.affiliations : s.profile.affiliations,
+        },
+        licensing: {
+          ...s.licensing,
+          ...licensing,
+          licenseTypes: { ...s.licensing.licenseTypes, ...(licensing.licenseTypes ?? {}) },
+          licensePrices: { ...s.licensing.licensePrices, ...(licensing.licensePrices ?? {}) },
+          licenseDropdowns: { ...s.licensing.licenseDropdowns, ...(licensing.licenseDropdowns ?? {}) },
+          permittedUses: { ...s.licensing.permittedUses, ...(licensing.permittedUses ?? {}) },
+        },
+        confirmations: { rightsConfirmed: true },
+        existingFiles,
+        isEditing: Object.values(existingFiles).some((files) => files.length > 0),
+      }))
+    },
     reset: () =>
       set({
         files: {
@@ -269,6 +351,8 @@ function createLikenessStore() {
           agreedToFee: false,
         },
         confirmations: { rightsConfirmed: false },
+        existingFiles: emptyExistingFiles(),
+        isEditing: false,
         ui: { loading: false },
       }),
   }
@@ -279,6 +363,12 @@ export const likenessStore = createLikenessStore()
 export const isFormValid = derived(likenessStore, ($s) => {
   const enabledLicenseTypes = Object.entries($s.licensing.licenseTypes).filter(([, enabled]) => enabled)
   const hasLicenseType = enabledLicenseTypes.length > 0
+  const hasHeadshots = $s.files.headshots.length > 0 || $s.existingFiles.headshots.length > 0
+
+  if ($s.isEditing) {
+    return hasHeadshots && hasLicenseType
+  }
+
   const hasValidLicensePrice = enabledLicenseTypes.some(([id]) => Number($s.licensing.licensePrices[id] || 0) > 0)
   const hasPermittedUse = Object.values($s.licensing.permittedUses).some(Boolean)
 

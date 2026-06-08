@@ -1,7 +1,6 @@
 import { ethers, initProvider } from '@repo/fe-evm-provider'
 import { configStore, ContractName } from '$lib/stores/config.svelte'
 
-
 export const getTokenPrice = async (accessToken: string, tokenId: string) => {
   try {
     const provider = await initProvider(accessToken)
