@@ -1,3 +1,5 @@
+import { configStore, ContractName } from '$lib/stores/config.svelte'
+
 export const load = async ({ params, parent }) => {
   const { trpcClient } = await parent()
 
@@ -7,7 +9,7 @@ export const load = async ({ params, parent }) => {
 
   const { items: contentItems } = await trpcClient!.contents.findContent.query({
     sub: publisher.sub,
-    contractAddress: import.meta.env.VITE_CONTENT_CONTRACT_ADDRESS,
+    contractAddress: configStore.getContractAddress(ContractName.CONTENT_NFT),
   })
 
   return { publisher, contentItems }

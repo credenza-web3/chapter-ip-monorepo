@@ -3,8 +3,16 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    "./client": "./src/client/client.ts",
-    "./server": "./src/server/server.ts"
+    "./client": {
+      "types": "./src/client/client.ts",
+      "import": "./src/client/client.ts",
+      "default": "./src/client/client.ts"
+    },
+    "./server": {
+      "types": "./src/server/server.ts",
+      "import": "./src/server/server.ts",
+      "default": "./src/server/server.ts"
+    }
   },
   "peerDependencies": {
     "@trpc/client": "^11.6.0",

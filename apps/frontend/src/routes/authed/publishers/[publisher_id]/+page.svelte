@@ -8,7 +8,6 @@
 
   let loading = $state(false)
   let searchQuery = $state('')
-  let contentContract = $state<any>(null)
 </script>
 
 <div class="container mx-auto px-4 py-8">

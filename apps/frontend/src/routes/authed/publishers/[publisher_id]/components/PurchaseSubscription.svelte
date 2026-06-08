@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation'
   import { getMembershipPrice, verifyMembership } from '$lib/membership'
   import { passportStore } from '$lib/passport.store'
+  import { configStore, ContractName } from '$lib/stores/config.svelte'
   import type { Passport } from '@credenza3/passport-evm'
   import { onMount } from 'svelte'
   import { get } from 'svelte/store'
@@ -16,7 +17,7 @@
       title,
       memberships: [
         {
-          contractAddress: import.meta.env.VITE_EVM_MEMBERSHIP_CONTRACT_ADDRESS,
+          contractAddress: configStore.getContractAddress(ContractName.MEMBERSHIP),
           membershipTokenId: String(BigInt(publisherAddress)),
         },
       ],

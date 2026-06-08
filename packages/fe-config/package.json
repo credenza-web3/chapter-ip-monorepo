@@ -1,0 +1,22 @@
+{
+  "name": "@repo/fe-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "module": "./src/index.ts",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts"
+    }
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  },
+  "peerDependencies": {
+    "@credenza3/contracts": "^0.0.16",
+    "@repo/fe-evm-provider": "workspace:*",
+    "svelte": "^5.39.5"
+  }
+}

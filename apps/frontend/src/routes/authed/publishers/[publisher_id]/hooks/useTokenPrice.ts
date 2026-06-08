@@ -1,14 +1,13 @@
 import { ethers, initProvider } from '@repo/fe-evm-provider'
-import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
+import { configStore, ContractName } from '$lib/stores/config.svelte'
 
-const CONTENT_CONTRACT = import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS
 
 export const getTokenPrice = async (accessToken: string, tokenId: string) => {
   try {
     const provider = await initProvider(accessToken)
     const ethersProvider = new ethers.BrowserProvider(provider)
 
-    const contentContract = new ethers.Contract(CONTENT_CONTRACT, content_abi, ethersProvider)
+    const contentContract = configStore.getContract(ContractName.CONTENT_NFT, ethersProvider)
 
     const priceCentsFulltimeLicense = await contentContract.getLicensePriceFiat(tokenId, '0')
     const priceCentsOnetimeLicense = await contentContract.getLicensePriceFiat(tokenId, '2')

@@ -1,17 +1,16 @@
 import { authStore } from '$lib'
 import { ethers, getSigner, initProvider } from '@repo/fe-evm-provider'
-import { abi as license_abi } from '@credenza3/contracts/artifacts/LicenseNftContract.json'
 import { passportStore } from '$lib/passport.store'
 import { forwardTransaction } from '@repo/fe-services'
 import { get } from 'svelte/store'
 import { goto } from '$app/navigation'
 import { Passport } from '@credenza3/passport-evm'
-
-const CONTENT_CONTRACT = import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS
-const LICENSE_CONTRACT = import.meta.env.VITE_EVM_LICENSE_NFT_CONTRACT_ADDRESS
+import { configStore, ContractName } from '$lib/stores/config.svelte'
 
 export const useLicensePurchase = () => {
   const onBuyLicense = async (tokenId: string, licenseType: string, metadata: any) => {
+    const contentContractAddress = configStore.getContractAddress(ContractName.CONTENT_NFT)
+    const licenseContractAddress = configStore.getContractAddress(ContractName.LICENSE_NFT)
     const pass = get(passportStore)
     const licenseName = licenseType === '0' ? 'Fulltime' : 'Onetime'
     const itemtitle = metadata?.title || ''
@@ -21,8 +20,8 @@ export const useLicensePurchase = () => {
       title,
       licenses: [
         {
-          contractAddress: CONTENT_CONTRACT,
-          licenseContractAddress: LICENSE_CONTRACT,
+          contractAddress: contentContractAddress,
+          licenseContractAddress,
           licenseType,
           contentTokenId: tokenId,
           amount: 1,
@@ -54,7 +53,8 @@ export const useLicensePurchase = () => {
           const provider = await initProvider(authStore.state.accessToken!)
           const signer = await getSigner()
           const userAddress = await signer.getAddress()
-          const licenseContract = new ethers.Contract(LICENSE_CONTRACT, license_abi, signer)
+          const licenseContract = configStore.getContract(ContractName.LICENSE_NFT, signer)
+
           const tx = await licenseContract.redeem.populateTransaction(userAddress, voucher, sig)
 
           const txHash = await forwardTransaction(tx, {
