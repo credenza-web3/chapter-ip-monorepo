@@ -3,10 +3,16 @@
   import Logo from '../assets/chapterip-full-logo-dark.svg'
   import Dots from '../assets/dots.svg'
 
-  let { authStore, children, menuItems } = $props<{
+  let {
+    authStore,
+    children,
+    menuItems,
+    showCreateButton = false,
+  } = $props<{
     authStore: any
     children?: () => any
     menuItems?: { text: string; href: string }[]
+    showCreateButton?: boolean
     pathname?: string
   }>()
   const { state: authState } = $derived(authStore)
@@ -96,7 +102,7 @@
       {/if}
     </ul>
   </div>
-  {#if authState.accessToken}
+  {#if authState.accessToken && showCreateButton}
     <div class="dropdown dropdown-bottom bg-transparent flex-shrink-0">
       <div
         tabindex="0"

@@ -8,7 +8,7 @@ export type TEvmEventDocument = HydratedDocument<EvmEvent>
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
   },
-  collection: 'evm-events',
+  collection: 'evm_events',
 })
 export class EvmEvent extends Document {
   @Prop({ required: true, index: true })

@@ -5,16 +5,30 @@ import { abi as contentAbi } from '@credenza3/contracts/artifacts/ContentNftCont
 import { abi as membershipAbi } from '@credenza3/contracts/artifacts/ChapterIpMembershipContract.json'
 import { CommonEvmService } from '../common/evm/evm.service'
 import { ContentModelService } from './content-model.service'
+import { EvmEventService } from '../evm-listener/evm-event.service'
+import type { TGetContentStatisticOutput } from './content.dto'
+
+const CONTENT_NFT_VOUCHER_EIP712_TYPE: Record<string, Array<{ name: string; type: string }>> = {
+  ContentNFTVoucher: [
+    { name: 'nonce', type: 'uint256' },
+    { name: 'price', type: 'uint256' },
+    { name: 'priceToken', type: 'uint256' },
+    { name: 'licenseInfo', type: 'string' },
+    { name: 'uri', type: 'string' },
+  ],
+}
 
 @Injectable()
 export class ContentService {
   private contentNftContract!: Contract
   private membershipContract!: Contract
+  private licenseContractAddress!: string
 
   constructor(
     private readonly configService: ConfigService,
     private readonly commonEvmService: CommonEvmService,
     private readonly contentService: ContentModelService,
+    private readonly evmEventService: EvmEventService,
   ) {
     const provider = this.commonEvmService.getProvider()
     const contentContractAddress = this.configService.get<string>('evm.contentNftContractAddress')
@@ -26,6 +40,11 @@ export class ContentService {
     if (membershipContractAddress) {
       this.membershipContract = new Contract(membershipContractAddress, membershipAbi, provider)
     }
+    const licenseContractAddress = this.configService.get<string>('evm.licenseNftContractAddress')
+    if (!licenseContractAddress) {
+      throw new Error('Missing EVM_LICENSE_NFT_CONTRACT_ADDRESS')
+    }
+    this.licenseContractAddress = licenseContractAddress.toLowerCase()
   }
 
   public getContentNftContract() {
@@ -47,7 +66,7 @@ export class ContentService {
     try {
       const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(sub)
       const content = await this.contentService.findById(contentId)
-      const ownerEvmAddress = await this.contentNftContract.ownerOf(content!.tokenId)
+      const ownerEvmAddress = (await this.contentNftContract.ownerOf(content!.tokenId)) as string
       if (ownerEvmAddress.toLowerCase() !== subEvmAddress.toLowerCase()) {
         return [false, `${subEvmAddress} is not the owner of ${content!.tokenId} token ID`]
       }
@@ -67,5 +86,112 @@ export class ContentService {
     }
     const res = (await this.membershipContract.confirmMembership(publisherAddress, subEvmAddress)) as boolean
     return res
+  }
+
+  public async requestLazyMintContentTokenVoucher(uri: string, licenseType: 0 | 2) {
+    const eip712Domain = (await this.contentNftContract.eip712Domain()) as [
+      string,
+      string,
+      string,
+      bigint,
+      string,
+      string,
+      bigint[],
+    ]
+    const verifyingContract = await this.getContentNftContractAddress()
+    const nowMs = BigInt(Date.now())
+    const randomPart = BigInt(Math.floor(Math.random() * 1_000_000))
+    const nonce = (nowMs * 1_000_000n + randomPart).toString()
+
+    const domain = {
+      name: eip712Domain[1],
+      version: eip712Domain[2],
+      chainId: Number(eip712Domain[3]),
+      verifyingContract,
+    }
+
+    const voucher = {
+      nonce,
+      price: '0',
+      priceToken: '0',
+      licenseInfo: String(licenseType),
+      uri,
+    }
+
+    const { sig } = await this.commonEvmService.signLazyMintToken({
+      domain,
+      type: CONTENT_NFT_VOUCHER_EIP712_TYPE,
+      voucher,
+    })
+
+    return { sig, domain, voucher }
+  }
+
+  public async getContentStatistic(tokenId: string): Promise<TGetContentStatisticOutput> {
+    const [aggregationResult] = await this.evmEventService.getModel().aggregate<{
+      tokenId: string
+      boughtLicensesAmount: number
+      revenueFiat: string
+      revenueEth: string
+      revenueToken: string
+    }>([
+      {
+        $match: {
+          contractAddress: this.licenseContractAddress,
+          eventName: 'LicenseBought',
+          'args.1': tokenId,
+        },
+      },
+      {
+        $facet: {
+          totals: [
+            {
+              $group: {
+                _id: null,
+                boughtLicensesAmount: { $sum: 1 },
+                revenueFiat: { $sum: { $toDecimal: { $ifNull: [{ $arrayElemAt: ['$args', 3] }, '0'] } } },
+                revenueEth: { $sum: { $toDecimal: { $ifNull: [{ $arrayElemAt: ['$args', 4] }, '0'] } } },
+                revenueToken: { $sum: { $toDecimal: { $ifNull: [{ $arrayElemAt: ['$args', 5] }, '0'] } } },
+              },
+            },
+          ],
+        },
+      },
+      {
+        $project: {
+          tokenId: tokenId,
+          totals: {
+            $ifNull: [
+              { $arrayElemAt: ['$totals', 0] },
+              {
+                boughtLicensesAmount: 0,
+                revenueFiat: { $toDecimal: '0' },
+                revenueEth: { $toDecimal: '0' },
+                revenueToken: { $toDecimal: '0' },
+              },
+            ],
+          },
+        },
+      },
+      {
+        $project: {
+          tokenId: 1,
+          boughtLicensesAmount: '$totals.boughtLicensesAmount',
+          revenueFiat: { $toString: '$totals.revenueFiat' },
+          revenueEth: { $toString: '$totals.revenueEth' },
+          revenueToken: { $toString: '$totals.revenueToken' },
+        },
+      },
+    ])
+
+    return {
+      tokenId,
+      boughtLicensesAmount: aggregationResult?.boughtLicensesAmount ?? 0,
+      revenue: {
+        fiat: aggregationResult?.revenueFiat ?? '0',
+        eth: aggregationResult?.revenueEth ?? '0',
+        token: aggregationResult?.revenueToken ?? '0',
+      },
+    }
   }
 }

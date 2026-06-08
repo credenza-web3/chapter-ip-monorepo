@@ -39,15 +39,10 @@
       .map((item) => {
         const licensing = item.metadata?.licensing ?? {}
         const licenseTypes = licensing.licenseTypes ?? {}
-        const licensePrices = licensing.licensePrices ?? {}
         const getLicenseTypes = (metadata: TMetadata): string[] =>
           Object.entries(metadata?.licensing?.licenseTypes ?? {})
             .filter(([, value]) => value)
             .map(([key]) => key)
-
-        const activePrices = Object.entries(licenseTypes)
-          .filter(([, enabled]) => enabled)
-          .map(([key]) => `$${licensePrices[key] ?? 0}`)
 
         return {
           id: item.id,
@@ -56,8 +51,8 @@
           fileType: normalizeFileType(item?.metadata?.type),
           licenseType: getLicenseTypes(item.metadata as TMetadata),
           status: 'Active',
-          sales: activePrices.length ? activePrices : '–',
-          revenue: null,
+          sales: item.statistic?.boughtLicensesAmount ?? 0,
+          revenue: item.statistic?.revenue ?? { fiat: '0', token: '0', eth: '0' },
         }
       })
       .sort(
@@ -157,11 +152,7 @@
                       {/if}
                     </td>
                     <td class="px-4 py-1.5">
-                      {#if row.sales}
-                        {#each row.sales as price, i (`${row.id}-${i}`)}
-                          <div>{price}</div>
-                        {/each}
-                      {/if}
+                      {row.sales}
                     </td>
                     <td class="px-4 py-1.5">
                       {#if row.status === 'Active'}
@@ -189,7 +180,7 @@
                     </td>
 
                     <td class="px-4 py-1.5">
-                      {row.revenue != null ? `$${formatKM(row.revenue)}` : '–'}
+                      ${formatKM(Number(row.revenue.token) / 1e6)}
                     </td>
                     <td class="px-4 py-1.5 text-right">
                       <RowActionMenu

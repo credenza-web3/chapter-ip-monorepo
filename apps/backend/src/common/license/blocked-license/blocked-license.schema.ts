@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { HydratedDocument, Document, ObjectId } from 'mongoose'
+import { HydratedDocument, Document, ObjectId, Schema as Mongooseschema } from 'mongoose'
 
 export type TFileDocument = HydratedDocument<BlockedLicense>
 
@@ -32,7 +32,7 @@ export class BlockedLicense extends Document<ObjectId> {
   declare updatedAt: Date
 }
 
-export const BlockedLicenseSchema = SchemaFactory.createForClass(BlockedLicense)
+export const BlockedLicenseSchema: Mongooseschema = SchemaFactory.createForClass(BlockedLicense)
 BlockedLicenseSchema.index({ tokenId: 1 })
 BlockedLicenseSchema.index({ subEvmAddress: 1 })
 BlockedLicenseSchema.index({ sub: 1 })

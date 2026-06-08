@@ -143,3 +143,56 @@ export const getContentFileLinkOutputSchema = z.object({
   url: z.string(),
 })
 export type TGetContentFileLinkOutput = z.infer<typeof getContentFileLinkOutputSchema>
+
+export const requestLazyMintContentTokenInputSchema = z.object({
+  uri: z.string(),
+  licenseType: z.union([z.literal(0), z.literal(2)]),
+})
+export type TRequestLazyMintContentTokenInput = z.infer<typeof requestLazyMintContentTokenInputSchema>
+
+export const contentNftLazyMintVoucherSchema = z.object({
+  nonce: z.string(),
+  price: z.string(),
+  priceToken: z.string(),
+  licenseInfo: z.string(),
+  uri: z.string(),
+})
+
+export const requestLazyMintContentTokenOutputSchema = z.object({
+  sig: z.string(),
+  domain: z.object({
+    name: z.string(),
+    version: z.string(),
+    chainId: z.number(),
+    verifyingContract: z.string(),
+  }),
+  voucher: contentNftLazyMintVoucherSchema,
+})
+export type TRequestLazyMintContentTokenOutput = z.infer<typeof requestLazyMintContentTokenOutputSchema>
+
+export const getContentStatisticInputSchema = z.object({
+  tokenId: z.string(),
+})
+export type TGetContentStatisticInput = z.infer<typeof getContentStatisticInputSchema>
+
+export const getContentStatisticOutputSchema = z.object({
+  tokenId: z.string(),
+  boughtLicensesAmount: z.number().int().nonnegative(),
+  revenue: z.object({
+    fiat: z.string(),
+    eth: z.string(),
+    token: z.string(),
+  }),
+})
+export type TGetContentStatisticOutput = z.infer<typeof getContentStatisticOutputSchema>
+
+export const getContentConfigOutputSchema = z.object({
+  contractAddresses: z.object({
+    contentNft: z.string(),
+    licenseNft: z.string(),
+    membership: z.string(),
+  }),
+  chainId: z.number().int().positive(),
+  env: z.string(),
+})
+export type TGetContentConfigOutput = z.infer<typeof getContentConfigOutputSchema>

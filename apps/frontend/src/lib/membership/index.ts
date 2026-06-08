@@ -1,6 +1,6 @@
 import { ethers, getSigner, initProvider } from '@repo/fe-evm-provider'
-import { abi as membership_abi } from '@credenza3/contracts/artifacts/ChapterIpMembershipContract.json'
 import { authStore } from '$lib/auth'
+import { configStore, ContractName } from '$lib/stores/config.svelte'
 
 let membershipContract: ethers.Contract | null
 const getMembershipContract = async (): Promise<ethers.Contract | null> => {
@@ -11,7 +11,7 @@ const getMembershipContract = async (): Promise<ethers.Contract | null> => {
   initProvider(accessToken)
   const signer = await getSigner()
 
-  membershipContract = new ethers.Contract(import.meta.env.VITE_EVM_MEMBERSHIP_CONTRACT_ADDRESS, membership_abi, signer)
+  membershipContract = configStore.getContract(ContractName.MEMBERSHIP, signer)
 
   return membershipContract
 }

@@ -8,5 +8,6 @@ import { EvmListenerService } from './evm-listener.service'
 @Module({
   imports: [MongooseModule.forFeature([{ name: EvmEvent.name, schema: EvmEventSchema }])],
   providers: [EvmEventService, EvmListenerService],
+  exports: [EvmEventService],
 })
 export class EvmListenerModule {}

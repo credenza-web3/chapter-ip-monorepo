@@ -1,11 +1,11 @@
 import { browser } from '$app/environment'
 import { authStore } from '$lib'
-import { ethers, getSigner, initProvider } from '@repo/fe-evm-provider'
+import { getSigner, initProvider } from '@repo/fe-evm-provider'
 import { createClient } from '@repo/trpc/client'
-import { abi as content_abi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
 import { agencyStore } from '$lib/stores/agency.svelte'
 import { goto } from '$app/navigation'
 import { publisherStore } from '$lib/stores/publisher.svelte'
+import { configStore, ContractName } from '$lib/stores/config.svelte'
 
 export const prerender = false
 export const ssr = false
@@ -31,15 +31,13 @@ async function loadFunction({ url }: { url: URL }) {
     getAccessTokenFn: () => authStore.state.accessToken!,
   })
 
+  const config = await trpcClient.contents.config.query()
+  configStore.set(config)
   initProvider(accessToken)
   const signer = await getSigner()
   const userAddress = await signer.getAddress()
 
-  const contentContract = new ethers.Contract(
-    import.meta.env.VITE_EVM_CONTENT_NFT_CONTRACT_ADDRESS,
-    content_abi,
-    signer,
-  )
+  const contentContract = configStore.getContract(ContractName.CONTENT_NFT, signer)
 
   const agencyAddress = await contentContract.publisherAgency(userAddress)
   const agencyFee = await contentContract.publisherAgencyFee(userAddress)

@@ -52,6 +52,16 @@ import {
   getContentFileLinkOutputSchema,
   type TGetContentFileLinkInput,
   type TGetContentFileLinkOutput,
+  requestLazyMintContentTokenInputSchema,
+  requestLazyMintContentTokenOutputSchema,
+  type TRequestLazyMintContentTokenInput,
+  type TRequestLazyMintContentTokenOutput,
+  getContentStatisticInputSchema,
+  getContentStatisticOutputSchema,
+  type TGetContentStatisticInput,
+  type TGetContentStatisticOutput,
+  getContentConfigOutputSchema,
+  type TGetContentConfigOutput,
 } from './content.dto'
 
 @Router({ alias: 'contents' })
@@ -281,6 +291,14 @@ export class ContentRouter {
     }
   }
 
+  @Query({
+    input: getContentStatisticInputSchema,
+    output: getContentStatisticOutputSchema,
+  })
+  async getContentStatistic(@Input() input: TGetContentStatisticInput): Promise<TGetContentStatisticOutput> {
+    return await this.commonContentService.getContentStatistic(input.tokenId)
+  }
+
   @UseMiddlewares(AuthMiddleware)
   @Query({
     input: getContentFileLinkInputSchema,
@@ -358,5 +376,46 @@ export class ContentRouter {
 
     const metadataBucketHost = this.configService.get<string>('cloudflare.rtwo.metadataBucketHost')
     return { url: `${metadataBucketHost}/${metadataKey}` }
+  }
+
+  @UseMiddlewares(AuthMiddleware)
+  @Mutation({
+    input: requestLazyMintContentTokenInputSchema,
+    output: requestLazyMintContentTokenOutputSchema,
+  })
+  async requestLazyMintContentToken(
+    @Input() input: TRequestLazyMintContentTokenInput,
+  ): Promise<TRequestLazyMintContentTokenOutput> {
+    try {
+      return await this.commonContentService.requestLazyMintContentTokenVoucher(input.uri, input.licenseType)
+    } catch (err) {
+      throw new TRPCError({
+        message: (err as Error).message,
+        code: 'INTERNAL_SERVER_ERROR',
+      })
+    }
+  }
+
+  @Query({
+    output: getContentConfigOutputSchema,
+  })
+  async config(): Promise<TGetContentConfigOutput> {
+    const [contentNftAddress, network] = await Promise.all([
+      this.commonContentService.getContentNftContractAddress(),
+      this.commonEvmService.getProvider().getNetwork(),
+    ])
+    const licenseNftAddress = this.configService.get<string>('evm.licenseNftContractAddress')
+    const membershipAddress = this.configService.get<string>('evm.membershipContractAddress')
+    const env = this.configService.get<string>('env')
+
+    return {
+      contractAddresses: {
+        contentNft: contentNftAddress,
+        licenseNft: licenseNftAddress!.toLowerCase(),
+        membership: membershipAddress!.toLowerCase(),
+      },
+      chainId: Number(network.chainId),
+      env: env!,
+    }
   }
 }
