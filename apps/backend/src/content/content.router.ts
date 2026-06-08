@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 
 import { ConfigService } from '@nestjs/config'
-import { Router, Mutation, Query, Input, Ctx, UseMiddlewares } from 'nestjs-trpc'
+import { Ctx, Input, Mutation, Query, Router, UseMiddlewares } from 'nestjs-trpc'
 import { TRPCError } from '@trpc/server'
 import { extension } from 'mime-types'
 
@@ -12,56 +12,56 @@ import { ContentService } from './content.service'
 import { CommonLicenseService } from '../common/license/license.service'
 
 import { ContentModelService } from './content-model.service'
+import { ContentStatus } from './content.schema'
 import { FileService } from './file/file.service'
 import {
-  uploadTokenMetadataInputSchema,
-  uploadTokenMetadataOutputSchema,
-  type TUploadTokenMetadataInput,
-  type TUploadTokenMetadataOutput,
-  createUserFileUploadUrlInputSchema,
-  type TCreateUserFileUploadUrlInput,
-  presignedPutOutputSchema,
-  type TPresignedPutOutput,
   createContentFileUploadUrlInputSchema,
-  type TCreateContentFileUploadUrlInput,
-  registerContentInputSchema,
-  registerContentOutputSchema,
-  type TRegisterContentInput,
-  type TRegisterContentOutput,
-  updateContentMetadataInputSchema,
-  updateContentMetadataOutputSchema,
-  type TUpdateContentMetadataInput,
-  type TUpdateContentMetadataOutput,
-  registerContentFileInputSchema,
-  registerContentFileOutputSchema,
-  type TRegisterContentFileInput,
-  type TRegisterContentFileOutput,
-  removeContentFileInputSchema,
-  removeContentFileOutputSchema,
-  type TRemoveContentFileInput,
-  type TRemoveContentFileOutput,
+  createUserFileUploadUrlInputSchema,
   findContentInputSchema,
-  type TFindContentInput,
   findContentOutputSchema,
-  type TFindContentOutput,
   getContentByIdInputSchema,
   getContentByIdOutputSchema,
-  type TGetContentByIdInput,
-  type TGetContentByIdOutput,
+  getContentConfigOutputSchema,
   getContentFileLinkInputSchema,
   getContentFileLinkOutputSchema,
-  type TGetContentFileLinkInput,
-  type TGetContentFileLinkOutput,
-  requestLazyMintContentTokenInputSchema,
-  requestLazyMintContentTokenOutputSchema,
-  type TRequestLazyMintContentTokenInput,
-  type TRequestLazyMintContentTokenOutput,
   getContentStatisticInputSchema,
   getContentStatisticOutputSchema,
+  presignedPutOutputSchema,
+  registerContentFileInputSchema,
+  registerContentFileOutputSchema,
+  registerContentInputSchema,
+  registerContentOutputSchema,
+  removeContentFileInputSchema,
+  removeContentFileOutputSchema,
+  requestLazyMintContentTokenInputSchema,
+  requestLazyMintContentTokenOutputSchema,
+  type TCreateContentFileUploadUrlInput,
+  type TCreateUserFileUploadUrlInput,
+  type TFindContentInput,
+  type TFindContentOutput,
+  type TGetContentByIdInput,
+  type TGetContentByIdOutput,
+  type TGetContentConfigOutput,
+  type TGetContentFileLinkInput,
+  type TGetContentFileLinkOutput,
   type TGetContentStatisticInput,
   type TGetContentStatisticOutput,
-  getContentConfigOutputSchema,
-  type TGetContentConfigOutput,
+  type TPresignedPutOutput,
+  type TRegisterContentFileInput,
+  type TRegisterContentFileOutput,
+  type TRegisterContentInput,
+  type TRegisterContentOutput,
+  type TRemoveContentFileInput,
+  type TRemoveContentFileOutput,
+  type TRequestLazyMintContentTokenInput,
+  type TRequestLazyMintContentTokenOutput,
+  type TUpdateContentMetadataInput,
+  type TUploadTokenMetadataInput,
+  type TUploadTokenMetadataOutput,
+  updateContentMetadataInputSchema,
+  updateContentMetadataOutputSchema,
+  uploadTokenMetadataInputSchema,
+  uploadTokenMetadataOutputSchema,
 } from './content.dto'
 
 @Router({ alias: 'contents' })
@@ -138,21 +138,24 @@ export class ContentRouter {
     @Ctx() ctx: TAppContextWithTokenPayload,
     @Input() input: TRegisterContentInput,
   ): Promise<TRegisterContentOutput> {
-    const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(ctx.authTokenPayload.sub)
-    try {
-      await this.commonContentService.verifyIsOwner(subEvmAddress, input.tokenId)
-    } catch (err) {
-      throw new TRPCError({ message: (err as Error).message, code: 'FORBIDDEN' })
+    const sub = ctx.authTokenPayload.sub
+
+    if (input.tokenId) {
+      const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(sub)
+      const [isOwner, message] = await this.commonContentService.verifyIsOwner(subEvmAddress, input.tokenId)
+      if (!isOwner) {
+        throw new TRPCError({ message: message ?? 'Forbidden', code: 'FORBIDDEN' })
+      }
     }
 
     const contractAddress = await this.commonContentService.getContentNftContractAddress()
-    const sub = ctx.authTokenPayload.sub
 
     const contentDoc = await this.contentService.create({
       sub,
-      tokenId: input.tokenId,
+      ...(input.tokenId && { tokenId: input.tokenId }),
       contractAddress,
       metadata: input.metadata,
+      status: input.tokenId ? (input.status ?? ContentStatus.ACTIVE) : ContentStatus.DRAFT,
     })
 
     return contentDoc
@@ -175,7 +178,14 @@ export class ContentRouter {
       throw new TRPCError({ message, code: 'FORBIDDEN' })
     }
 
-    const updated = await this.contentService.updateById(input.contentId, { metadata: input.metadata })
+    const existing = await this.contentService.findById(input.contentId)
+    const tokenId = existing?.tokenId ?? input.tokenId
+
+    const updated = await this.contentService.updateById(input.contentId, {
+      metadata: input.metadata,
+      ...(tokenId ? { tokenId } : {}),
+      ...(input.status ? { status: input.status } : {}),
+    })
 
     return updated!
   }
@@ -319,24 +329,37 @@ export class ContentRouter {
     const parent = await this.contentService.findById(contentFile.contentId)
     const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(ctx.authTokenPayload.sub)
 
-    const publisherAddress = await this.commonContentService.getOwner(parent!.tokenId)
-    const hasMembership = await this.commonContentService.verifyHasSubscription(publisherAddress, subEvmAddress)
+    let hasMembership = false
+    if (parent!.tokenId) {
+      const publisherAddress = await this.commonContentService.getOwner(parent!.tokenId)
+      hasMembership = await this.commonContentService.verifyHasSubscription(publisherAddress, subEvmAddress)
+    }
+
+    let result = true,
+      err: string | null = null
 
     if (!hasMembership) {
-      try {
+      if (parent!.tokenId) {
         if (input.licenseTokenId) {
-          await this.commonLicenseService.verify(
+          ;[result, err] = await this.commonLicenseService.verify(
             ctx.authTokenPayload.sub,
             subEvmAddress,
             parent!.tokenId,
             input.licenseTokenId,
           )
         } else {
-          await this.commonContentService.verifyIsOwner(subEvmAddress, parent!.tokenId)
+          ;[result, err] = await this.commonContentService.verifyIsOwner(subEvmAddress, parent!.tokenId)
         }
-      } catch (err) {
-        throw new TRPCError({ message: (err as Error).message, code: 'FORBIDDEN' })
+      } else {
+        ;[result, err] = await this.commonContentService.verifyIsOwnerById(
+          ctx.authTokenPayload.sub,
+          contentFile.contentId,
+        )
       }
+    }
+
+    if (!result) {
+      throw new TRPCError({ message: err ?? 'Forbidden', code: 'FORBIDDEN' })
     }
 
     const url = await this.fileService.getSignedObjectUrl({

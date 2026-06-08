@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { paginatedRequestWithCursorSchema, createPaginatedResponseSchema } from '../common/model/model.dto'
+import { ContentStatus } from './content.schema'
 
 export const contentMetadataRecordSchema = z.record(z.string(), z.any()).optional()
 
@@ -43,17 +44,19 @@ export const createContentFileUploadUrlInputSchema = z.object({
 export type TCreateContentFileUploadUrlInput = z.infer<typeof createContentFileUploadUrlInputSchema>
 
 export const registerContentInputSchema = z.object({
-  tokenId: z.string(),
+  tokenId: z.string().optional(),
   metadata: contentMetadataRecordSchema,
+  status: z.enum(ContentStatus).optional(),
 })
 export type TRegisterContentInput = z.infer<typeof registerContentInputSchema>
 
 export const registerContentOutputSchema = z.object({
   id: z.string(),
   sub: z.string(),
-  tokenId: z.string(),
+  tokenId: z.string().optional(),
   contractAddress: z.string(),
   metadata: contentMetadataRecordSchema,
+  status: z.enum(ContentStatus),
   createdAt: z.date(),
   updatedAt: z.date(),
 })
@@ -61,7 +64,9 @@ export type TRegisterContentOutput = z.infer<typeof registerContentOutputSchema>
 
 export const updateContentMetadataInputSchema = z.object({
   contentId: z.string(),
+  tokenId: z.string().optional(),
   metadata: contentMetadataRecordSchema,
+  status: z.enum(ContentStatus).optional(),
 })
 export type TUpdateContentMetadataInput = z.infer<typeof updateContentMetadataInputSchema>
 
