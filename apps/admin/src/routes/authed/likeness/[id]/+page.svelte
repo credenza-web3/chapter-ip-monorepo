@@ -13,7 +13,6 @@
 
   let { data } = $props()
 
-
   let currentStep = $state(1)
   const uploadService = new UploadService()
 
