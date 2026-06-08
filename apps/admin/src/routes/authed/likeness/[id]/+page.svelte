@@ -18,9 +18,6 @@
   const uploadService = new UploadService()
 
   onMount(() => likenessStore.hydrateFromContent(data, data.existingFiles))
-  console.log('Existing files:', data
-    
-  )
   onDestroy(() => likenessStore.reset())
 
   beforeNavigate(() => likenessStore.setLoading(true))
