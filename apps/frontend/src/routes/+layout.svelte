@@ -8,7 +8,7 @@
 
   const menuItems = [
     { label: 'Home', href: '/authed/purchases' },
-    { label: 'Publishers', href: '/authed/publishers' },
+    { label: 'Likeness', href: '/authed/likeness' },
   ]
 </script>
 
