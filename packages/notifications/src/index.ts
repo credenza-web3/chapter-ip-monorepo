@@ -10,10 +10,11 @@ export type TNotificationType = (typeof NOTIFICATION_TYPE)[keyof typeof NOTIFICA
 export const NOTIFICATION_TYPE_VALUES = Object.values(NOTIFICATION_TYPE)
 
 export const notificationSchema = z.object({
+  id: z.string(),
   type: z.enum(NOTIFICATION_TYPE_VALUES),
   sub: z.string(),
-  title: z.string(),
-  message: z.string(),
+  title: z.string().optional(),
+  message: z.string().optional(),
   payload: z.looseObject({}),
   createdAt: z.date(),
   updatedAt: z.date(),
