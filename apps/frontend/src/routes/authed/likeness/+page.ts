@@ -14,6 +14,5 @@ export const load = async ({ parent }) => {
 
   return {
     likenessItems: toLikenessItems(contentItems),
-    trpcClient,
   }
 }

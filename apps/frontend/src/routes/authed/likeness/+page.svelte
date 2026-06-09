@@ -4,4 +4,4 @@
   let { data } = $props()
 </script>
 
-<LikenessDashboard items={data.likenessItems} trpcClient={data.trpcClient} />
+<LikenessDashboard items={data.likenessItems} />
