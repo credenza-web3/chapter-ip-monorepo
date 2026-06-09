@@ -1,18 +1,16 @@
 import { browser } from '$app/environment'
 import { authStore } from '$lib'
-import { getSigner, initProvider } from '@repo/fe-evm-provider'
 import { createClient } from '@repo/trpc/client'
-import { agencyStore } from '$lib/stores/agency.svelte'
 import { goto } from '$app/navigation'
+import { configStore } from '$lib/stores/config.svelte'
 import { publisherStore } from '$lib/stores/publisher.svelte'
-import { configStore, ContractName } from '$lib/stores/config.svelte'
 
 export const prerender = false
 export const ssr = false
 
 let authInitialized = false
 
-async function loadFunction({ url }: { url: URL }) {
+async function loadFunction() {
   if (!browser) return {}
 
   if (!authInitialized) {
@@ -33,17 +31,6 @@ async function loadFunction({ url }: { url: URL }) {
 
   const config = await trpcClient.contents.config.query()
   configStore.set(config)
-  initProvider(accessToken)
-  const signer = await getSigner()
-  const userAddress = await signer.getAddress()
-
-  const contentContract = configStore.getContract(ContractName.CONTENT_NFT, signer)
-
-  const agencyAddress = await contentContract.publisherAgency(userAddress)
-  const agencyFee = await contentContract.publisherAgencyFee(userAddress)
-
-  agencyStore.setAddress(agencyAddress)
-  agencyStore.setFee(agencyFee)
 
   const sub = await authStore.getSubFromToken()
   try {
@@ -51,12 +38,12 @@ async function loadFunction({ url }: { url: URL }) {
       sub: sub!,
     })
     publisherStore.setData(publisher)
-    return { trpcClient, userAddress, contentContract }
   } catch {
-    if (url.pathname === '/authed/publisher/create') {
-      return { trpcClient, userAddress, contentContract }
-    }
-    return goto(`/authed/publisher/create`)
+    console.log('no publisher data found')
+  }
+
+  return {
+    trpcClient,
   }
 }
 

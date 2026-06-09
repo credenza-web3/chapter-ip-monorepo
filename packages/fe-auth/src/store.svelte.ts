@@ -1,6 +1,7 @@
-import type { TAuthStore, TAuthConfig } from './types'
+import type { TAccountUser, TAuthStore, TAuthConfig } from './types'
 import { generateRandomString, sha256, base64urlencode } from './helper'
 import { createClient } from '@repo/trpc/client'
+import { authStore } from '$lib'
 
 export function createAuthStore<T>(
   config: TAuthConfig,
@@ -202,9 +203,31 @@ export function createAuthStore<T>(
     return JSON.parse(atob(payload)).sub as string
   }
 
+  async function getCurrentUser(): Promise<TAccountUser> {
+    const accessToken = await getAccessToken()
+    if (!accessToken) {
+      throw new Error('No access token available')
+    }
+
+    const sub = await authStore.getSubFromToken()
+
+    const response = await fetch(`${config.accountsUri.replace(/\/$/, '')}/accounts/${sub}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+        'x-client-id': config.clientId,
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch current user: ${response.status} ${response.statusText}`)
+    }
+
+    return (await response.json()) as TAccountUser
+  }
+
   function logout() {
     if (!browser) return
-    console.log('go')
 
     revokeOAuth2Session()
     localStorage.removeItem('refresh_token')
@@ -244,6 +267,7 @@ export function createAuthStore<T>(
     refreshAccessToken,
     getAccessToken,
     getSubFromToken,
+    getCurrentUser,
     logout,
   }
 }
