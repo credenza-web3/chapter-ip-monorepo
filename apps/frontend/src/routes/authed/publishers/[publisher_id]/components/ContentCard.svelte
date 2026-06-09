@@ -30,7 +30,7 @@
       <img src={r2Config.url + r2Config.defaultImage} alt="File" />
     </object>
     <div class="card-body">
-      <h3 class="card-title">{item.metadata.title || 'UNTITLED'}</h3>
+      <h3 class="card-title">{item.metadata.profile.fullLegalName}</h3>
       <h3 class="card-description">{item.metadata.description || ''}</h3>
 
       {#if price}

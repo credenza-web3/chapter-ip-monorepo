@@ -91,13 +91,13 @@
         </div>
       </div>
       <div class="flex items-center md:gap-7.25 gap-4">
-        <a href="/authed/notifications" class="inline-flex opacity-40 pointer-events-none">
+        <a href="/authed/notifications" class="inline-flex">
           <div class="relative cursor-pointer">
             <img src={BellIcon} alt="notifications" class="h-5.75" />
             {#if requests.length > 0}
               <span class="absolute top-0 -right-1 block w-3 h-3 rounded-full bg-primary border-2 border-[#fef9ee]"
               ></span>
-            {/if}
+            {/if} 
           </div>
         </a>
         <spam class="my-auto flex items-center justify-center rounded-full bg-primary text-white font-semibold w-7 h-7">
