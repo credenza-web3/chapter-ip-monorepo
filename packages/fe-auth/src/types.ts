@@ -6,6 +6,13 @@ export type TAuthStore = {
   isInitialized: boolean
 }
 
+export type TAccountUser = {
+  id?: string
+  phone?: string
+  email?: string
+  [key: string]: unknown
+}
+
 export type TTokenResponse = {
   accessToken: string
   refreshToken: string

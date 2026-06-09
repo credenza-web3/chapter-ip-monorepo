@@ -4,7 +4,7 @@
 
   let { activeTab = 'privacy' }: { activeTab?: 'privacy' | 'terms' } = $props()
 
-  let tab: 'privacy' | 'terms' = $state(activeTab)
+  let tab: 'privacy' | 'terms' = $derived(activeTab)
 </script>
 
 <div class="min-h-screen py-16 px-4">

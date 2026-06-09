@@ -1,94 +1,42 @@
 import { notify, ToastType } from '@repo/ui-components'
 import { publisherStore } from '$lib/stores/publisher.svelte'
-import { agencyStore } from '$lib/stores/agency.svelte.js'
 import { savePublisher } from '$lib/services/publisher'
-import { savePublisherAgencyAddress, savePublisherAgencyFee } from '$lib/services/agency'
-import { ethers, getSigner } from '@repo/fe-evm-provider'
-import { authStore } from '$lib/auth'
-import { forwardTransaction } from '@repo/fe-services'
 import { uploadFileToBucket } from '$lib/upload'
-import { configStore, ContractName } from '$lib/stores/config.svelte'
-
-const FIAT_PRICE_MULTIPLIER = 100
-const TOKEN_PRICE_MULTIPLIER = 10 ** 6
+import type { TRPCClient, AppRouter } from '@repo/trpc/client'
 
 interface ProfileData {
   publisherName: string
   avatarUrl: string
-  subscriptionPrice: number
 }
 
 interface SaveResult {
   success: boolean
   error?: string
 }
-export function useProfileSave(trpcClient: any, contentContract: ethers.Contract, userAddress: string) {
+export function useProfileSave(trpcClient: TRPCClient<AppRouter>) {
   let loading = $state(false)
 
   // Profile data state
   const profileData = $state<ProfileData>({
     publisherName: publisherStore.title || '',
     avatarUrl: publisherStore.avatarUrl || '',
-    subscriptionPrice: 0,
   })
 
   // Original values for change detection
   const originalData = $state<ProfileData>({
     publisherName: publisherStore.title || '',
     avatarUrl: publisherStore.avatarUrl || '',
-    subscriptionPrice: 0,
   })
-
-  async function saveSubscriptionPrice(price: number): Promise<void> {
-    if (price <= 0) {
-      throw new Error('Subscription price must be greater than 0')
-    }
-
-    const signer = await getSigner()
-    const contract = configStore.getContract(ContractName.MEMBERSHIP, signer)
-
-    const tokenId = BigInt(ethers.getAddress(publisherStore.evmAddress))
-
-    const [setPriceFiatTx, setPriceTokenTx] = await Promise.all([
-      contract.setPriceFiat.populateTransaction(tokenId, price * FIAT_PRICE_MULTIPLIER),
-      contract.setPriceToken.populateTransaction(tokenId, price * TOKEN_PRICE_MULTIPLIER),
-    ])
-
-    const fwtOpts = {
-      token: authStore.state.accessToken!,
-      client_id: import.meta.env.VITE_CLIENT_ID,
-      evm_wss: import.meta.env.VITE_CREDENZA_EVM_WSS,
-    }
-
-    const [fiatHash, tokenHash] = await Promise.all([
-      forwardTransaction(setPriceFiatTx, fwtOpts),
-      forwardTransaction(setPriceTokenTx, fwtOpts),
-    ])
-
-    // Wait for transactions to be mined
-    await Promise.all([signer.provider?.waitForTransaction(fiatHash), signer.provider?.waitForTransaction(tokenHash)])
-  }
 
   // Check if any fields have changed
   const hasChanges = $derived(
-    profileData.publisherName !== originalData.publisherName ||
-      profileData.avatarUrl !== originalData.avatarUrl ||
-      profileData.subscriptionPrice !== originalData.subscriptionPrice ||
-      agencyStore.hasAddressChanged ||
-      agencyStore.hasFeeChanged,
+    profileData.publisherName !== originalData.publisherName || profileData.avatarUrl !== originalData.avatarUrl,
   )
 
   // Update functions for child components
   function updatePublisherData(name: string, avatar: string): void {
     profileData.publisherName = name
     profileData.avatarUrl = avatar
-  }
-
-  function updateSubscriptionPrice(price: number): void {
-    profileData.subscriptionPrice = price
-    if (originalData.subscriptionPrice === 0) {
-      originalData.subscriptionPrice = price
-    }
   }
 
   async function handleSaveAll(): Promise<void> {
@@ -135,54 +83,6 @@ export function useProfileSave(trpcClient: any, contentContract: ethers.Contract
         savePromises.push(publisherPromise)
       }
 
-      // Save agency address if changed
-      if (agencyStore.hasAddressChanged && contentContract) {
-        const addressPromise = savePublisherAgencyAddress(contentContract, userAddress)
-        savePromises.push(
-          addressPromise
-            .then(() => {
-              agencyStore.setOriginalAddress(agencyStore.agencyAddress)
-              return { success: true }
-            })
-            .catch((error: unknown) => ({
-              success: false,
-              error: error instanceof Error ? error.message : String(error),
-            })),
-        )
-      }
-
-      // Save agency fee if changed
-      if (agencyStore.hasFeeChanged && contentContract) {
-        const feePromise = savePublisherAgencyFee(contentContract, userAddress)
-        savePromises.push(
-          feePromise
-            .then(() => {
-              agencyStore.setOriginalFee(agencyStore.agencyFee)
-              return { success: true }
-            })
-            .catch((error: unknown) => ({
-              success: false,
-              error: error instanceof Error ? error.message : String(error),
-            })),
-        )
-      }
-
-      // Save subscription price if changed
-      if (profileData.subscriptionPrice !== originalData.subscriptionPrice) {
-        const pricePromise = saveSubscriptionPrice(profileData.subscriptionPrice)
-        savePromises.push(
-          pricePromise
-            .then(() => {
-              originalData.subscriptionPrice = profileData.subscriptionPrice
-              return { success: true }
-            })
-            .catch((error: unknown) => ({
-              success: false,
-              error: error instanceof Error ? error.message : String(error),
-            })),
-        )
-      }
-
       const results = await Promise.all(savePromises)
 
       // Check if any operations failed
@@ -214,7 +114,6 @@ export function useProfileSave(trpcClient: any, contentContract: ethers.Contract
       return hasChanges
     },
     updatePublisherData,
-    updateSubscriptionPrice,
     handleSaveAll,
   }
 }
