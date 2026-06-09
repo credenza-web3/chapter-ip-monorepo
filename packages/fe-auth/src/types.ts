@@ -7,7 +7,6 @@ export type TAuthStore = {
 }
 
 export type TAccountUser = {
-  id?: string
   phone?: string
   email?: string
   [key: string]: unknown
