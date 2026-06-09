@@ -1,12 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import type { AppRouter, TRPCClient } from '@repo/trpc/client'
-  import LazyLikenessImage from './LazyLikenessImage.svelte'
   import { getRecentLikenesses, type LikenessItem } from './likeness'
 
-  let { items, trpcClient } = $props<{
+  let { items } = $props<{
     items: LikenessItem[]
-    trpcClient: TRPCClient<AppRouter>
   }>()
 
   let carousel = $state<HTMLDivElement>()
@@ -73,9 +70,8 @@
           <article
             class="flex w-[min(88vw,382px)] shrink-0 snap-start gap-3 rounded-lg border border-[#ddd8d1] p-2.5 sm:w-[382px]"
           >
-            <LazyLikenessImage
-              {item}
-              {trpcClient}
+            <img
+              src={item.imageUrl}
               alt={item.name || 'Likeness'}
               class="size-20 shrink-0 rounded-md object-cover"
             />
@@ -104,9 +100,8 @@
       <div class="grid grid-cols-1 gap-x-6 gap-y-12 min-[420px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
         {#each items as item (item.id)}
           <article class="min-w-0">
-            <LazyLikenessImage
-              {item}
-              {trpcClient}
+            <img
+              src={item.imageUrl}
               alt={item.name || 'Likeness'}
               class="aspect-square w-full rounded-lg object-cover"
             />
