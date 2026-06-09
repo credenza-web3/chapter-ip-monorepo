@@ -5,7 +5,7 @@ import { BlockchainService } from './blockchain.service'
 import { configStore, ContractName } from '$lib/stores/config.svelte'
 
 export class TransactionService {
-  private blockchainService = new BlockchainService()
+  constructor(private readonly blockchainService: BlockchainService) {}
 
   async mintWithPrices(accessToken: string, lifetimePrice: number, onetimePrice: number): Promise<string> {
     const userAddress = await this.blockchainService.getUserAddress()
