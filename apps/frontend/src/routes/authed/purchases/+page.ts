@@ -1,4 +1,4 @@
-import { getTokensWithMetadata, getPurchasedMembershipContent } from './helper'
+import { getTokensWithMetadata } from './helper'
 
 export const load = async ({ parent }) => {
   const { accessToken, trpcClient } = await parent()
@@ -9,11 +9,11 @@ export const load = async ({ parent }) => {
   const onetimeLicenses = tokens.filter((p) => p.licenseType === '2')
 
   // Get content items for purchased membership publishers
-  const membershipContent = await getPurchasedMembershipContent(accessToken!, trpcClient!)
+  // const membershipContent = await getPurchasedMembershipContent(accessToken!, trpcClient!)
 
   return {
     lifetimeLicenses,
     onetimeLicenses,
-    membershipContent,
+    // membershipContent,
   }
 }

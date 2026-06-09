@@ -1,6 +1,5 @@
 <script lang="ts">
   import SearchInput from '$lib/components/SearchInput.svelte'
-  import PurchaseSubscription from './components/PurchaseSubscription.svelte'
   import PublisherHeader from './components/PublisherHeader.svelte'
   import ContentGrid from './components/ContentGrid.svelte'
 
@@ -18,8 +17,6 @@
       <span class="loading loading-dots loading-lg"></span>
     </div>
   {:else}
-    <PurchaseSubscription publisherAddress={data.publisher.evmAddress} />
-
     {#if data.contentItems.length > 1}
       <div class="mb-6">
         <SearchInput placeholder="Search products by title" bind:value={searchQuery} />
