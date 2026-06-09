@@ -209,13 +209,10 @@ export function createAuthStore<T>(
       throw new Error('No access token available')
     }
 
-    const sub = await authStore.getSubFromToken()
-
-    const response = await fetch(`${config.accountsUri.replace(/\/$/, '')}/accounts/${sub}`, {
+    const response = await fetch(`${config.oauthUri}/oauth2/userinfo`, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
-        'x-client-id': config.clientId,
       },
     })
 
