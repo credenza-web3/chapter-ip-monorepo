@@ -101,7 +101,7 @@
             {#if $headerStore.hasNotifications}
               <span class="absolute top-0 -right-1 block w-3 h-3 rounded-full bg-primary border-2 border-[#fef9ee]"
               ></span>
-            {/if} 
+            {/if}
           </div>
         </a>
         <spam class="my-auto flex items-center justify-center rounded-full bg-primary text-white font-semibold w-7 h-7">
