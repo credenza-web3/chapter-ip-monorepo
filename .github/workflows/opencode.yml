@@ -19,6 +19,9 @@ jobs:
       )) ||
       github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    concurrency:
+      group: opencode-${{ github.event_name }}-${{ github.event.issue.number || github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
     permissions:
       id-token: write
       contents: read
