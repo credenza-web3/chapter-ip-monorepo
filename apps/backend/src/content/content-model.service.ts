@@ -16,11 +16,16 @@ export class ContentModelService extends CommonModelService<Content> {
 
   buildPaginationOptions(opts: TFindContentInput): TBuiltPaginationOptions {
     const result = super.buildPaginationOptions(opts)
+    const metadataQuery = opts.metadata
+      ? Object.fromEntries(Object.entries(opts.metadata).map(([key, value]) => [`metadata.${key}`, value]))
+      : {}
+
     result.query = {
       ...result.query,
       ...(opts.tokenId && { tokenId: opts.tokenId }),
       ...(opts.sub && { sub: opts.sub }),
       ...(opts.contractAddress && { contractAddress: opts.contractAddress }),
+      ...metadataQuery,
     }
     return result
   }

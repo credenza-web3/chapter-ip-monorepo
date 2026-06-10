@@ -52,3 +52,4 @@ ContentSchema.index(
 )
 ContentSchema.index({ createdAt: 1 })
 ContentSchema.index({ updatedAt: 1 })
+ContentSchema.index({ 'metadata.$**': 1 })
