@@ -60,9 +60,8 @@ export class NotificationRouter {
     @Input() input: TMarkNotificationAsReadInput,
     @Ctx() ctx: TAppContextWithTokenPayload,
   ): Promise<TMarkNotificationAsReadOutput> {
-    const model = this.commonNotificationService.getModel()
-    const notification = await model.findOne({
-      id: input.id,
+    const notification = await this.commonNotificationService.findOne({
+      _id: input.id,
       sub: ctx.authTokenPayload.sub,
     })
     if (!notification) {
