@@ -22,7 +22,8 @@ export const notificationSchema = z.object({
 })
 export type TNotification = z.infer<typeof notificationSchema>
 
-export type TNotificationItem = Omit<TNotification, 'createdAt' | 'updatedAt'> & {
+export type TNotificationItem = Omit<TNotification, 'createdAt' | 'updatedAt' | 'readAt'> & {
   createdAt: string
   updatedAt: string
+  readAt: string | null
 }
