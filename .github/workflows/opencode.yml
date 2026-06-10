@@ -21,14 +21,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
-      contents: write
-      pull-requests: write
+      contents: read
+      pull-requests: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
           persist-credentials: false
-
       - name: Run opencode
         uses: anomalyco/opencode/github@v1
         env:
@@ -37,5 +36,3 @@ jobs:
         with:
           share: false
           model: opencode/big-pickle
-          prompt: |
-            Review this pull request. Fix any issues you find and push the fixes to the branch.
