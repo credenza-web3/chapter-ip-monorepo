@@ -16,12 +16,14 @@ export const notificationSchema = z.object({
   title: z.string().optional(),
   message: z.string().optional(),
   payload: z.looseObject({}),
+  readAt: z.date().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 })
 export type TNotification = z.infer<typeof notificationSchema>
 
-export type TNotificationItem = Omit<TNotification, 'createdAt' | 'updatedAt'> & {
+export type TNotificationItem = Omit<TNotification, 'createdAt' | 'updatedAt' | 'readAt'> & {
   createdAt: string
   updatedAt: string
+  readAt: string | null
 }
