@@ -11,7 +11,7 @@
       try {
         page.url.searchParams.delete('code')
         page.url.searchParams.delete('state')
-        await authStore.exchangeCodeForTokens(code, state, `/authed/purchases`)
+        await authStore.exchangeCodeForTokens(code, state, `/authed`)
       } catch (error) {
         console.error('Auth callback error:', error)
       }

@@ -6,7 +6,12 @@
   import UploadLikenessStep from '../components/UploadLikenessStep.svelte'
   import UploadLicensingStep from '../components/UploadLicensingStep.svelte'
   import ConfirmLikenessStep from '../components/ConfirmLikenessStep.svelte'
-  import { UploadService, uploadFileToBucket, BlockchainService, TransactionService, authStore } from '$lib'
+
+  import { authStore } from '$lib'
+  import UploadService from '$lib/upload/upload.service'
+  import TransactionService from '$lib/upload/transaction.service'
+  import BlockchainService from '$lib/upload/blockchain.service'
+  import uploadFileToBucket from '$lib/upload/file-upload.service'
   import { notify, ToastType, ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
   import { modals, type ModalProps } from 'svelte-modals'
   import { onDestroy, onMount } from 'svelte'
