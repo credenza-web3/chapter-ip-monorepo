@@ -14,14 +14,14 @@
         >{[...data.onetimeLicenses, ...data.lifetimeLicenses].length}</span
       > )
     </div>
-    <div>
+    <!-- <div>
       ( Total Memberships: <span class="text-primary text-lg font-semibold"
         >{Object.keys(data.membershipContent).length}</span
       > )
-    </div>
+    </div> -->
   </div>
 
-  {#if !data.lifetimeLicenses.length && !data.onetimeLicenses.length && Object.keys(data.membershipContent).length === 0}
+  {#if !data.lifetimeLicenses.length && !data.onetimeLicenses.length}
     <div class="alert p-7">
       <span>You haven't made any purchases yet.</span>
       <a href="/authed/publishers" class="btn btn-primary py-6 md:py-0">Browse Publishers</a>
@@ -33,7 +33,7 @@
         {#if !data.lifetimeLicenses.length}
           No lifetime content purchased yet
         {/if}
-        {#each data.lifetimeLicenses as purchase, i}
+        {#each data.lifetimeLicenses as purchase (purchase.licenseTokenId)}
           <ContentItem {purchase} trpcClient={data.trpcClient} />
         {/each}
       </div>
@@ -42,29 +42,29 @@
         {#if !data.onetimeLicenses.length}
           No onetime content purchased yet
         {/if}
-        {#each data.onetimeLicenses as purchase, i}
+        {#each data.onetimeLicenses as purchase (purchase.licenseTokenId)}
           <ContentItem {purchase} trpcClient={data.trpcClient} />
         {/each}
       </div>
 
-      <div class="border border-gray-200 rounded-lg p-3">
+      <!-- <div class="border border-gray-200 rounded-lg p-3">
         <h1 class="text-primary text-lg font-semibold mb-3">Memberships Content</h1>
         {#if Object.keys(data.membershipContent).length === 0}
           No membership purchased yet
         {/if}
-        {#each Object.entries(data.membershipContent) as [publisherId, publisherData]}
+        {#each Object.entries(data.membershipContent) as [publisherId, publisherData] (publisherId)}
           <div class="mb-6">
             <h2 class="text-secondary text-md font-semibold mb-3">
               {publisherData.publisherTitle}
             </h2>
             <div class="ml-4 space-y-3">
-              {#each publisherData.contentItems as purchase}
+              {#each publisherData.contentItems as purchase (purchase)}
                 <ContentItem {purchase} trpcClient={data.trpcClient} />
               {/each}
             </div>
           </div>
         {/each}
-      </div>
+      </div> -->
     </div>
   {/if}
 </div>

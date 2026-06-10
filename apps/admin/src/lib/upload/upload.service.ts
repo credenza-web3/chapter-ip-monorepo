@@ -4,10 +4,7 @@ import { uploadFileToBucket, TransactionService } from './index'
 import { r2Config } from '@repo/fe-services'
 
 export class UploadService {
-  transactionService: TransactionService
-  constructor() {
-    this.transactionService = new TransactionService()
-  }
+  constructor(private readonly transactionService: TransactionService) {}
   async uploadContent({
     uploads,
     metadata,

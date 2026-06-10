@@ -6,7 +6,7 @@
   import UploadLikenessStep from '../components/UploadLikenessStep.svelte'
   import UploadLicensingStep from '../components/UploadLicensingStep.svelte'
   import ConfirmLikenessStep from '../components/ConfirmLikenessStep.svelte'
-  import { UploadService, uploadFileToBucket } from '$lib'
+  import { UploadService, uploadFileToBucket, BlockchainService, TransactionService, authStore } from '$lib'
   import { notify, ToastType, ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
   import { modals, type ModalProps } from 'svelte-modals'
   import { onDestroy, onMount } from 'svelte'
@@ -14,7 +14,9 @@
   let { data } = $props()
 
   let currentStep = $state(1)
-  const uploadService = new UploadService()
+  const blockchainService = new BlockchainService(authStore.state.accessToken!)
+  const transactionService = new TransactionService(blockchainService)
+  const uploadService = new UploadService(transactionService)
 
   onMount(() => likenessStore.hydrateFromContent(data, data.existingFiles))
   onDestroy(() => likenessStore.reset())

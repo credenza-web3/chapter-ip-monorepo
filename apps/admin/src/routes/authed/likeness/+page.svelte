@@ -5,13 +5,15 @@
   import UploadLikenessStep from './components/UploadLikenessStep.svelte'
   import UploadLicensingStep from './components/UploadLicensingStep.svelte'
   import ConfirmLikenessStep from './components/ConfirmLikenessStep.svelte'
-  import { UploadService } from '$lib'
+  import { BlockchainService, UploadService, TransactionService, authStore } from '$lib'
   import { notify, ToastType } from '@repo/ui-components'
   import { modals, type ModalProps } from 'svelte-modals'
   import { ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
 
   let currentStep = $state(1)
-  const uploadService = new UploadService()
+  const blockchainService = new BlockchainService(authStore.state.accessToken!)
+  const transactionService = new TransactionService(blockchainService)
+  const uploadService = new UploadService(transactionService)
 
   beforeNavigate(() => likenessStore.setLoading(true))
   afterNavigate(() => likenessStore.setLoading(false))
