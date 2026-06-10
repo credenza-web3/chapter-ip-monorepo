@@ -1,0 +1,83 @@
+<script lang="ts">
+  import { MOCK_CREATIVE_WORKS, MOCK_LOCATIONS, toDashboardCards, type DashboardSection } from './dashboard'
+  import type { LikenessItem } from './likeness/likeness'
+
+  let { likenessItems } = $props<{
+    likenessItems: LikenessItem[]
+  }>()
+
+  const sections = $derived<DashboardSection[]>([
+    {
+      title: 'Likeness',
+      ctaLabel: 'View all Likenesses',
+      href: '/authed/likeness',
+      items: toDashboardCards(likenessItems),
+    },
+    {
+      title: 'Creative Works',
+      ctaLabel: 'View all Creative Works',
+      disabled: true,
+      items: MOCK_CREATIVE_WORKS,
+    },
+    {
+      title: 'Locations',
+      ctaLabel: 'View all Locations',
+      disabled: true,
+      items: MOCK_LOCATIONS,
+    },
+  ])
+</script>
+
+<div class="mx-auto w-full max-w-360 px-2 py-5 sm:px-4 lg:px-8">
+  <header class="mb-8">
+    <h1 class="text-2xl font-bold leading-tight text-dark">ChapterIP</h1>
+    <p class="mt-1 text-sm font-medium text-[#7b7881] sm:text-base">What do you want to license today?</p>
+  </header>
+
+  <div class="space-y-12 lg:space-y-14">
+    {#each sections as section (section.title)}
+      <section
+        class:opacity-55={section.disabled}
+        class="transition-opacity"
+        aria-labelledby={`${section.title.toLowerCase().replaceAll(' ', '-')}-heading`}
+      >
+        <div class="mb-4 flex items-center justify-between gap-4">
+          <h2 id={`${section.title.toLowerCase().replaceAll(' ', '-')}-heading`} class="text-xl font-bold text-dark">
+            {section.title}
+          </h2>
+
+          {#if section.href && !section.disabled}
+            <a class="text-sm font-bold text-[#8d5dc4] hover:text-[#6f3fb0]" href={section.href}>
+              {section.ctaLabel}
+            </a>
+          {:else}
+            <span class="cursor-not-allowed text-sm font-bold text-[#a6a1aa]" aria-disabled="true">
+              {section.ctaLabel}
+            </span>
+          {/if}
+        </div>
+
+        {#if section.items.length > 0}
+          <div class="grid grid-cols-1 gap-x-7 gap-y-8 min-[480px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
+            {#each section.items as item (item.id)}
+              <article class="min-w-0">
+                <img
+                  src={item.imageUrl}
+                  alt={item.title}
+                  class:grayscale={section.disabled}
+                  class="aspect-square w-full rounded-lg object-cover"
+                />
+                <h3 class="mt-3 line-clamp-2 text-base font-bold leading-[19px] text-dark">{item.title}</h3>
+                <p class="mt-1 line-clamp-4 text-sm font-medium leading-[18px] text-[#77757d]">{item.description}</p>
+              </article>
+            {/each}
+          </div>
+        {:else}
+          <div class="rounded-lg border border-[#e5e0d9] bg-[#f8f5f1] px-4 py-12 text-center">
+            <p class="text-sm font-medium text-[#77757d]">No {section.title.toLowerCase()} available yet.</p>
+          </div>
+        {/if}
+      </section>
+    {/each}
+  </div>
+</div>

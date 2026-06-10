@@ -4,7 +4,7 @@
   import { onMount } from 'svelte'
   import { afterNavigate, beforeNavigate } from '$app/navigation'
 
-  let { children, data } = $props()
+  let { children } = $props()
   let isMounted = $state(false)
   let loading = $state(false)
 
@@ -42,11 +42,5 @@
     <span class="loading loading-dots loading-lg"></span>
   </div>
 {:else if isMounted}
-  {#if data.userAddress}
-    <span class="text-[10px]">
-      <span class="font-semibold text-gray-900">User Address:</span>
-      <span class="text-gray-500 ml-1">{data.userAddress}</span>
-    </span>
-  {/if}
   {@render children?.()}
 {/if}

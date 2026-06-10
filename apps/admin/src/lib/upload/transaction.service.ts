@@ -1,10 +1,10 @@
 import { forwardTransaction } from '@repo/fe-services'
 import { authStore } from '$lib'
 import { ethers } from '@repo/fe-evm-provider'
-import { BlockchainService } from './blockchain.service'
+import BlockchainService from './blockchain.service'
 import { configStore, ContractName } from '$lib/stores/config.svelte'
 
-export class TransactionService {
+export default class TransactionService {
   constructor(private readonly blockchainService: BlockchainService) {}
 
   async mintWithPrices(accessToken: string, lifetimePrice: number, onetimePrice: number): Promise<string> {
