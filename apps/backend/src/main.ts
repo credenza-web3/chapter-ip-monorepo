@@ -22,7 +22,7 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService)
   // @ts-ignore
-  console.log(configService.internalConfig)
+  // console.log(configService.internalConfig)
   const port = configService.get<number>('port')!
 
   await app.listen(port, () => {
