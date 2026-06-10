@@ -1,5 +1,5 @@
-import { writable } from "svelte/store";
+import { writable } from 'svelte/store'
 
-export const headerStore = writable({ 
+export const headerStore = writable({
   hasNotifications: false,
 }) 
