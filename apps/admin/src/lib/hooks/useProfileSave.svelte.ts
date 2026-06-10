@@ -1,7 +1,7 @@
 import { notify, ToastType } from '@repo/ui-components'
 import { publisherStore } from '$lib/stores/publisher.svelte'
 import { savePublisher } from '$lib/services/publisher'
-import { uploadFileToBucket } from '$lib/upload'
+import uploadFileToBucket from '$lib/upload/file-upload.service'
 import type { TRPCClient, AppRouter } from '@repo/trpc/client'
 
 interface ProfileData {

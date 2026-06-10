@@ -2,16 +2,22 @@ import { describe, expect, it } from 'vitest'
 import { DEFAULT_IMAGE_URL, RECENT_LIMIT, getRecentLikenesses, toLikenessItems } from './likeness'
 
 describe('likeness data helpers', () => {
-  it('maps likeness metadata and excludes other content types', () => {
+  it('maps likeness metadata with the default image and excludes other content types', () => {
     const items = toLikenessItems([
       {
         id: 'likeness-1',
         metadata: {
           type: 'likeness',
           profile: { fullLegalName: 'Avery Stone', bio: 'Actor and vocalist.' },
-          uploadsByBucket: { headshots: ['headshot.jpg'] },
         },
-        files: [{ filename: 'headshot.jpg', label: '', key: 'contract/content/headshot.jpg' }],
+        files: [
+          {
+            filename: 'headshot.jpg',
+            label: '',
+            key: 'contract/content/headshot.jpg',
+            url: 'https://cdn.example.test/contract/content/headshot.jpg',
+          },
+        ],
       },
       { id: 'other', metadata: { type: 'written-work' } },
     ])
@@ -21,21 +27,27 @@ describe('likeness data helpers', () => {
         id: 'likeness-1',
         name: 'Avery Stone',
         bio: 'Actor and vocalist.',
-        imageUrl: expect.stringContaining('contract/content/headshot.jpg'),
+        imageUrl: DEFAULT_IMAGE_URL,
       },
     ])
   })
 
-  it('falls back to the default image when findContent does not include a matching file', () => {
+  it('uses the default image while the file image contract is unsettled', () => {
     const items = toLikenessItems([
       {
         id: 'likeness-1',
         metadata: {
           type: 'likeness',
           profile: { fullLegalName: 'Avery Stone' },
-          uploadsByBucket: { headshots: ['headshot.jpg'] },
         },
-        files: [{ filename: 'other.jpg', label: '', key: 'contract/content/other.jpg' }],
+        files: [
+          {
+            filename: 'headshot.jpg',
+            label: '',
+            key: 'contract/content/headshot.jpg',
+            url: 'https://cdn.example.test/contract/content/headshot.jpg',
+          },
+        ],
       },
     ])
 

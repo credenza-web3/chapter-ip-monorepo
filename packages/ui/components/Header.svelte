@@ -7,11 +7,13 @@
     authStore,
     children,
     menuItems,
+    logoHref = '/',
     showCreateButton = false,
   } = $props<{
     authStore: any
     children?: () => any
     menuItems?: { text: string; href: string }[]
+    logoHref?: string
     showCreateButton?: boolean
     pathname?: string
   }>()
@@ -51,12 +53,14 @@
   bind:this={headerRef}
   class="mx-auto w-full flex items-center justify-between md:px-10 px-4 py-4 border-b border-[#eef2f6] bg-[#f8f5f1] relative text-black"
 >
-  <a href="/" class="flex-shrink-0">
-    <img src={Logo} alt="Logo" class="w-[110px] md:w-[130px]" />
-  </a>
-  {#if authState.accessToken}
-    {@render children?.()}
-  {/if}
+  <div class="w-full flex items-center gap-8">
+    <a href={logoHref} class="flex-shrink-0">
+      <img src={Logo} alt="Logo" class="w-[110px] md:w-[130px]" />
+    </a>
+    {#if authState.accessToken}
+      {@render children?.()}
+    {/if}
+  </div>
 
   <div class="dropdown dropdown-bottom flex-shrink-0 bg-transparent">
     <div
@@ -74,7 +78,7 @@
         shadow-[3px_6px_8px_0_rgba(21,34,50,0.08)] right-0 top-10 whitespace-normal break-words md:w-52"
     >
       {#if authState.accessToken}
-        {#each menuItems as item}
+        {#each menuItems ?? [] as item}
           <li>
             <a href={item.href} class="px-4 py-2 mx-2 rounded-md transition-all hover:bg-[#E0DBD6]">
               {item.text}

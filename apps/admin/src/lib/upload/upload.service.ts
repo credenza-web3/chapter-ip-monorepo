@@ -1,9 +1,11 @@
 import { createClient, type TRPCClient, type AppRouter } from '@repo/trpc/client'
 import { authStore } from '$lib'
-import { uploadFileToBucket, TransactionService } from './index'
+import TransactionService from './transaction.service'
+import uploadFileToBucket from './file-upload.service'
+
 import { r2Config } from '@repo/fe-services'
 
-export class UploadService {
+export default class UploadService {
   constructor(private readonly transactionService: TransactionService) {}
   async uploadContent({
     uploads,

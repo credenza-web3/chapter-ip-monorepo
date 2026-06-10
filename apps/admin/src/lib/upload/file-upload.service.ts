@@ -1,4 +1,4 @@
-export const uploadFileToBucket = async (uploaded: File, url: string) => {
+const uploadFileToBucket = async (uploaded: File, url: string) => {
   const uploadFileRes = await fetch(url, {
     method: 'PUT',
     headers: {
@@ -11,3 +11,5 @@ export const uploadFileToBucket = async (uploaded: File, url: string) => {
     throw new Error(`Upload failed: ${uploadFileRes.status} ${uploadFileRes.statusText}`)
   }
 }
+
+export default uploadFileToBucket

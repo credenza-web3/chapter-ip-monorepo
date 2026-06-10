@@ -31,7 +31,7 @@
   })
 </script>
 
-<div class="mx-auto w-full max-w-[1440px]">
+<div class="mx-auto w-full max-w-360 px-6">
   <section class="mb-7" aria-labelledby="recently-added-heading">
     <div class="mb-3 flex items-center justify-between gap-4">
       <h1 id="recently-added-heading" class="text-base font-bold text-dark">Recently added</h1>
@@ -68,13 +68,9 @@
       >
         {#each recentItems as item (item.id)}
           <article
-            class="flex w-[min(88vw,382px)] shrink-0 snap-start gap-3 rounded-lg border border-[#ddd8d1] p-2.5 sm:w-[382px]"
+            class="flex w-[min(88vw,382px)] shrink-0 snap-start gap-3 rounded-sm border border-[#ddd8d1] p-2.5 sm:w-[382px]"
           >
-            <img
-              src={item.imageUrl}
-              alt={item.name || 'Likeness'}
-              class="size-20 shrink-0 rounded-md object-cover"
-            />
+            <img src={item.imageUrl} alt={item.name || 'Likeness'} class="size-20 shrink-0 rounded-md object-cover" />
             <div class="min-w-0 py-1">
               <h2 class="truncate text-base font-semibold text-dark">{item.name || 'Unnamed likeness'}</h2>
               {#if item.bio}
@@ -90,7 +86,7 @@
   </section>
 
   <section
-    class="rounded-[24px] border border-[#ebe6df] bg-[#f8f5f1] px-4 py-8 sm:px-6 lg:px-[52px] lg:py-12"
+    class="rounded-sm border border-[#ebe6df] bg-[#f8f5f1] px-4 py-8 sm:px-6 lg:px-13 lg:py-12"
     aria-labelledby="likeness-heading"
   >
     <h2 id="likeness-heading" class="text-xl font-bold text-dark">Likeness</h2>

@@ -1,7 +1,7 @@
 import { ethers, initProvider, getSigner } from '@repo/fe-evm-provider'
 import { configStore, ContractName } from '$lib/stores/config.svelte'
 
-export class BlockchainService {
+export default class BlockchainService {
   constructor(accessToken: string) {
     initProvider(accessToken)
   }

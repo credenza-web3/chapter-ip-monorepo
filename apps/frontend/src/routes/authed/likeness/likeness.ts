@@ -22,6 +22,7 @@ type ContentFile = {
   filename: string
   label: string
   key: string
+  url?: string
 }
 
 function isRecord(value: unknown): value is UnknownRecord {
@@ -38,17 +39,13 @@ export function toLikenessItems(contentItems: ContentItem[]): LikenessItem[] {
     if (!isRecord(metadata) || metadata.type !== 'likeness') return []
 
     const profile = isRecord(metadata.profile) ? metadata.profile : {}
-    const uploadsByBucket = isRecord(metadata.uploadsByBucket) ? metadata.uploadsByBucket : {}
-    const headshots = Array.isArray(uploadsByBucket.headshots) ? uploadsByBucket.headshots : []
-    const headshotFilename = headshots.find((filename): filename is string => typeof filename === 'string') ?? null
-    const imageUrl = getContentFileUrl(item.files, headshotFilename)
 
     return [
       {
         id: item.id,
         name: getString(profile.fullLegalName),
         bio: getString(profile.bio),
-        imageUrl,
+        imageUrl: DEFAULT_IMAGE_URL,
       },
     ]
   })
@@ -56,14 +53,4 @@ export function toLikenessItems(contentItems: ContentItem[]): LikenessItem[] {
 
 export function getRecentLikenesses(items: LikenessItem[]): LikenessItem[] {
   return items.slice(0, RECENT_LIMIT)
-}
-
-function getContentFileUrl(files: ContentFile[] | undefined, headshotFilename: string | null): string {
-  const file = files?.find(
-    (candidate) =>
-      candidate.key &&
-      (!headshotFilename || candidate.filename === headshotFilename || candidate.label === headshotFilename),
-  )
-
-  return file ? r2Config.url + file.key : DEFAULT_IMAGE_URL
 }
