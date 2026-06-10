@@ -1,7 +1,10 @@
 import { ethers, initProvider, getSigner } from '@repo/fe-evm-provider'
 import { configStore, ContractName } from '$lib/stores/config.svelte'
 
-export class BlockchainService {
+export default class BlockchainService {
+  constructor(accessToken: string) {
+    initProvider(accessToken)
+  }
   async createMintTransaction(userAddress: string, lifetimePrice: number, onetimePrice: number) {
     const signer = await getSigner()
     const contentContract = configStore.getContract(ContractName.CONTENT_NFT, signer)

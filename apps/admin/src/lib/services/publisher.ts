@@ -1,6 +1,7 @@
 import { notify, ToastType } from '@repo/ui-components'
+import type { TRPCClient, AppRouter } from '@repo/trpc/client'
 
-export async function savePublisher(trpcClient: any, publisherName: string, avatarUrl: string) {
+export async function savePublisher(trpcClient: TRPCClient<AppRouter>, publisherName: string, avatarUrl: string) {
   try {
     await trpcClient.publishers.setPublisher.mutate({
       title: publisherName,
