@@ -23,7 +23,6 @@ jobs:
       id-token: write
       contents: write
       pull-requests: write
-      issues: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -31,7 +30,7 @@ jobs:
           persist-credentials: false
 
       - name: Run opencode
-        uses: anomalyco/opencode/github@latest
+        uses: anomalyco/opencode/github@v1
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -40,4 +39,3 @@ jobs:
           model: opencode/big-pickle
           prompt: |
             Review this pull request. Fix any issues you find and push the fixes to the branch.
-          
