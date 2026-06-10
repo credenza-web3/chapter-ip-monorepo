@@ -16,6 +16,7 @@
     "test": "npm run test:unit -- --run"
   },
   "devDependencies": {
+    "@repo/notifications": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/fe-auth": "workspace:*",
     "@repo/fe-config": "workspace:*",

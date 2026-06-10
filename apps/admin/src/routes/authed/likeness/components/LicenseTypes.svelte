@@ -36,9 +36,9 @@
                 <input
                   type="number"
                   min="0"
-                  step="0.01"
                   value={$likenessStore.licensing.licensePrices[license.id]}
                   oninput={(e) => likenessStore.setLicenseTypePrice(license.id, e.currentTarget.value)}
+                  onwheel={(e) => e.preventDefault()}
                   placeholder="USD"
                   class="flex-1 h-10.5 w-20 font-medium focus:outline-none pr-2"
                 />
