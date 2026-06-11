@@ -27,7 +27,7 @@
             {#if item.href && !item.disabled}
               <a
                 href={item.href}
-                class:text-primary={page.url.pathname === item.href}
+                class:text-primary={page.url.pathname === item.href || page.url.pathname.startsWith(`${item.href}/`)}
                 class="transition-colors hover:text-primary"
               >
                 {item.label}
