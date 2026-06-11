@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "lib": ["es5", "ESNext", "DOM"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
