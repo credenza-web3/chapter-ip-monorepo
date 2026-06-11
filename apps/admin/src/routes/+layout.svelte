@@ -1,6 +1,5 @@
 <script lang="ts">
   import '../app.css'
-  import { onMount } from 'svelte'
   import { Toast, Header, Footer } from '@repo/ui-components'
   import { authStore } from '$lib'
   import NavLink from '$lib/components/NavLink.svelte'
@@ -36,7 +35,6 @@
     },
   ]
 
-  let subscription: ReturnType<typeof trpcClient.notifications.onMessage.subscribe>
   const trpcClient = createClient({
     trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
     getAccessTokenFn: () => authStore.state.accessToken!,
@@ -44,14 +42,16 @@
 
   $effect(() => {
     if (!authStore.state.accessToken) return
+
+    const subscription = trpcClient.notifications.onMessage.subscribe(undefined, {
+      onData(info) {
+        console.log('NOTIFICATION RECEIVED', info)
+        const data = info as TNotificationItem
+        notificationStore.update((n) => [...n, data])
+      },
+    })
+
     ;(async () => {
-      subscription = trpcClient.notifications.onMessage.subscribe(undefined, {
-        onData(info) {
-          console.log('NOTIFICATION RECEIVED', info)
-          const data = info as TNotificationItem
-          notificationStore.update((n) => [...n, data])
-        },
-      })
       const { items, cursor } = await trpcClient.notifications.findMyNotifications.query({
         limit: '10',
         sort: 'createdAt',
@@ -59,6 +59,10 @@
       })
       notificationStore.update((n) => [...n, ...items])
     })()
+
+    return () => {
+      subscription.unsubscribe()
+    }
   })
 
   async function markAsRead(id: string) {
@@ -70,12 +74,6 @@
     await trpcClient.notifications.markAllMyNotificationsAsRead.mutate()
     notificationStore.update((n) => n.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() })))
   }
-
-  onMount(() => {
-    return () => {
-      subscription.unsubscribe()
-    }
-  })
 </script>
 
 <svelte:head>
