@@ -42,7 +42,15 @@ describe('likeness purchase mapper', () => {
       stageName: 'Avery',
       bio: 'Actor and vocalist.',
       affiliations: [{ union: 'SAG-AFTRA', memberId: '12345' }],
-      licenses: [{ id: 'single-use', name: 'Single-use campaign', price: '10', detail: '' }],
+      licenses: [
+        {
+          id: 'single-use',
+          name: 'Single-use campaign',
+          price: '10',
+          detail: '',
+          description: expect.stringContaining('One approved use'),
+        },
+      ],
       permittedUses: ['AI', 'Digital'],
       territories: ['United States only'],
       allowRetouching: false,
@@ -50,7 +58,7 @@ describe('likeness purchase mapper', () => {
     })
     expect(purchase?.attributes).toContainEqual({ label: 'Height', value: `5' 10" (178 cm)` })
     expect(purchase?.attributes).toContainEqual({ label: 'Weight', value: '165 lbs (74.8 kg)' })
-    expect(purchase?.images).toHaveLength(6)
+    expect(purchase?.images).toHaveLength(5)
   })
 
   it('rejects content that is not a likeness', () => {

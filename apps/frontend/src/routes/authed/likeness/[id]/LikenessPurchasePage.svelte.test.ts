@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
 import { render } from 'vitest-browser-svelte'
+import { tick } from 'svelte'
 import LikenessPurchasePage from './LikenessPurchasePage.svelte'
 import type { LikenessPurchase } from './purchase'
 
@@ -11,8 +12,20 @@ const purchase: LikenessPurchase = {
   attributes: [{ label: 'Eye color', value: 'Brown' }],
   affiliations: [{ union: 'SAG-AFTRA', memberId: '12345' }],
   licenses: [
-    { id: 'single-use', name: 'Single-use campaign', price: '10', detail: '' },
-    { id: 'perpetual', name: 'Perpetual campaign', price: '100', detail: 'Ongoing' },
+    {
+      id: 'single-use',
+      name: 'Single-use campaign',
+      price: '10',
+      detail: '',
+      description: 'One approved use across a single campaign.',
+    },
+    {
+      id: 'perpetual',
+      name: 'Perpetual brand ambassador',
+      price: '100',
+      detail: 'Annually',
+      description: 'Ongoing partnership.',
+    },
   ],
   permittedUses: ['AI', 'Digital'],
   territories: ['United States only'],
@@ -24,17 +37,28 @@ const purchase: LikenessPurchase = {
   })),
 }
 
-test('renders likeness metadata and updates the selected license', async () => {
+test('renders likeness metadata, purchase summary, and mock media', async () => {
   const screen = await render(LikenessPurchasePage, { purchase })
 
   await expect.element(screen.getByRole('heading', { name: 'Avery Stone' })).toBeVisible()
   await expect.element(screen.getByText('Actor and vocalist.')).toBeVisible()
-  await expect.element(screen.getByText('United States only')).toBeVisible()
-  await expect.element(screen.getByRole('complementary').getByText('$10', { exact: false })).toBeVisible()
+  const purchaseSummary = screen.getByRole('region', { name: 'Purchase summary' })
+  await expect.element(purchaseSummary.getByText('$10', { exact: true })).toBeVisible()
+  await expect.element(screen.getByRole('button', { name: 'Add to Cart' })).toBeVisible()
+  expect(document.body.textContent).not.toContain('Stage name:')
+  expect(document.body.textContent).not.toContain('Show more')
+  expect(document.body.textContent).not.toContain('Usage Terms')
+  expect(document.querySelectorAll('[aria-label^="Open media image "]')).toHaveLength(10)
+  expect(document.querySelectorAll('[aria-label^="Mock video "]')).toHaveLength(5)
+  expect(document.querySelectorAll('[data-testid="media-play-icon"]')).toHaveLength(5)
 
-  await screen.getByRole('radio', { name: /Perpetual campaign/ }).click()
+  const singleUseLicense = screen.getByRole('radio', { name: /Single-use campaign/ })
+  const perpetualLicense = screen.getByRole('radio', { name: /Perpetual brand ambassador/ })
+  await expect.element(singleUseLicense).toBeChecked()
+  await perpetualLicense.click()
 
-  await expect.element(screen.getByRole('complementary').getByText('$100', { exact: false })).toBeVisible()
+  await expect.element(perpetualLicense).toBeChecked()
+  await expect.element(purchaseSummary.getByText('$100', { exact: true })).toBeVisible()
 })
 
 test('opens and closes an enlarged image dialog', async () => {
@@ -45,4 +69,14 @@ test('opens and closes an enlarged image dialog', async () => {
 
   await screen.getByRole('button', { name: 'Close image' }).click()
   expect(document.querySelector('[role="dialog"]')).toBeNull()
+
+  await screen.getByRole('button', { name: 'Enlarge Avery likeness preview 1' }).click()
+  await expect.element(screen.getByRole('dialog', { name: 'Enlarged likeness image' })).toBeVisible()
+
+  window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+  await tick()
+  expect(document.querySelector('[role="dialog"]')).toBeNull()
+
+  await screen.getByRole('button', { name: 'Open media image 1', exact: true }).click()
+  await expect.element(screen.getByRole('dialog', { name: 'Enlarged likeness image' })).toBeVisible()
 })

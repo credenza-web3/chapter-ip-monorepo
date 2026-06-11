@@ -17,6 +17,7 @@ export type LikenessLicense = {
   name: string
   price: string
   detail: string
+  description: string
 }
 
 export type LikenessPurchase = {
@@ -41,10 +42,19 @@ type Content = {
 
 const LICENSE_NAMES: Record<string, string> = {
   'single-use': 'Single-use campaign',
-  'time-limited': 'Time-limited campaign',
-  perpetual: 'Perpetual campaign',
+  'time-limited': 'Time-limited commercial',
+  perpetual: 'Perpetual brand ambassador',
   'ai-digital': 'AI and digital use',
   bulk: 'Bulk licensing',
+}
+
+const LICENSE_DESCRIPTIONS: Record<string, string> = {
+  'single-use':
+    'One approved use across a single campaign. Buyer cannot reuse the asset for a separate project, extend the run, or sublicense without purchasing a new license.',
+  'time-limited':
+    'Commercial use across multiple placements within a defined window. The asset is automatically retired from the buyer’s library when the term ends.',
+  perpetual:
+    'Ongoing partnership for buyers who want long-term association with your digital likeness. Priced as a recurring fee. End the license at any time to stop all future use.',
 }
 
 const PERMITTED_USE_NAMES: Record<string, string> = {
@@ -129,6 +139,7 @@ function getLicenses(licensing: UnknownRecord): LikenessLicense[] {
         name: LICENSE_NAMES[id] ?? formatLabel(id),
         price,
         detail: getString(details[id]),
+        description: LICENSE_DESCRIPTIONS[id] ?? '',
       },
     ]
   })
@@ -141,7 +152,7 @@ function getPermittedUses(value: unknown): string[] {
 }
 
 function getMockImages(name: string): LikenessPurchase['images'] {
-  return Array.from({ length: 6 }, (_, index) => ({
+  return Array.from({ length: 5 }, (_, index) => ({
     src: DEFAULT_IMAGE_URL,
     alt: `${name} likeness preview ${index + 1}`,
   }))
