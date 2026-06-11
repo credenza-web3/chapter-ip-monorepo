@@ -14,6 +14,9 @@
   "dependencies": {
     "@zerodevx/svelte-toast": "^0.9.6"
   },
+  "devDependencies": {
+    "@repo/notifications": "workspace:*"
+  },
   "peerDependencies": {
     "svelte": "^5.39.5"
   }

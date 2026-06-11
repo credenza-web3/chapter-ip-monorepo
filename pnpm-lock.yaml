@@ -66,6 +66,9 @@ importers:
       '@repo/fe-services':
         specifier: workspace:*
         version: link:../../packages/services
+      '@repo/notifications':
+        specifier: workspace:*
+        version: link:../../packages/notifications
       '@repo/trpc':
         specifier: workspace:*
         version: link:../../packages/trpc
@@ -491,6 +494,10 @@ importers:
       svelte:
         specifier: ^5.39.5
         version: 5.56.1(@typescript-eslint/types@8.61.0)
+    devDependencies:
+      '@repo/notifications':
+        specifier: workspace:*
+        version: link:../notifications
 
 packages:
 

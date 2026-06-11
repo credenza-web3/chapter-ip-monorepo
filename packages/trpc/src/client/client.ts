@@ -6,10 +6,7 @@ import {
   createWSClient,
   wsLink,
 } from '@trpc/client'
-import type { AppRouter } from '../server/server' // e.g. copied from backend
-
-export { type TRPCClient } from '@trpc/client'
-export { type AppRouter } from '../server/server'
+import type { AppRouter } from '../server/server'
 
 function wsUrlFromHttp(httpUrl: string): string {
   return httpUrl.replace(/^http/, 'ws')
