@@ -1,43 +1,17 @@
 packages:
-  - "apps/*"
-  - "packages/*"
+  - 'apps/*'
+  - 'packages/*'
 
 # "onlyBuiltDependencies":
 #   - "esbuild"
 
-# overrides: 
+# overrides:
 #   "zod": "^4.4.3"
-    
+
 allowBuilds:
   '@credenza3/passport-evm': false
   '@nestjs/core': false
   esbuild: true
   unrs-resolver: false
 
-minimumReleaseAgeExclude:
-  - '@aws-sdk/client-s3@3.1060.0'
-  - '@aws-sdk/core@3.974.17'
-  - '@aws-sdk/crc64-nvme@3.972.10'
-  - '@aws-sdk/credential-provider-env@3.972.43'
-  - '@aws-sdk/credential-provider-http@3.972.45'
-  - '@aws-sdk/credential-provider-ini@3.972.48'
-  - '@aws-sdk/credential-provider-login@3.972.47'
-  - '@aws-sdk/credential-provider-node@3.972.50'
-  - '@aws-sdk/credential-provider-process@3.972.43'
-  - '@aws-sdk/credential-provider-sso@3.972.47'
-  - '@aws-sdk/credential-provider-web-identity@3.972.47'
-  - '@aws-sdk/lib-storage@3.1060.0'
-  - '@aws-sdk/middleware-bucket-endpoint@3.972.19'
-  - '@aws-sdk/middleware-expect-continue@3.972.15'
-  - '@aws-sdk/middleware-flexible-checksums@3.974.25'
-  - '@aws-sdk/middleware-location-constraint@3.972.12'
-  - '@aws-sdk/middleware-sdk-s3@3.972.46'
-  - '@aws-sdk/middleware-ssec@3.972.12'
-  - '@aws-sdk/nested-clients@3.997.15'
-  - '@aws-sdk/s3-request-presigner@3.1060.0'
-  - '@aws-sdk/signature-v4-multi-region@3.996.31'
-  - '@aws-sdk/token-providers@3.1060.0'
-  - '@aws-sdk/types@3.973.10'
-  - '@aws-sdk/xml-builder@3.972.27'
-  - '@credenza3/passport-evm@0.4.29'
-  - '@sveltejs/kit@2.62.0'
+minimumReleaseAge: 0

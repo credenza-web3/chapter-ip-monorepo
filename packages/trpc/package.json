@@ -14,9 +14,11 @@
       "default": "./src/server/server.ts"
     }
   },
+  "dependencies": {
+    "@trpc/client": "^11.17.0",
+    "@trpc/server": "^11.17.0"
+  },
   "peerDependencies": {
-    "@trpc/client": "^11.6.0",
-    "@trpc/server": "^11.6.0",
     "zod": "^4"
   }
 }

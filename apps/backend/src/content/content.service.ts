@@ -6,6 +6,7 @@ import { abi as membershipAbi } from '@credenza3/contracts/artifacts/ChapterIpMe
 import { CommonEvmService } from '../common/evm/evm.service'
 import { ContentModelService } from './content-model.service'
 import { EvmEventService } from '../evm-listener/evm-event.service'
+import type { Content } from './content.schema'
 import type { TGetContentStatisticOutput } from './content.dto'
 
 const CONTENT_NFT_VOUCHER_EIP712_TYPE: Record<string, Array<{ name: string; type: string }>> = {
@@ -55,20 +56,32 @@ export class ContentService {
     return (await this.getContentNftContract().getAddress()).toLowerCase()
   }
 
-  public async verifyIsOwner(subEvmAddress: string, contentTokenId: string) {
-    const ownerEvmAddress = (await this.contentNftContract.ownerOf(contentTokenId)) as string
-    if (ownerEvmAddress.toLowerCase() !== subEvmAddress.toLowerCase()) {
-      throw new Error(`${subEvmAddress} is not the owner of ${contentTokenId}`)
+  public async verifyIsOwner(subEvmAddress: string, contentTokenId: string): Promise<[false, string] | [true, null]> {
+    try {
+      const ownerEvmAddress = (await this.contentNftContract.ownerOf(contentTokenId)) as string
+      if (ownerEvmAddress.toLowerCase() !== subEvmAddress.toLowerCase()) {
+        return [false, `${subEvmAddress} is not the owner of ${contentTokenId} token ID`]
+      }
+      return [true, null]
+    } catch {
+      return [false, 'Forbidden']
     }
   }
 
   public async verifyIsOwnerById(sub: string, contentId: string): Promise<[false, string] | [true, null]> {
     try {
-      const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(sub)
       const content = await this.contentService.findById(contentId)
-      const ownerEvmAddress = (await this.contentNftContract.ownerOf(content!.tokenId)) as string
-      if (ownerEvmAddress.toLowerCase() !== subEvmAddress.toLowerCase()) {
-        return [false, `${subEvmAddress} is not the owner of ${content!.tokenId} token ID`]
+      if (!content) {
+        return [false, 'Content is not found']
+      }
+
+      if (content.tokenId) {
+        const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(sub)
+        return this.verifyIsOwner(subEvmAddress, content.tokenId)
+      }
+
+      if (content.sub !== sub) {
+        return [false, 'Forbidden']
       }
 
       return [true, null]

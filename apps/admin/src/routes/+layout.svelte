@@ -115,7 +115,7 @@
     <div class="flex-1">
       {@render children?.()}
     </div>
-    <div class="p-8 md:p-12.5">
+    <div class="px-6">
       <Footer />
     </div>
   </main>

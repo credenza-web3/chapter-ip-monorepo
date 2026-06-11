@@ -28,42 +28,55 @@ export class CommonLicenseService {
     return this.licenseNftContract
   }
 
-  public async verify(sub: string, subEvmAddress: string, contentTokenId: string, licenseTokenId: string) {
-    subEvmAddress = subEvmAddress.toLowerCase()
-    const licenseContentTokenId = (await this.licenseNftContract.getTokenLicenseContentNftId(licenseTokenId)) as number
-    if (String(licenseContentTokenId) !== contentTokenId) {
-      throw new Error('Invalid license content token ID')
-    }
+  public async verify(
+    sub: string,
+    subEvmAddress: string,
+    contentTokenId: string,
+    licenseTokenId: string,
+  ): Promise<[false, string] | [true, null]> {
+    try {
+      subEvmAddress = subEvmAddress.toLowerCase()
+      const licenseContentTokenId = (await this.licenseNftContract.getTokenLicenseContentNftId(
+        licenseTokenId,
+      )) as number
+      if (String(licenseContentTokenId) !== contentTokenId) {
+        return [false, 'Invalid license content token ID']
+      }
 
-    const licenseOwner = (await this.licenseNftContract.ownerOf(licenseTokenId)) as string
-    if (licenseOwner.toLowerCase() !== subEvmAddress) {
-      throw new Error('You are not the owner of this license')
-    }
+      const licenseOwner = (await this.licenseNftContract.ownerOf(licenseTokenId)) as string
+      if (licenseOwner.toLowerCase() !== subEvmAddress) {
+        return [false, 'You are not the owner of this license']
+      }
 
-    const licenseType = Number(await this.licenseNftContract.getTokenLicenseType(licenseTokenId))
-    switch (licenseType) {
-      case 2: {
-        const blockedLicenseModel = this.blockedLicenseService.getModel()
-        const blocked = await blockedLicenseModel.findOne({ tokenId: licenseTokenId, subEvmAddress, sub })
-        if (blocked) {
-          throw new Error('License has been already used')
+      const licenseType = Number(await this.licenseNftContract.getTokenLicenseType(licenseTokenId))
+      switch (licenseType) {
+        case 2: {
+          const blockedLicenseModel = this.blockedLicenseService.getModel()
+          const blocked = await blockedLicenseModel.findOne({ tokenId: licenseTokenId, subEvmAddress, sub })
+          if (blocked) {
+            return [false, 'License has been already used']
+          }
+          await blockedLicenseModel.create({ tokenId: licenseTokenId, subEvmAddress, sub })
+          break
         }
-        await blockedLicenseModel.create({ tokenId: licenseTokenId, subEvmAddress, sub })
-        break
-      }
-      case 1: {
-        const expiresAt = (await this.licenseNftContract.getTokenLicenseExpiresAt(licenseTokenId)) as number
-        if (expiresAt < Date.now() / 1000) {
-          throw new Error('License expired')
+        case 1: {
+          const expiresAt = (await this.licenseNftContract.getTokenLicenseExpiresAt(licenseTokenId)) as number
+          if (expiresAt < Date.now() / 1000) {
+            return [false, 'License expired']
+          }
+          break
         }
-        break
+        case 0: {
+          break
+        }
+        default: {
+          return [false, `Unsupported license type (${licenseType})`]
+        }
       }
-      case 0: {
-        break
-      }
-      default: {
-        throw new Error(`Unsupported license type (${licenseType})`)
-      }
+
+      return [true, null]
+    } catch {
+      return [false, 'Forbidden']
     }
   }
 }
