@@ -2,7 +2,8 @@
   import { goto } from '$app/navigation'
   import { onMount } from 'svelte'
   import LikenessPurchasePage from './LikenessPurchasePage.svelte'
-  import { toLikenessPurchase, type LikenessPurchase } from './purchase'
+  import { toLikenessPurchase } from './purchase'
+  import type { LikenessPurchase } from './types'
 
   let { data } = $props()
 

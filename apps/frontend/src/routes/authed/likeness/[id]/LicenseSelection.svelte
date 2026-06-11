@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { LikenessLicense } from './purchase'
+  import type { LikenessLicense } from './types'
 
   let {
     licenses,

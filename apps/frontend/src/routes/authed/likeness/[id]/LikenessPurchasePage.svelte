@@ -4,7 +4,7 @@
   import LikenessProfileDetails from './LikenessProfileDetails.svelte'
   import LicenseSelection from './LicenseSelection.svelte'
   import PermittedUses from './PermittedUses.svelte'
-  import type { LikenessPurchase } from './purchase'
+  import type { LikenessPurchase } from './types'
 
   let { purchase }: { purchase: LikenessPurchase } = $props()
 

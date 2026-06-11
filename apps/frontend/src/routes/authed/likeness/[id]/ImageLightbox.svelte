@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { LikenessPurchase } from './purchase'
+  import type { LikenessPurchase } from './types'
 
   let {
     image,

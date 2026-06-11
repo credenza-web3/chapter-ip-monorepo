@@ -2,7 +2,7 @@ import { expect, test } from 'vitest'
 import { render } from 'vitest-browser-svelte'
 import { tick } from 'svelte'
 import LikenessPurchasePage from './LikenessPurchasePage.svelte'
-import type { LikenessPurchase } from './purchase'
+import type { LikenessPurchase } from './types'
 
 const purchase: LikenessPurchase = {
   id: 'likeness-1',
