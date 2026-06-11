@@ -1,53 +1,31 @@
 <script lang="ts">
   import Code from '$lib/assets/code.svg'
   import RowActionMenu from '$lib/components/RowActionMenu.svelte'
-  import { createClient } from '@repo/trpc/client'
   import { formatDate } from '../files/helper'
   import { NotificationsMenuItems } from './constants'
-  import { onMount } from 'svelte'
+  import { notificationStore } from '$lib/stores/notification.svelte'
+  import { createClient } from '@repo/trpc/client'
   import { authStore } from '$lib'
-  import type { TNotificationItem } from '@repo/notifications'
 
   let activeMenuRow = $state<number | null>(null)
-  let notificationsIsRead = $state<TNotificationItem[]>([])
-  let notificationsIsUnread = $state<TNotificationItem[]>([])
-  let trpcClient: ReturnType<typeof createClient>
-
-  const loadNotifications = async () => {
-    const result1 = await trpcClient.notifications.findMyNotifications.query({
-      limit: '20',
-      isRead: true,
+  const allNotifications = $derived(
+    $notificationStore.toSorted((a, b) => {
+      if (!a.readAt && b.readAt) return -1
+      if (a.readAt && !b.readAt) return 1
+      return 0
     })
-    const result2 = await trpcClient.notifications.findMyNotifications.query({
-      limit: '20',
-      isUnread: true,
-    })
-    notificationsIsRead = result1.items
-    notificationsIsUnread = result2.items
-    {
-      if (notificationsIsUnread.length > 0) {
-        headerStore.set({ hasNotifications: notificationsIsUnread.length > 0 })
-      }
-    }
-    console.log('read:', JSON.parse(JSON.stringify(notificationsIsRead)))
-    console.log('unread:', JSON.parse(JSON.stringify(notificationsIsUnread)))
-  }
-
-  onMount(async () => {
-    trpcClient = createClient({
-      trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
-      getAccessTokenFn: () => authStore.state.accessToken ?? '',
-    })
-    await loadNotifications()
-  })
-
-  const allNotifications = $derived([...notificationsIsUnread, ...notificationsIsRead])
+  )
 
   async function handleMenuSelect(item: { text: string; href?: string; action?: string }, notificationId: string) {
     if (item.action === 'mark-read') {
-      console.log('marking as read:', notificationId)
+      const trpcClient = createClient({
+        trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
+        getAccessTokenFn: () => authStore.state.accessToken ?? '',
+      })
       await trpcClient.notifications.markMyNotificationAsRead.mutate({ id: notificationId })
-      await loadNotifications()
+      notificationStore.update((n) =>
+        n.map((x) => (x.id === notificationId ? { ...x, readAt: new Date().toISOString() } : x))
+      )
     }
   }
 
@@ -78,7 +56,7 @@
           </thead>
           <tbody>
             {#each allNotifications as tx, i (tx.id)}
-              {@const isRead = notificationsIsRead.some((n) => n.id === tx.id)}
+              {@const isRead = !!tx.readAt}
               <tr
                 class="border-b border-[#ddd] last:border-0 {activeMenuRow === i
                   ? 'bg-[#ece7df]'

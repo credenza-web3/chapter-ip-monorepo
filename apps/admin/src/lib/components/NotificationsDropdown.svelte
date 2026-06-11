@@ -8,7 +8,14 @@
     $props()
   let activeMenuRow = $state<number | null>(null)
 
-  const unreadNotifications = $derived(notifications.filter((n) => !n.readAt))
+  const sortedNotifications = $derived(
+    notifications.toSorted((a, b) => {
+      if (!a.readAt && b.readAt) return -1
+      if (a.readAt && !b.readAt) return 1
+      return 0
+    })
+  )
+  const unreadNotifications = $derived(sortedNotifications.filter((n) => !n.readAt))
   const hasUnread = $derived(unreadNotifications.length > 0)
 
   function getMenuItems(isRead: boolean) {
@@ -69,7 +76,7 @@
       </button>
     </div>
     <div class="pt-9">
-      {#each notifications as tx, i (tx.id)}
+      {#each sortedNotifications as tx, i (tx.id)}
         <li>
           <div class="flex items-start leading-0">
             <div class="size-1.5 rounded-full bg-primary shrink-0 mt-1.5" class:invisible={!!tx.readAt}></div>
@@ -120,7 +127,7 @@
               <span class="text-xs font-medium text-[#1A1A2E99]">
                 {formatDateWithOrdinal(tx.createdAt)}
               </span>
-              {#if i !== notifications.length - 1}
+              {#if i !== sortedNotifications.length - 1}
                 <div class="border-t border-[#DDD7D1] mt-3.5"></div>
               {/if}
             </div>
@@ -133,7 +140,7 @@
       <div class="border-t border-[#DDD7D1] mb-3.5"></div>
       <div class="flex items-center justify-between">
         <span class="text-[13px] text-[#1A1A2E99] font-semibold">
-          {unreadNotifications.length} of {notifications.length} unread notifications
+          {unreadNotifications.length} of {sortedNotifications.length} unread notifications
         </span>
         <button
           class="text-[13px] font-semibold text-primary hover:opacity-80 transition cursor-pointer"

@@ -63,9 +63,7 @@
 
   async function markAsRead(id: string) {
     await trpcClient.notifications.markMyNotificationAsRead.mutate({ id })
-    notificationStore.update((n) =>
-      n.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x))
-    )
+    notificationStore.update((n) => n.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x)))
   }
 
   onMount(() => {
@@ -81,7 +79,13 @@
 
 <Toast />
 <div class="flex min-h-screen flex-col overflow-x-hidden bg-cream text-dark">
-  <Header {authStore} {menuItems} pathname={page.url.pathname} showCreateButton={true} notifications={$notificationStore}>
+  <Header
+    {authStore}
+    {menuItems}
+    pathname={page.url.pathname}
+    showCreateButton={true}
+    notifications={$notificationStore}
+  >
     <div class="flex h-full items-stretch w-full justify-between md:pl-15 pl-2">
       <div class="flex items-stretch">
         <NavLink href="/authed/files">Dashboard</NavLink>
