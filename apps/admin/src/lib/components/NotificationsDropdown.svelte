@@ -4,8 +4,15 @@
   import { NotificationsMenuItems } from '../../routes/authed/notifications/constants'
   import type { TNotificationItem } from '@repo/notifications'
 
-  let { notifications = [], onMarkRead }: { notifications: TNotificationItem[]; onMarkRead?: (id: string) => void } =
-    $props()
+  let {
+    notifications = [],
+    onMarkRead,
+    onMarkAllRead,
+  }: {
+    notifications: TNotificationItem[]
+    onMarkRead?: (id: string) => void
+    onMarkAllRead?: () => void
+  } = $props()
   let activeMenuRow = $state<number | null>(null)
 
   const sortedNotifications = $derived(
@@ -71,7 +78,10 @@
   >
     <div class="flex items-center justify-between">
       <h2 class="text-[13px] font-semibold text-dark">Notifications</h2>
-      <button class="text-xs font-medium text-cream rounded-sm bg-primary px-3.75 py-2.5">
+      <button
+        class="text-xs font-medium text-cream rounded-sm bg-primary px-3.75 py-2.5"
+        onclick={onMarkAllRead}
+      >
         Mark {unreadNotifications.length} as read
       </button>
     </div>
