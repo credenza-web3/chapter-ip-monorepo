@@ -281,7 +281,8 @@ export class ContentRouter {
   async findContent(@Input() input: TFindContentInput): Promise<TFindContentOutput> {
     const paginationOptions = this.contentService.buildPaginationOptions(input)
 
-    return await this.contentService.paginate(paginationOptions)
+    const res = await this.contentService.paginate(paginationOptions)
+    return res
   }
 
   @Query({

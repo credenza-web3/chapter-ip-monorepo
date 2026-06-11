@@ -67,7 +67,8 @@
         onscroll={updateCarouselState}
       >
         {#each recentItems as item (item.id)}
-          <article
+          <a
+            href={`/authed/likeness/${item.id}`}
             class="flex w-[min(88vw,382px)] shrink-0 snap-start gap-3 rounded-sm border border-[#ddd8d1] p-2.5 sm:w-[382px]"
           >
             <img src={item.imageUrl} alt={item.name || 'Likeness'} class="size-20 shrink-0 rounded-md object-cover" />
@@ -77,7 +78,7 @@
                 <p class="mt-1 line-clamp-2 text-sm leading-5 text-[#77757d]">{item.bio}</p>
               {/if}
             </div>
-          </article>
+          </a>
         {/each}
       </div>
     {:else}
@@ -95,17 +96,17 @@
     {#if items.length > 0}
       <div class="grid grid-cols-1 gap-x-6 gap-y-12 min-[420px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
         {#each items as item (item.id)}
-          <article class="min-w-0">
+          <a href={`/authed/likeness/${item.id}`} class="group min-w-0">
             <img
               src={item.imageUrl}
               alt={item.name || 'Likeness'}
-              class="aspect-square w-full rounded-lg object-cover"
+              class="aspect-square w-full rounded-lg object-cover transition-opacity group-hover:opacity-85"
             />
             <h3 class="mt-3 truncate text-base font-semibold text-dark">{item.name || 'Unnamed likeness'}</h3>
             {#if item.bio}
               <p class="mt-1 line-clamp-2 text-sm leading-[18px] text-[#77757d]">{item.bio}</p>
             {/if}
-          </article>
+          </a>
         {/each}
       </div>
     {:else}
