@@ -6,7 +6,7 @@
   import NavLink from '$lib/components/NavLink.svelte'
   import { publisherStore } from '$lib/stores/publisher.svelte'
   import { page } from '$app/state'
-  import { headerStore } from '$lib/stores/header.store'
+  import { notificationStore } from '$lib/stores/notification.svelte'
 
   import { createClient } from '@repo/trpc/client'
   import type { TNotificationItem } from '@repo/notifications'
@@ -37,7 +37,6 @@
   ]
 
   let subscription: ReturnType<typeof trpcClient.notifications.onMessage.subscribe>
-  const notifications: TNotificationItem[] = $state([])
   const trpcClient = createClient({
     trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
     getAccessTokenFn: () => authStore.state.accessToken!,
@@ -50,7 +49,7 @@
         onData(info) {
           console.log('NOTIFICATION RECEIVED', info)
           const data = info as TNotificationItem
-          notifications.push(data)
+          notificationStore.update((n) => [...n, data])
         },
       })
       const { items, cursor } = await trpcClient.notifications.findMyNotifications.query({
@@ -58,14 +57,15 @@
         sort: 'createdAt',
         order: 'desc',
       })
-      notifications.push(...items)
+      notificationStore.update((n) => [...n, ...items])
     })()
   })
 
   async function markAsRead(id: string) {
     await trpcClient.notifications.markMyNotificationAsRead.mutate({ id })
-    const n = notifications.find((n) => n.id === id)
-    if (n) n.readAt = new Date().toISOString()
+    notificationStore.update((n) =>
+      n.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x))
+    )
   }
 
   onMount(() => {
@@ -81,13 +81,13 @@
 
 <Toast />
 <div class="flex min-h-screen flex-col overflow-x-hidden bg-cream text-dark">
-  <Header {authStore} {menuItems} pathname={page.url.pathname} showCreateButton={true} {notifications}>
+  <Header {authStore} {menuItems} pathname={page.url.pathname} showCreateButton={true} notifications={$notificationStore}>
     <div class="flex h-full items-stretch w-full justify-between md:pl-15 pl-2">
       <div class="flex items-stretch">
         <NavLink href="/authed/files">Dashboard</NavLink>
       </div>
       <div class="flex items-center md:gap-7.25 gap-4">
-        <NotificationsDropdown {notifications} onMarkRead={markAsRead} />
+        <NotificationsDropdown notifications={$notificationStore} onMarkRead={markAsRead} />
         <a
           href="/authed/profile"
           aria-label="Open profile"

@@ -7,7 +7,6 @@
   import { onMount } from 'svelte'
   import { authStore } from '$lib'
   import type { TNotificationItem } from '@repo/notifications'
-  import { headerStore } from '$lib/stores/header.store'
 
   let activeMenuRow = $state<number | null>(null)
   let notificationsIsRead = $state<TNotificationItem[]>([])
