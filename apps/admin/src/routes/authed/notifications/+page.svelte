@@ -13,7 +13,7 @@
       if (!a.readAt && b.readAt) return -1
       if (a.readAt && !b.readAt) return 1
       return 0
-    })
+    }),
   )
 
   async function handleMenuSelect(item: { text: string; href?: string; action?: string }, notificationId: string) {
@@ -24,7 +24,7 @@
       })
       await trpcClient.notifications.markMyNotificationAsRead.mutate({ id: notificationId })
       notificationStore.update((n) =>
-        n.map((x) => (x.id === notificationId ? { ...x, readAt: new Date().toISOString() } : x))
+        n.map((x) => (x.id === notificationId ? { ...x, readAt: new Date().toISOString() } : x)),
       )
     }
   }
