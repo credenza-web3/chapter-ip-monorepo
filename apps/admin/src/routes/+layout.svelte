@@ -66,6 +66,11 @@
     notificationStore.update((n) => n.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x)))
   }
 
+  async function markAllAsRead() {
+    await trpcClient.notifications.markAllMyNotificationsAsRead.mutate()
+    notificationStore.update((n) => n.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() })))
+  }
+
   onMount(() => {
     return () => {
       subscription.unsubscribe()
@@ -91,7 +96,7 @@
         <NavLink href="/authed/files">Dashboard</NavLink>
       </div>
       <div class="flex items-center md:gap-7.25 gap-4">
-        <NotificationsDropdown notifications={$notificationStore} onMarkRead={markAsRead} />
+        <NotificationsDropdown notifications={$notificationStore} onMarkRead={markAsRead} onMarkAllRead={markAllAsRead} />
         <a
           href="/authed/profile"
           aria-label="Open profile"
