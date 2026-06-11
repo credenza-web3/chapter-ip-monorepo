@@ -6,11 +6,11 @@
   import NavLink from '$lib/components/NavLink.svelte'
   import { publisherStore } from '$lib/stores/publisher.svelte'
   import { page } from '$app/state'
-  import BellIcon from '$lib/assets/bell.svg'
   import { headerStore } from '$lib/stores/header.store'
 
   import { createClient } from '@repo/trpc/client'
   import type { TNotificationItem } from '@repo/notifications'
+  import NotificationsDropdown from '$lib/components/NotificationsDropdown.svelte'
 
   let { children } = $props()
   const menuItems = [
@@ -59,11 +59,14 @@
         order: 'desc',
       })
       notifications.push(...items)
-      console.log('LAYOUT notifications', JSON.stringify(notifications.map((n) => n.id)))
     })()
   })
 
-  const hasNewNotifications = $derived(!!notifications.find((n) => !n.readAt))
+  async function markAsRead(id: string) {
+    await trpcClient.notifications.markMyNotificationAsRead.mutate({ id })
+    const n = notifications.find((n) => n.id === id)
+    if (n) n.readAt = new Date().toISOString()
+  }
 
   onMount(() => {
     return () => {
@@ -84,22 +87,14 @@
         <NavLink href="/authed/files">Dashboard</NavLink>
       </div>
       <div class="flex items-center md:gap-7.25 gap-4">
-        <a href="/authed/notifications" class="inline-flex">
-          <div class="relative cursor-pointer">
-            <img src={BellIcon} alt="notifications" class="h-5.75" />
-            {#if hasNewNotifications}
-              <span class="absolute top-0 -right-1 block w-3 h-3 rounded-full bg-primary border-2 border-[#fef9ee]"
-              ></span>
-            {/if}
-          </div>
+        <NotificationsDropdown {notifications} onMarkRead={markAsRead} />
+        <a
+          href="/authed/profile"
+          aria-label="Open profile"
+          class="my-auto flex items-center justify-center rounded-full bg-primary text-white font-semibold w-7 h-7"
+        >
+          {publisherStore.title?.slice(0, 1)?.toUpperCase() || 'U'}
         </a>
-        <spam class="my-auto flex items-center justify-center rounded-full text-white font-semibold w-[28px] h-7">
-          {#if publisherStore.avatarUrl}
-            <img src={publisherStore.avatarUrl} class="object-cover w-full h-full rounded-full" alt="avatar" />
-          {:else}
-            {publisherStore.title?.slice(0, 1)?.toUpperCase() || 'U'}
-          {/if}
-        </spam>
       </div>
     </div>
   </Header>
