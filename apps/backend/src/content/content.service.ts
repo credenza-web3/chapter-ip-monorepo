@@ -6,7 +6,6 @@ import { abi as membershipAbi } from '@credenza3/contracts/artifacts/ChapterIpMe
 import { CommonEvmService } from '../common/evm/evm.service'
 import { ContentModelService } from './content-model.service'
 import { EvmEventService } from '../evm-listener/evm-event.service'
-import type { Content } from './content.schema'
 import type { TGetContentStatisticOutput } from './content.dto'
 
 const CONTENT_NFT_VOUCHER_EIP712_TYPE: Record<string, Array<{ name: string; type: string }>> = {

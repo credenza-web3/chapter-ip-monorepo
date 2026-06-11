@@ -99,7 +99,7 @@ export class PublisherRouter {
     @Input() input: TMintContentNftTokenInput,
   ): Promise<TMintContentNftTokenOutput> {
     // Mock implementation - returns mock signature, domain, and voucher
-    return {
+    return Promise.resolve({
       sig: '0x' + '0'.repeat(130), // Mock signature (65 bytes = 130 hex chars)
       domain: {
         name: 'Chapter IP Content',
@@ -114,6 +114,6 @@ export class PublisherRouter {
         licenseInfo: String(input.licenseType),
         uri: input.tokenUri || '',
       },
-    }
+    })
   }
 }
