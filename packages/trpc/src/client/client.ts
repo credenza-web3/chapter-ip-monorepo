@@ -29,12 +29,7 @@
 //   })
 // }
 
-import {
-  createTRPCProxyClient,
-  httpBatchLink,
-  httpSubscriptionLink,
-  splitLink
-} from '@trpc/client'
+import { createTRPCProxyClient, httpBatchLink, httpSubscriptionLink, splitLink } from '@trpc/client'
 import type { AppRouter } from '../server/server'
 
 export function createClient(opts: {
@@ -55,19 +50,19 @@ export function createClient(opts: {
               const accessToken = await opts.getAccessTokenFn()
               return { Authorization: `Bearer ${accessToken}` }
             }
-            return { Authorization: undefined } 
-          }
+            return { Authorization: undefined }
+          },
         }),
         false: httpBatchLink({
           url: opts.trpcUrl,
-          headers: async () => { 
+          headers: async () => {
             const headers: Record<string, string> = opts.headers || {}
             if (opts.getAccessTokenFn && typeof opts.getAccessTokenFn === 'function') {
               const accessToken = await opts.getAccessTokenFn()
               headers.Authorization = `Bearer ${accessToken}`
             }
             return headers
-          }
+          },
         }),
       }),
     ],
