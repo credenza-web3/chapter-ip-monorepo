@@ -13,7 +13,7 @@
       if (!a.readAt && b.readAt) return -1
       if (a.readAt && !b.readAt) return 1
       return 0
-    })
+    }),
   )
   const unreadNotifications = $derived(sortedNotifications.filter((n) => !n.readAt))
   const hasUnread = $derived(unreadNotifications.length > 0)
