@@ -4,7 +4,8 @@
   import { NotificationsMenuItems } from '../../routes/authed/notifications/constants'
   import type { TNotificationItem } from '@repo/notifications'
 
-  let { notifications = [], onMarkRead }: { notifications: TNotificationItem[]; onMarkRead?: (id: string) => void } = $props()
+  let { notifications = [], onMarkRead }: { notifications: TNotificationItem[]; onMarkRead?: (id: string) => void } =
+    $props()
   let activeMenuRow = $state<number | null>(null)
 
   const unreadNotifications = $derived(notifications.filter((n) => !n.readAt))
@@ -63,7 +64,9 @@
   >
     <div class="flex items-center justify-between">
       <h2 class="text-[13px] font-semibold text-dark">Notifications</h2>
-      <button class="text-xs font-medium text-cream rounded-sm bg-primary px-3.75 py-2.5"> Mark {unreadNotifications.length} as read </button>
+      <button class="text-xs font-medium text-cream rounded-sm bg-primary px-3.75 py-2.5">
+        Mark {unreadNotifications.length} as read
+      </button>
     </div>
     <div class="pt-9">
       {#each notifications as tx, i (tx.id)}
@@ -129,7 +132,9 @@
     <div class="flex flex-col h-full mt-auto px-3 pb-3.75">
       <div class="border-t border-[#DDD7D1] mb-3.5"></div>
       <div class="flex items-center justify-between">
-        <span class="text-[13px] text-[#1A1A2E99] font-semibold"> {unreadNotifications.length} of {notifications.length} unread notifications </span>
+        <span class="text-[13px] text-[#1A1A2E99] font-semibold">
+          {unreadNotifications.length} of {notifications.length} unread notifications
+        </span>
         <button
           class="text-[13px] font-semibold text-primary hover:opacity-80 transition cursor-pointer"
           onclick={() => {
