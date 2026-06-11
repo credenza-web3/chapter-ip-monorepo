@@ -78,10 +78,7 @@
   >
     <div class="flex items-center justify-between">
       <h2 class="text-[13px] font-semibold text-dark">Notifications</h2>
-      <button
-        class="text-xs font-medium text-cream rounded-sm bg-primary px-3.75 py-2.5"
-        onclick={onMarkAllRead}
-      >
+      <button class="text-xs font-medium text-cream rounded-sm bg-primary px-3.75 py-2.5" onclick={onMarkAllRead}>
         Mark {unreadNotifications.length} as read
       </button>
     </div>

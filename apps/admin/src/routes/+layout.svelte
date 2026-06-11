@@ -96,7 +96,11 @@
         <NavLink href="/authed/files">Dashboard</NavLink>
       </div>
       <div class="flex items-center md:gap-7.25 gap-4">
-        <NotificationsDropdown notifications={$notificationStore} onMarkRead={markAsRead} onMarkAllRead={markAllAsRead} />
+        <NotificationsDropdown
+          notifications={$notificationStore}
+          onMarkRead={markAsRead}
+          onMarkAllRead={markAllAsRead}
+        />
         <a
           href="/authed/profile"
           aria-label="Open profile"
