@@ -16,7 +16,7 @@ export class AuthMiddleware implements TRPCMiddleware {
     try {
       const context = opts.ctx as TAppContextWithTokenPayload
 
-      const authTokenHeader = context.req.headers?.['authorization']
+      const authTokenHeader = context.req.headers?.['authorization'] ?? context.accessToken
       if (!authTokenHeader) {
         throw new TRPCError({ message: 'Missing authorization header', code: 'UNAUTHORIZED' })
       }

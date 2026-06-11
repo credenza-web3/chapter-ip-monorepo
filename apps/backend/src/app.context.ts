@@ -26,11 +26,13 @@ export class AppContext implements TRPCContext {
       })
     }
 
-    return await Promise.resolve({ requestId, req, res })
+    const accessToken = opts.info?.connectionParams?.Authorization
+    return await Promise.resolve({ requestId, req, res, accessToken })
   }
 }
 
 export type TAppContext = {
+  accessToken: string | undefined
   requestId: string
   req: Request
   res: Response

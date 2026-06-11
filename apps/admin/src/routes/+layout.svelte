@@ -1,5 +1,6 @@
 <script lang="ts">
   import '../app.css'
+  import { onMount } from 'svelte'
   import { Toast, Header, Footer } from '@repo/ui-components'
   import { authStore } from '$lib'
   import NavLink from '$lib/components/NavLink.svelte'
@@ -7,6 +8,9 @@
   import { page } from '$app/state'
   import BellIcon from '$lib/assets/bell.svg'
   import { headerStore } from '$lib/stores/header.store'
+
+  import { createClient } from '@repo/trpc/client'
+  import type { TNotificationItem } from '@repo/notifications'
 
   let { children } = $props()
   const menuItems = [
@@ -32,20 +36,40 @@
     },
   ]
 
-  const BrowseAndPurchaseItems = [
-    {
-      text: 'Written Works',
-      href: '/authed/upload',
-    },
-    {
-      text: 'Location',
-      href: '/authed/location',
-    },
-    {
-      text: 'Likeness',
-      href: '/authed/likeness',
-    },
-  ]
+  let subscription: ReturnType<typeof trpcClient.notifications.onMessage.subscribe>
+  const notifications: TNotificationItem[] = $state([])
+  const trpcClient = createClient({
+    trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
+    getAccessTokenFn: () => authStore.state.accessToken!,
+  })
+
+  $effect(() => {
+    if (!authStore.state.accessToken) return
+    ;(async () => {
+      subscription = trpcClient.notifications.onMessage.subscribe(undefined, {
+        onData(info) {
+          console.log('NOTIFICATION RECEIVED', info)
+          const data = info as TNotificationItem
+          notifications.push(data)
+        },
+      })
+      const { items, cursor } = await trpcClient.notifications.findMyNotifications.query({
+        limit: '10',
+        sort: 'createdAt',
+        order: 'desc',
+      })
+      notifications.push(...items)
+      console.log('LAYOUT notifications', JSON.stringify(notifications.map((n) => n.id)))
+    })()
+  })
+
+  const hasNewNotifications = $derived(!!notifications.find((n) => !n.readAt))
+
+  onMount(() => {
+    return () => {
+      subscription.unsubscribe()
+    }
+  })
 </script>
 
 <svelte:head>
@@ -54,7 +78,7 @@
 
 <Toast />
 <div class="flex min-h-screen flex-col overflow-x-hidden bg-cream text-dark">
-  <Header {authStore} {menuItems} pathname={page.url.pathname} showCreateButton={true}>
+  <Header {authStore} {menuItems} pathname={page.url.pathname} showCreateButton={true} {notifications}>
     <div class="flex h-full items-stretch w-full justify-between md:pl-15 pl-2">
       <div class="flex items-stretch">
         <NavLink href="/authed/files">Dashboard</NavLink>
@@ -63,13 +87,13 @@
         <a href="/authed/notifications" class="inline-flex">
           <div class="relative cursor-pointer">
             <img src={BellIcon} alt="notifications" class="h-5.75" />
-            {#if $headerStore.hasNotifications}
+            {#if hasNewNotifications}
               <span class="absolute top-0 -right-1 block w-3 h-3 rounded-full bg-primary border-2 border-[#fef9ee]"
               ></span>
             {/if}
           </div>
         </a>
-        <spam class="my-auto flex items-center justify-center rounded-full text-white font-semibold w-7 h-7">
+        <spam class="my-auto flex items-center justify-center rounded-full text-white font-semibold w-[28px] h-7">
           {#if publisherStore.avatarUrl}
             <img src={publisherStore.avatarUrl} class="object-cover w-full h-full rounded-full" alt="avatar" />
           {:else}

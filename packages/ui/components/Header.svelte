@@ -16,6 +16,7 @@
     logoHref?: string
     showCreateButton?: boolean
     pathname?: string
+    notifications?: any[]
   }>()
   const { state: authState } = $derived(authStore)
   let headerRef: HTMLElement
