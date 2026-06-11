@@ -490,10 +490,10 @@ importers:
     dependencies:
       '@zerodevx/svelte-toast':
         specifier: ^0.9.6
-        version: 0.9.6(svelte@5.56.3(@typescript-eslint/types@8.61.0))
+        version: 0.9.6(svelte@5.56.1(@typescript-eslint/types@8.61.0))
       svelte:
         specifier: ^5.39.5
-        version: 5.56.3(@typescript-eslint/types@8.61.0)
+        version: 5.56.1(@typescript-eslint/types@8.61.0)
     devDependencies:
       '@repo/notifications':
         specifier: workspace:*
@@ -8225,10 +8225,6 @@ snapshots:
   '@zerodevx/svelte-toast@0.9.6(svelte@5.56.1(@typescript-eslint/types@8.61.0))':
     dependencies:
       svelte: 5.56.1(@typescript-eslint/types@8.61.0)
-
-  '@zerodevx/svelte-toast@0.9.6(svelte@5.56.3(@typescript-eslint/types@8.61.0))':
-    dependencies:
-      svelte: 5.56.3(@typescript-eslint/types@8.61.0)
 
   accepts@2.0.0:
     dependencies:
