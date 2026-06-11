@@ -6,6 +6,7 @@
   import { publisherStore } from '$lib/stores/publisher.svelte'
   import { page } from '$app/state'
   import BellIcon from '$lib/assets/bell.svg'
+  import { headerStore } from '$lib/stores/header.store'
 
   let { children } = $props()
   const menuItems = [
@@ -25,8 +26,26 @@
     //   text: 'Billing',
     //   href: '/authed/billing',
     // },
+    {
+      text: 'Notifications',
+      href: '/authed/notifications',
+    },
   ]
-  let requests = [1, 2, 3]
+
+  const BrowseAndPurchaseItems = [
+    {
+      text: 'Written Works',
+      href: '/authed/upload',
+    },
+    {
+      text: 'Location',
+      href: '/authed/location',
+    },
+    {
+      text: 'Likeness',
+      href: '/authed/likeness',
+    },
+  ]
 </script>
 
 <svelte:head>
@@ -44,7 +63,7 @@
         <a href="/authed/notifications" class="inline-flex">
           <div class="relative cursor-pointer">
             <img src={BellIcon} alt="notifications" class="h-5.75" />
-            {#if requests.length > 0}
+            {#if $headerStore.hasNotifications}
               <span class="absolute top-0 -right-1 block w-3 h-3 rounded-full bg-primary border-2 border-[#fef9ee]"
               ></span>
             {/if}

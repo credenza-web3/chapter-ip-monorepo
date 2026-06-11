@@ -66,6 +66,9 @@ importers:
       '@repo/fe-services':
         specifier: workspace:*
         version: link:../../packages/services
+      '@repo/notifications':
+        specifier: workspace:*
+        version: link:../../packages/notifications
       '@repo/trpc':
         specifier: workspace:*
         version: link:../../packages/trpc
