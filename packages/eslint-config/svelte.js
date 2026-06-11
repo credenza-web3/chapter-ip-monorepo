@@ -20,7 +20,8 @@ export const getConfig = ({ svelteConfig, tsconfigRootDir }) => {
         globals: { ...globals.browser, ...globals.node },
         parserOptions: {
           projectService: {
-            allowDefaultProject: ['*.js', '*.config.js', 'vitest-setup-client.ts'],
+            allowDefaultProject: ['*.js', 'svelte.config.js', 'eslint.config.js', 'vitest-setup-client.ts'],
+            maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 40,
           },
           ...(tsconfigRootDir ? { tsconfigRootDir } : {}),
         },
@@ -37,7 +38,8 @@ export const getConfig = ({ svelteConfig, tsconfigRootDir }) => {
       languageOptions: {
         parserOptions: {
           projectService: {
-            allowDefaultProject: ['*.js', '*.config.js', 'vitest-setup-client.ts'],
+            allowDefaultProject: ['*.js', 'svelte.config.js', 'eslint.config.js', 'vitest-setup-client.ts'],
+            maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 40,
           },
           extraFileExtensions: ['.svelte'],
           parser: ts.parser,
