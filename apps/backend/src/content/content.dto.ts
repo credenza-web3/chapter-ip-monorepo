@@ -38,7 +38,7 @@ export type TCreateUserFileUploadUrlInput = z.infer<typeof createUserFileUploadU
 export const createContentFileUploadUrlInputSchema = z.object({
   contentId: z.string(),
   mimetype: z.string(),
-  extension: z.string().optional(),
+  filename: z.string(),
   bucket: z.enum(['content', 'preview']).default('content'),
 })
 export type TCreateContentFileUploadUrlInput = z.infer<typeof createContentFileUploadUrlInputSchema>
