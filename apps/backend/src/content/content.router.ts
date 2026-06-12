@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto'
-
 import { ConfigService } from '@nestjs/config'
 import { Ctx, Input, Mutation, Query, Router, UseMiddlewares } from 'nestjs-trpc'
 import { TRPCError } from '@trpc/server'
@@ -107,11 +105,6 @@ export class ContentRouter {
     @Ctx() ctx: TAppContextWithTokenPayload,
     @Input() input: TCreateContentFileUploadUrlInput,
   ): Promise<TPresignedPutOutput> {
-    const ext = input.extension ? input.extension.replaceAll('.', '') : extension(input.mimetype)
-    if (!ext) {
-      throw new TRPCError({ message: 'Invalid mimetype', code: 'BAD_REQUEST' })
-    }
-
     const [isOwner, message] = await this.commonContentService.verifyIsOwnerById(
       ctx.authTokenPayload.sub,
       input.contentId,
@@ -120,7 +113,7 @@ export class ContentRouter {
       throw new TRPCError({ message, code: 'FORBIDDEN' })
     }
 
-    const key = `${await this.commonContentService.getContentNftContractAddress()}/${input.contentId}/${randomUUID()}.${ext}`
+    const key = `${await this.commonContentService.getContentNftContractAddress()}/${input.contentId}/${input.filename}`
     const url = await this.fileService.createUploadUrl({
       Bucket: this.fileService.getBucketName(input.bucket),
       Key: key,
