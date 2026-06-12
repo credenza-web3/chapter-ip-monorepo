@@ -43,6 +43,7 @@ export default class UploadService {
       const { url, key } = await trpcClient.contents.createContentFileUploadUrl.mutate({
         contentId: id,
         mimetype: file.type,
+        filename: name,
       })
       keys.push(key)
       await uploadFileToBucket(file, url)
@@ -62,6 +63,7 @@ export default class UploadService {
             contentId: id,
             mimetype: preview.type,
             bucket: 'preview',
+            filename: name,
           })
           await uploadFileToBucket(preview, previewUrl)
         } catch (error) {
