@@ -15,14 +15,6 @@ export type LikenessItem = {
 type ContentItem = {
   id: string
   metadata?: UnknownRecord
-  files?: ContentFile[]
-}
-
-type ContentFile = {
-  filename: string
-  label: string
-  key: string
-  url?: string
 }
 
 function isRecord(value: unknown): value is UnknownRecord {
@@ -33,7 +25,11 @@ function getString(value: unknown): string {
   return typeof value === 'string' ? value : ''
 }
 
-export function toLikenessItems(contentItems: ContentItem[]): LikenessItem[] {
+export function getPreviewUrl(contractAddress: string, contentId: string, filename: string): string {
+  return `${r2Config.url}${contractAddress}/${contentId}/${filename}`
+}
+
+export function toLikenessItems(contentItems: ContentItem[], contractAddress: string): LikenessItem[] {
   return contentItems.flatMap((item) => {
     const metadata = item.metadata
     if (!isRecord(metadata) || metadata.type !== 'likeness') return []
@@ -45,7 +41,7 @@ export function toLikenessItems(contentItems: ContentItem[]): LikenessItem[] {
         id: item.id,
         name: getString(profile.fullLegalName),
         bio: getString(profile.bio),
-        imageUrl: DEFAULT_IMAGE_URL,
+        imageUrl: getPreviewUrl(contractAddress, item.id, 'headshot_1'),
       },
     ]
   })

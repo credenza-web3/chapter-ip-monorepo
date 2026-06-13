@@ -5,8 +5,12 @@ import {
   httpSubscriptionLink,
   createWSClient,
   wsLink,
+  type TRPCClient,
 } from '@trpc/client'
 import type { AppRouter } from '../server/server'
+
+export type { AppRouter }
+export type { TRPCClient }
 
 function wsUrlFromHttp(httpUrl: string): string {
   return httpUrl.replace(/^http/, 'ws')

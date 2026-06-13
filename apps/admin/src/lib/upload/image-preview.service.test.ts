@@ -53,16 +53,16 @@ describe('createImagePreview', () => {
     const preview = await createImagePreview(original)
 
     expect(mocks.imageCompression).toHaveBeenCalledWith(original, {
-      maxSizeMB: 1,
-      maxWidthOrHeight: 1920,
+      maxSizeMB: 0.2,
+      maxWidthOrHeight: 900,
       useWebWorker: true,
       fileType: 'image/jpeg',
     })
     expect(mocks.watermark).toHaveBeenCalledWith([compressed, 'watermark.svg'], {
       type: 'image/jpeg',
-      encoderOptions: 0.85,
+      encoderOptions: 0.5,
     })
-    expect(mocks.center).toHaveBeenCalledWith(0.2)
+    expect(mocks.center).toHaveBeenCalledWith(0.35)
     expect(mocks.blob).toHaveBeenCalledWith('center-draw')
     expect(preview.name).toBe('photo.jpg')
     expect(preview.type).toBe('image/jpeg')

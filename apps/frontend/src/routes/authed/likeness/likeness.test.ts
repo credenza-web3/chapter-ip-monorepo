@@ -1,57 +1,38 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_IMAGE_URL, RECENT_LIMIT, getRecentLikenesses, toLikenessItems } from './likeness'
+import { DEFAULT_IMAGE_URL, RECENT_LIMIT, getPreviewUrl, getRecentLikenesses, toLikenessItems } from './likeness'
+
+const CONTRACT_ADDRESS = '0xcontent'
 
 describe('likeness data helpers', () => {
-  it('maps likeness metadata with the default image and excludes other content types', () => {
-    const items = toLikenessItems([
-      {
-        id: 'likeness-1',
-        metadata: {
-          type: 'likeness',
-          profile: { fullLegalName: 'Avery Stone', bio: 'Actor and vocalist.' },
-        },
-        files: [
-          {
-            filename: 'headshot.jpg',
-            label: '',
-            key: 'contract/content/headshot.jpg',
-            url: 'https://cdn.example.test/contract/content/headshot.jpg',
+  it('maps likeness metadata with the headshot preview and excludes other content types', () => {
+    const items = toLikenessItems(
+      [
+        {
+          id: 'likeness-1',
+          metadata: {
+            type: 'likeness',
+            profile: { fullLegalName: 'Avery Stone', bio: 'Actor and vocalist.' },
           },
-        ],
-      },
-      { id: 'other', metadata: { type: 'written-work' } },
-    ])
+        },
+        { id: 'other', metadata: { type: 'written-work' } },
+      ],
+      CONTRACT_ADDRESS,
+    )
 
     expect(items).toEqual([
       {
         id: 'likeness-1',
         name: 'Avery Stone',
         bio: 'Actor and vocalist.',
-        imageUrl: DEFAULT_IMAGE_URL,
+        imageUrl: getPreviewUrl(CONTRACT_ADDRESS, 'likeness-1', 'headshot_1'),
       },
     ])
   })
 
-  it('uses the default image while the file image contract is unsettled', () => {
-    const items = toLikenessItems([
-      {
-        id: 'likeness-1',
-        metadata: {
-          type: 'likeness',
-          profile: { fullLegalName: 'Avery Stone' },
-        },
-        files: [
-          {
-            filename: 'headshot.jpg',
-            label: '',
-            key: 'contract/content/headshot.jpg',
-            url: 'https://cdn.example.test/contract/content/headshot.jpg',
-          },
-        ],
-      },
-    ])
-
-    expect(items[0]?.imageUrl).toBe(DEFAULT_IMAGE_URL)
+  it('builds preview URLs from the contract, content id, and technical filename', () => {
+    expect(getPreviewUrl(CONTRACT_ADDRESS, 'likeness-1', 'headshot_1')).toBe(
+      'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/likeness-1/headshot_1',
+    )
   })
 
   it('limits recent likenesses without changing grid items', () => {

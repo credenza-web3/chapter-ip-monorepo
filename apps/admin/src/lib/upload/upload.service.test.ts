@@ -84,6 +84,7 @@ describe('UploadService.uploadContent', () => {
     expect(createContentFileUploadUrl).toHaveBeenNthCalledWith(2, {
       contentId: 'content-id',
       mimetype: 'image/jpeg',
+      filename: 'headshot_1',
       bucket: 'preview',
     })
     expect(mocks.uploadFileToBucket).toHaveBeenNthCalledWith(2, preview, 'preview-url')

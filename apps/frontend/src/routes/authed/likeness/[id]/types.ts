@@ -16,6 +16,22 @@ export type LikenessLicense = {
   description: string
 }
 
+export type LikenessImage = {
+  src: string
+  alt: string
+}
+
+export type LikenessMedia =
+  | (LikenessImage & {
+      id: string
+      type: 'image'
+    })
+  | {
+      id: string
+      type: 'audio' | 'video' | 'file'
+      label: string
+    }
+
 export type LikenessPurchase = {
   id: string
   name: string
@@ -28,5 +44,6 @@ export type LikenessPurchase = {
   territories: string[]
   allowRetouching: boolean
   approveFinalUse: boolean
-  images: { src: string; alt: string }[]
+  images: LikenessImage[]
+  media: LikenessMedia[]
 }

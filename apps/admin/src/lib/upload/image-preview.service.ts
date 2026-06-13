@@ -9,8 +9,8 @@ export const isPreviewImage = (file: File): boolean => PREVIEW_IMAGE_MIME_TYPES.
 export const createImagePreview = async (file: File): Promise<File> => {
   const outputMimetype = file.type === 'image/jpg' ? 'image/jpeg' : file.type
   const compressedFile = await imageCompression(file, {
-    maxSizeMB: 1,
-    maxWidthOrHeight: 1920,
+    maxSizeMB: 0.2,
+    maxWidthOrHeight: 900,
     useWebWorker: true,
     fileType: outputMimetype,
   })
@@ -18,8 +18,8 @@ export const createImagePreview = async (file: File): Promise<File> => {
   try {
     const blob = await watermark([compressedFile, watermarkUrl], {
       type: outputMimetype,
-      encoderOptions: outputMimetype === 'image/png' ? 1 : 0.85,
-    }).blob(watermark.image.center(0.2))
+      encoderOptions: 0.5,
+    }).blob(watermark.image.center(0.35))
 
     return new File([blob], file.name, {
       type: outputMimetype,

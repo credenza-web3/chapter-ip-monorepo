@@ -5,14 +5,15 @@ export const load = async ({ parent }) => {
   const { trpcClient } = await parent()
   if (!trpcClient) throw new Error('tRPC client is not initialized')
 
+  const contractAddress = configStore.getContractAddress(ContractName.CONTENT_NFT)
   const { items: contentItems } = await trpcClient.contents.findContent.query({
-    contractAddress: configStore.getContractAddress(ContractName.CONTENT_NFT),
+    contractAddress,
     limit: '100',
     sort: 'createdAt',
     order: 'desc',
   })
 
   return {
-    likenessItems: toLikenessItems(contentItems),
+    likenessItems: toLikenessItems(contentItems, contractAddress),
   }
 }

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import { onMount } from 'svelte'
+  import { configStore, ContractName } from '$lib/stores/config.svelte'
   import LikenessPurchasePage from './LikenessPurchasePage.svelte'
   import { toLikenessPurchase } from './purchase'
   import type { LikenessPurchase } from './types'
@@ -11,12 +12,12 @@
   let loading = $state(true)
 
   const skeletonThumbnails = Array.from({ length: 4 }, (_, index) => index)
-  const skeletonMedia = Array.from({ length: 15 }, (_, index) => index)
+  const skeletonMedia = Array.from({ length: 5 }, (_, index) => index)
 
   onMount(async () => {
     try {
       const content = await data.trpcClient.contents.getContentById.query({ id: data.id })
-      purchase = toLikenessPurchase(content)
+      purchase = toLikenessPurchase(content, configStore.getContractAddress(ContractName.CONTENT_NFT))
       if (!purchase) await goto('/authed/likeness')
     } catch {
       await goto('/authed/likeness')

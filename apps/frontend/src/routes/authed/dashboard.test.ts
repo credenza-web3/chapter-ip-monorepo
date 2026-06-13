@@ -23,7 +23,7 @@ describe('dashboard helpers', () => {
     expect(cards[0]).toMatchObject({
       title: 'Unnamed likeness',
       description: 'Bio 0',
-      imageUrl: DEFAULT_IMAGE_URL,
+      imageUrl: '/image-0.jpg',
     })
     expect(cards[1]?.description).toBe('No biography available yet.')
   })

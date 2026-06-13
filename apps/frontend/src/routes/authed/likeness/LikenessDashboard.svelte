@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { getRecentLikenesses, type LikenessItem } from './likeness'
+  import { DEFAULT_IMAGE_URL, getRecentLikenesses, type LikenessItem } from './likeness'
 
   let { items } = $props<{
     items: LikenessItem[]
@@ -20,6 +20,11 @@
 
   function scrollCarousel(direction: -1 | 1) {
     carousel?.scrollBy({ left: direction * Math.min(carousel.clientWidth * 0.8, 400), behavior: 'smooth' })
+  }
+
+  function useDefaultImage(event: Event) {
+    const image = event.currentTarget as HTMLImageElement
+    if (image.src !== DEFAULT_IMAGE_URL) image.src = DEFAULT_IMAGE_URL
   }
 
   onMount(() => {
@@ -71,7 +76,12 @@
             href={`/authed/likeness/${item.id}`}
             class="flex w-[min(88vw,382px)] shrink-0 snap-start gap-3 rounded-sm border border-[#ddd8d1] p-2.5 sm:w-[382px]"
           >
-            <img src={item.imageUrl} alt={item.name || 'Likeness'} class="size-20 shrink-0 rounded-md object-cover" />
+            <img
+              src={item.imageUrl}
+              alt={item.name || 'Likeness'}
+              class="size-20 shrink-0 rounded-md object-cover"
+              onerror={useDefaultImage}
+            />
             <div class="min-w-0 py-1">
               <h2 class="truncate text-base font-semibold text-dark">{item.name || 'Unnamed likeness'}</h2>
               {#if item.bio}
@@ -101,6 +111,7 @@
               src={item.imageUrl}
               alt={item.name || 'Likeness'}
               class="aspect-square w-full rounded-lg object-cover transition-opacity group-hover:opacity-85"
+              onerror={useDefaultImage}
             />
             <h3 class="mt-3 truncate text-base font-semibold text-dark">{item.name || 'Unnamed likeness'}</h3>
             {#if item.bio}
