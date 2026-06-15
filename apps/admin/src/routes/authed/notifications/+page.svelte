@@ -18,6 +18,8 @@
 
   const trpcClient = getTrpcClient()
 
+  let cancelled = false
+
   const loadPage = async (cursor?: string) => {
     loading = true
     try {
@@ -27,6 +29,7 @@
         order: 'desc',
         ...(cursor ? { cursor } : {}),
       })
+      if (cancelled) return
       items = result.items
       const nextCursor = result.cursor.next
       hasNext = !!nextCursor && nextCursor !== result.cursor.current
@@ -35,14 +38,20 @@
         cursorStack = [...cursorStack, nextCursor!]
       }
     } catch (err) {
+      if (cancelled) return
       console.error('Failed to load notifications', err)
       items = []
     } finally {
-      loading = false
+      if (!cancelled) loading = false
     }
   }
 
-  loadPage()
+  $effect(() => {
+    loadPage()
+    return () => {
+      cancelled = true
+    }
+  })
 
   const nextPage = async () => {
     if (!hasNext || loading) return
