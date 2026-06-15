@@ -47,6 +47,7 @@
   }
 
   $effect(() => {
+    cancelled = false
     loadPage()
     return () => {
       cancelled = true
@@ -83,19 +84,8 @@
     }
   }
 
-  async function markAllAsRead() {
-    try {
-      await trpcClient.notifications.markAllMyNotificationsAsRead.mutate()
-      items = items.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() }))
-      notificationStore.update((n) => n.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() })))
-    } catch (err) {
-      console.error('Failed to mark all notifications as read', err)
-    }
-  }
-
   async function handleMenuSelect(item: { text: string; href?: string; action?: string }, notificationId: string) {
     if (item.action === 'mark-read') await markAsRead(notificationId)
-    else if (item.action === 'mark-all-read') await markAllAsRead()
   }
 
   function getMenuItems(isRead: boolean) {
