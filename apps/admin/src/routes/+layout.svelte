@@ -7,7 +7,7 @@
   import { page } from '$app/state'
   import { notificationStore } from '$lib/stores/notification.svelte'
 
-  import { createClient } from '@repo/trpc/client'
+  import { getTrpcClient } from '$lib/stores/trpc-client'
   import type { TNotificationItem } from '@repo/notifications'
   import NotificationsDropdown from '$lib/components/NotificationsDropdown.svelte'
 
@@ -35,41 +35,36 @@
     },
   ]
 
-  let trpcClient: ReturnType<typeof createClient>
-
   $effect(() => {
-    if (authStore.state.accessToken && !trpcClient) {
-      trpcClient = createClient({
-        trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
-        getAccessTokenFn: () => authStore.state.accessToken!,
-      })
-      const subscription = trpcClient.notifications.onMessage.subscribe(undefined, {
-        onData(info) {
-          const data = info as TNotificationItem
-          notificationStore.update((n) => [data, ...n])
-        },
-      })
+    if (!authStore.state.accessToken) return
 
-      ;(async () => {
-        const { items } = await trpcClient.notifications.findMyNotifications.query({
-          limit: '2',
-          sort: 'createdAt',
-          order: 'desc',
-        })
-        notificationStore.set(items)
-      })()
+    const trpcClient = getTrpcClient()
+    const subscription = trpcClient.notifications.onMessage.subscribe(undefined, {
+      onData(info) {
+        const data = info as TNotificationItem
+        notificationStore.update((n) => [data, ...n])
+      },
+    })
 
-      return () => subscription.unsubscribe()
-    }
+    ;(async () => {
+      const { items } = await trpcClient.notifications.findMyNotifications.query({
+        limit: '2',
+        sort: 'createdAt',
+        order: 'desc',
+      })
+      notificationStore.set(items)
+    })()
+
+    return () => subscription.unsubscribe()
   })
 
   async function markAsRead(id: string) {
-    await trpcClient.notifications.markMyNotificationAsRead.mutate({ id })
+    await getTrpcClient().notifications.markMyNotificationAsRead.mutate({ id })
     notificationStore.update((n) => n.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x)))
   }
 
   async function markAllAsRead() {
-    await trpcClient.notifications.markAllMyNotificationsAsRead.mutate()
+    await getTrpcClient().notifications.markAllMyNotificationsAsRead.mutate()
     notificationStore.update((n) => n.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() })))
   }
 </script>

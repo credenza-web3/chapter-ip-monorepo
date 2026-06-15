@@ -3,8 +3,7 @@
   import RowActionMenu from '$lib/components/RowActionMenu.svelte'
   import { formatDate } from '../files/helper'
   import { NotificationsMenuItems } from './constants'
-  import { createClient } from '@repo/trpc/client'
-  import { authStore } from '$lib'
+  import { getTrpcClient } from '$lib/stores/trpc-client'
   import type { TNotificationItem } from '@repo/notifications'
 
   const PAGE_SIZE = 2
@@ -17,10 +16,7 @@
   let currentPage = $state(0)
   let hasNext = $state(false)
 
-  const trpcClient = createClient({
-    trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
-    getAccessTokenFn: () => authStore.state.accessToken ?? '',
-  })
+  const trpcClient = getTrpcClient()
 
   const loadPage = async (cursor?: string) => {
     loading = true
