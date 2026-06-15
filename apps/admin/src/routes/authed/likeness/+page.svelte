@@ -12,6 +12,11 @@
   import { notify, ToastType } from '@repo/ui-components'
   import { modals, type ModalProps } from 'svelte-modals'
   import { ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
+  import {
+    createLikenessFileNames,
+    LIKENESS_FILE_BUCKETS,
+    type MultipleFileKey,
+  } from '$lib/constants/likenessFileBuckets'
 
   let currentStep = $state(1)
   const blockchainService = new BlockchainService(authStore.state.accessToken!)
@@ -26,19 +31,18 @@
       likenessStore.setLoading(true)
       const trpcClient = uploadService.createTrpcClient()
 
-      const uploads = [
-        ...$likenessStore.files.headshots,
-        ...$likenessStore.files.bodyShots,
-        ...$likenessStore.files.videoReels,
-        ...$likenessStore.files.voiceSamples,
-      ]
-
-      const uploadsByBucket = Object.entries($likenessStore.files).reduce(
-        (acc, [bucket, files]) => {
-          acc[bucket] = files.map((f) => f.name)
+      const uploadsByBucket = LIKENESS_FILE_BUCKETS.reduce(
+        (acc, bucket) => {
+          acc[bucket] = createLikenessFileNames(bucket, $likenessStore.files[bucket].length)
           return acc
         },
-        {} as Record<string, string[]>,
+        {} as Record<MultipleFileKey, string[]>,
+      )
+      const uploads = LIKENESS_FILE_BUCKETS.flatMap((bucket) =>
+        $likenessStore.files[bucket].map((file, index) => ({
+          file,
+          name: uploadsByBucket[bucket][index],
+        })),
       )
 
       const { tokenId, keys } = await uploadService.uploadContent({

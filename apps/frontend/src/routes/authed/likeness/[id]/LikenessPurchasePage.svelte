@@ -39,7 +39,7 @@
     </div>
   </div>
 
-  <LikenessMediaGrid images={purchase.images} onSelectImage={(image) => (selectedImage = image)} />
+  <LikenessMediaGrid media={purchase.media} onSelectImage={(image) => (selectedImage = image)} />
 </article>
 
 {#if selectedImage}

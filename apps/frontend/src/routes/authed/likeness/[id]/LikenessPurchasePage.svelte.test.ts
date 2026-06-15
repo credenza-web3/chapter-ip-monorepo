@@ -35,9 +35,19 @@ const purchase: LikenessPurchase = {
     src: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=',
     alt: `Avery likeness preview ${index + 1}`,
   })),
+  media: [
+    {
+      id: 'image-1',
+      type: 'image',
+      src: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=',
+      alt: 'Avery likeness preview 1',
+    },
+    { id: 'video-1', type: 'video', label: 'video_reel_1' },
+    { id: 'audio-1', type: 'audio', label: 'voice_sample_1' },
+  ],
 }
 
-test('renders likeness metadata, purchase summary, and mock media', async () => {
+test('renders likeness metadata, purchase summary, and real media entries', async () => {
   const screen = await render(LikenessPurchasePage, { purchase })
 
   await expect.element(screen.getByRole('heading', { name: 'Avery Stone' })).toBeVisible()
@@ -48,9 +58,11 @@ test('renders likeness metadata, purchase summary, and mock media', async () => 
   expect(document.body.textContent).not.toContain('Stage name:')
   expect(document.body.textContent).not.toContain('Show more')
   expect(document.body.textContent).not.toContain('Usage Terms')
-  expect(document.querySelectorAll('[aria-label^="Open media image "]')).toHaveLength(10)
-  expect(document.querySelectorAll('[aria-label^="Mock video "]')).toHaveLength(5)
-  expect(document.querySelectorAll('[data-testid="media-play-icon"]')).toHaveLength(5)
+  expect(document.querySelectorAll('[aria-label^="Open Avery likeness preview"]')).toHaveLength(1)
+  await expect.element(screen.getByText('Video', { exact: true })).toBeVisible()
+  await expect.element(screen.getByText('Audio', { exact: true })).toBeVisible()
+  await expect.element(screen.getByText('video_reel_1')).toBeVisible()
+  await expect.element(screen.getByText('voice_sample_1')).toBeVisible()
 
   const singleUseLicense = screen.getByRole('radio', { name: /Single-use campaign/ })
   const perpetualLicense = screen.getByRole('radio', { name: /Perpetual brand ambassador/ })
@@ -77,6 +89,6 @@ test('opens and closes an enlarged image dialog', async () => {
   await tick()
   expect(document.querySelector('[role="dialog"]')).toBeNull()
 
-  await screen.getByRole('button', { name: 'Open media image 1', exact: true }).click()
+  await screen.getByRole('button', { name: 'Open Avery likeness preview 1', exact: true }).click()
   await expect.element(screen.getByRole('dialog', { name: 'Enlarged likeness image' })).toBeVisible()
 })

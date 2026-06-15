@@ -48,7 +48,9 @@
   "dependencies": {
     "@credenza3/contracts": "^0.0.19",
     "@tailwindcss/vite": "^4.3.0",
+    "browser-image-compression": "^2.0.2",
     "daisyui": "^5.5.23",
-    "svelte-modals": "^2.0.1"
+    "svelte-modals": "^2.0.1",
+    "watermarkjs": "^2.1.1"
   }
 }

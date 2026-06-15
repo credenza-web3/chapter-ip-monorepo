@@ -22,7 +22,8 @@ test('renders mocked disabled sections and an active likeness dashboard link', a
     .element(screen.getByRole('link', { name: 'View all Likenesses' }))
     .toHaveAttribute('href', '/authed/likeness')
   expect(document.querySelectorAll('[aria-disabled="true"]')).toHaveLength(2)
-  expect(document.querySelectorAll('a')).toHaveLength(1)
+  expect(document.querySelectorAll('a[href="/authed/likeness/likeness-1"]')).toHaveLength(1)
+  expect(document.querySelector('img[alt="Avery Stone"]')?.getAttribute('src')).toBe('/avery.jpg')
 })
 
 test('renders an empty likeness state when likeness content is not available', async () => {

@@ -1,4 +1,4 @@
-import { DEFAULT_IMAGE_URL } from '../likeness'
+import { DEFAULT_IMAGE_URL, getPreviewUrl } from '../likeness'
 import type { LikenessAffiliation, LikenessLicense, LikenessPurchase } from './types'
 
 type UnknownRecord = Record<string, unknown>
@@ -6,6 +6,14 @@ type UnknownRecord = Record<string, unknown>
 type Content = {
   id: string
   metadata?: UnknownRecord
+  files?: ContentFile[]
+}
+
+type ContentFile = {
+  id: string
+  filename: string
+  label: string
+  mimetype: string
 }
 
 const LICENSE_NAMES: Record<string, string> = {
@@ -119,14 +127,35 @@ function getPermittedUses(value: unknown): string[] {
   )
 }
 
-function getMockImages(name: string): LikenessPurchase['images'] {
-  return Array.from({ length: 5 }, (_, index) => ({
-    src: DEFAULT_IMAGE_URL,
-    alt: `${name} likeness preview ${index + 1}`,
-  }))
+function getMedia(content: Content, name: string, contractAddress: string): LikenessPurchase['media'] {
+  return (content.files ?? []).map((file) => {
+    const filename = getString(file.filename) || getString(file.label)
+    const id = getString(file.id) || filename
+
+    if (file.mimetype.startsWith('image/')) {
+      return {
+        id,
+        type: 'image' as const,
+        src: getPreviewUrl(contractAddress, content.id, filename),
+        alt: `${name} ${filename}`,
+      }
+    }
+
+    const type = file.mimetype.startsWith('video/')
+      ? ('video' as const)
+      : file.mimetype.startsWith('audio/')
+        ? ('audio' as const)
+        : ('file' as const)
+
+    return {
+      id,
+      type,
+      label: filename,
+    }
+  })
 }
 
-export function toLikenessPurchase(content: Content): LikenessPurchase | null {
+export function toLikenessPurchase(content: Content, contractAddress: string): LikenessPurchase | null {
   const metadata = getRecord(content.metadata)
   if (metadata.type !== 'likeness') return null
 
@@ -134,6 +163,8 @@ export function toLikenessPurchase(content: Content): LikenessPurchase | null {
   const attributes = getRecord(profile.attributes)
   const licensing = getRecord(metadata.licensing)
   const name = getString(profile.fullLegalName) || 'Unnamed likeness'
+  const media = getMedia(content, name, contractAddress)
+  const images = media.flatMap((item) => (item.type === 'image' ? [{ src: item.src, alt: item.alt }] : []))
 
   return {
     id: content.id,
@@ -153,6 +184,7 @@ export function toLikenessPurchase(content: Content): LikenessPurchase | null {
     territories: getStringArray(licensing.territories),
     allowRetouching: licensing.allowRetouching === 'yes',
     approveFinalUse: licensing.approveFinalUse === 'yes',
-    images: getMockImages(name),
+    images: images.length > 0 ? images : [{ src: DEFAULT_IMAGE_URL, alt: `${name} default likeness preview` }],
+    media,
   }
 }

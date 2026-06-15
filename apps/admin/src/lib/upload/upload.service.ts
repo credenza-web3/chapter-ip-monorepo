@@ -2,8 +2,14 @@ import { createClient, type TRPCClient, type AppRouter } from '@repo/trpc/client
 import { authStore } from '$lib'
 import TransactionService from './transaction.service'
 import uploadFileToBucket from './file-upload.service'
+import { createImagePreview, isPreviewImage } from './image-preview.service'
 
 import { r2Config } from '@repo/fe-services'
+
+export type NamedUpload = {
+  file: File
+  name: string
+}
 
 export default class UploadService {
   constructor(private readonly transactionService: TransactionService) {}
@@ -14,7 +20,7 @@ export default class UploadService {
     oneTimePrice,
     trpcClient,
   }: {
-    uploads: File[]
+    uploads: NamedUpload[]
     metadata: Record<string, unknown>
     lifetimePrice: number
     oneTimePrice: number
@@ -33,11 +39,11 @@ export default class UploadService {
 
     const keys: string[] = []
 
-    for (let i = 0; i < uploads.length; i++) {
-      const file = uploads[i]
+    for (const { file, name } of uploads) {
       const { url, key } = await trpcClient.contents.createContentFileUploadUrl.mutate({
         contentId: id,
         mimetype: file.type,
+        filename: name,
       })
       keys.push(key)
       await uploadFileToBucket(file, url)
@@ -45,10 +51,25 @@ export default class UploadService {
       await trpcClient.contents.registerContentFile.mutate({
         contentId: id,
         key,
-        filename: file.name,
+        filename: name,
         mimetype: file.type,
-        label: file.name,
+        label: name,
       })
+
+      if (isPreviewImage(file)) {
+        try {
+          const preview = await createImagePreview(file)
+          const { url: previewUrl } = await trpcClient.contents.createContentFileUploadUrl.mutate({
+            contentId: id,
+            mimetype: preview.type,
+            bucket: 'preview',
+            filename: name,
+          })
+          await uploadFileToBucket(preview, previewUrl)
+        } catch (error) {
+          console.error(`Failed to upload preview for ${file.name}`, error)
+        }
+      }
     }
 
     // Upload preview image if provided

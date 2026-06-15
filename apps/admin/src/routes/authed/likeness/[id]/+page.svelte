@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { LIKENESS_FILE_BUCKETS } from '$lib/constants/likenessFileBuckets'
+  import { createLikenessFileNames, LIKENESS_FILE_BUCKETS } from '$lib/constants/likenessFileBuckets'
   import { afterNavigate, beforeNavigate, goto } from '$app/navigation'
   import { likenessStore } from '../stores/likeness-store'
   import UploadStepHeader from '../components/UploadStepHeader.svelte'
@@ -43,8 +43,19 @@
         }
       }
 
+      const uploadsByBucket = Object.fromEntries(
+        buckets.map((bucket) => {
+          const existingNames = $likenessStore.existingFiles[bucket].map((file) => file.name)
+          const newNames = createLikenessFileNames(bucket, $likenessStore.files[bucket].length, existingNames)
+          return [bucket, [...existingNames, ...newNames]]
+        }),
+      )
+
       for (const bucket of buckets) {
-        for (const file of $likenessStore.files[bucket]) {
+        const existingFileCount = $likenessStore.existingFiles[bucket].length
+
+        for (const [index, file] of $likenessStore.files[bucket].entries()) {
+          const name = uploadsByBucket[bucket][existingFileCount + index]
           const { url, key } = await trpcClient.contents.createContentFileUploadUrl.mutate({
             contentId,
             mimetype: file.type,
@@ -53,22 +64,12 @@
           await trpcClient.contents.registerContentFile.mutate({
             contentId,
             key,
-            filename: file.name,
+            filename: name,
             mimetype: file.type,
-            label: file.name,
+            label: name,
           })
         }
       }
-
-      const uploadsByBucket = Object.fromEntries(
-        buckets.map((bucket) => [
-          bucket,
-          [
-            ...$likenessStore.existingFiles[bucket].map((f) => f.name),
-            ...$likenessStore.files[bucket].map((f) => f.name),
-          ],
-        ]),
-      )
 
       await trpcClient.contents.updateContentMetadata.mutate({
         contentId,

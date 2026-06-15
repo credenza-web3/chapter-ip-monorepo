@@ -288,7 +288,7 @@ export class ContentRouter {
       throw new TRPCError({ message: 'Content is not found', code: 'NOT_FOUND' })
     }
 
-    const files = await this.fileService.find({ contentId: content._id })
+    const files = await this.fileService.find({ contentId: content._id.toString() })
     return {
       ...content.toJSON(),
       files,

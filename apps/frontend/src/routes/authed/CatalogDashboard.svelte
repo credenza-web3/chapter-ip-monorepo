@@ -1,5 +1,6 @@
 <script lang="ts">
   import { MOCK_CREATIVE_WORKS, MOCK_LOCATIONS, toDashboardCards, type DashboardSection } from './dashboard'
+  import { DEFAULT_IMAGE_URL } from './likeness/likeness'
   import type { LikenessItem } from './likeness/likeness'
 
   let { likenessItems } = $props<{
@@ -26,6 +27,11 @@
       items: MOCK_LOCATIONS,
     },
   ])
+
+  function useDefaultImage(event: Event) {
+    const image = event.currentTarget as HTMLImageElement
+    if (image.src !== DEFAULT_IMAGE_URL) image.src = DEFAULT_IMAGE_URL
+  }
 </script>
 
 <div class="mx-auto w-full max-w-360 px-2 py-5 sm:px-4 lg:px-8">
@@ -61,14 +67,31 @@
           <div class="grid grid-cols-1 gap-x-7 gap-y-8 min-[480px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
             {#each section.items as item (item.id)}
               <article class="min-w-0">
-                <img
-                  src={item.imageUrl}
-                  alt={item.title}
-                  class:grayscale={section.disabled}
-                  class="aspect-square w-full rounded-lg object-cover"
-                />
-                <h3 class="mt-3 line-clamp-2 text-base font-bold leading-[19px] text-dark">{item.title}</h3>
-                <p class="mt-1 line-clamp-4 text-sm font-medium leading-[18px] text-[#77757d]">{item.description}</p>
+                {#if section.title === 'Likeness'}
+                  <a href={`/authed/likeness/${item.id}`} class="group block">
+                    <img
+                      src={item.imageUrl}
+                      alt={item.title}
+                      class="aspect-square w-full rounded-lg object-cover transition-opacity group-hover:opacity-85"
+                      onerror={useDefaultImage}
+                    />
+                    <h3 class="mt-3 line-clamp-2 text-base font-bold leading-[19px] text-dark">{item.title}</h3>
+                    <p class="mt-1 line-clamp-4 text-sm font-medium leading-[18px] text-[#77757d]">
+                      {item.description}
+                    </p>
+                  </a>
+                {:else}
+                  <img
+                    src={item.imageUrl}
+                    alt={item.title}
+                    class:grayscale={section.disabled}
+                    class="aspect-square w-full rounded-lg object-cover"
+                  />
+                  <h3 class="mt-3 line-clamp-2 text-base font-bold leading-[19px] text-dark">{item.title}</h3>
+                  <p class="mt-1 line-clamp-4 text-sm font-medium leading-[18px] text-[#77757d]">
+                    {item.description}
+                  </p>
+                {/if}
               </article>
             {/each}
           </div>

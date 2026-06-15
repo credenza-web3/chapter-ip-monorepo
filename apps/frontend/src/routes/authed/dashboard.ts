@@ -87,6 +87,6 @@ export function toDashboardCards(items: LikenessItem[]): DashboardCard[] {
     id: item.id,
     title: item.name || 'Unnamed likeness',
     description: item.bio || 'No biography available yet.',
-    imageUrl: DEFAULT_IMAGE_URL,
+    imageUrl: item.imageUrl,
   }))
 }
