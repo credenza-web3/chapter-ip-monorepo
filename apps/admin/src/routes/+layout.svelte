@@ -35,33 +35,42 @@
     },
   ]
 
-  const trpcClient = createClient({
-    trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
-    getAccessTokenFn: () => authStore.state.accessToken!,
-  })
+  let trpcClient: ReturnType<typeof createClient>
 
   $effect(() => {
-    if (!authStore.state.accessToken) return
-
-    const subscription = trpcClient.notifications.onMessage.subscribe(undefined, {
-      onData(info) {
-        console.log('NOTIFICATION RECEIVED', info)
-        const data = info as TNotificationItem
-        notificationStore.update((n) => [...n, data])
-      },
-    })
-
-    ;(async () => {
-      const { items, cursor } = await trpcClient.notifications.findMyNotifications.query({
-        limit: '10',
-        sort: 'createdAt',
-        order: 'desc',
+    if (authStore.state.accessToken && !trpcClient) {
+      trpcClient = createClient({
+        trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
+        getAccessTokenFn: () => authStore.state.accessToken!,
       })
-      notificationStore.update((n) => [...n, ...items])
-    })()
+      const subscription = trpcClient.notifications.onMessage.subscribe(undefined, {
+        onData(info) {
+          const data = info as TNotificationItem
+          notificationStore.update((n) => [data, ...n])
+        },
+      })
 
-    return () => {
-      subscription.unsubscribe()
+      ;(async () => {
+        const notif = await trpcClient.notifications.findMyNotifications.query({
+          limit: '2',
+          // sort: 'createdAt',
+          order: 'desc',
+        })
+        const nextCursor = notif?.cursor?.next ?? undefined
+        console.log(notif, 'not')
+        const notif2 = await trpcClient.notifications.findMyNotifications.query({
+          limit: '2',
+          // sort: 'createdAt',
+          order: 'desc',
+          cursor: nextCursor,
+        })
+        console.log(notif2, 'not2')
+
+        const { items } = notif
+        notificationStore.set(items)
+      })()
+
+      return () => subscription.unsubscribe()
     }
   })
 
@@ -82,20 +91,14 @@
 
 <Toast />
 <div class="flex min-h-screen flex-col overflow-x-hidden bg-cream text-dark">
-  <Header
-    {authStore}
-    {menuItems}
-    pathname={page.url.pathname}
-    showCreateButton={true}
-    notifications={$notificationStore}
-  >
+  <Header {authStore} {menuItems} pathname={page.url.pathname} showCreateButton={true}>
     <div class="flex h-full items-stretch w-full justify-between md:pl-15 pl-2">
       <div class="flex items-stretch">
         <NavLink href="/authed/files">Dashboard</NavLink>
       </div>
       <div class="flex items-center md:gap-7.25 gap-4">
         <NotificationsDropdown
-          notifications={$notificationStore}
+          notifications={$notificationStore.items}
           onMarkRead={markAsRead}
           onMarkAllRead={markAllAsRead}
         />

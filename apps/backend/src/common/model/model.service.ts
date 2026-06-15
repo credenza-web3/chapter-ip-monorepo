@@ -40,6 +40,12 @@ export class CommonModelService<T> {
     const sortOrder = opts.order === 'asc' ? 1 : -1
     const cursorDirection = opts.order === 'asc' ? '$gt' : '$lt'
 
+    console.log(sortBy, sortOrder, cursorDirection)
+    console.log(
+      'cursorBUILD',
+      opts.cursor && { [sortBy]: { [cursorDirection]: Buffer.from(opts.cursor, 'hex').toString('utf8') } },
+    )
+
     const query: TBuiltPaginationOptions['query'] = {
       ...(opts.cursor && { [sortBy]: { [cursorDirection]: Buffer.from(opts.cursor, 'hex').toString('utf8') } }),
       ...(opts.id && { _id: opts.id }),
@@ -48,6 +54,8 @@ export class CommonModelService<T> {
       ...(opts.startUpdatedAt && { createdAt: { $gte: opts.startUpdatedAt } }),
       ...(opts.endUpdatedAt && { createdAt: { $lte: opts.endUpdatedAt } }),
     }
+
+    console.log(`queryBuild`, query)
 
     return {
       currentCursor: opts.cursor || null,
