@@ -7,7 +7,8 @@
   import { page } from '$app/state'
   import { notificationStore } from '$lib/stores/notification.svelte'
 
-  import { createClient } from '@repo/trpc/client'
+  import { getTrpcClient } from '$lib/stores/trpc-client'
+  import { NOTIFICATIONS_DROPDOWN_LIMIT } from '$lib/constants'
   import type { TNotificationItem } from '@repo/notifications'
   import NotificationsDropdown from '$lib/components/NotificationsDropdown.svelte'
 
@@ -35,44 +36,49 @@
     },
   ]
 
-  const trpcClient = createClient({
-    trpcUrl: import.meta.env.VITE_TRPC_URL || 'http://localhost:8060/trpc',
-    getAccessTokenFn: () => authStore.state.accessToken!,
-  })
-
   $effect(() => {
     if (!authStore.state.accessToken) return
 
+    const trpcClient = getTrpcClient()
     const subscription = trpcClient.notifications.onMessage.subscribe(undefined, {
       onData(info) {
-        console.log('NOTIFICATION RECEIVED', info)
         const data = info as TNotificationItem
-        notificationStore.update((n) => [...n, data])
+        notificationStore.update((n) => [data, ...n])
       },
     })
 
     ;(async () => {
-      const { items, cursor } = await trpcClient.notifications.findMyNotifications.query({
-        limit: '10',
-        sort: 'createdAt',
-        order: 'desc',
-      })
-      notificationStore.update((n) => [...n, ...items])
+      try {
+        const { items } = await trpcClient.notifications.findMyNotifications.query({
+          limit: String(NOTIFICATIONS_DROPDOWN_LIMIT),
+          sort: 'createdAt',
+          order: 'desc',
+        })
+        notificationStore.set(items)
+      } catch (err) {
+        console.error('Failed to fetch notifications', err)
+      }
     })()
 
-    return () => {
-      subscription.unsubscribe()
-    }
+    return () => subscription.unsubscribe()
   })
 
   async function markAsRead(id: string) {
-    await trpcClient.notifications.markMyNotificationAsRead.mutate({ id })
-    notificationStore.update((n) => n.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x)))
+    try {
+      await getTrpcClient().notifications.markMyNotificationAsRead.mutate({ id })
+      notificationStore.update((n) => n.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x)))
+    } catch (err) {
+      console.error('Failed to mark notification as read', err)
+    }
   }
 
   async function markAllAsRead() {
-    await trpcClient.notifications.markAllMyNotificationsAsRead.mutate()
-    notificationStore.update((n) => n.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() })))
+    try {
+      await getTrpcClient().notifications.markAllMyNotificationsAsRead.mutate()
+      notificationStore.update((n) => n.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() })))
+    } catch (err) {
+      console.error('Failed to mark all notifications as read', err)
+    }
   }
 </script>
 
@@ -82,13 +88,7 @@
 
 <Toast />
 <div class="flex min-h-screen flex-col overflow-x-hidden bg-cream text-dark">
-  <Header
-    {authStore}
-    {menuItems}
-    pathname={page.url.pathname}
-    showCreateButton={true}
-    notifications={$notificationStore}
-  >
+  <Header {authStore} {menuItems} pathname={page.url.pathname} showCreateButton={true}>
     <div class="flex h-full items-stretch w-full justify-between md:pl-15 pl-2">
       <div class="flex items-stretch">
         <NavLink href="/authed/files">Dashboard</NavLink>
