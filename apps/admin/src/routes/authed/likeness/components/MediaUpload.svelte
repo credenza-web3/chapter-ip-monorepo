@@ -19,10 +19,6 @@
     multiple?: boolean
   }>()
 
-  $effect(() => {
-    console.log($likenessStore)
-  })
-
   const accept = $derived(mediaKind === 'image' ? 'image/*' : mediaKind === 'audio' ? 'audio/*' : 'video/*')
   const helperText = $derived(
     mediaKind === 'image'

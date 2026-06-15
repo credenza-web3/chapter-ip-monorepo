@@ -4,7 +4,6 @@
   import LikenessDetails from './LikenessDetails.svelte'
 
   let { currentStep = $bindable() } = $props()
-  console.log($likenessStore)
   const canContinueFromStepOne = $derived(
     Boolean(
       $likenessStore.profile.fullLegalName.trim() &&

@@ -48,7 +48,6 @@ export class NotificationRouter {
       ...input,
       sub: ctx.authTokenPayload.sub,
     })
-    console.log('paginationOptionsNOTIF', paginationOptions)
     return await this.commonNotificationService.paginate(paginationOptions)
   }
 
