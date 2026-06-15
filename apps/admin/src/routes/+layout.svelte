@@ -53,14 +53,14 @@
       ;(async () => {
         const notif = await trpcClient.notifications.findMyNotifications.query({
           limit: '2',
-          // sort: 'createdAt',
+          sort: 'createdAt',
           order: 'desc',
         })
         const nextCursor = notif?.cursor?.next ?? undefined
         console.log(notif, 'not')
         const notif2 = await trpcClient.notifications.findMyNotifications.query({
           limit: '2',
-          // sort: 'createdAt',
+          sort: 'createdAt',
           order: 'desc',
           cursor: nextCursor,
         })

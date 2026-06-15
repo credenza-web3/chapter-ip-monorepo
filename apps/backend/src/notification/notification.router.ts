@@ -44,7 +44,6 @@ export class NotificationRouter {
     @Input() input: TFindNotificationsInput,
     @Ctx() ctx: TAppContextWithTokenPayload,
   ): Promise<TFindNotificationsOutput> {
-    console.log('inputNOTIF', input)
     const paginationOptions = this.commonNotificationService.buildPaginationOptions({
       ...input,
       sub: ctx.authTokenPayload.sub,

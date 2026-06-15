@@ -45,12 +45,12 @@ export class CommonNotificationService extends CommonModelService<CommonNotifica
 
   buildPaginationOptions(opts: TFindCommonNotificationsInput): TBuiltPaginationOptions {
     const result = super.buildPaginationOptions(opts)
-    result.query = {
+    Object.assign(result.query, {
       ...(opts.sub && { sub: opts.sub }),
       ...(opts.type && { type: opts.type }),
       ...(opts.isRead !== undefined && { readAt: { $ne: null, $exists: true } }),
       ...(opts.isUnread !== undefined && { readAt: null }),
-    }
+    })
     return result
   }
 
