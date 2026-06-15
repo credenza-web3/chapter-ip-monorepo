@@ -47,25 +47,37 @@
     })
 
     ;(async () => {
-      const { items } = await trpcClient.notifications.findMyNotifications.query({
-        limit: '2',
-        sort: 'createdAt',
-        order: 'desc',
-      })
-      notificationStore.set(items)
+      try {
+        const { items } = await trpcClient.notifications.findMyNotifications.query({
+          limit: '2',
+          sort: 'createdAt',
+          order: 'desc',
+        })
+        notificationStore.set(items)
+      } catch (err) {
+        console.error('Failed to fetch notifications', err)
+      }
     })()
 
     return () => subscription.unsubscribe()
   })
 
   async function markAsRead(id: string) {
-    await getTrpcClient().notifications.markMyNotificationAsRead.mutate({ id })
-    notificationStore.update((n) => n.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x)))
+    try {
+      await getTrpcClient().notifications.markMyNotificationAsRead.mutate({ id })
+      notificationStore.update((n) => n.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x)))
+    } catch (err) {
+      console.error('Failed to mark notification as read', err)
+    }
   }
 
   async function markAllAsRead() {
-    await getTrpcClient().notifications.markAllMyNotificationsAsRead.mutate()
-    notificationStore.update((n) => n.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() })))
+    try {
+      await getTrpcClient().notifications.markAllMyNotificationsAsRead.mutate()
+      notificationStore.update((n) => n.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() })))
+    } catch (err) {
+      console.error('Failed to mark all notifications as read', err)
+    }
   }
 </script>
 

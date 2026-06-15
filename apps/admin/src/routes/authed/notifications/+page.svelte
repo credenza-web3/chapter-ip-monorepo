@@ -10,7 +10,7 @@
   const PAGE_SIZE = 2
 
   let activeMenuRow = $state<number | null>(null)
-  let loading = $state(false)
+  let loading = $state(true)
   let items = $state<TNotificationItem[]>([])
 
   let cursorStack = $state<Array<string | undefined>>([undefined])
@@ -35,6 +35,9 @@
       if (hasNext && cursorStack.length <= currentPage + 1) {
         cursorStack = [...cursorStack, nextCursor!]
       }
+    } catch (err) {
+      console.error('Failed to load notifications', err)
+      items = []
     } finally {
       loading = false
     }
@@ -63,15 +66,23 @@
   )
 
   async function markAsRead(id: string) {
-    await trpcClient.notifications.markMyNotificationAsRead.mutate({ id })
-    items = items.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x))
-    notificationStore.update((n) => n.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x)))
+    try {
+      await trpcClient.notifications.markMyNotificationAsRead.mutate({ id })
+      items = items.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x))
+      notificationStore.update((n) => n.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x)))
+    } catch (err) {
+      console.error('Failed to mark notification as read', err)
+    }
   }
 
   async function markAllAsRead() {
-    await trpcClient.notifications.markAllMyNotificationsAsRead.mutate()
-    items = items.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() }))
-    notificationStore.update((n) => n.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() })))
+    try {
+      await trpcClient.notifications.markAllMyNotificationsAsRead.mutate()
+      items = items.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() }))
+      notificationStore.update((n) => n.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() })))
+    } catch (err) {
+      console.error('Failed to mark all notifications as read', err)
+    }
   }
 
   async function handleMenuSelect(item: { text: string; href?: string; action?: string }, notificationId: string) {
