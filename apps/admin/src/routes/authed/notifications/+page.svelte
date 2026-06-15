@@ -35,7 +35,7 @@
       hasNext = !!nextCursor && nextCursor !== result.cursor.current
 
       if (hasNext) {
-        cursorStack = [...cursorStack, nextCursor!]
+        cursorStack = [...cursorStack.slice(0, currentPage + 1), nextCursor!]
       }
     } catch (err) {
       if (cancelled) return
