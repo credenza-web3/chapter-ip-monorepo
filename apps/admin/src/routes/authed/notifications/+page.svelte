@@ -32,7 +32,7 @@
       const nextCursor = result.cursor.next
       hasNext = !!nextCursor && nextCursor !== result.cursor.current
 
-      if (hasNext && cursorStack.length <= currentPage + 1) {
+      if (hasNext) {
         cursorStack = [...cursorStack, nextCursor!]
       }
     } catch (err) {
