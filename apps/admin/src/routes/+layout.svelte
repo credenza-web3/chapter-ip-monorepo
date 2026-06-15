@@ -87,7 +87,7 @@
       </div>
       <div class="flex items-center md:gap-7.25 gap-4">
         <NotificationsDropdown
-          notifications={$notificationStore.items}
+          notifications={$notificationStore}
           onMarkRead={markAsRead}
           onMarkAllRead={markAllAsRead}
         />
