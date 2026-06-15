@@ -1,3 +1,6 @@
+export const NOTIFICATIONS_DROPDOWN_LIMIT = 5
+export const NOTIFICATIONS_PAGE_SIZE = 20
+
 export const chainConfig = {
   chainId: '0xa869',
   rpcUrl: 'https://api.avax-test.network/ext/bc/C/rpc',

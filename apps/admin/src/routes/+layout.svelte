@@ -8,6 +8,7 @@
   import { notificationStore } from '$lib/stores/notification.svelte'
 
   import { getTrpcClient } from '$lib/stores/trpc-client'
+  import { NOTIFICATIONS_DROPDOWN_LIMIT } from '$lib/constants'
   import type { TNotificationItem } from '@repo/notifications'
   import NotificationsDropdown from '$lib/components/NotificationsDropdown.svelte'
 
@@ -49,7 +50,7 @@
     ;(async () => {
       try {
         const { items } = await trpcClient.notifications.findMyNotifications.query({
-          limit: '2',
+          limit: String(NOTIFICATIONS_DROPDOWN_LIMIT),
           sort: 'createdAt',
           order: 'desc',
         })

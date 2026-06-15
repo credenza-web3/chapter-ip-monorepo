@@ -4,10 +4,9 @@
   import { formatDate } from '../files/helper'
   import { NotificationsMenuItems } from './constants'
   import { getTrpcClient } from '$lib/stores/trpc-client'
+  import { NOTIFICATIONS_PAGE_SIZE } from '$lib/constants'
   import { notificationStore } from '$lib/stores/notification.svelte'
   import type { TNotificationItem } from '@repo/notifications'
-
-  const PAGE_SIZE = 2
 
   let activeMenuRow = $state<number | null>(null)
   let loading = $state(true)
@@ -23,7 +22,7 @@
     loading = true
     try {
       const result = await trpcClient.notifications.findMyNotifications.query({
-        limit: String(PAGE_SIZE),
+        limit: String(NOTIFICATIONS_PAGE_SIZE),
         sort: 'createdAt',
         order: 'desc',
         ...(cursor ? { cursor } : {}),
