@@ -4,6 +4,7 @@
   import { formatDate } from '../files/helper'
   import { NotificationsMenuItems } from './constants'
   import { getTrpcClient } from '$lib/stores/trpc-client'
+  import { notificationStore } from '$lib/stores/notification.svelte'
   import type { TNotificationItem } from '@repo/notifications'
 
   const PAGE_SIZE = 2
@@ -64,11 +65,13 @@
   async function markAsRead(id: string) {
     await trpcClient.notifications.markMyNotificationAsRead.mutate({ id })
     items = items.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x))
+    notificationStore.update((n) => n.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x)))
   }
 
   async function markAllAsRead() {
     await trpcClient.notifications.markAllMyNotificationsAsRead.mutate()
     items = items.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() }))
+    notificationStore.update((n) => n.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() })))
   }
 
   async function handleMenuSelect(item: { text: string; href?: string; action?: string }, notificationId: string) {
