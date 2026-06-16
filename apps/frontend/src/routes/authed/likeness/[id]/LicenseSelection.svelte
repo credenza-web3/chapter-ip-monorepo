@@ -21,9 +21,7 @@
       {#each licenses as license, i (license.id)}
         <label
           class={`relative flex min-h-32.75 cursor-pointer gap-2.5 border px-3.75 py-3.5 font-sans transition-colors ${i === 0 ? 'rounded-t-lg' : ''} ${i === 1 ? 'rounded-b-lg' : ''} ${
-            selectedLicenseId === license.id
-              ? 'z-10 border-primary bg-[#f8f5f1]'
-              : '-mt-px border-[#1a1a2e1a] bg-[#f5f1ec]'
+            selectedLicenseId === license.id ? 'z-10 border-primary bg-[#f8f5f1]' : '-mt-px border-[#1a1a2e1a] bg-cream'
           }`}
         >
           <input
@@ -78,7 +76,7 @@
     </p>
     <button
       type="button"
-      class="mt-1.75 h-13 w-full rounded-[3px] bg-primary px-5 font-heading text-base font-medium text-[#f5f1ec] transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      class="mt-1.75 h-13 w-full rounded-[3px] bg-primary px-5 font-heading text-base font-medium text-cream transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     >
       Add to Cart
     </button>
