@@ -4,16 +4,32 @@
   import LikenessProfileDetails from './LikenessProfileDetails.svelte'
   import LicenseSelection from './LicenseSelection.svelte'
   import PermittedUses from './PermittedUses.svelte'
+  import { canPurchaseLicense, purchaseLicense } from './purchaseLicense'
   import type { LikenessPurchase } from './types'
 
   let { purchase }: { purchase: LikenessPurchase } = $props()
 
   let selectedImage = $state<LikenessPurchase['images'][number] | null>(null)
   let selectedLicenseId = $state('')
+  let purchasePending = $state(false)
+
+  const selectedLicense = $derived(purchase.licenses.find((license) => license.id === selectedLicenseId))
+  const purchaseDisabled = $derived(purchasePending || !canPurchaseLicense(purchase, selectedLicense))
 
   $effect(() => {
     if (!selectedLicenseId && purchase.licenses[0]) selectedLicenseId = purchase.licenses[0].id
   })
+
+  async function handlePurchase() {
+    if (!selectedLicense || purchaseDisabled) return
+
+    purchasePending = true
+    try {
+      await purchaseLicense({ purchase, license: selectedLicense })
+    } finally {
+      purchasePending = false
+    }
+  }
 </script>
 
 <article
@@ -34,6 +50,9 @@
         licenses={purchase.licenses}
         {selectedLicenseId}
         onSelect={(licenseId) => (selectedLicenseId = licenseId)}
+        onPurchase={handlePurchase}
+        {purchaseDisabled}
+        {purchasePending}
       />
       <PermittedUses uses={purchase.permittedUses} />
     </div>

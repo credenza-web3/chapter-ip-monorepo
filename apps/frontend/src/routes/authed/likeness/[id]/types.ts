@@ -34,6 +34,7 @@ export type LikenessMedia =
 
 export type LikenessPurchase = {
   id: string
+  contentTokenId?: string
   name: string
   stageName: string
   bio: string

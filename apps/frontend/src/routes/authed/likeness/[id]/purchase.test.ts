@@ -6,6 +6,7 @@ describe('likeness purchase mapper', () => {
     const purchase = toLikenessPurchase(
       {
         id: 'likeness-1',
+        tokenId: '123',
         metadata: {
           type: 'likeness',
           profile: {
@@ -61,6 +62,7 @@ describe('likeness purchase mapper', () => {
 
     expect(purchase).toMatchObject({
       id: 'likeness-1',
+      contentTokenId: '123',
       name: 'Avery Stone',
       stageName: 'Avery',
       bio: 'Actor and vocalist.',

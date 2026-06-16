@@ -5,6 +5,7 @@ type UnknownRecord = Record<string, unknown>
 
 type Content = {
   id: string
+  tokenId?: string
   metadata?: UnknownRecord
   files?: ContentFile[]
 }
@@ -168,6 +169,7 @@ export function toLikenessPurchase(content: Content, contractAddress: string): L
 
   return {
     id: content.id,
+    contentTokenId: getString(content.tokenId),
     name,
     stageName: getString(profile.stageName),
     bio: getString(profile.bio),

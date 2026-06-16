@@ -5,10 +5,16 @@
     licenses,
     selectedLicenseId,
     onSelect,
+    onPurchase,
+    purchaseDisabled,
+    purchasePending,
   }: {
     licenses: LikenessLicense[]
     selectedLicenseId: string
     onSelect: (licenseId: string) => void
+    onPurchase: () => void
+    purchaseDisabled: boolean
+    purchasePending: boolean
   } = $props()
 
   const selectedLicense = $derived(licenses.find((license) => license.id === selectedLicenseId))
@@ -78,9 +84,13 @@
     </p>
     <button
       type="button"
-      class="mt-1.75 h-13 w-full rounded-[3px] bg-primary px-5 font-heading text-base font-medium text-[#f5f1ec] transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      disabled={purchaseDisabled}
+      onclick={onPurchase}
+      class={`mt-1.75 h-13 w-full rounded-[3px] bg-primary px-5 font-heading text-base font-medium text-[#f5f1ec] transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+        purchaseDisabled ? 'cursor-not-allowed opacity-50' : 'hover:opacity-90'
+      }`}
     >
-      Add to Cart
+      {purchasePending ? 'Processing...' : 'Buy License'}
     </button>
   </section>
 {/if}
