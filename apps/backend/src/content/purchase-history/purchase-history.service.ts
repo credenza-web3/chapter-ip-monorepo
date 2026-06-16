@@ -1,0 +1,26 @@
+import { Injectable } from '@nestjs/common'
+import { InjectModel } from '@nestjs/mongoose'
+import { Model } from 'mongoose'
+
+import { CommonModelService } from '../../common/model/model.service'
+import type { TBuiltPaginationOptions } from '../../common/model/model.dto'
+import type { TFindPurchaseHistoryInput } from '../content.dto'
+
+import { PurchaseHistoryItem } from './purchase-history-item.schema'
+
+@Injectable()
+export class PurchaseHistoryService extends CommonModelService<PurchaseHistoryItem> {
+  constructor(@InjectModel(PurchaseHistoryItem.name) private purchaseHistoryItemModel: Model<PurchaseHistoryItem>) {
+    super(purchaseHistoryItemModel)
+  }
+
+  buildPaginationOptions(opts: TFindPurchaseHistoryInput & { ownerId: string }): TBuiltPaginationOptions {
+    const result = super.buildPaginationOptions(opts)
+    result.query = {
+      ...result.query,
+      ownerId: opts.ownerId,
+      ...(opts.contentId && { contentId: opts.contentId }),
+    }
+    return result
+  }
+}

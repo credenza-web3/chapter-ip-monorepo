@@ -7,6 +7,7 @@ import { EvmEventService } from '../evm-listener/evm-event.service'
 import { EvmEvent } from '../evm-listener/evm-event.schema'
 import { ContentModelService } from '../content/content-model.service'
 import { ContentService } from '../content/content.service'
+import { PurchaseHistoryService } from '../content/purchase-history/purchase-history.service'
 
 import { CommonNotificationService } from '../common/notification/notification.service'
 import { type TCommonNotificationDocument } from '../common/notification/notification.schema'
@@ -24,6 +25,7 @@ export class NotificationService implements OnModuleInit {
     private readonly evmEventService: EvmEventService,
     private readonly commonEvmService: CommonEvmService,
     private readonly commonNotificationService: CommonNotificationService,
+    private readonly purchaseHistoryService: PurchaseHistoryService,
   ) {}
 
   private async restartEvmEventsChangeStream() {
@@ -72,14 +74,26 @@ export class NotificationService implements OnModuleInit {
                 return
               }
 
-              await this.commonNotificationService
-                .getModel()
-                .insertMany([
-                  { ...notification, sub: toSub, type: NOTIFICATION_TYPE.LICENSE_PURCHASED },
-                  ...(content.sub !== toSub
-                    ? [{ ...notification, sub: content.sub, type: NOTIFICATION_TYPE.LICENSE_PURCHASED }]
-                    : []),
-                ])
+              await Promise.all([
+                this.commonNotificationService
+                  .getModel()
+                  .insertMany([
+                    { ...notification, sub: toSub, type: NOTIFICATION_TYPE.LICENSE_PURCHASED },
+                    ...(content.sub !== toSub
+                      ? [{ ...notification, sub: content.sub, type: NOTIFICATION_TYPE.LICENSE_PURCHASED }]
+                      : []),
+                  ]),
+                this.purchaseHistoryService.create({
+                  buyerAddress: toAddress,
+                  contentId: String(content._id),
+                  licenseType: Number(args[2]),
+                  priceFiat: String(args[3] ?? '0'),
+                  priceEther: String(args[4] ?? '0'),
+                  priceToken: String(args[5] ?? '0'),
+                  currencyTokenContract: String(args[6] ?? '').toLowerCase(),
+                  ownerId: content.sub,
+                }),
+              ])
               break
             }
             case 'Transfer': {

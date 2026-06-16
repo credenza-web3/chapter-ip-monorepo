@@ -192,6 +192,29 @@ export const getContentStatisticOutputSchema = z.object({
 })
 export type TGetContentStatisticOutput = z.infer<typeof getContentStatisticOutputSchema>
 
+export const purchaseHistoryItemOutputSchema = z.object({
+  id: z.string(),
+  buyerAddress: z.string(),
+  contentId: z.string(),
+  licenseType: z.number().int().nonnegative(),
+  priceFiat: z.string(),
+  priceToken: z.string(),
+  priceEther: z.string(),
+  currencyTokenContract: z.string(),
+  ownerId: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+})
+export type TPurchaseHistoryItemOutput = z.infer<typeof purchaseHistoryItemOutputSchema>
+
+export const findPurchaseHistoryInputSchema = paginatedRequestWithCursorSchema.extend({
+  contentId: z.string().optional(),
+})
+export type TFindPurchaseHistoryInput = z.infer<typeof findPurchaseHistoryInputSchema>
+
+export const findPurchaseHistoryOutputSchema = createPaginatedResponseSchema(purchaseHistoryItemOutputSchema)
+export type TFindPurchaseHistoryOutput = z.infer<typeof findPurchaseHistoryOutputSchema>
+
 export const getContentConfigOutputSchema = z.object({
   contractAddresses: z.object({
     contentNft: z.string(),

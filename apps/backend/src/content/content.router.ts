@@ -12,11 +12,16 @@ import { CommonLicenseService } from '../common/license/license.service'
 import { ContentModelService } from './content-model.service'
 import { ContentStatus } from './content.schema'
 import { FileService } from './file/file.service'
+import { PurchaseHistoryService } from './purchase-history/purchase-history.service'
 import {
   createContentFileUploadUrlInputSchema,
   createUserFileUploadUrlInputSchema,
   findContentInputSchema,
   findContentOutputSchema,
+  findPurchaseHistoryInputSchema,
+  findPurchaseHistoryOutputSchema,
+  type TFindPurchaseHistoryInput,
+  type TFindPurchaseHistoryOutput,
   getContentByIdInputSchema,
   getContentByIdOutputSchema,
   getContentConfigOutputSchema,
@@ -71,6 +76,7 @@ export class ContentRouter {
     private readonly commonEvmService: CommonEvmService,
     private readonly commonContentService: ContentService,
     private readonly commonLicenseService: CommonLicenseService,
+    private readonly purchaseHistoryService: PurchaseHistoryService,
   ) {}
 
   @UseMiddlewares(AuthMiddleware)
@@ -411,6 +417,22 @@ export class ContentRouter {
         code: 'INTERNAL_SERVER_ERROR',
       })
     }
+  }
+
+  @UseMiddlewares(AuthMiddleware)
+  @Query({
+    input: findPurchaseHistoryInputSchema,
+    output: findPurchaseHistoryOutputSchema,
+  })
+  async findPurchaseHistory(
+    @Ctx() ctx: TAppContextWithTokenPayload,
+    @Input() input: TFindPurchaseHistoryInput,
+  ): Promise<TFindPurchaseHistoryOutput> {
+    const paginationOptions = this.purchaseHistoryService.buildPaginationOptions({
+      ...input,
+      ownerId: ctx.authTokenPayload.sub,
+    })
+    return await this.purchaseHistoryService.paginate(paginationOptions)
   }
 
   @Query({
