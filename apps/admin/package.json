@@ -16,12 +16,13 @@
     "test": "npm run test:unit -- --run"
   },
   "devDependencies": {
-    "@repo/notifications": "workspace:*",
+    "@repo/content-types": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/fe-auth": "workspace:*",
     "@repo/fe-config": "workspace:*",
     "@repo/fe-evm-provider": "workspace:*",
     "@repo/fe-services": "workspace:*",
+    "@repo/notifications": "workspace:*",
     "@repo/trpc": "workspace:*",
     "@repo/ui-components": "workspace:*",
     "@sveltejs/adapter-static": "^3.0.10",

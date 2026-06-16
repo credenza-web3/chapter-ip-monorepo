@@ -6,12 +6,12 @@ import { Passport } from '@credenza3/passport-evm'
 import { ethers, initProvider } from '@repo/fe-evm-provider'
 import { forwardTransaction } from '@repo/fe-services'
 import { get } from 'svelte/store'
-import type { LikenessLicense, LikenessPurchase } from './types'
+import type { LikenessDetails, LikenessLicense } from '@repo/content-types/likeness'
 
 type PurchaseLicenseType = '0' | '2'
 
 type PurchaseLicenseInput = {
-  purchase: LikenessPurchase
+  purchase: LikenessDetails
   license: LikenessLicense
 }
 
@@ -34,7 +34,7 @@ type PassportPaymentEvent = {
 type PurchaseContext = {
   passport: Passport
   accessToken: string
-  purchase: LikenessPurchase
+  purchase: LikenessDetails
   license: LikenessLicense
   licenseType: PurchaseLicenseType
   contentTokenId: string
@@ -53,7 +53,7 @@ export function getPurchaseLicenseType(licenseId: string): PurchaseLicenseType |
   return LICENSE_TYPES[licenseId] ?? null
 }
 
-export function canPurchaseLicense(purchase: LikenessPurchase, license: LikenessLicense | undefined): boolean {
+export function canPurchaseLicense(purchase: LikenessDetails, license: LikenessLicense | undefined): boolean {
   return Boolean(license && getPurchaseLicenseType(license.id) && purchase.contentTokenId?.trim())
 }
 
@@ -63,6 +63,9 @@ export async function purchaseLicense({ purchase, license }: PurchaseLicenseInpu
   const payment = parsePassportPayment(payload)
   const hash = payment.kind === 'card' ? await redeemVoucher(payment, context) : payment.hash
 
+  context.passport.once(Passport.events.ERROR, (error: unknown) => {
+    throw error
+  })
   await goto('/authed/purchases')
   await openPurchaseAlert(context.passport, hash)
 }

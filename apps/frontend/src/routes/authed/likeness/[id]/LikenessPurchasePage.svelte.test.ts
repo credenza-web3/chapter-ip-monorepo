@@ -12,7 +12,7 @@ vi.mock('./purchaseLicense', () => ({
   purchaseLicense: purchaseLicenseMock,
 }))
 
-const purchase: LikenessPurchase = {
+const likenessDetails: LikenessPurchase = {
   id: 'likeness-1',
   contentTokenId: '123',
   name: 'Avery Stone',
@@ -63,7 +63,7 @@ beforeEach(() => {
 })
 
 test('renders likeness metadata, purchase summary, and real media entries', async () => {
-  const screen = await render(LikenessPurchasePage, { purchase })
+  const screen = await render(LikenessPurchasePage, { likenessDetails })
 
   await expect.element(screen.getByRole('heading', { name: 'Avery Stone' })).toBeVisible()
   await expect.element(screen.getByText('Actor and vocalist.')).toBeVisible()
@@ -86,7 +86,7 @@ test('renders likeness metadata, purchase summary, and real media entries', asyn
   await expect.element(singleUseLicense).toBeChecked()
   await buyButton.click()
 
-  expect(purchaseLicenseMock).toHaveBeenCalledWith({ purchase, license: purchase.licenses[0] })
+  expect(purchaseLicenseMock).toHaveBeenCalledWith({ likenessDetails, license: likenessDetails.licenses[0] })
 
   await perpetualLicense.click()
 
@@ -94,12 +94,12 @@ test('renders likeness metadata, purchase summary, and real media entries', asyn
   await expect.element(purchaseSummary.getByText('$100', { exact: true })).toBeVisible()
   await buyButton.click()
 
-  expect(purchaseLicenseMock).toHaveBeenLastCalledWith({ purchase, license: purchase.licenses[1] })
+  expect(purchaseLicenseMock).toHaveBeenLastCalledWith({ likenessDetails, license: likenessDetails.licenses[1] })
   expect(purchaseLicenseMock).toHaveBeenCalledTimes(2)
 })
 
 test('opens and closes an enlarged image dialog', async () => {
-  const screen = await render(LikenessPurchasePage, { purchase })
+  const screen = await render(LikenessPurchasePage, { likenessDetails })
 
   await screen.getByRole('button', { name: 'Enlarge Avery likeness preview 2' }).click()
   await expect.element(screen.getByRole('dialog', { name: 'Enlarged likeness image' })).toBeVisible()

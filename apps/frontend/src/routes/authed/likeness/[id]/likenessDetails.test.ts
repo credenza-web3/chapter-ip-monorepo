@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { toLikenessPurchase } from './purchase'
+import { DEFAULT_IMAGE_URL } from '../likeness'
+import { normalizeLikeness } from './likenessDetails'
 
 describe('likeness purchase mapper', () => {
   it('maps profile and enabled licensing metadata into the purchase view', () => {
-    const purchase = toLikenessPurchase(
+    const purchase = normalizeLikeness(
       {
         id: 'likeness-1',
         tokenId: '123',
@@ -102,6 +103,89 @@ describe('likeness purchase mapper', () => {
   })
 
   it('rejects content that is not a likeness', () => {
-    expect(toLikenessPurchase({ id: 'other', metadata: { type: 'written-work' } }, '0xcontent')).toBeNull()
+    expect(normalizeLikeness({ id: 'other', metadata: { type: 'written-work' } }, '0xcontent')).toBeNull()
+  })
+
+  it('uses defaults for partial likeness metadata and falls back when no image media exists', () => {
+    const purchase = normalizeLikeness(
+      {
+        id: 'partial-likeness',
+        tokenId: ' 456 ',
+        metadata: {
+          type: 'likeness',
+          profile: {
+            fullLegalName: '   ',
+            affiliations: [{ union: '  ', memberId: '' }],
+          },
+          licensing: {
+            licenseTypes: { 'single-use': false, custom: true },
+            licensePrices: { custom: ' 25 ' },
+            permittedUses: { ai: false },
+            territories: ['  ', ' Worldwide '],
+          },
+        },
+        files: [
+          {
+            id: ' file-id ',
+            filename: ' ',
+            label: ' contract.pdf ',
+            mimetype: 'application/pdf',
+          },
+        ],
+      },
+      '0xcontent',
+    )
+
+    expect(purchase).toMatchObject({
+      id: 'partial-likeness',
+      contentTokenId: '456',
+      name: 'Unnamed likeness',
+      stageName: '',
+      bio: '',
+      attributes: [],
+      affiliations: [],
+      licenses: [
+        {
+          id: 'custom',
+          name: 'Custom',
+          price: '25',
+          detail: '',
+          description: '',
+        },
+      ],
+      permittedUses: [],
+      territories: ['Worldwide'],
+      allowRetouching: false,
+      approveFinalUse: false,
+      images: [{ src: DEFAULT_IMAGE_URL, alt: 'Unnamed likeness default likeness preview' }],
+      media: [{ id: 'file-id', type: 'file', label: 'contract.pdf' }],
+    })
+  })
+
+  it('uses empty purchase fields when likeness metadata sections are missing', () => {
+    const purchase = normalizeLikeness(
+      {
+        id: 'empty-likeness',
+        metadata: { type: 'likeness' },
+      },
+      '0xcontent',
+    )
+
+    expect(purchase).toMatchObject({
+      id: 'empty-likeness',
+      contentTokenId: '',
+      name: 'Unnamed likeness',
+      stageName: '',
+      bio: '',
+      attributes: [],
+      affiliations: [],
+      licenses: [],
+      permittedUses: [],
+      territories: [],
+      allowRetouching: false,
+      approveFinalUse: false,
+      images: [{ src: DEFAULT_IMAGE_URL, alt: 'Unnamed likeness default likeness preview' }],
+      media: [],
+    })
   })
 })
