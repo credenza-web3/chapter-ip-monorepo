@@ -8,8 +8,8 @@ export interface TPurchaseHistoryItem {
   priceEther: string
   currencyTokenContract: string
   ownerId: string
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
 }
 
 export const HistoryMenuItems = [
