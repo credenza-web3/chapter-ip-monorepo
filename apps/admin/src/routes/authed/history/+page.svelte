@@ -5,9 +5,10 @@
   import { getTrpcClient } from '$lib/stores/trpc-client'
   import { HISTORY_PAGE_SIZE } from '$lib/constants'
   import { goto } from '$app/navigation'
+  import type { TPurchaseHistoryItem } from './constants'
 
   let loading = $state(true)
-  let items = $state<any[]>([])
+  let items = $state<TPurchaseHistoryItem[]>([])
 
   let cursorStack = $state<Array<string | undefined>>([undefined])
   let currentPage = $state(0)
