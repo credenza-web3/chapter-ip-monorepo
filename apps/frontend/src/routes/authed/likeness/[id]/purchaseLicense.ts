@@ -66,10 +66,7 @@ export async function purchaseLicense({ purchase, license }: PurchaseLicenseInpu
   })
   const payload = await requestPassportPayment(context)
   const payment = parsePassportPayment(payload)
-
-  console.log('payment', payment)
   const hash = payment.kind === 'card' ? await redeemVoucher(payment, context) : payment.hash
-  console.log('hash', hash)
 
   await goto('/authed/purchases')
   await openPurchaseAlert(context.passport, hash)
@@ -78,8 +75,6 @@ export async function purchaseLicense({ purchase, license }: PurchaseLicenseInpu
 export function parsePassportPayment(payload: PassportPaymentEvent): PassportPayment {
   const type = payload.type.toUpperCase()
   const firstItem = payload.results?.items?.[0]
-
-  console.log(payload)
 
   if (type === 'CARD' || type === 'STRIPE') {
     const { voucher, sig } = firstItem?.outcome ?? {}
@@ -154,19 +149,14 @@ async function redeemVoucher(
     payment.voucher,
     payment.sig,
   )
-  console.log('userAddress', userAddress)
-  console.log('licenseContract', licenseContract)
-  console.log('populatedTx', populatedTx)
 
   const hash = await forwardTransaction(populatedTx, {
     token: context.accessToken,
     client_id: import.meta.env.VITE_CLIENT_ID,
     evm_wss: import.meta.env.VITE_CREDENZA_EVM_WSS,
   })
-  console.log('hash2', hash)
 
   const receipt = await ethersProvider.waitForTransaction(hash)
-  console.log('receipt', receipt)
   if (!receipt) throw new Error('License redemption transaction failed')
 
   return hash

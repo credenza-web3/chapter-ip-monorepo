@@ -129,7 +129,6 @@ function getMedia(content: LikenessContentInput, name: string, contractAddress: 
 
 export function normalizeLikeness(content: LikenessContentInput, contractAddress: string): LikenessDetails | null {
   const metadata = content.metadata
-  console.log(content)
   if (metadata?.type !== 'likeness') return null
 
   const profile = metadata.profile
