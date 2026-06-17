@@ -11,9 +11,10 @@ export async function findContent(tokenId?: string) {
     contractAddress: configStore.getContractAddress(ContractName.CONTENT_NFT),
     tokenId,
   })
+  const metadata = result.items[0]?.metadata as Record<string, unknown> | undefined
   return {
-    name: result.items[0]?.metadata?.profile?.fullLegalName,
-    type: result.items[0]?.metadata?.type,
+    name: (metadata?.profile as Record<string, unknown> | undefined)?.fullLegalName as string | undefined,
+    type: metadata?.type as string | undefined,
   }
 }
 
