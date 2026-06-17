@@ -98,6 +98,8 @@
                       ? 'added to your products'
                       : 'was purchased'}
                   </p>
+                {:catch}
+                  <p class="text-[13px] font-semibold min-w-0 leading-tight">{tx.message ?? tx.title}</p>
                 {/await}
                 <div class="relative shrink-0">
                   <button

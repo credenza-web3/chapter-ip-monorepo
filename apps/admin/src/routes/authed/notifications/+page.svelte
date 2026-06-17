@@ -139,10 +139,12 @@
                       <p class="text-[13px] font-semibold">Loading...</p>
                     {:then value}
                       <p class="text-[13px] font-semibold min-w-0 leading-tight">
-                        {value?.type ?? ''} [{value?.name}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
+                        {value?.type ?? ''} [{value?.name ?? ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
                           ? 'added to your products'
                           : 'was purchased'}
                       </p>
+                    {:catch}
+                      <p class="text-[13px] font-semibold">{tx.message ?? tx.title}</p>
                     {/await}
                   </td>
                   <td class="px-4 py-1.5 text-right">
