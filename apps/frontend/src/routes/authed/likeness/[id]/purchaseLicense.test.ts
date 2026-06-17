@@ -1,7 +1,7 @@
 import { goto } from '$app/navigation'
 import { authStore } from '$lib'
 import { configStore, ContractName } from '$lib/stores/config.svelte'
-import { ethers, initProvider } from '@repo/fe-evm-provider'
+import { ethers, getSigner, initProvider } from '@repo/fe-evm-provider'
 import { forwardTransaction } from '@repo/fe-services'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { canPurchaseLicense, getPurchaseLicenseType, parsePassportPayment, purchaseLicense } from './purchaseLicense'
@@ -56,6 +56,7 @@ vi.mock('@credenza3/passport-evm', () => ({
 }))
 vi.mock('@repo/fe-evm-provider', () => ({
   ethers: { BrowserProvider: vi.fn() },
+  getSigner: vi.fn(),
   initProvider: vi.fn(),
 }))
 vi.mock('@repo/fe-services', () => ({ forwardTransaction: vi.fn() }))
@@ -106,7 +107,7 @@ const unsupportedLicense: LikenessLicense = {
 
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0))
 
-const richAlertPayload = (hash: string) => ({
+const richAlertPayload = () => ({
   richAlertData: {
     title: 'License Purchased',
     description: 'Your license is available in purchases.',
@@ -168,17 +169,17 @@ describe('parsePassportPayment', () => {
       parsePassportPayment({
         type,
         results: {
-          items: [{ outcome: { voucher: 'voucher-string', sig: '0xsig' } }],
+          items: [{ outcome: { voucher: { nonce: '1' }, sig: '0xsig' } }],
         },
       }),
-    ).toEqual({ kind: 'card', voucher: 'voucher-string', sig: '0xsig' })
+    ).toEqual({ kind: 'card', voucher: { nonce: '1' }, sig: '0xsig' })
   })
 
   it('throws when a card payload is missing a voucher outcome', () => {
     expect(() =>
       parsePassportPayment({
         type: 'CARD',
-        results: { items: [{ outcome: { voucher: '', sig: '0xsig' } }] },
+        results: { items: [{ outcome: { voucher: { nonce: '' }, sig: '0xsig' } }] },
       }),
     ).toThrow('Missing card payment voucher outcome')
   })
@@ -217,10 +218,11 @@ describe('purchaseLicense', () => {
     await purchasePromise
 
     expect(goto).toHaveBeenCalledWith('/authed/purchases')
-    expect(mocks.passportMock.openUI).toHaveBeenLastCalledWith('richAlert', richAlertPayload('0xdirect-hash'))
+    expect(mocks.passportMock.openUI).toHaveBeenLastCalledWith('richAlert', richAlertPayload())
   })
 
   it('redeems card payments before showing the purchase alert', async () => {
+    const voucher = { nonce: '1' }
     const signer = { getAddress: vi.fn().mockResolvedValue('0xuser') }
     const waitForTransaction = vi.fn().mockResolvedValue({ hash: '0xforwarded-hash' })
     const redeem = {
@@ -230,8 +232,9 @@ describe('purchaseLicense', () => {
 
     vi.mocked(initProvider).mockResolvedValue(provider)
     vi.mocked(ethers.BrowserProvider).mockImplementation(function () {
-      return { getSigner: vi.fn().mockResolvedValue(signer), waitForTransaction } as never
+      return { waitForTransaction } as never
     })
+    vi.mocked(getSigner).mockResolvedValue(signer as never)
     vi.mocked(configStore.getContract).mockReturnValue({ redeem } as never)
     vi.mocked(forwardTransaction).mockResolvedValue('0xforwarded-hash')
 
@@ -241,19 +244,19 @@ describe('purchaseLicense', () => {
     mocks.paymentCallback?.({
       type: 'CARD',
       results: {
-        items: [{ outcome: { voucher: 'voucher-string', sig: '0xsig' } }],
+        items: [{ outcome: { voucher, sig: '0xsig' } }],
       },
     })
     await purchasePromise
 
-    expect(redeem.populateTransaction).toHaveBeenCalledWith('0xuser', 'voucher-string', '0xsig')
+    expect(redeem.populateTransaction).toHaveBeenCalledWith('0xuser', voucher, '0xsig')
     expect(forwardTransaction).toHaveBeenCalledWith(
       { to: '0xlicense', data: '0xdata' },
       { token: 'access-token', client_id: 'client-id', evm_wss: 'wss://evm' },
     )
     expect(waitForTransaction).toHaveBeenCalledWith('0xforwarded-hash')
     expect(goto).toHaveBeenCalledWith('/authed/purchases')
-    expect(mocks.passportMock.openUI).toHaveBeenLastCalledWith('richAlert', richAlertPayload('0xforwarded-hash'))
+    expect(mocks.passportMock.openUI).toHaveBeenLastCalledWith('richAlert', richAlertPayload())
   })
 
   it('rejects unsupported licenses before opening payment UI', async () => {

@@ -35,6 +35,10 @@ const PERMITTED_USE_NAMES: Record<string, string> = {
   'film-tv': 'Film and TV',
 }
 
+function trimString(value: unknown): string {
+  return value == null ? '' : String(value).trim()
+}
+
 function formatLabel(value: string): string {
   return value
     .split('-')
@@ -43,8 +47,8 @@ function formatLabel(value: string): string {
 }
 
 function formatHeight(attributes: Partial<LikenessProfileAttributes> | undefined): string {
-  const feet = attributes?.heightFt ?? ''
-  const inches = attributes?.heightIn ?? ''
+  const feet = trimString(attributes?.heightFt)
+  const inches = trimString(attributes?.heightIn)
   if (!feet && !inches) return ''
 
   const imperial = [feet && `${feet}'`, inches && `${inches}"`].filter(Boolean).join(' ')
@@ -54,8 +58,8 @@ function formatHeight(attributes: Partial<LikenessProfileAttributes> | undefined
   return `${imperial} (${Math.round(totalInches * 2.54)} cm)`
 }
 
-function formatWeight(value: string | undefined): string {
-  const weight = value ?? ''
+function formatWeight(value: unknown): string {
+  const weight = trimString(value)
   if (!weight) return ''
 
   const pounds = Number(weight)
@@ -66,8 +70,8 @@ function formatWeight(value: string | undefined): string {
 
 function getAffiliations(affiliations: Array<Partial<LikenessProfileAffiliation>> | undefined): LikenessAffiliation[] {
   return (affiliations ?? []).flatMap((affiliation) => {
-    const union = affiliation.union ?? ''
-    const memberId = affiliation.memberId ?? ''
+    const union = trimString(affiliation.union)
+    const memberId = trimString(affiliation.memberId)
     return union || memberId ? [{ union, memberId }] : []
   })
 }
@@ -80,13 +84,13 @@ function getLicenses(licensing: LikenessLicensingMetadataInput | undefined): Lik
   return Object.entries(enabledTypes).flatMap(([id, enabled]) => {
     if (enabled !== true) return []
 
-    const price = prices[id] || '0'
+    const price = trimString(prices[id]) || '0'
     return [
       {
         id,
         name: LICENSE_NAMES[id] ?? formatLabel(id),
         price,
-        detail: details[id] ?? '',
+        detail: trimString(details[id]),
         description: LICENSE_DESCRIPTIONS[id] ?? '',
       },
     ]
@@ -101,8 +105,8 @@ function getPermittedUses(permittedUses: Record<string, boolean> | undefined): s
 
 function getMedia(content: LikenessContentInput, name: string, contractAddress: string): LikenessDetails['media'] {
   return (content.files ?? []).map((file) => {
-    const filename = file.filename || file.label
-    const id = file.id || filename
+    const filename = trimString(file.filename) || trimString(file.label)
+    const id = trimString(file.id) || filename
 
     if (file.mimetype.startsWith('image/')) {
       return {
@@ -134,27 +138,27 @@ export function normalizeLikeness(content: LikenessContentInput, contractAddress
   const profile = metadata.profile
   const attributes = profile?.attributes
   const licensing = metadata.licensing
-  const name = profile?.fullLegalName || 'Unnamed likeness'
+  const name = trimString(profile?.fullLegalName) || 'Unnamed likeness'
   const media = getMedia(content, name, contractAddress)
   const images = media.flatMap((item) => (item.type === 'image' ? [{ src: item.src, alt: item.alt }] : []))
 
   return {
     id: content.id,
-    contentTokenId: content.tokenId ?? '',
+    contentTokenId: trimString(content.tokenId),
     name,
-    stageName: profile?.stageName ?? '',
-    bio: profile?.bio ?? '',
+    stageName: trimString(profile?.stageName),
+    bio: trimString(profile?.bio),
     attributes: [
-      { label: 'Ethnicity', value: attributes?.ethnicity ?? '' },
+      { label: 'Ethnicity', value: trimString(attributes?.ethnicity) },
       { label: 'Height', value: formatHeight(attributes) },
       { label: 'Weight', value: formatWeight(attributes?.weight) },
-      { label: 'Eye color', value: attributes?.eyeColor ?? '' },
-      { label: 'Hair color', value: attributes?.hairColor ?? '' },
+      { label: 'Eye color', value: trimString(attributes?.eyeColor) },
+      { label: 'Hair color', value: trimString(attributes?.hairColor) },
     ].filter((attribute) => attribute.value),
     affiliations: getAffiliations(profile?.affiliations),
     licenses: getLicenses(licensing),
     permittedUses: getPermittedUses(licensing?.permittedUses),
-    territories: (licensing?.territories ?? []).filter(Boolean),
+    territories: (licensing?.territories ?? []).map(trimString).filter(Boolean),
     allowRetouching: licensing?.allowRetouching === 'yes',
     approveFinalUse: licensing?.approveFinalUse === 'yes',
     images: images.length > 0 ? images : [{ src: DEFAULT_IMAGE_URL, alt: `${name} default likeness preview` }],

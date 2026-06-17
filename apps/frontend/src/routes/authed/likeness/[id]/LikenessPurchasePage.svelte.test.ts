@@ -86,7 +86,7 @@ test('renders likeness metadata, purchase summary, and real media entries', asyn
   await expect.element(singleUseLicense).toBeChecked()
   await buyButton.click()
 
-  expect(purchaseLicenseMock).toHaveBeenCalledWith({ likenessDetails, license: likenessDetails.licenses[0] })
+  expect(purchaseLicenseMock).toHaveBeenCalledWith({ purchase: likenessDetails, license: likenessDetails.licenses[0] })
 
   await perpetualLicense.click()
 
@@ -94,7 +94,10 @@ test('renders likeness metadata, purchase summary, and real media entries', asyn
   await expect.element(purchaseSummary.getByText('$100', { exact: true })).toBeVisible()
   await buyButton.click()
 
-  expect(purchaseLicenseMock).toHaveBeenLastCalledWith({ likenessDetails, license: likenessDetails.licenses[1] })
+  expect(purchaseLicenseMock).toHaveBeenLastCalledWith({
+    purchase: likenessDetails,
+    license: likenessDetails.licenses[1],
+  })
   expect(purchaseLicenseMock).toHaveBeenCalledTimes(2)
 })
 

@@ -55,8 +55,26 @@ export function getPurchaseLicenseType(licenseId: string): PurchaseLicenseType |
   return LICENSE_TYPES[licenseId] ?? null
 }
 
+function normalizeTokenId(tokenId: LikenessDetails['contentTokenId']): string {
+  return tokenId == null ? '' : String(tokenId).trim()
+}
+
+function isLicenseVoucher(value: unknown): value is TLicenseVoucher {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+
+  const entries = Object.entries(value)
+  return (
+    entries.length > 0 &&
+    entries.every(([, entryValue]) =>
+      typeof entryValue === 'number'
+        ? Number.isFinite(entryValue)
+        : typeof entryValue === 'string' && entryValue.trim() !== '',
+    )
+  )
+}
+
 export function canPurchaseLicense(purchase: LikenessDetails, license: LikenessLicense | undefined): boolean {
-  return Boolean(license && getPurchaseLicenseType(license.id) && purchase.contentTokenId)
+  return Boolean(license && getPurchaseLicenseType(license.id) && normalizeTokenId(purchase.contentTokenId))
 }
 
 export async function purchaseLicense({ purchase, license }: PurchaseLicenseInput): Promise<void> {
@@ -78,7 +96,9 @@ export function parsePassportPayment(payload: PassportPaymentEvent): PassportPay
 
   if (type === 'CARD' || type === 'STRIPE') {
     const { voucher, sig } = firstItem?.outcome ?? {}
-    if (!voucher || !sig) throw new Error('Missing card payment voucher outcome')
+    if (!isLicenseVoucher(voucher) || typeof sig !== 'string' || !sig.trim()) {
+      throw new Error('Missing card payment voucher outcome')
+    }
     return { kind: 'card', voucher, sig }
   }
 
@@ -98,7 +118,7 @@ async function getPurchaseContext({ purchase, license }: PurchaseLicenseInput): 
   const licenseType = getPurchaseLicenseType(license.id)
   if (!licenseType) throw new Error(`Unsupported license type: ${license.id}`)
 
-  const contentTokenId = purchase.contentTokenId
+  const contentTokenId = normalizeTokenId(purchase.contentTokenId)
   if (!contentTokenId) throw new Error('Missing content token ID for license purchase')
 
   return {
