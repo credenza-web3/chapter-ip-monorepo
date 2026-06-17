@@ -3,12 +3,12 @@
   import { onMount } from 'svelte'
   import { configStore, ContractName } from '$lib/stores/config.svelte'
   import LikenessPurchasePage from './LikenessPurchasePage.svelte'
-  import { toLikenessPurchase } from './purchase'
-  import type { LikenessPurchase } from './types'
+  import { normalizeLikeness } from './likenessDetails'
+  import type { LikenessDetails } from './types'
 
   let { data } = $props()
 
-  let purchase = $state<LikenessPurchase | null>(null)
+  let likenessDetails = $state<LikenessDetails | null>(null)
   let loading = $state(true)
 
   const skeletonThumbnails = Array.from({ length: 4 }, (_, index) => index)
@@ -17,8 +17,8 @@
   onMount(async () => {
     try {
       const content = await data.trpcClient.contents.getContentById.query({ id: data.id })
-      purchase = toLikenessPurchase(content, configStore.getContractAddress(ContractName.CONTENT_NFT))
-      if (!purchase) await goto('/authed/likeness')
+      likenessDetails = normalizeLikeness(content, configStore.getContractAddress(ContractName.CONTENT_NFT))
+      if (!likenessDetails) await goto('/authed/likeness')
     } catch {
       await goto('/authed/likeness')
     } finally {
@@ -65,6 +65,6 @@
       {/each}
     </div>
   </div>
-{:else if purchase}
-  <LikenessPurchasePage {purchase} />
+{:else if likenessDetails}
+  <LikenessPurchasePage {likenessDetails} />
 {/if}

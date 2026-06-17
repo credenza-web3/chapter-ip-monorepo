@@ -1,0 +1,16 @@
+{
+  "name": "@repo/content-types",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./likeness": {
+      "types": "./src/likeness.ts",
+      "import": "./src/likeness.ts",
+      "default": "./src/likeness.ts"
+    }
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  }
+}

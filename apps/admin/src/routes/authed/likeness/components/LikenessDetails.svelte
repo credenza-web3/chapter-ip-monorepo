@@ -149,7 +149,7 @@
     <button
       type="button"
       onclick={() => {
-        const hasEmpty = $likenessStore.profile.affiliations.some((a) => !a.union.trim() || !a.memberId.trim())
+        const hasEmpty = $likenessStore.profile.affiliations.some((a) => !a.union || !a.memberId)
         if (!hasEmpty) likenessStore.addAffiliation()
       }}
       class="text-sm text-primary flex items-center gap-2.25"

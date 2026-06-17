@@ -1,11 +1,20 @@
-import { expect, test } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
 import { render } from 'vitest-browser-svelte'
 import { tick } from 'svelte'
 import LikenessPurchasePage from './LikenessPurchasePage.svelte'
 import type { LikenessPurchase } from './types'
 
-const purchase: LikenessPurchase = {
+const canPurchaseLicenseMock = vi.hoisted(() => vi.fn(() => true))
+const purchaseLicenseMock = vi.hoisted(() => vi.fn())
+
+vi.mock('./purchaseLicense', () => ({
+  canPurchaseLicense: canPurchaseLicenseMock,
+  purchaseLicense: purchaseLicenseMock,
+}))
+
+const likenessDetails: LikenessPurchase = {
   id: 'likeness-1',
+  contentTokenId: '123',
   name: 'Avery Stone',
   stageName: 'Avery',
   bio: 'Actor and vocalist.',
@@ -47,14 +56,22 @@ const purchase: LikenessPurchase = {
   ],
 }
 
+beforeEach(() => {
+  canPurchaseLicenseMock.mockReturnValue(true)
+  purchaseLicenseMock.mockResolvedValue(undefined)
+  vi.clearAllMocks()
+})
+
 test('renders likeness metadata, purchase summary, and real media entries', async () => {
-  const screen = await render(LikenessPurchasePage, { purchase })
+  const screen = await render(LikenessPurchasePage, { likenessDetails })
 
   await expect.element(screen.getByRole('heading', { name: 'Avery Stone' })).toBeVisible()
   await expect.element(screen.getByText('Actor and vocalist.')).toBeVisible()
   const purchaseSummary = screen.getByRole('region', { name: 'Purchase summary' })
   await expect.element(purchaseSummary.getByText('$10', { exact: true })).toBeVisible()
-  await expect.element(screen.getByRole('button', { name: 'Add to Cart' })).toBeVisible()
+  const buyButton = screen.getByRole('button', { name: 'Buy License' })
+  await expect.element(buyButton).toBeVisible()
+  await expect.element(buyButton).toBeEnabled()
   expect(document.body.textContent).not.toContain('Stage name:')
   expect(document.body.textContent).not.toContain('Show more')
   expect(document.body.textContent).not.toContain('Usage Terms')
@@ -67,14 +84,25 @@ test('renders likeness metadata, purchase summary, and real media entries', asyn
   const singleUseLicense = screen.getByRole('radio', { name: /Single-use campaign/ })
   const perpetualLicense = screen.getByRole('radio', { name: /Perpetual brand ambassador/ })
   await expect.element(singleUseLicense).toBeChecked()
+  await buyButton.click()
+
+  expect(purchaseLicenseMock).toHaveBeenCalledWith({ purchase: likenessDetails, license: likenessDetails.licenses[0] })
+
   await perpetualLicense.click()
 
   await expect.element(perpetualLicense).toBeChecked()
   await expect.element(purchaseSummary.getByText('$100', { exact: true })).toBeVisible()
+  await buyButton.click()
+
+  expect(purchaseLicenseMock).toHaveBeenLastCalledWith({
+    purchase: likenessDetails,
+    license: likenessDetails.licenses[1],
+  })
+  expect(purchaseLicenseMock).toHaveBeenCalledTimes(2)
 })
 
 test('opens and closes an enlarged image dialog', async () => {
-  const screen = await render(LikenessPurchasePage, { purchase })
+  const screen = await render(LikenessPurchasePage, { likenessDetails })
 
   await screen.getByRole('button', { name: 'Enlarge Avery likeness preview 2' }).click()
   await expect.element(screen.getByRole('dialog', { name: 'Enlarged likeness image' })).toBeVisible()

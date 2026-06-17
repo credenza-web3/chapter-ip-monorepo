@@ -1,8 +1,14 @@
 import { writable, derived } from 'svelte/store'
 import type { AppRouter, TRPCClient } from '@repo/trpc/client'
 import { LIKENESS_FILE_BUCKETS, type MultipleFileKey } from '$lib/constants/likenessFileBuckets'
-
-type YesNo = 'yes' | 'no' | null
+import type {
+  ContentFile,
+  LikenessLicensingMetadata,
+  LikenessMetadata,
+  LikenessMetadataInput,
+  LikenessProfileMetadata,
+  YesNo,
+} from '@repo/content-types/likeness'
 
 export type ExistingFile = { id: string; name: string; url: string }
 export type ExistingFilesByBucket = Record<MultipleFileKey, ExistingFile[]>
@@ -14,9 +20,10 @@ const emptyExistingFiles = (): ExistingFilesByBucket => ({
   videoReels: [],
 })
 
-type ContentFile = { id: string; filename: string; label: string; mimetype: string }
-
-function resolveBucket(file: ContentFile, uploadsByBucket: Record<MultipleFileKey, string[]>): MultipleFileKey | null {
+function resolveBucket(
+  file: ContentFile,
+  uploadsByBucket: LikenessMetadata['uploadsByBucket'] = {},
+): MultipleFileKey | null {
   const bucket = LIKENESS_FILE_BUCKETS.find((bucket) =>
     uploadsByBucket[bucket]?.some((name) => name === file.filename || name === file.label),
   )
@@ -26,11 +33,11 @@ function resolveBucket(file: ContentFile, uploadsByBucket: Record<MultipleFileKe
 }
 
 export async function loadExistingFiles(
-  content: { files?: ContentFile[]; metadata?: Record<string, unknown> },
+  content: { files?: ContentFile[]; metadata?: LikenessMetadataInput },
   trpcClient: TRPCClient<AppRouter>,
 ): Promise<ExistingFilesByBucket> {
   const existingFiles = emptyExistingFiles()
-  const uploadsByBucket = (content.metadata?.uploadsByBucket ?? {}) as Record<MultipleFileKey, string[]>
+  const uploadsByBucket = content.metadata?.uploadsByBucket ?? {}
 
   for (const file of content.files ?? []) {
     const bucket = resolveBucket(file, uploadsByBucket)
@@ -50,37 +57,8 @@ interface LikenessState {
     voiceSamples: File[] // multiple
     videoReels: File[] // multiple
   }
-  profile: {
-    fullLegalName: string
-    stageName: string
-    bio: string
-    attributes: {
-      ethnicity: string
-      heightFt: string
-      heightIn: string
-      weight: string
-      eyeColor: string
-      hairColor: string
-    }
-    affiliations: {
-      union: string
-      memberId: string
-    }[]
-  }
-  licensing: {
-    isLifetime: boolean
-    isOneTime: boolean
-    lifetimePrice: number
-    oneTimePrice: number
-    licenseTypes: Record<string, boolean>
-    licensePrices: Record<string, string>
-    licenseDropdowns: Record<string, string>
-    permittedUses: Record<string, boolean>
-    territories: string[]
-    allowRetouching: YesNo
-    approveFinalUse: YesNo
-    agreedToFee: boolean
-  }
+  profile: LikenessProfileMetadata
+  licensing: LikenessLicensingMetadata
   confirmations: {
     rightsConfirmed: boolean
   }
@@ -270,12 +248,12 @@ function createLikenessStore() {
       update((s) => ({ ...s, confirmations: { ...s.confirmations, rightsConfirmed: value } })),
     setLoading: (loading: boolean) => update((s) => ({ ...s, ui: { ...s.ui, loading } })),
     hydrateFromContent(
-      content: { metadata?: Record<string, unknown> },
+      content: { metadata?: LikenessMetadataInput },
       existingFiles: ExistingFilesByBucket = emptyExistingFiles(),
     ) {
       const metadata = content.metadata ?? {}
-      const profile = (metadata.profile ?? {}) as Partial<LikenessState['profile']>
-      const licensing = (metadata.licensing ?? {}) as Partial<LikenessState['licensing']>
+      const profile = (metadata.profile ?? {}) as Partial<LikenessProfileMetadata>
+      const licensing = (metadata.licensing ?? {}) as Partial<LikenessLicensingMetadata>
 
       update((s) => ({
         ...s,
