@@ -138,11 +138,15 @@
                     {#await findContent(getTokenId(tx?.payload ?? {}))}
                       <p class="text-[13px] font-semibold">Loading...</p>
                     {:then value}
-                      <p class="text-[13px] font-semibold min-w-0 leading-tight">
-                        {value?.type ?? ''} [{value?.name ?? ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
-                          ? 'added to your products'
-                          : 'was purchased'}
-                      </p>
+                      {#if value}
+                        <p class="text-[13px] font-semibold min-w-0 leading-tight">
+                          {value.type ?? ''} [{value.name ?? ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
+                            ? 'added to your products'
+                            : 'was purchased'}
+                        </p>
+                      {:else}
+                        <p class="text-[13px] font-semibold">{tx.message ?? tx.title}</p>
+                      {/if}
                     {:catch}
                       <p class="text-[13px] font-semibold">{tx.message ?? tx.title}</p>
                     {/await}

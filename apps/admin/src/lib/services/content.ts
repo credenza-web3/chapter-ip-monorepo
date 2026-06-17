@@ -11,7 +11,9 @@ export async function findContent(tokenId?: string) {
     contractAddress: configStore.getContractAddress(ContractName.CONTENT_NFT),
     tokenId,
   })
-  const metadata = result.items[0]?.metadata as Record<string, unknown> | undefined
+  const item = result.items[0]
+  if (!item?.metadata) return undefined
+  const metadata = item.metadata as Record<string, unknown>
   return {
     name: (metadata?.profile as Record<string, unknown> | undefined)?.fullLegalName as string | undefined,
     type: metadata?.type as string | undefined,
