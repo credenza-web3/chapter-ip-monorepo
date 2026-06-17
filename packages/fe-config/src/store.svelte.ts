@@ -18,6 +18,7 @@ const contractAbis: Record<ContractName, ethers.InterfaceAbi> = {
 }
 
 function createConfigStore() {
+  console.log(license_abi)
   let data = $state<ConfigResponse | null>(null)
 
   function getContractAddress(contractName: ContractName) {

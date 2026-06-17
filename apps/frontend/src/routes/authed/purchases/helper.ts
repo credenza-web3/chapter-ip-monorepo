@@ -2,8 +2,7 @@ import { initProvider, getSigner } from '@repo/fe-evm-provider'
 import { getMemberships } from '$lib/membership'
 import { configStore, ContractName } from '$lib/stores/config.svelte'
 import type { createClient } from '@repo/trpc/client'
-
-type ContentTokenMetadata = Record<string, unknown>
+import type { PurchasedContentToken } from './types'
 
 export const getTokensWithMetadata = async (accessToken: string, trpcClient: ReturnType<typeof createClient>) => {
   await initProvider(accessToken)
@@ -20,7 +19,7 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
   })
   const blockedLicensesIds = blockedLicenses.map((b) => b.tokenId)
 
-  const tokens = []
+  const tokens: PurchasedContentToken[] = []
 
   for (let i = 0; i < balanceNum; i++) {
     const licenseTokenId = await licenseContract.tokenOfOwnerByIndex(userAddress, i)
@@ -40,10 +39,14 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
       if (!content) continue
 
       const contentWithFiles = await trpcClient.contents.getContentById.query({ id: content.id })
+      const contentTokenIdString = contentTokenId.toString()
+      const licenseTokenIdString = licenseTokenId.toString()
 
       tokens.push({
-        licenseTokenId,
-        isBlocked: blockedLicensesIds.includes(String(licenseTokenId)),
+        id: content.id,
+        tokenId: contentTokenIdString,
+        licenseTokenId: licenseTokenIdString,
+        isBlocked: blockedLicensesIds.includes(licenseTokenIdString),
         contentTokenId: Number(contentTokenId),
         metadata: content.metadata ?? {},
         files: contentWithFiles.files ?? [],
@@ -79,7 +82,7 @@ export const getPurchasedMembershipContent = async (
       publisherSub: string
       contentItems: Array<{
         contentTokenId: number
-        metadata: ContentTokenMetadata
+        metadata: PurchasedContentToken['metadata']
       }>
     }
   > = {}

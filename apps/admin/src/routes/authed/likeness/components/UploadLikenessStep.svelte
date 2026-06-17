@@ -6,8 +6,8 @@
   let { currentStep = $bindable() } = $props()
   const canContinueFromStepOne = $derived(
     Boolean(
-      $likenessStore.profile.fullLegalName.trim() &&
-      $likenessStore.profile.bio.trim() &&
+      $likenessStore.profile.fullLegalName &&
+      $likenessStore.profile.bio &&
       ($likenessStore.files.headshots.length || $likenessStore.existingFiles.headshots.length) &&
       $likenessStore.confirmations.rightsConfirmed,
     ),

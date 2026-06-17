@@ -3,7 +3,7 @@ import { authStore } from '$lib'
 import { passportStore } from '$lib/passport.store'
 import { configStore, ContractName } from '$lib/stores/config.svelte'
 import { Passport } from '@credenza3/passport-evm'
-import { ethers, initProvider } from '@repo/fe-evm-provider'
+import { ethers, initProvider, getSigner } from '@repo/fe-evm-provider'
 import { forwardTransaction } from '@repo/fe-services'
 import { get } from 'svelte/store'
 import type { LikenessDetails, LikenessLicense } from '@repo/content-types/likeness'
@@ -24,12 +24,14 @@ type PassportPaymentEvent = {
       tx?: string
       hash?: string
       outcome?: {
-        voucher: string
+        voucher: TLicenseVoucher
         sig: string
       }
     }>
   }
 }
+
+type TLicenseVoucher = Record<string, number | string>
 
 type PurchaseContext = {
   passport: Passport
@@ -42,7 +44,7 @@ type PurchaseContext = {
   licenseContractAddress: string
 }
 
-export type PassportPayment = { kind: 'card'; voucher: string; sig: string } | { kind: 'direct'; hash: string }
+export type PassportPayment = { kind: 'card'; voucher: TLicenseVoucher; sig: string } | { kind: 'direct'; hash: string }
 
 const LICENSE_TYPES: Partial<Record<string, PurchaseLicenseType>> = {
   perpetual: '0',
@@ -54,18 +56,21 @@ export function getPurchaseLicenseType(licenseId: string): PurchaseLicenseType |
 }
 
 export function canPurchaseLicense(purchase: LikenessDetails, license: LikenessLicense | undefined): boolean {
-  return Boolean(license && getPurchaseLicenseType(license.id) && purchase.contentTokenId?.trim())
+  return Boolean(license && getPurchaseLicenseType(license.id) && purchase.contentTokenId)
 }
 
 export async function purchaseLicense({ purchase, license }: PurchaseLicenseInput): Promise<void> {
   const context = await getPurchaseContext({ purchase, license })
-  const payload = await requestPassportPayment(context)
-  const payment = parsePassportPayment(payload)
-  const hash = payment.kind === 'card' ? await redeemVoucher(payment, context) : payment.hash
-
   context.passport.once(Passport.events.ERROR, (error: unknown) => {
     throw error
   })
+  const payload = await requestPassportPayment(context)
+  const payment = parsePassportPayment(payload)
+
+  console.log('payment', payment)
+  const hash = payment.kind === 'card' ? await redeemVoucher(payment, context) : payment.hash
+  console.log('hash', hash)
+
   await goto('/authed/purchases')
   await openPurchaseAlert(context.passport, hash)
 }
@@ -73,6 +78,8 @@ export async function purchaseLicense({ purchase, license }: PurchaseLicenseInpu
 export function parsePassportPayment(payload: PassportPaymentEvent): PassportPayment {
   const type = payload.type.toUpperCase()
   const firstItem = payload.results?.items?.[0]
+
+  console.log(payload)
 
   if (type === 'CARD' || type === 'STRIPE') {
     const { voucher, sig } = firstItem?.outcome ?? {}
@@ -96,7 +103,7 @@ async function getPurchaseContext({ purchase, license }: PurchaseLicenseInput): 
   const licenseType = getPurchaseLicenseType(license.id)
   if (!licenseType) throw new Error(`Unsupported license type: ${license.id}`)
 
-  const contentTokenId = purchase.contentTokenId?.trim()
+  const contentTokenId = purchase.contentTokenId
   if (!contentTokenId) throw new Error('Missing content token ID for license purchase')
 
   return {
@@ -133,21 +140,33 @@ async function requestPassportPayment(context: PurchaseContext): Promise<Passpor
   return paymentEvent
 }
 
-async function redeemVoucher(payment: { voucher: string; sig: string }, context: PurchaseContext): Promise<string> {
+async function redeemVoucher(
+  payment: { voucher: TLicenseVoucher; sig: string },
+  context: PurchaseContext,
+): Promise<string> {
   const provider = await initProvider(context.accessToken)
   const ethersProvider = new ethers.BrowserProvider(provider)
-  const signer = await ethersProvider.getSigner()
+  const signer = await getSigner()
   const userAddress = await signer.getAddress()
   const licenseContract = configStore.getContract(ContractName.LICENSE_NFT, signer)
-  const populatedTx = await licenseContract.redeem.populateTransaction(userAddress, payment.voucher, payment.sig)
+  const populatedTx = await licenseContract.redeem.populateTransaction(
+    userAddress.toLowerCase(),
+    payment.voucher,
+    payment.sig,
+  )
+  console.log('userAddress', userAddress)
+  console.log('licenseContract', licenseContract)
+  console.log('populatedTx', populatedTx)
 
   const hash = await forwardTransaction(populatedTx, {
     token: context.accessToken,
     client_id: import.meta.env.VITE_CLIENT_ID,
     evm_wss: import.meta.env.VITE_CREDENZA_EVM_WSS,
   })
+  console.log('hash2', hash)
 
   const receipt = await ethersProvider.waitForTransaction(hash)
+  console.log('receipt', receipt)
   if (!receipt) throw new Error('License redemption transaction failed')
 
   return hash
