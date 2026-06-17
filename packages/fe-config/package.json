@@ -15,7 +15,7 @@
     "typescript": "^6.0.3"
   },
   "peerDependencies": {
-    "@credenza3/contracts": "^0.0.16",
+    "@credenza3/contracts": "^0.0.20",
     "@repo/fe-evm-provider": "workspace:*",
     "svelte": "^5.39.5"
   }

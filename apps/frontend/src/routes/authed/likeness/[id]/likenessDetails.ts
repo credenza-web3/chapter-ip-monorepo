@@ -1,20 +1,15 @@
 import { DEFAULT_IMAGE_URL, getPreviewUrl } from '../likeness'
-import type { LikenessAffiliation, LikenessLicense, LikenessPurchase } from './types'
+import type {
+  LikenessAffiliation,
+  LikenessContent,
+  LikenessDetails,
+  LikenessLicense,
+  LikenessLicensingMetadataInput,
+  LikenessProfileAffiliation,
+  LikenessProfileAttributes,
+} from '@repo/content-types/likeness'
 
-type UnknownRecord = Record<string, unknown>
-
-type Content = {
-  id: string
-  metadata?: UnknownRecord
-  files?: ContentFile[]
-}
-
-type ContentFile = {
-  id: string
-  filename: string
-  label: string
-  mimetype: string
-}
+type LikenessContentInput = LikenessContent
 
 const LICENSE_NAMES: Record<string, string> = {
   'single-use': 'Single-use campaign',
@@ -40,24 +35,8 @@ const PERMITTED_USE_NAMES: Record<string, string> = {
   'film-tv': 'Film and TV',
 }
 
-function isRecord(value: unknown): value is UnknownRecord {
-  return typeof value === 'object' && value !== null
-}
-
-function getString(value: unknown): string {
-  return typeof value === 'string' ? value.trim() : ''
-}
-
-function getBoolean(value: unknown): boolean {
-  return value === true
-}
-
-function getRecord(value: unknown): UnknownRecord {
-  return isRecord(value) ? value : {}
-}
-
-function getStringArray(value: unknown): string[] {
-  return Array.isArray(value) ? value.map(getString).filter(Boolean) : []
+function trimString(value: unknown): string {
+  return value == null ? '' : String(value).trim()
 }
 
 function formatLabel(value: string): string {
@@ -67,9 +46,9 @@ function formatLabel(value: string): string {
     .join(' ')
 }
 
-function formatHeight(attributes: UnknownRecord): string {
-  const feet = getString(attributes.heightFt)
-  const inches = getString(attributes.heightIn)
+function formatHeight(attributes: Partial<LikenessProfileAttributes> | undefined): string {
+  const feet = trimString(attributes?.heightFt)
+  const inches = trimString(attributes?.heightIn)
   if (!feet && !inches) return ''
 
   const imperial = [feet && `${feet}'`, inches && `${inches}"`].filter(Boolean).join(' ')
@@ -80,7 +59,7 @@ function formatHeight(attributes: UnknownRecord): string {
 }
 
 function formatWeight(value: unknown): string {
-  const weight = getString(value)
+  const weight = trimString(value)
   if (!weight) return ''
 
   const pounds = Number(weight)
@@ -89,48 +68,45 @@ function formatWeight(value: unknown): string {
   return `${weight} lbs (${(pounds * 0.453592).toFixed(1)} kg)`
 }
 
-function getAffiliations(value: unknown): LikenessAffiliation[] {
-  if (!Array.isArray(value)) return []
-
-  return value.flatMap((item) => {
-    const affiliation = getRecord(item)
-    const union = getString(affiliation.union)
-    const memberId = getString(affiliation.memberId)
+function getAffiliations(affiliations: Array<Partial<LikenessProfileAffiliation>> | undefined): LikenessAffiliation[] {
+  return (affiliations ?? []).flatMap((affiliation) => {
+    const union = trimString(affiliation.union)
+    const memberId = trimString(affiliation.memberId)
     return union || memberId ? [{ union, memberId }] : []
   })
 }
 
-function getLicenses(licensing: UnknownRecord): LikenessLicense[] {
-  const enabledTypes = getRecord(licensing.licenseTypes)
-  const prices = getRecord(licensing.licensePrices)
-  const details = getRecord(licensing.licenseDropdowns)
+function getLicenses(licensing: LikenessLicensingMetadataInput | undefined): LikenessLicense[] {
+  const enabledTypes = licensing?.licenseTypes ?? {}
+  const prices = licensing?.licensePrices ?? {}
+  const details = licensing?.licenseDropdowns ?? {}
 
   return Object.entries(enabledTypes).flatMap(([id, enabled]) => {
-    if (!getBoolean(enabled)) return []
+    if (enabled !== true) return []
 
-    const price = getString(prices[id]) || '0'
+    const price = trimString(prices[id]) || '0'
     return [
       {
         id,
         name: LICENSE_NAMES[id] ?? formatLabel(id),
         price,
-        detail: getString(details[id]),
+        detail: trimString(details[id]),
         description: LICENSE_DESCRIPTIONS[id] ?? '',
       },
     ]
   })
 }
 
-function getPermittedUses(value: unknown): string[] {
-  return Object.entries(getRecord(value)).flatMap(([id, enabled]) =>
-    getBoolean(enabled) ? [PERMITTED_USE_NAMES[id] ?? formatLabel(id)] : [],
+function getPermittedUses(permittedUses: Record<string, boolean> | undefined): string[] {
+  return Object.entries(permittedUses ?? {}).flatMap(([id, enabled]) =>
+    enabled === true ? [PERMITTED_USE_NAMES[id] ?? formatLabel(id)] : [],
   )
 }
 
-function getMedia(content: Content, name: string, contractAddress: string): LikenessPurchase['media'] {
+function getMedia(content: LikenessContentInput, name: string, contractAddress: string): LikenessDetails['media'] {
   return (content.files ?? []).map((file) => {
-    const filename = getString(file.filename) || getString(file.label)
-    const id = getString(file.id) || filename
+    const filename = trimString(file.filename) || trimString(file.label)
+    const id = trimString(file.id) || filename
 
     if (file.mimetype.startsWith('image/')) {
       return {
@@ -155,35 +131,36 @@ function getMedia(content: Content, name: string, contractAddress: string): Like
   })
 }
 
-export function toLikenessPurchase(content: Content, contractAddress: string): LikenessPurchase | null {
-  const metadata = getRecord(content.metadata)
-  if (metadata.type !== 'likeness') return null
+export function normalizeLikeness(content: LikenessContentInput, contractAddress: string): LikenessDetails | null {
+  const metadata = content.metadata
+  if (metadata?.type !== 'likeness') return null
 
-  const profile = getRecord(metadata.profile)
-  const attributes = getRecord(profile.attributes)
-  const licensing = getRecord(metadata.licensing)
-  const name = getString(profile.fullLegalName) || 'Unnamed likeness'
+  const profile = metadata.profile
+  const attributes = profile?.attributes
+  const licensing = metadata.licensing
+  const name = trimString(profile?.fullLegalName) || 'Unnamed likeness'
   const media = getMedia(content, name, contractAddress)
   const images = media.flatMap((item) => (item.type === 'image' ? [{ src: item.src, alt: item.alt }] : []))
 
   return {
     id: content.id,
+    contentTokenId: trimString(content.tokenId),
     name,
-    stageName: getString(profile.stageName),
-    bio: getString(profile.bio),
+    stageName: trimString(profile?.stageName),
+    bio: trimString(profile?.bio),
     attributes: [
-      { label: 'Ethnicity', value: getString(attributes.ethnicity) },
+      { label: 'Ethnicity', value: trimString(attributes?.ethnicity) },
       { label: 'Height', value: formatHeight(attributes) },
-      { label: 'Weight', value: formatWeight(attributes.weight) },
-      { label: 'Eye color', value: getString(attributes.eyeColor) },
-      { label: 'Hair color', value: getString(attributes.hairColor) },
+      { label: 'Weight', value: formatWeight(attributes?.weight) },
+      { label: 'Eye color', value: trimString(attributes?.eyeColor) },
+      { label: 'Hair color', value: trimString(attributes?.hairColor) },
     ].filter((attribute) => attribute.value),
-    affiliations: getAffiliations(profile.affiliations),
+    affiliations: getAffiliations(profile?.affiliations),
     licenses: getLicenses(licensing),
-    permittedUses: getPermittedUses(licensing.permittedUses),
-    territories: getStringArray(licensing.territories),
-    allowRetouching: licensing.allowRetouching === 'yes',
-    approveFinalUse: licensing.approveFinalUse === 'yes',
+    permittedUses: getPermittedUses(licensing?.permittedUses),
+    territories: (licensing?.territories ?? []).map(trimString).filter(Boolean),
+    allowRetouching: licensing?.allowRetouching === 'yes',
+    approveFinalUse: licensing?.approveFinalUse === 'yes',
     images: images.length > 0 ? images : [{ src: DEFAULT_IMAGE_URL, alt: `${name} default likeness preview` }],
     media,
   }
