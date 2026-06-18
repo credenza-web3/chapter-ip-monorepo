@@ -83,7 +83,7 @@ export function parsePassportPayment(payload: PassportPaymentEvent): PassportPay
   if (type === 'CARD' || type === 'STRIPE') {
     const { voucher, sig } = firstItem?.outcome ?? {}
 
-    if (typeof voucher !== 'object' || typeof sig !== 'string') {
+    if (!voucher || !voucher.nonce || !sig) {
       throw new Error('Missing card payment voucher outcome')
     }
     return { kind: 'card', voucher, sig }
