@@ -1,8 +1,9 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import BellIcon from '$lib/assets/bell.svg'
+  import { findContent, getTokenId } from '$lib/services/content'
   import { NotificationsMenuItems } from '../../routes/authed/notifications/constants'
-  import type { TNotificationItem } from '@repo/notifications'
+  import { NOTIFICATION_TYPE, type TNotificationItem } from '@repo/notifications'
 
   let {
     notifications = [],
@@ -89,10 +90,22 @@
             <div class="size-1.5 rounded-full bg-primary shrink-0 mt-1.5" class:invisible={!!tx.readAt}></div>
             <div class="flex flex-col items-between justify-start w-full">
               <div class="flex items-center justify-between w-full">
-                <p class="text-[13px] font-semibold">
-                  {tx.message ?? tx.title ?? 'No title'}
-                </p>
-                <div class="relative ml-3 shrink-0">
+                {#await findContent(getTokenId(tx?.payload ?? {}))}
+                  <p class="text-[13px] font-semibold">Loading...</p>
+                {:then value}
+                  {#if value}
+                    <p class="text-[13px] font-semibold min-w-0 leading-tight">
+                      {value.type ?? ''} [{value.name ?? ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
+                        ? 'added to your products'
+                        : 'was purchased'}
+                    </p>
+                  {:else}
+                    <p class="text-[13px] font-semibold min-w-0 leading-tight">{tx.message ?? tx.title}</p>
+                  {/if}
+                {:catch}
+                  <p class="text-[13px] font-semibold min-w-0 leading-tight">{tx.message ?? tx.title}</p>
+                {/await}
+                <div class="relative shrink-0">
                   <button
                     type="button"
                     aria-haspopup="menu"
