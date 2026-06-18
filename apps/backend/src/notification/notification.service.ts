@@ -92,6 +92,8 @@ export class NotificationService implements OnModuleInit {
                   priceEther: String(args[4] ?? '0'),
                   priceToken: String(args[5] ?? '0'),
                   currencyTokenContract: String(args[6] ?? '').toLowerCase(),
+                  platformFeeAmount: String(args[7] ?? '0'),
+                  agencyFeeAmount: String(args[8] ?? '0'),
                   ownerId: content.sub,
                 }),
               ])
