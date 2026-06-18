@@ -150,6 +150,23 @@ export const getContentFileLinkOutputSchema = z.object({
 })
 export type TGetContentFileLinkOutput = z.infer<typeof getContentFileLinkOutputSchema>
 
+export const getContentAllFilesLinkInputSchema = z.object({
+  contentId: z.string(),
+  licenseTokenId: z.string().optional(),
+})
+export type TGetContentAllFilesLinkInput = z.infer<typeof getContentAllFilesLinkInputSchema>
+
+export const getContentAllFilesLinkOutputSchema = z.object({
+  files: z.array(
+    z.object({
+      id: z.string(),
+      label: z.string(),
+      url: z.string(),
+    }),
+  ),
+})
+export type TGetContentAllFilesLinkOutput = z.infer<typeof getContentAllFilesLinkOutputSchema>
+
 export const requestLazyMintContentTokenInputSchema = z.object({
   uri: z.string(),
   licenseType: z.union([z.literal(0), z.literal(2)]),

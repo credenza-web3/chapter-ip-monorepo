@@ -4,6 +4,7 @@ import { Contract } from 'ethers'
 import { abi as contentAbi } from '@credenza3/contracts/artifacts/ContentNftContract.json'
 import { abi as membershipAbi } from '@credenza3/contracts/artifacts/ChapterIpMembershipContract.json'
 import { CommonEvmService } from '../common/evm/evm.service'
+import { CommonLicenseService } from '../common/license/license.service'
 import { ContentModelService } from './content-model.service'
 import { EvmEventService } from '../evm-listener/evm-event.service'
 import type { TGetContentStatisticOutput } from './content.dto'
@@ -27,6 +28,7 @@ export class ContentService {
   constructor(
     private readonly configService: ConfigService,
     private readonly commonEvmService: CommonEvmService,
+    private readonly commonLicenseService: CommonLicenseService,
     private readonly contentService: ContentModelService,
     private readonly evmEventService: EvmEventService,
   ) {
@@ -98,6 +100,38 @@ export class ContentService {
     }
     const res = (await this.membershipContract.confirmMembership(publisherAddress, subEvmAddress)) as boolean
     return res
+  }
+
+  public async verifyContentFileAccess(
+    sub: string,
+    contentId: string,
+    licenseTokenId?: string,
+  ): Promise<[false, string] | [true, null]> {
+    const parent = await this.contentService.findById(contentId)
+    if (!parent) {
+      return [false, 'Content is not found']
+    }
+
+    const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(sub)
+
+    let hasMembership = false
+    if (parent.tokenId) {
+      const publisherAddress = await this.getOwner(parent.tokenId)
+      hasMembership = await this.verifyHasSubscription(publisherAddress, subEvmAddress)
+    }
+
+    if (hasMembership) {
+      return [true, null]
+    }
+
+    if (parent.tokenId) {
+      if (licenseTokenId) {
+        return this.commonLicenseService.verify(sub, subEvmAddress, parent.tokenId, licenseTokenId)
+      }
+      return this.verifyIsOwner(subEvmAddress, parent.tokenId)
+    }
+
+    return this.verifyIsOwnerById(sub, contentId)
   }
 
   public async requestLazyMintContentTokenVoucher(uri: string, licenseType: 0 | 2) {
