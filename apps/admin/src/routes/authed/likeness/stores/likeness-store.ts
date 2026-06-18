@@ -40,7 +40,7 @@ export async function loadExistingFiles(
   const uploadsByBucket = content.metadata?.uploadsByBucket ?? {}
   const contentFiles = content.files ?? []
 
-  if (!contentFiles.length) return existingFiles
+  if (!content.id || !contentFiles.length) return existingFiles
 
   const { files: fileLinks } = await trpcClient.contents.getContentAllFilesLink.query({ contentId: content.id })
   const fileUrlsById = new Map(fileLinks.map((file) => [file.id, file.url]))
@@ -50,7 +50,10 @@ export async function loadExistingFiles(
     if (!bucket) continue
 
     const url = fileUrlsById.get(file.id)
-    if (!url) continue
+    if (!url) {
+      console.warn('No URL for file', file.id, file.filename)
+      continue
+    }
 
     existingFiles[bucket].push({ id: file.id, name: file.filename || file.label, url })
   }

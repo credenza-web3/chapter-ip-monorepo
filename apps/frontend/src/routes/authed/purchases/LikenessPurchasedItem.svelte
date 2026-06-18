@@ -44,14 +44,20 @@
   }
 
   function downloadContentFile({ url, label }: DownloadableContentFile) {
-    const anchor = document.createElement('a')
-    anchor.href = url
-    anchor.download = label || 'download'
-    anchor.target = '_blank'
-    anchor.rel = 'noopener noreferrer'
-    document.body.append(anchor)
-    anchor.click()
-    anchor.remove()
+    try {
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = label || 'download'
+      anchor.target = '_blank'
+      anchor.rel = 'noopener noreferrer'
+      document.body.append(anchor)
+      anchor.click()
+      anchor.remove()
+      return true
+    } catch (error) {
+      console.error('Error starting content file download:', { url, label }, error)
+      return false
+    }
   }
 
   async function downloadFiles() {
@@ -65,10 +71,15 @@
       const { files } = await trpcClient.contents.getContentAllFilesLink.query(getFilesLinkInput())
       if (!files.length) throw new Error('No content files available')
 
-      files.forEach(downloadContentFile)
+      let startedDownloadCount = 0
+      for (const file of files) {
+        if (downloadContentFile(file)) startedDownloadCount += 1
+      }
+      if (!startedDownloadCount) throw new Error('No content file downloads started')
+
       if (purchase.licenseType === '2') isBlocked = true
     } catch (error) {
-      console.error('Error fetching file URLs:', error)
+      console.error('Error downloading content files:', error)
       errorMessage = 'Download is unavailable right now.'
     } finally {
       isDownloading = false
