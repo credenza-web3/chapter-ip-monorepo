@@ -31,7 +31,8 @@
         ...(cursor ? { cursor } : {}),
       })
       if (cancelled) return
-      items = result.items
+      items = result.items.filter((item) => item.type !== NOTIFICATION_TYPE.LICENSE_PURCHASED)
+
       const nextCursor = result.cursor.next
       hasNext = !!nextCursor && nextCursor !== result.cursor.current
 
@@ -135,7 +136,7 @@
                 >
                   <td class="px-4 py-1.5">{formatDate(tx.createdAt)}</td>
                   <td class="px-4 py-1.5">
-                    {#await findContent(getTokenId(tx?.payload ?? {}))}
+                    {#await findContent(getTokenId(tx))}
                       <p class="text-[13px] font-semibold">Loading...</p>
                     {:then value}
                       {#if value}
