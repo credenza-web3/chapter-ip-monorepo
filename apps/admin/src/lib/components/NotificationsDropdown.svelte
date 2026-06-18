@@ -90,7 +90,7 @@
             <div class="size-1.5 rounded-full bg-primary shrink-0 mt-1.5" class:invisible={!!tx.readAt}></div>
             <div class="flex flex-col items-between justify-start w-full">
               <div class="flex items-center justify-between w-full">
-                {#await findContent(getTokenId(tx?.payload ?? {}))}
+                {#await findContent(getTokenId(tx))}
                   <p class="text-[13px] font-semibold">Loading...</p>
                 {:then value}
                   {#if value}
