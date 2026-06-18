@@ -6,7 +6,8 @@
   import { getTrpcClient } from '$lib/stores/trpc-client'
   import { NOTIFICATIONS_PAGE_SIZE } from '$lib/constants'
   import { notificationStore } from '$lib/stores/notification.svelte'
-  import type { TNotificationItem } from '@repo/notifications'
+  import { NOTIFICATION_TYPE, type TNotificationItem } from '@repo/notifications'
+  import { findContent, getTokenId } from '$lib/services/content'
 
   let activeMenuRow = $state<number | null>(null)
   let loading = $state(true)
@@ -133,7 +134,23 @@
                         : 'bg-cream'}"
                 >
                   <td class="px-4 py-1.5">{formatDate(tx.createdAt)}</td>
-                  <td class="px-4 py-1.5">{tx.message ?? tx.title ?? '—'}</td>
+                  <td class="px-4 py-1.5">
+                    {#await findContent(getTokenId(tx?.payload ?? {}))}
+                      <p class="text-[13px] font-semibold">Loading...</p>
+                    {:then value}
+                      {#if value}
+                        <p class="text-[13px] font-semibold min-w-0 leading-tight">
+                          {value.type ?? ''} [{value.name ?? ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
+                            ? 'added to your products'
+                            : 'was purchased'}
+                        </p>
+                      {:else}
+                        <p class="text-[13px] font-semibold">{tx.message ?? tx.title}</p>
+                      {/if}
+                    {:catch}
+                      <p class="text-[13px] font-semibold">{tx.message ?? tx.title}</p>
+                    {/await}
+                  </td>
                   <td class="px-4 py-1.5 text-right">
                     <RowActionMenu
                       items={getMenuItems(isRead)}

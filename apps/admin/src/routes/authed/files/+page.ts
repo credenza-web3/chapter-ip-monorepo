@@ -6,7 +6,7 @@ import type { TContentStatistic } from './types'
 export const load = async (): Promise<{
   cursor: { next: string | null; current: string | null }
   items: {
-    tokenId: string
+    tokenId?: string
     id: string
     sub: string
     contractAddress: string
@@ -33,7 +33,7 @@ export const load = async (): Promise<{
   const items = await Promise.all(
     paginatedResponse.items.map(async (item) => {
       const statistic = await trpcClient.contents.getContentStatistic.query({
-        tokenId: item.tokenId,
+        tokenId: item.tokenId!,
       })
 
       return { ...item, statistic }
