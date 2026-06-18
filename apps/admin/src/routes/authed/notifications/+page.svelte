@@ -135,7 +135,7 @@
                 >
                   <td class="px-4 py-1.5">{formatDate(tx.createdAt)}</td>
                   <td class="px-4 py-1.5">
-                    {#await findContent(getTokenId(tx?.payload ?? {}))}
+                    {#await findContent(getTokenId(tx?.payload ?? {}, tx.type))}
                       <p class="text-[13px] font-semibold">Loading...</p>
                     {:then value}
                       {#if value}

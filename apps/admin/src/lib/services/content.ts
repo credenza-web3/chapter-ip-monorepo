@@ -1,6 +1,7 @@
 import { authStore } from '$lib/auth'
 import { configStore, ContractName } from '$lib/stores/config.svelte'
 import { getTrpcClient } from '$lib/stores/trpc-client'
+import { NOTIFICATION_TYPE, type TNotificationType } from '@repo/notifications'
 
 export async function findContent(tokenId?: string) {
   const trpcClient = getTrpcClient()
@@ -23,6 +24,8 @@ export async function findContent(tokenId?: string) {
   return undefined
 }
 
-export function getTokenId(payload: Record<string, unknown>): string | undefined {
-  return (payload.args as string[] | undefined)?.[2]
+export function getTokenId(payload: Record<string, unknown>, type?: TNotificationType): string | undefined {
+  const args = payload.args as string[] | undefined
+  if (!args) return undefined
+  return type === NOTIFICATION_TYPE.LICENSE_PURCHASED ? args[1] : args[2]
 }
