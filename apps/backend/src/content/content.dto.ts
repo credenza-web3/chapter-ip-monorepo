@@ -218,6 +218,8 @@ export const purchaseHistoryItemOutputSchema = z.object({
   priceToken: z.string(),
   priceEther: z.string(),
   currencyTokenContract: z.string(),
+  platformFeeAmount: z.string(),
+  agencyFeeAmount: z.string(),
   ownerId: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),

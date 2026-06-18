@@ -42,6 +42,12 @@ export class PurchaseHistoryItem extends Document<ObjectId> {
   @Prop({ required: false, lowercase: true, trim: true })
   declare currencyTokenContract: string
 
+  @Prop({ required: false })
+  declare platformFeeAmount: string
+
+  @Prop({ required: false })
+  declare agencyFeeAmount: string
+
   @Prop({ required: true })
   declare ownerId: string
 
