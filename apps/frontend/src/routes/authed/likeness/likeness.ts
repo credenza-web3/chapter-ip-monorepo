@@ -55,7 +55,6 @@ type ContentItem = {
 }
 
 export type LikenessFilters = {
-  q: string
   ethnicity: LikenessOptionValue<typeof ETHNICITY_OPTIONS>[]
   eyeColor: LikenessOptionValue<typeof EYE_COLOR_OPTIONS>[]
   hairColor: LikenessOptionValue<typeof HAIR_COLOR_OPTIONS>[]
@@ -165,7 +164,6 @@ export function getPreviewUrl(contractAddress: string, contentId: string, filena
 
 export function createEmptyLikenessFilters(): LikenessFilters {
   return {
-    q: '',
     ethnicity: [],
     eyeColor: [],
     hairColor: [],
@@ -179,7 +177,6 @@ export function createEmptyLikenessFilters(): LikenessFilters {
 
 export function parseLikenessFilters(searchParams: URLSearchParams): LikenessFilters {
   return {
-    q: searchParams.get('q')?.trim() ?? '',
     ethnicity: selectedOptionValues(searchParams, 'ethnicity', ETHNICITY_OPTIONS),
     eyeColor: selectedOptionValues(searchParams, 'eyeColor', EYE_COLOR_OPTIONS),
     hairColor: selectedOptionValues(searchParams, 'hairColor', HAIR_COLOR_OPTIONS),
@@ -193,9 +190,6 @@ export function parseLikenessFilters(searchParams: URLSearchParams): LikenessFil
 
 export function filtersToSearchParams(filters: LikenessFilters): URLSearchParams {
   const searchParams = new URLSearchParams()
-  const q = filters.q.trim()
-
-  if (q) searchParams.set('q', q)
 
   const appendValues = (key: ArrayFilterKey) => {
     for (const value of filters[key]) searchParams.append(key, value)
@@ -222,7 +216,6 @@ export function getActiveFilterCount(filters: LikenessFilters): number {
     filters.union.length +
     filters.licenseType.length +
     filters.permittedUse.length +
-    (filters.q.trim() ? 1 : 0) +
     (filters.height ? 1 : 0) +
     (filters.weight ? 1 : 0)
   )
@@ -271,12 +264,9 @@ export function getRecentLikenesses(items: LikenessItem[]): LikenessItem[] {
 }
 
 export function filterLikenessItems(items: LikenessItem[], filters: LikenessFilters): LikenessItem[] {
-  const query = normalizeToken(filters.q)
-
   return items.filter((item) => {
     const filterData = item.filterData ?? getFallbackFilterData(item)
 
-    if (query && !filterData.searchText.includes(query)) return false
     if (!hasMatchingValue(filterData.ethnicity, filters.ethnicity, ETHNICITY_OPTIONS)) return false
     if (!hasMatchingValue(filterData.eyeColor, filters.eyeColor, EYE_COLOR_OPTIONS)) return false
     if (!hasMatchingValue(filterData.hairColor, filters.hairColor, HAIR_COLOR_OPTIONS)) return false

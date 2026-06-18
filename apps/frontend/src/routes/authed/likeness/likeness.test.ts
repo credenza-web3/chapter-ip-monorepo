@@ -119,12 +119,11 @@ describe('likeness data helpers', () => {
   it('parses and serializes shareable likeness filter query params', () => {
     const filters = parseLikenessFilters(
       new URLSearchParams(
-        'q=avery&ethnicity=asian&ethnicity=unknown&eyeColor=brown&licenseType=single-use&height=5-8-6-0&weight=unknown',
+        'q=ignored&ethnicity=asian&ethnicity=unknown&eyeColor=brown&licenseType=single-use&height=5-8-6-0&weight=unknown',
       ),
     )
 
     expect(filters).toMatchObject({
-      q: 'avery',
       ethnicity: ['asian'],
       eyeColor: ['brown'],
       licenseType: ['single-use'],
@@ -132,11 +131,11 @@ describe('likeness data helpers', () => {
       weight: null,
     })
     expect(filtersToSearchParams(filters).toString()).toBe(
-      'q=avery&ethnicity=asian&eyeColor=brown&licenseType=single-use&height=5-8-6-0',
+      'ethnicity=asian&eyeColor=brown&licenseType=single-use&height=5-8-6-0',
     )
   })
 
-  it('filters likenesses by query, metadata options, and selected ranges', () => {
+  it('filters likenesses by metadata options and selected ranges', () => {
     const avery = createItem({
       id: '1',
       searchText: 'avery-stone actor',
@@ -164,7 +163,6 @@ describe('likeness data helpers', () => {
 
     const filters: LikenessFilters = {
       ...createEmptyLikenessFilters(),
-      q: 'avery',
       ethnicity: ['white_or_caucasian'],
       height: '5-8-6-0',
       weight: '155-175',

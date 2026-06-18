@@ -100,11 +100,6 @@
     return (filters[key] as string[]).includes(value)
   }
 
-  function updateSearch(value: string) {
-    filters.q = value
-    updateUrl()
-  }
-
   function setHeightRange(value: HeightRangeValue) {
     filters.height = filters.height === value ? null : value
     updateUrl()
@@ -138,7 +133,7 @@
   function filterButtonClasses(active: boolean): string {
     return [
       'inline-flex h-9 items-center gap-2 rounded-sm border px-3.5 text-sm font-semibold transition-colors',
-      active ? 'border-[#ddd8d1] bg-[#efebe5] text-dark' : 'border-[#ddd8d1] bg-white text-[#77757d]',
+      active ? 'border-[#d6d0c8] bg-[#efebe5] text-dark' : 'border-[#ddd8d1] bg-[#f8f5f1] text-[#77757d]',
     ].join(' ')
   }
 
@@ -163,18 +158,41 @@
 {/snippet}
 
 {#snippet filterButton(menu: FilterMenu, label: string)}
-  <button
-    type="button"
-    class={filterButtonClasses(openFilter === menu)}
-    aria-expanded={openFilter === menu}
-    onclick={() => toggleFilter(menu)}
-  >
-    <span>{label}</span>
-    {#if getMenuCount(menu) > 0}
-      <span class="rounded-full bg-primary px-1.5 text-xs text-white">{getMenuCount(menu)}</span>
+  <div class="relative">
+    <button
+      type="button"
+      class={filterButtonClasses(openFilter === menu)}
+      aria-expanded={openFilter === menu}
+      onclick={() => toggleFilter(menu)}
+    >
+      <span>{label}{getMenuCount(menu) > 0 ? ` (${getMenuCount(menu)})` : ''}</span>
+      {@render chevron(openFilter === menu)}
+    </button>
+
+    {#if openFilter === menu}
+      <div
+        class="absolute left-0 top-full z-20 mt-2 w-max max-w-[min(82vw,520px)] rounded-lg border border-[#e4ded6] bg-[#f8f5f1] p-5 shadow-[0_18px_36px_rgba(42,36,30,0.14)]"
+      >
+        {#if menu === 'ethnicity'}
+          {@render optionPills('ethnicity', ETHNICITY_OPTIONS)}
+        {:else if menu === 'height'}
+          {@render heightRangePanel()}
+        {:else if menu === 'weight'}
+          {@render weightRangePanel()}
+        {:else if menu === 'eyeColor'}
+          {@render optionPills('eyeColor', EYE_COLOR_OPTIONS)}
+        {:else if menu === 'hairColor'}
+          {@render optionPills('hairColor', HAIR_COLOR_OPTIONS)}
+        {:else if menu === 'union'}
+          {@render optionPills('union', UNION_OPTIONS)}
+        {:else if menu === 'licenseType'}
+          {@render optionPills('licenseType', LICENSE_TYPE_OPTIONS)}
+        {:else if menu === 'permittedUse'}
+          {@render optionPills('permittedUse', PERMITTED_USE_OPTIONS)}
+        {/if}
+      </div>
     {/if}
-    {@render chevron(openFilter === menu)}
-  </button>
+  </div>
 {/snippet}
 
 {#snippet optionPills(key: MultiFilterKey, options: readonly FilterOption[])}
@@ -286,38 +304,12 @@
     class="rounded-sm border border-[#ebe6df] bg-[#f8f5f1] px-4 py-8 sm:px-6 lg:px-13 lg:py-12"
     aria-labelledby="likeness-heading"
   >
-    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-      <h2 id="likeness-heading" class="text-xl font-bold text-dark">Likeness</h2>
-
-      <label class="relative w-full lg:max-w-87.5">
-        <span class="sr-only">Search likenesses</span>
-        <input
-          type="search"
-          value={filters.q}
-          placeholder="Search likenesses"
-          class="h-10 w-full rounded-sm border border-[#ddd8d1] bg-white px-4 pr-10 text-sm text-dark outline-none placeholder:text-[#aaa5a0] focus:border-primary"
-          oninput={(event) => updateSearch(event.currentTarget.value)}
-        />
-        <svg
-          aria-hidden="true"
-          class="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[#bbb5ad]"
-          viewBox="0 0 20 20"
-          fill="none"
-        >
-          <path
-            d="M9 15.5C12.5899 15.5 15.5 12.5899 15.5 9C15.5 5.41015 12.5899 2.5 9 2.5C5.41015 2.5 2.5 5.41015 2.5 9C2.5 12.5899 5.41015 15.5 9 15.5Z"
-            stroke="currentColor"
-            stroke-width="1.7"
-          />
-          <path d="M13.75 13.75L17.5 17.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-        </svg>
-      </label>
-    </div>
+    <h2 id="likeness-heading" class="text-xl font-bold text-dark">Likeness</h2>
 
     <div class="mt-6 flex flex-wrap items-center gap-2">
       <button
         type="button"
-        class="inline-flex size-9 items-center justify-center rounded-sm border border-[#ddd8d1] bg-white text-[#77757d] transition-colors disabled:opacity-40"
+        class="inline-flex size-9 items-center justify-center rounded-sm border border-[#ddd8d1] bg-[#f8f5f1] text-[#77757d] transition-colors disabled:opacity-40"
         aria-label="Clear filters"
         disabled={activeFilterCount === 0}
         onclick={clearFilters}
@@ -339,28 +331,6 @@
       {@render filterButton('licenseType', 'License Type')}
       {@render filterButton('permittedUse', 'Permitted Uses')}
     </div>
-
-    {#if openFilter}
-      <div class="mt-2 rounded-sm border border-[#e4ded6] bg-[#f8f5f1] p-5 shadow-[0_12px_32px_rgba(26,26,46,0.08)]">
-        {#if openFilter === 'ethnicity'}
-          {@render optionPills('ethnicity', ETHNICITY_OPTIONS)}
-        {:else if openFilter === 'height'}
-          {@render heightRangePanel()}
-        {:else if openFilter === 'weight'}
-          {@render weightRangePanel()}
-        {:else if openFilter === 'eyeColor'}
-          {@render optionPills('eyeColor', EYE_COLOR_OPTIONS)}
-        {:else if openFilter === 'hairColor'}
-          {@render optionPills('hairColor', HAIR_COLOR_OPTIONS)}
-        {:else if openFilter === 'union'}
-          {@render optionPills('union', UNION_OPTIONS)}
-        {:else if openFilter === 'licenseType'}
-          {@render optionPills('licenseType', LICENSE_TYPE_OPTIONS)}
-        {:else if openFilter === 'permittedUse'}
-          {@render optionPills('permittedUse', PERMITTED_USE_OPTIONS)}
-        {/if}
-      </div>
-    {/if}
 
     <div class="my-6 border-t border-[#e5e0d9]"></div>
 
