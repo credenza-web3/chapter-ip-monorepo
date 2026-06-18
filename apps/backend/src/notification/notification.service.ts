@@ -69,6 +69,7 @@ export class NotificationService implements OnModuleInit {
                 contractAddress: contentNftContractAddress,
                 tokenId,
               })
+
               if (!content) {
                 this.logger.warn(`Cannot find content for contract: ${change.fullDocument.contractAddress}`)
                 return
@@ -80,7 +81,7 @@ export class NotificationService implements OnModuleInit {
                   .insertMany([
                     { ...notification, sub: toSub, type: NOTIFICATION_TYPE.LICENSE_PURCHASED },
                     ...(content.sub !== toSub
-                      ? [{ ...notification, sub: content.sub, type: NOTIFICATION_TYPE.LICENSE_PURCHASED }]
+                      ? [{ ...notification, sub: content.sub, type: NOTIFICATION_TYPE.LICENSE_SOLD }]
                       : []),
                   ]),
                 this.purchaseHistoryService.create({

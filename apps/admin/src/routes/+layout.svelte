@@ -9,7 +9,7 @@
 
   import { getTrpcClient } from '$lib/stores/trpc-client'
   import { NOTIFICATIONS_DROPDOWN_LIMIT } from '$lib/constants'
-  import type { TNotificationItem } from '@repo/notifications'
+  import { NOTIFICATION_TYPE, type TNotificationItem } from '@repo/notifications'
   import NotificationsDropdown from '$lib/components/NotificationsDropdown.svelte'
 
   let { children } = $props()
@@ -54,7 +54,10 @@
           sort: 'createdAt',
           order: 'desc',
         })
-        notificationStore.set(items)
+
+        const filtered = items.filter((item) => item.type !== NOTIFICATION_TYPE.LICENSE_PURCHASED)
+
+        notificationStore.set(filtered)
       } catch (err) {
         console.error('Failed to fetch notifications', err)
       }
