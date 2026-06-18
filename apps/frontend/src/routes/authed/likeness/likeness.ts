@@ -45,7 +45,6 @@ export type LikenessItem = {
     unions: string[]
     licenseTypes: string[]
     permittedUses: string[]
-    searchText: string
   }
 }
 
@@ -78,6 +77,13 @@ function getOptionLabels(options: readonly LikenessOption[]): Record<string, str
   return Object.fromEntries(options.map((option) => [option.value, option.label]))
 }
 
+const ETHNICITY_LABELS = getOptionLabels(ETHNICITY_OPTIONS)
+const EYE_COLOR_LABELS = getOptionLabels(EYE_COLOR_OPTIONS)
+const HAIR_COLOR_LABELS = getOptionLabels(HAIR_COLOR_OPTIONS)
+const UNION_LABELS = getOptionLabels(UNION_OPTIONS)
+const LICENSE_TYPE_LABELS = getOptionLabels(LICENSE_TYPE_OPTIONS)
+const PERMITTED_USE_LABELS = getOptionLabels(PERMITTED_USE_OPTIONS)
+
 function selectedOptionValues<TOptions extends readonly LikenessOption[]>(
   searchParams: URLSearchParams,
   key: ArrayFilterKey,
@@ -100,11 +106,10 @@ function selectedOptionValue<TOptions extends readonly LikenessOption[]>(
   return (selected ?? null) as LikenessOptionValue<TOptions> | null
 }
 
-function hasMatchingValue(candidate: string, selected: string[], options: readonly LikenessOption[]): boolean {
+function hasMatchingValue(candidate: string, selected: string[], labels: Record<string, string>): boolean {
   if (selected.length === 0) return true
   if (!candidate) return false
 
-  const labels = getOptionLabels(options)
   const normalizedCandidate = normalizeToken(candidate)
 
   return selected.some((value) => {
@@ -113,9 +118,9 @@ function hasMatchingValue(candidate: string, selected: string[], options: readon
   })
 }
 
-function hasMatchingList(candidates: string[], selected: string[], options: readonly LikenessOption[]): boolean {
+function hasMatchingList(candidates: string[], selected: string[], labels: Record<string, string>): boolean {
   if (selected.length === 0) return true
-  return candidates.some((candidate) => hasMatchingValue(candidate, selected, options))
+  return candidates.some((candidate) => hasMatchingValue(candidate, selected, labels))
 }
 
 function getEnabledKeys(value: Record<string, boolean> | undefined): string[] {
@@ -139,12 +144,12 @@ function matchesRange(value: number | null, selectedRange: string | null, ranges
   if (!range) return true
   if (!value) return false
   if (range.min && value < range.min) return false
-  if (range.max && value > range.max) return false
+  if (range.max && value >= range.max) return false
 
   return true
 }
 
-function getFallbackFilterData(item: LikenessItem): NonNullable<LikenessItem['filterData']> {
+function getFallbackFilterData(): NonNullable<LikenessItem['filterData']> {
   return {
     ethnicity: '',
     heightInches: null,
@@ -154,7 +159,6 @@ function getFallbackFilterData(item: LikenessItem): NonNullable<LikenessItem['fi
     unions: [],
     licenseTypes: [],
     permittedUses: [],
-    searchText: [item.name, item.bio].map(normalizeToken).join(' '),
   }
 }
 
@@ -230,7 +234,6 @@ export function toLikenessItems(contentItems: ContentItem[], contractAddress: st
     const attributes = profile?.attributes
     const licensing = metadata.licensing
     const name = profile?.fullLegalName ?? ''
-    const stageName = profile?.stageName ?? ''
     const bio = profile?.bio ?? ''
     const heightFt = Number(attributes?.heightFt)
     const heightIn = Number(attributes?.heightIn)
@@ -252,7 +255,6 @@ export function toLikenessItems(contentItems: ContentItem[], contractAddress: st
           unions: getAffiliationUnions(profile?.affiliations),
           licenseTypes: getEnabledKeys(licensing?.licenseTypes),
           permittedUses: getEnabledKeys(licensing?.permittedUses),
-          searchText: [name, stageName, bio].map(normalizeToken).join(' '),
         },
       },
     ]
@@ -265,14 +267,14 @@ export function getRecentLikenesses(items: LikenessItem[]): LikenessItem[] {
 
 export function filterLikenessItems(items: LikenessItem[], filters: LikenessFilters): LikenessItem[] {
   return items.filter((item) => {
-    const filterData = item.filterData ?? getFallbackFilterData(item)
+    const filterData = item.filterData ?? getFallbackFilterData()
 
-    if (!hasMatchingValue(filterData.ethnicity, filters.ethnicity, ETHNICITY_OPTIONS)) return false
-    if (!hasMatchingValue(filterData.eyeColor, filters.eyeColor, EYE_COLOR_OPTIONS)) return false
-    if (!hasMatchingValue(filterData.hairColor, filters.hairColor, HAIR_COLOR_OPTIONS)) return false
-    if (!hasMatchingList(filterData.unions, filters.union, UNION_OPTIONS)) return false
-    if (!hasMatchingList(filterData.licenseTypes, filters.licenseType, LICENSE_TYPE_OPTIONS)) return false
-    if (!hasMatchingList(filterData.permittedUses, filters.permittedUse, PERMITTED_USE_OPTIONS)) return false
+    if (!hasMatchingValue(filterData.ethnicity, filters.ethnicity, ETHNICITY_LABELS)) return false
+    if (!hasMatchingValue(filterData.eyeColor, filters.eyeColor, EYE_COLOR_LABELS)) return false
+    if (!hasMatchingValue(filterData.hairColor, filters.hairColor, HAIR_COLOR_LABELS)) return false
+    if (!hasMatchingList(filterData.unions, filters.union, UNION_LABELS)) return false
+    if (!hasMatchingList(filterData.licenseTypes, filters.licenseType, LICENSE_TYPE_LABELS)) return false
+    if (!hasMatchingList(filterData.permittedUses, filters.permittedUse, PERMITTED_USE_LABELS)) return false
     if (!matchesRange(filterData.heightInches, filters.height, HEIGHT_RANGES)) return false
     if (!matchesRange(filterData.weightLbs, filters.weight, WEIGHT_RANGES)) return false
 

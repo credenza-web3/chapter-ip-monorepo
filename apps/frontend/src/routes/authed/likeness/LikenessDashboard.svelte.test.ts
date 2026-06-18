@@ -11,7 +11,6 @@ test('renders the recent strip and links likeness cards to purchase pages', asyn
         name: 'Avery Stone',
         bio: 'A long biography that should stay visually constrained inside the card layout.',
         imageUrl: '/headshot.jpg',
-        searchText: 'avery-stone',
       }),
     ],
   })
@@ -35,7 +34,6 @@ test('renders images from findContent items without lazy content lookups', async
         name: 'Avery Stone',
         bio: '',
         imageUrl: '/content/headshot.jpg',
-        searchText: 'avery-stone',
       }),
     ],
   })
@@ -55,13 +53,11 @@ test('filters likeness cards from the supplied shareable filters', async () => {
         id: '1',
         name: 'Avery Stone',
         ethnicity: 'white_or_caucasian',
-        searchText: 'avery-stone',
       }),
       createItem({
         id: '2',
         name: 'Mikey Berry',
         ethnicity: 'asian',
-        searchText: 'mikey-berry',
       }),
     ],
   })
@@ -78,7 +74,6 @@ function createItem(item: {
   bio?: string
   imageUrl?: string
   ethnicity?: string
-  searchText: string
 }): LikenessItem {
   return {
     id: item.id,
@@ -94,7 +89,6 @@ function createItem(item: {
       unions: [],
       licenseTypes: [],
       permittedUses: [],
-      searchText: item.searchText,
     },
   }
 }

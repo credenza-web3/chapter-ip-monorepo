@@ -83,8 +83,6 @@ describe('likeness data helpers', () => {
       licenseTypes: ['single-use'],
       permittedUses: ['ai', 'commercial'],
     })
-    expect(filterData?.searchText).toContain('avery-stone')
-    expect(filterData?.searchText).toContain('ace')
   })
 
   it('builds preview URLs from the contract, content id, and technical filename', () => {
@@ -108,7 +106,6 @@ describe('likeness data helpers', () => {
         unions: [],
         licenseTypes: [],
         permittedUses: [],
-        searchText: `name-${index}`,
       },
     }))
 
@@ -138,7 +135,7 @@ describe('likeness data helpers', () => {
   it('filters likenesses by metadata options and selected ranges', () => {
     const avery = createItem({
       id: '1',
-      searchText: 'avery-stone actor',
+      name: 'Avery Stone',
       ethnicity: 'white_or_caucasian',
       heightInches: 70,
       weightLbs: 165,
@@ -150,7 +147,7 @@ describe('likeness data helpers', () => {
     })
     const mikey = createItem({
       id: '2',
-      searchText: 'mikey-berry producer',
+      name: 'Mikey Berry',
       ethnicity: 'asian',
       heightInches: 66,
       weightLbs: 190,
@@ -173,14 +170,62 @@ describe('likeness data helpers', () => {
 
     expect(filterLikenessItems([avery, mikey], filters)).toEqual([avery])
   })
+
+  it('matches range boundary values only in the higher bucket', () => {
+    const boundary = createItem({
+      id: 'boundary',
+      name: 'Boundary Talent',
+      heightInches: 60,
+      weightLbs: 110,
+    })
+
+    expect(
+      filterLikenessItems([boundary], {
+        ...createEmptyLikenessFilters(),
+        height: 'under-5-0',
+      }),
+    ).toEqual([])
+    expect(
+      filterLikenessItems([boundary], {
+        ...createEmptyLikenessFilters(),
+        height: '5-0-5-4',
+      }),
+    ).toEqual([boundary])
+    expect(
+      filterLikenessItems([boundary], {
+        ...createEmptyLikenessFilters(),
+        weight: 'under-110',
+      }),
+    ).toEqual([])
+    expect(
+      filterLikenessItems([boundary], {
+        ...createEmptyLikenessFilters(),
+        weight: '110-130',
+      }),
+    ).toEqual([boundary])
+  })
 })
 
-function createItem(filterData: NonNullable<LikenessItem['filterData']> & { id: string }): LikenessItem {
+function createItem(
+  item: Partial<NonNullable<LikenessItem['filterData']>> & {
+    id: string
+    name: string
+  },
+): LikenessItem {
   return {
-    id: filterData.id,
-    name: filterData.searchText,
+    id: item.id,
+    name: item.name,
     bio: '',
     imageUrl: DEFAULT_IMAGE_URL,
-    filterData,
+    filterData: {
+      ethnicity: item.ethnicity ?? '',
+      heightInches: item.heightInches ?? null,
+      weightLbs: item.weightLbs ?? null,
+      eyeColor: item.eyeColor ?? '',
+      hairColor: item.hairColor ?? '',
+      unions: item.unions ?? [],
+      licenseTypes: item.licenseTypes ?? [],
+      permittedUses: item.permittedUses ?? [],
+    },
   }
 }

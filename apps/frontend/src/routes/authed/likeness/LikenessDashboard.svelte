@@ -77,8 +77,6 @@
   }
 
   function updateUrl() {
-    if (typeof window === 'undefined') return
-
     const searchParams = filtersToSearchParams(filters)
     const query = searchParams.toString()
     const nextUrl = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`
@@ -117,10 +115,24 @@
   }
 
   function getMenuCount(menu: FilterMenu): number {
-    if (menu === 'height') return filters.height ? 1 : 0
-    if (menu === 'weight') return filters.weight ? 1 : 0
-
-    return filters[menu].length
+    switch (menu) {
+      case 'ethnicity':
+        return filters.ethnicity.length
+      case 'height':
+        return filters.height ? 1 : 0
+      case 'weight':
+        return filters.weight ? 1 : 0
+      case 'eyeColor':
+        return filters.eyeColor.length
+      case 'hairColor':
+        return filters.hairColor.length
+      case 'union':
+        return filters.union.length
+      case 'licenseType':
+        return filters.licenseType.length
+      case 'permittedUse':
+        return filters.permittedUse.length
+    }
   }
 
   function optionClasses(selected: boolean): string {
