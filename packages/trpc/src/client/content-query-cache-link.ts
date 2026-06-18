@@ -28,17 +28,26 @@ type QueryCacheEntry =
     }
 
 const contentQueryCache = new Map<string, QueryCacheEntry>()
+let contentQueryCacheVersion = 0
 
 function invalidateContentQueryCache(): void {
+  contentQueryCacheVersion += 1
   contentQueryCache.clear()
 }
 
-function pruneExpiredContentQueryCache(now = Date.now()): void {
-  for (const [key, entry] of contentQueryCache.entries()) {
-    if (entry.expiresAt <= now) {
-      contentQueryCache.delete(key)
-    }
+function getContentQueryCacheEntry(cacheKey: string, now = Date.now()): QueryCacheEntry | undefined {
+  const cached = contentQueryCache.get(cacheKey)
+
+  if (!cached) {
+    return undefined
   }
+
+  if (cached.expiresAt <= now) {
+    contentQueryCache.delete(cacheKey)
+    return undefined
+  }
+
+  return cached
 }
 
 export function contentQueryCacheLink(): TRPCLink<AppRouter> {
@@ -66,12 +75,10 @@ export function contentQueryCacheLink(): TRPCLink<AppRouter> {
       }
 
       const now = Date.now()
-      pruneExpiredContentQueryCache(now)
-
       const cacheKey = createStableCacheKey(op.path, op.input)
-      const cached = contentQueryCache.get(cacheKey)
+      const cached = getContentQueryCacheEntry(cacheKey, now)
 
-      if (cached && cached.expiresAt > now) {
+      if (cached) {
         if (cached.status === 'pending') {
           return cached.observable
         }
@@ -82,19 +89,24 @@ export function contentQueryCacheLink(): TRPCLink<AppRouter> {
         })
       }
 
+      const requestCacheVersion = contentQueryCacheVersion
       const observableResult = shareObservable(
         createObservable<QueryCacheResult, TRPCClientError<AppRouter>>((observer) =>
           next(op).subscribe({
             next(value) {
-              contentQueryCache.set(cacheKey, {
-                expiresAt: Date.now() + CONTENT_QUERY_CACHE_TTL_MS,
-                status: 'resolved',
-                value,
-              })
+              if (requestCacheVersion === contentQueryCacheVersion) {
+                contentQueryCache.set(cacheKey, {
+                  expiresAt: Date.now() + CONTENT_QUERY_CACHE_TTL_MS,
+                  status: 'resolved',
+                  value,
+                })
+              }
               observer.next?.(value)
             },
             error(error) {
-              contentQueryCache.delete(cacheKey)
+              if (requestCacheVersion === contentQueryCacheVersion) {
+                contentQueryCache.delete(cacheKey)
+              }
               observer.error?.(error)
             },
             complete() {
