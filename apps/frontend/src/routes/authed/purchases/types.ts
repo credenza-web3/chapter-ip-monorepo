@@ -22,8 +22,8 @@ export type PurchasedContentToken = {
   isBlocked: boolean
 }
 
-export type ContentFileLinkClient = {
-  contents: Pick<TRPCClient<AppRouter>['contents'], 'getContentFileLink'>
+export type ContentFilesLinkClient = {
+  contents: Pick<TRPCClient<AppRouter>['contents'], 'getContentAllFilesLink'>
 }
 
 export type LikenessPurchaseRow = {

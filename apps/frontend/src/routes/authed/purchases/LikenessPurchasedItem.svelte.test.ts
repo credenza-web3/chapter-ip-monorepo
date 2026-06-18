@@ -5,10 +5,9 @@ import LikenessPurchasedItem from './LikenessPurchasedItem.svelte'
 import type { LikenessDetails } from '@repo/content-types/likeness'
 import type { PurchasedContentToken } from './types'
 
-type FileLinkInput = {
+type FilesLinkInput = {
+  contentId: string
   licenseTokenId?: string
-  id?: string
-  key?: string
 }
 
 const likeness: LikenessDetails = {
@@ -62,12 +61,26 @@ const purchase: PurchasedContentToken = {
   isBlocked: false,
 }
 
-let queryInputs: FileLinkInput[]
-let openMock: ReturnType<typeof vi.spyOn>
+let queryInputs: FilesLinkInput[]
+let clickMock: ReturnType<typeof vi.spyOn>
+let clickedDownloads: Array<{
+  href: string | null
+  download: string
+  target: string
+  rel: string
+}>
 
 beforeEach(() => {
   queryInputs = []
-  openMock = vi.spyOn(window, 'open').mockImplementation(() => null)
+  clickedDownloads = []
+  clickMock = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) {
+    clickedDownloads.push({
+      href: this.getAttribute('href'),
+      download: this.download,
+      target: this.target,
+      rel: this.rel,
+    })
+  })
 })
 
 afterEach(() => {
@@ -77,10 +90,15 @@ afterEach(() => {
 function getTrpcClient() {
   return {
     contents: {
-      getContentFileLink: {
-        query: async (input: FileLinkInput) => {
+      getContentAllFilesLink: {
+        query: async (input: FilesLinkInput) => {
           queryInputs.push(input)
-          return { url: 'https://r2.example/file' }
+          return {
+            files: [
+              { id: 'file-1', label: 'Headshot', url: 'https://r2.example/headshot' },
+              { id: 'file-2', label: 'Voice sample', url: 'https://r2.example/voice' },
+            ],
+          }
         },
       },
     },
@@ -115,7 +133,7 @@ test('opens likeness license details in an accessible modal', async () => {
   expect(document.querySelector('[role="dialog"]')).toBeNull()
 })
 
-test('downloads through the existing content file link endpoint and blocks one-time licenses locally', async () => {
+test('downloads all content files and blocks one-time licenses locally', async () => {
   const screen = await render(LikenessPurchasedItem, {
     purchase,
     likeness,
@@ -124,7 +142,21 @@ test('downloads through the existing content file link endpoint and blocks one-t
 
   await screen.getByRole('button', { name: 'Download' }).click()
 
-  expect(queryInputs).toEqual([{ licenseTokenId: '44', id: 'file-1' }])
-  expect(openMock).toHaveBeenCalledWith('https://r2.example/file', '_blank', 'noopener,noreferrer')
+  expect(queryInputs).toEqual([{ contentId: 'content-1', licenseTokenId: '44' }])
+  expect(clickMock).toHaveBeenCalledTimes(2)
+  expect(clickedDownloads).toEqual([
+    {
+      href: 'https://r2.example/headshot',
+      download: 'Headshot',
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    },
+    {
+      href: 'https://r2.example/voice',
+      download: 'Voice sample',
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    },
+  ])
   await expect.element(screen.getByRole('button', { name: 'Already used' })).toBeDisabled()
 })

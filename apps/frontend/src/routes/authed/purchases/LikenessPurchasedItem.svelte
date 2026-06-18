@@ -1,7 +1,12 @@
 <script lang="ts">
   import type { LikenessDetails } from '@repo/content-types/likeness'
   import LikenessLicenseModal from './LikenessLicenseModal.svelte'
-  import type { ContentFileLinkClient, PurchasedContentToken } from './types'
+  import type { ContentFilesLinkClient, PurchasedContentToken } from './types'
+
+  type DownloadableContentFile = {
+    url: string
+    label: string
+  }
 
   let {
     purchase,
@@ -10,7 +15,7 @@
   }: {
     purchase: PurchasedContentToken
     likeness: LikenessDetails
-    trpcClient: ContentFileLinkClient | undefined
+    trpcClient: ContentFilesLinkClient | undefined
   } = $props()
 
   let isBlocked = $state(false)
@@ -31,19 +36,25 @@
     initializedLicenseTokenId = purchase.licenseTokenId
   })
 
-  function getFileLinkInput() {
-    const file = purchase.files?.[0]
-    const key = typeof file?.key === 'string' ? file.key : ''
-    const metadataKey =
-      'key' in purchase.metadata && typeof purchase.metadata.key === 'string' ? purchase.metadata.key : ''
-
+  function getFilesLinkInput() {
     return {
+      contentId: purchase.id,
       ...(purchase.licenseTokenId ? { licenseTokenId: purchase.licenseTokenId } : {}),
-      ...(file?.id ? { id: file.id } : { key: key || metadataKey }),
     }
   }
 
-  async function downloadFile() {
+  function downloadContentFile({ url, label }: DownloadableContentFile) {
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = label || 'download'
+    anchor.target = '_blank'
+    anchor.rel = 'noopener noreferrer'
+    document.body.append(anchor)
+    anchor.click()
+    anchor.remove()
+  }
+
+  async function downloadFiles() {
     if (!canDownload) return
 
     errorMessage = ''
@@ -51,11 +62,13 @@
     try {
       if (!trpcClient) throw new Error('Missing TRPC client')
 
-      const { url } = await trpcClient.contents.getContentFileLink.query(getFileLinkInput())
-      window.open(url, '_blank', 'noopener,noreferrer')
+      const { files } = await trpcClient.contents.getContentAllFilesLink.query(getFilesLinkInput())
+      if (!files.length) throw new Error('No content files available')
+
+      files.forEach(downloadContentFile)
       if (purchase.licenseType === '2') isBlocked = true
     } catch (error) {
-      console.error('Error fetching file URL:', error)
+      console.error('Error fetching file URLs:', error)
       errorMessage = 'Download is unavailable right now.'
     } finally {
       isDownloading = false
@@ -103,7 +116,7 @@
       type="button"
       class="btn min-h-11 w-full rounded-none border-primary bg-white px-5 text-sm font-semibold text-primary hover:border-[#5427dc] hover:bg-[#f5f1ec] md:min-h-[50px] md:w-[188px]"
       disabled={!canDownload}
-      onclick={downloadFile}
+      onclick={downloadFiles}
     >
       {#if isDownloading}
         Downloading

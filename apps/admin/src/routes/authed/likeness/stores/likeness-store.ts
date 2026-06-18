@@ -33,17 +33,25 @@ function resolveBucket(
 }
 
 export async function loadExistingFiles(
-  content: { files?: ContentFile[]; metadata?: LikenessMetadataInput },
+  content: { id: string; files?: ContentFile[]; metadata?: LikenessMetadataInput },
   trpcClient: TRPCClient<AppRouter>,
 ): Promise<ExistingFilesByBucket> {
   const existingFiles = emptyExistingFiles()
   const uploadsByBucket = content.metadata?.uploadsByBucket ?? {}
+  const contentFiles = content.files ?? []
 
-  for (const file of content.files ?? []) {
+  if (!contentFiles.length) return existingFiles
+
+  const { files: fileLinks } = await trpcClient.contents.getContentAllFilesLink.query({ contentId: content.id })
+  const fileUrlsById = new Map(fileLinks.map((file) => [file.id, file.url]))
+
+  for (const file of contentFiles) {
     const bucket = resolveBucket(file, uploadsByBucket)
     if (!bucket) continue
 
-    const { url } = await trpcClient.contents.getContentFileLink.query({ id: file.id })
+    const url = fileUrlsById.get(file.id)
+    if (!url) continue
+
     existingFiles[bucket].push({ id: file.id, name: file.filename || file.label, url })
   }
 
