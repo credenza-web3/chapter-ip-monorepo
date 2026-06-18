@@ -11,6 +11,7 @@
     { label: 'Creative Works', disabled: true },
     { label: 'Location', disabled: true },
     { label: 'Likeness', href: '/authed/likeness' },
+    { label: 'Purchases', href: '/authed/purchases' },
   ]
 </script>
 
