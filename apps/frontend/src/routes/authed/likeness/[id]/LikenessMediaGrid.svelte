@@ -34,6 +34,25 @@
             class="flex aspect-square flex-col items-center justify-center gap-2 bg-[#202225] px-3 text-center text-white"
             aria-label={`${item.type} ${item.label}`}
           >
+            <span class="flex size-8 items-center justify-center text-white/90" aria-hidden="true">
+              {#if item.type === 'video'}
+                <svg viewBox="0 0 24 24" class="size-7" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <rect x="3.5" y="6.5" width="12" height="11" rx="1.5" />
+                  <path d="M15.5 10l5-3v10l-5-3" />
+                </svg>
+              {:else if item.type === 'audio'}
+                <svg viewBox="0 0 24 24" class="size-7" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M9 18V5l10-2v13" />
+                  <circle cx="6" cy="18" r="3" />
+                  <circle cx="16" cy="16" r="3" />
+                </svg>
+              {:else}
+                <svg viewBox="0 0 24 24" class="size-7" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M7 3.5h7l4 4V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z" />
+                  <path d="M14 3.5V8h4" />
+                </svg>
+              {/if}
+            </span>
             <span class="text-sm font-semibold">{getMediaTypeLabel(item.type)}</span>
             <span class="max-w-full truncate text-xs text-white/65">{item.label}</span>
           </div>
