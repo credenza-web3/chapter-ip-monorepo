@@ -67,13 +67,17 @@
     await loadPage(cursorStack[currentPage])
   }
 
-  const pageItems = $derived(
-    [...items].sort((a, b) => {
+  const pageItems = $derived.by(() => {
+    const merged = items.map((item) => {
+      const fromStore = $notificationStore.find((s) => s.id === item.id)
+      return fromStore ? { ...item, readAt: fromStore.readAt } : item
+    })
+    return merged.sort((a, b) => {
       if (!a.readAt && b.readAt) return -1
       if (a.readAt && !b.readAt) return 1
       return 0
-    }),
-  )
+    })
+  })
 
   async function markAsRead(id: string) {
     try {
