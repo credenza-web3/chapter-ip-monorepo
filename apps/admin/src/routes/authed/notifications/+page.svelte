@@ -6,11 +6,11 @@
   import { getTrpcClient } from '$lib/stores/trpc-client'
   import { NOTIFICATIONS_PAGE_SIZE } from '$lib/constants'
   import { notificationStore } from '$lib/stores/notification.svelte'
-  import { NOTIFICATION_TYPE, type TNotificationItem } from '@repo/notifications'
+  import { NOTIFICATION_TYPE } from '@repo/notifications'
 
   let activeMenuRow = $state<number | null>(null)
   let loading = $state(true)
-  let items = $state<TNotificationItem[]>([])
+  let items = $state<import('@repo/notifications').TNotificationItem[]>([])
 
   let cursorStack = $state<Array<string | undefined>>([undefined])
   let currentPage = $state(0)
