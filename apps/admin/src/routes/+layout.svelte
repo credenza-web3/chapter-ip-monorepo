@@ -42,7 +42,8 @@
     const trpcClient = getTrpcClient()
     const subscription = trpcClient.notifications.onMessage.subscribe(undefined, {
       onData(info) {
-        const data = info as TNotificationItem
+        const raw = info as Record<string, unknown>
+        const data = { ...raw, id: raw['id'] ?? raw['_id'] } as TNotificationItem
         notificationStore.update((n) => [data, ...n])
       },
     })

@@ -40,9 +40,9 @@
     return isRead ? NotificationsMenuItems.filter((item) => item.action !== 'mark-read') : NotificationsMenuItems
   }
 
-  function selectNotificationMenuItem(index: number, action?: string) {
+  function selectNotificationMenuItem(id: string, action?: string) {
     if (action === 'mark-read') {
-      markAsRead?.($notificationStore[index].id)
+      markAsRead?.(id)
     }
     activeMenuRow = null
   }
@@ -138,7 +138,7 @@
                             class="block w-full rounded-sm px-3 py-2 text-left hover:bg-[#ece7df]"
                             onclick={(event) => {
                               event.stopPropagation()
-                              selectNotificationMenuItem(i, item.action)
+                              selectNotificationMenuItem(tx.id, item.action)
                             }}
                           >
                             {item.text}
