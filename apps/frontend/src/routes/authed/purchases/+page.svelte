@@ -52,9 +52,7 @@
         class="flex flex-col gap-4 border border-[#1a1a2e1a] bg-white p-6 sm:flex-row sm:items-center sm:justify-between"
       >
         <span>You haven't made any purchases yet.</span>
-        <a href="/authed/publishers" class="btn rounded-none border-primary bg-primary px-5 text-white"
-          >Browse Publishers</a
-        >
+        <a href="/authed/likeness" class="btn rounded-none border-primary bg-primary px-5 text-white">Browse Items</a>
       </div>
     {:else if !likenessPurchases.length}
       <div class="border border-[#1a1a2e1a] bg-white p-6">
