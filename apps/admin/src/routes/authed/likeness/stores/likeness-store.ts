@@ -2,7 +2,6 @@ import { writable, derived } from 'svelte/store'
 import type { AppRouter, TRPCClient } from '@repo/trpc/client'
 import { LIKENESS_FILE_BUCKETS, type MultipleFileKey } from '$lib/constants/likenessFileBuckets'
 import type {
-  ContentFile,
   LikenessLicensingMetadata,
   LikenessMetadata,
   LikenessMetadataInput,
@@ -21,41 +20,32 @@ const emptyExistingFiles = (): ExistingFilesByBucket => ({
 })
 
 function resolveBucket(
-  file: ContentFile,
+  filename: string,
   uploadsByBucket: LikenessMetadata['uploadsByBucket'] = {},
 ): MultipleFileKey | null {
-  const bucket = LIKENESS_FILE_BUCKETS.find((bucket) =>
-    uploadsByBucket[bucket]?.some((name) => name === file.filename || name === file.label),
-  )
+  const bucket = LIKENESS_FILE_BUCKETS.find((bucket) => uploadsByBucket[bucket]?.some((name) => name === filename))
   if (bucket) return bucket
 
   return null
 }
 
 export async function loadExistingFiles(
-  content: { id: string; files?: ContentFile[]; metadata?: LikenessMetadataInput },
+  content: { id: string; metadata?: LikenessMetadataInput },
   trpcClient: TRPCClient<AppRouter>,
 ): Promise<ExistingFilesByBucket> {
   const existingFiles = emptyExistingFiles()
   const uploadsByBucket = content.metadata?.uploadsByBucket ?? {}
-  const contentFiles = content.files ?? []
 
-  if (!content.id || !contentFiles.length) return existingFiles
+  if (!content.id) return existingFiles
 
   const { files: fileLinks } = await trpcClient.contents.getContentAllFilesLink.query({ contentId: content.id })
-  const fileUrlsById = new Map(fileLinks.map((file) => [file.id, file.url]))
 
-  for (const file of contentFiles) {
-    const bucket = resolveBucket(file, uploadsByBucket)
+  for (const file of fileLinks) {
+    const filename = file.label
+    const bucket = resolveBucket(filename, uploadsByBucket)
     if (!bucket) continue
 
-    const url = fileUrlsById.get(file.id)
-    if (!url) {
-      console.warn('No URL for file', file.id, file.filename)
-      continue
-    }
-
-    existingFiles[bucket].push({ id: file.id, name: file.filename || file.label, url })
+    existingFiles[bucket].push({ id: file.id, name: filename, url: file.url })
   }
 
   return existingFiles
