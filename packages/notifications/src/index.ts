@@ -29,4 +29,10 @@ export type TNotificationItem = Omit<TNotification, 'createdAt' | 'updatedAt' | 
   updatedAt: string
   readAt: string | null
   expiresAt?: string | null
+  metadata?: Record<string, unknown>
+  profile?: { fullLegalName?: string; stageName?: string; bio?: string }
+  attributes?: Record<string, unknown>
+  affiliations?: unknown[]
+  licensing?: Record<string, unknown>
+  uploadsByBucket?: Record<string, unknown>
 }

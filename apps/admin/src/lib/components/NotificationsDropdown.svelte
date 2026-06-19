@@ -101,8 +101,10 @@
             <div class="flex flex-col items-between justify-start w-full">
               <div class="flex items-center justify-between w-full">
                 <p class="text-[13px] font-semibold">
-                  {(tx.payload as any)?.metadata?.type ?? ''} [{(tx.payload as any)?.metadata?.profile?.fullLegalName ??
-                    ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED ? 'added to your products' : 'was purchased'}
+                  {(tx.metadata?.type as string) ?? ''} [{tx.profile?.fullLegalName ?? ''}] {tx.type ===
+                  NOTIFICATION_TYPE.CONTENT_CREATED
+                    ? 'added to your products'
+                    : 'was purchased'}
                 </p>
                 <div class="relative shrink-0">
                   <button
