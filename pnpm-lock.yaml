@@ -316,9 +316,6 @@ importers:
       native-file-system-adapter:
         specifier: ^3.0.1
         version: 3.0.1
-      streamsaver:
-        specifier: ^2.0.6
-        version: 2.0.6
       svelte-modals:
         specifier: ^2.0.1
         version: 2.0.1(svelte@5.56.3(@typescript-eslint/types@8.61.0))
@@ -362,9 +359,6 @@ importers:
       '@types/node':
         specifier: ^25
         version: 25.9.1
-      '@types/streamsaver':
-        specifier: ^2.0.5
-        version: 2.0.5
       '@vitest/browser':
         specifier: ^4.1.8
         version: 4.1.8(vite@8.0.16(@types/node@25.9.1)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))(vitest@4.1.8)
@@ -2287,9 +2281,6 @@ packages:
 
   '@types/stack-utils@2.0.3':
     resolution: {integrity: sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==}
-
-  '@types/streamsaver@2.0.5':
-    resolution: {integrity: sha512-93o0zjV8swEhR2YI57h/2ytbJF8bJh7sI9GNB02TLJHdM4fWDxZuChwfWhyD8vt2ub4kw4rsfZ0C0yAUX+3gcg==}
 
   '@types/superagent@8.1.10':
     resolution: {integrity: sha512-nbt4IWXABhW0jGmmpRzCFNlbmwCTzZ2gTUsNIr+X+ItdqPms+PAJZbWsNzpS2USqXjcoNLQcO6nXo60zcPQiIg==}
@@ -5117,9 +5108,6 @@ packages:
 
   stream-browserify@3.0.0:
     resolution: {integrity: sha512-H73RAHsVBapbim0tU2JwwOiXUj+fikfiaoYAKHF3VJfA0pe2BCzkhAHBlLG6REzE+2WNZcxOXjK7lkso+9euLA==}
-
-  streamsaver@2.0.6:
-    resolution: {integrity: sha512-LK4e7TfCV8HzuM0PKXuVUfKyCB1FtT9L0EGxsFk5Up8njj0bXK8pJM9+Wq2Nya7/jslmCQwRK39LFm55h7NBTw==}
 
   streamsearch@1.1.0:
     resolution: {integrity: sha512-Mcc5wHehp9aXz1ax6bZUyY5afg9u2rv5cqQI3mRrYkGC8rW2hM02jWuwjtL++LS5qinSyhj2QfLyNsuc+VsExg==}
@@ -7950,8 +7938,6 @@ snapshots:
       '@types/node': 25.9.1
 
   '@types/stack-utils@2.0.3': {}
-
-  '@types/streamsaver@2.0.5': {}
 
   '@types/superagent@8.1.10':
     dependencies:
@@ -11208,8 +11194,6 @@ snapshots:
     dependencies:
       inherits: 2.0.4
       readable-stream: 3.6.2
-
-  streamsaver@2.0.6: {}
 
   streamsearch@1.1.0: {}
 

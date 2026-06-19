@@ -28,7 +28,6 @@
     "@sveltejs/kit": "^2.65.0",
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
     "@types/node": "^25",
-    "@types/streamsaver": "^2.0.5",
     "@vitest/browser": "^4.1.8",
     "@vitest/browser-playwright": "^4.1.8",
     "eslint": "^10.4.1",
@@ -51,7 +50,6 @@
     "daisyui": "^5.5.23",
     "mime": "^4.1.0",
     "native-file-system-adapter": "^3.0.1",
-    "streamsaver": "^2.0.6",
     "svelte-modals": "^2.0.1",
     "tailwindcss": "^4.3.0"
   }
