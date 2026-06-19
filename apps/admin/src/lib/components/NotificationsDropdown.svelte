@@ -8,8 +8,6 @@
 
   let activeMenuRow = $state<number | null>(null)
 
-  $inspect($notificationStore)
-
   async function markAsRead(id: string) {
     try {
       await getTrpcClient().notifications.markMyNotificationAsRead.mutate({ id })
