@@ -1,4 +1,8 @@
 <script lang="ts">
+  import { downloadZip } from 'client-zip'
+  import { showSaveFilePicker } from 'native-file-system-adapter'
+  import mime from 'mime'
+
   import type { LikenessDetails } from '@repo/content-types/likeness'
   import LikenessLicenseModal from './LikenessLicenseModal.svelte'
   import type { ContentFilesLinkClient, PurchasedContentToken } from './types'
@@ -6,6 +10,7 @@
   type DownloadableContentFile = {
     url: string
     label: string
+    mimetype: string
   }
 
   let {
@@ -43,20 +48,47 @@
     }
   }
 
-  function downloadContentFile({ url, label }: DownloadableContentFile) {
+  async function* fileStreamGenerator(files: DownloadableContentFile[]) {
+    for (const file of files) {
+      try {
+        const response = await fetch(file.url)
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+
+        yield {
+          name: `${file.label}.${mime.getExtension(file.mimetype) ?? 'bin'}`,
+          input: response.body!,
+        }
+      } catch (error) {
+        console.error(`Skipping ${file.label}:`, error)
+      }
+    }
+  }
+
+  async function downloadAllNativeStreaming(files: DownloadableContentFile[]) {
+    let fileHandle
     try {
-      const anchor = document.createElement('a')
-      anchor.href = url
-      anchor.download = label || 'download'
-      anchor.target = '_blank'
-      anchor.rel = 'noopener noreferrer'
-      document.body.append(anchor)
-      anchor.click()
-      anchor.remove()
-      return true
-    } catch (error) {
-      console.error('Error starting content file download:', { url, label }, error)
-      return false
+      fileHandle = await showSaveFilePicker({
+        suggestedName: `${likeness.name}.zip`,
+        types: [
+          {
+            description: 'ZIP Archive',
+            accept: { 'application/zip': ['.zip'] },
+          },
+        ],
+      })
+    } catch {
+      console.log('User cancelled the save dialog.')
+      return
+    }
+
+    const writableStream = await fileHandle.createWritable()
+
+    try {
+      const zipResponse = downloadZip(fileStreamGenerator(files))
+      if (!zipResponse.body) throw new Error('Streams are not supported')
+      await zipResponse.body.pipeTo(writableStream)
+    } catch (err) {
+      console.error('Download failed:', err)
     }
   }
 
@@ -71,11 +103,7 @@
       const { files } = await trpcClient.contents.getContentAllFilesLink.query(getFilesLinkInput())
       if (!files.length) throw new Error('No content files available')
 
-      let startedDownloadCount = 0
-      for (const file of files) {
-        if (downloadContentFile(file)) startedDownloadCount += 1
-      }
-      if (!startedDownloadCount) throw new Error('No content file downloads started')
+      await downloadAllNativeStreaming(files)
 
       if (purchase.licenseType === '2') isBlocked = true
     } catch (error) {

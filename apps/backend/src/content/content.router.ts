@@ -378,6 +378,8 @@ export class ContentRouter {
       files.map(async (file) => ({
         id: file.id,
         label: file.label,
+        filename: file.filename,
+        mimetype: file.mimetype,
         url: await this.fileService.getSignedObjectUrl({
           Bucket: file.bucket,
           Key: file.key,
