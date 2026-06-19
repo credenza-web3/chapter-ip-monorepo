@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_IMAGE_URL } from '../likeness'
 import { normalizeLikeness } from './likenessDetails'
 
 describe('likeness purchase mapper', () => {
@@ -36,16 +35,22 @@ describe('likeness purchase mapper', () => {
             allowRetouching: 'no',
             approveFinalUse: 'yes',
           },
+          uploadsByBucket: {
+            headshots: ['headshot_1'],
+            bodyShots: ['bodyshot_1'],
+            voiceSamples: ['voice_sample_1'],
+            videoReels: ['video_reel_1'],
+          },
         },
         files: [
           {
-            id: 'headshot-file',
-            filename: 'headshot_1',
-            label: 'headshot_1',
+            id: 'ignored-headshot-file',
+            filename: 'different_headshot',
+            label: 'different_headshot',
             mimetype: 'image/jpeg',
           },
           {
-            id: 'voice-file',
+            id: 'ignored-voice-file',
             filename: 'voice_sample_1',
             label: 'voice_sample_1',
             mimetype: 'audio/mpeg',
@@ -89,16 +94,26 @@ describe('likeness purchase mapper', () => {
         src: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/likeness-1/headshot_1',
         alt: 'Avery Stone headshot_1',
       },
+      {
+        src: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/likeness-1/bodyshot_1',
+        alt: 'Avery Stone bodyshot_1',
+      },
     ])
     expect(purchase?.media).toEqual([
       {
-        id: 'headshot-file',
+        id: 'headshot_1',
         type: 'image',
         src: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/likeness-1/headshot_1',
         alt: 'Avery Stone headshot_1',
       },
-      { id: 'voice-file', type: 'audio', label: 'voice_sample_1' },
-      { id: 'video-file', type: 'video', label: 'video_reel_1' },
+      {
+        id: 'bodyshot_1',
+        type: 'image',
+        src: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/likeness-1/bodyshot_1',
+        alt: 'Avery Stone bodyshot_1',
+      },
+      { id: 'voice_sample_1', type: 'audio', label: 'voice_sample_1' },
+      { id: 'video_reel_1', type: 'video', label: 'video_reel_1' },
     ])
   })
 
@@ -157,8 +172,20 @@ describe('likeness purchase mapper', () => {
       territories: ['Worldwide'],
       allowRetouching: false,
       approveFinalUse: false,
-      images: [{ src: DEFAULT_IMAGE_URL, alt: 'Unnamed likeness default likeness preview' }],
-      media: [{ id: 'file-id', type: 'file', label: 'contract.pdf' }],
+      images: [
+        {
+          src: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/partial-likeness/headshot_1',
+          alt: 'Unnamed likeness headshot_1',
+        },
+      ],
+      media: [
+        {
+          id: 'headshot_1',
+          type: 'image',
+          src: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/partial-likeness/headshot_1',
+          alt: 'Unnamed likeness headshot_1',
+        },
+      ],
     })
   })
 
@@ -184,8 +211,20 @@ describe('likeness purchase mapper', () => {
       territories: [],
       allowRetouching: false,
       approveFinalUse: false,
-      images: [{ src: DEFAULT_IMAGE_URL, alt: 'Unnamed likeness default likeness preview' }],
-      media: [],
+      images: [
+        {
+          src: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/empty-likeness/headshot_1',
+          alt: 'Unnamed likeness headshot_1',
+        },
+      ],
+      media: [
+        {
+          id: 'headshot_1',
+          type: 'image',
+          src: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/empty-likeness/headshot_1',
+          alt: 'Unnamed likeness headshot_1',
+        },
+      ],
     })
   })
 })
