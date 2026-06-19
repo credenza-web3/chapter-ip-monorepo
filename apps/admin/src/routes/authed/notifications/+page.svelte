@@ -7,7 +7,6 @@
   import { NOTIFICATIONS_PAGE_SIZE } from '$lib/constants'
   import { notificationStore } from '$lib/stores/notification.svelte'
   import { NOTIFICATION_TYPE, type TNotificationItem } from '@repo/notifications'
-  import { findContent, getTokenId } from '$lib/services/content'
 
   let activeMenuRow = $state<number | null>(null)
   let loading = $state(true)
@@ -125,6 +124,11 @@
             {:else}
               {#each pageItems as tx, i (tx.id)}
                 {@const isRead = !!tx.readAt}
+                {@const payload = tx.payload as Record<string, unknown> | undefined}
+                {@const metadata = payload?.['metadata'] as Record<string, unknown> | undefined}
+                {@const itemType = metadata?.['type'] as string | undefined}
+                {@const profile = metadata?.['profile'] as Record<string, unknown> | undefined}
+                {@const fullName = profile?.['fullLegalName'] as string | undefined}
                 <tr
                   class="border-b border-[#ddd] last:border-0 {activeMenuRow === i
                     ? 'bg-[#ece7df]'
@@ -136,21 +140,11 @@
                 >
                   <td class="px-4 py-1.5">{formatDate(tx.createdAt)}</td>
                   <td class="px-4 py-1.5">
-                    {#await findContent(getTokenId(tx))}
-                      <p class="text-[13px] font-semibold">Loading...</p>
-                    {:then value}
-                      {#if value}
-                        <p class="text-[13px] font-semibold min-w-0 leading-tight">
-                          {value.type ?? ''} [{value.name ?? ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
-                            ? 'added to your products'
-                            : 'was purchased'}
-                        </p>
-                      {:else}
-                        <p class="text-[13px] font-semibold">{tx.message ?? tx.title}</p>
-                      {/if}
-                    {:catch}
-                      <p class="text-[13px] font-semibold">{tx.message ?? tx.title}</p>
-                    {/await}
+                    <p class="text-[13px] font-semibold">
+                      {itemType ?? ''} [{fullName ?? ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
+                        ? 'added to your products'
+                        : 'was purchased'}
+                    </p>
                   </td>
                   <td class="px-4 py-1.5 text-right">
                     <RowActionMenu
