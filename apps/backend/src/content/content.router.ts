@@ -3,9 +3,12 @@ import { Ctx, Input, Mutation, Query, Router, UseMiddlewares } from 'nestjs-trpc
 import { TRPCError } from '@trpc/server'
 import { extension } from 'mime-types'
 
+import { NOTIFICATION_TYPE } from '@repo/notifications'
+
 import { AuthMiddleware } from '../common/auth/auth.middleware'
 import type { TAppContextWithTokenPayload } from '../common/auth/auth.types'
 import { CommonEvmService } from '../common/evm/evm.service'
+import { CommonNotificationService } from '../common/notification/notification.service'
 import { ContentService } from './content.service'
 import { ContentModelService } from './content-model.service'
 import { ContentStatus } from './content.schema'
@@ -77,6 +80,7 @@ export class ContentRouter {
     private readonly fileService: FileService,
     private readonly commonEvmService: CommonEvmService,
     private readonly commonContentService: ContentService,
+    private readonly commonNotificationService: CommonNotificationService,
     private readonly purchaseHistoryService: PurchaseHistoryService,
   ) {}
 
@@ -156,6 +160,12 @@ export class ContentRouter {
       contractAddress,
       metadata: input.metadata,
       status: input.tokenId ? (input.status ?? ContentStatus.ACTIVE) : ContentStatus.DRAFT,
+    })
+
+    void this.commonNotificationService.getModel().create({
+      sub,
+      type: NOTIFICATION_TYPE.CONTENT_CREATED,
+      payload: { ...contentDoc, _id: contentDoc.id },
     })
 
     return contentDoc
@@ -295,7 +305,7 @@ export class ContentRouter {
       throw new TRPCError({ message: 'Content is not found', code: 'NOT_FOUND' })
     }
 
-    const files = await this.fileService.find({ contentId: content._id.toString() })
+    const files = await this.fileService.find({ contentId: content._id })
     return {
       ...content.toJSON(),
       files,

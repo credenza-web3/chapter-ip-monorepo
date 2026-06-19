@@ -86,7 +86,7 @@ export class NotificationService implements OnModuleInit {
                   ]),
                 this.purchaseHistoryService.create({
                   buyerAddress: toAddress,
-                  contentId: String(content._id),
+                  contentId: content.id,
                   licenseType: Number(args[2]),
                   priceFiat: String(args[3] ?? '0'),
                   priceEther: String(args[4] ?? '0'),
@@ -100,16 +100,8 @@ export class NotificationService implements OnModuleInit {
               break
             }
             case 'Transfer': {
-              if (change.fullDocument.contractAddress !== contentNftContractAddress) return
-
-              const toAddress = args[1]?.toLowerCase()
-              const toSub = await this.commonEvmService.getSubByEvmAddress(toAddress)
-
-              await this.commonNotificationService.getModel().create({
-                ...notification,
-                sub: toSub,
-                type: NOTIFICATION_TYPE.CONTENT_CREATED,
-              })
+              // PASS for now we'll trigger this later
+              // Currently not used but might be useful in the future
               break
             }
             default: {
