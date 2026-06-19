@@ -22,10 +22,10 @@
     //   text: 'My Listings',
     //   href: '/authed/files',
     // },
-    {
-      text: 'My History',
-      href: '/authed/history',
-    },
+    // {
+    //   text: 'My History',
+    //   href: '/authed/history',
+    // },
     // {
     //   text: 'Billing',
     //   href: '/authed/billing',

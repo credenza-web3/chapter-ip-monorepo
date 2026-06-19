@@ -30,9 +30,11 @@
     return isRead ? NotificationsMenuItems.filter((item) => item.action !== 'mark-read') : NotificationsMenuItems
   }
 
-  function selectNotificationMenuItem(index: number, action?: string) {
-    if (action === 'mark-read') {
+  function selectNotificationMenuItem(index: number, item: { href?: string; action?: string }) {
+    if (item.action === 'mark-read') {
       onMarkRead?.(notifications[index].id)
+    } else if (item.href) {
+      goto(item.href)
     }
     activeMenuRow = null
   }
