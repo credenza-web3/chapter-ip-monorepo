@@ -65,24 +65,6 @@
 
     return () => subscription.unsubscribe()
   })
-
-  async function markAsRead(id: string) {
-    try {
-      await getTrpcClient().notifications.markMyNotificationAsRead.mutate({ id })
-      notificationStore.update((n) => n.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x)))
-    } catch (err) {
-      console.error('Failed to mark notification as read', err)
-    }
-  }
-
-  async function markAllAsRead() {
-    try {
-      await getTrpcClient().notifications.markAllMyNotificationsAsRead.mutate()
-      notificationStore.update((n) => n.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() })))
-    } catch (err) {
-      console.error('Failed to mark all notifications as read', err)
-    }
-  }
 </script>
 
 <svelte:head>
@@ -97,11 +79,7 @@
         <NavLink href="/authed/files">Dashboard</NavLink>
       </div>
       <div class="flex items-center md:gap-7.25 gap-4">
-        <NotificationsDropdown
-          notifications={$notificationStore}
-          onMarkRead={markAsRead}
-          onMarkAllRead={markAllAsRead}
-        />
+        <NotificationsDropdown />
         <a
           href="/authed/profile"
           aria-label="Open profile"

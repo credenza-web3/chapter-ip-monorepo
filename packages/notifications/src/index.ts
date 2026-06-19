@@ -16,7 +16,7 @@ export const notificationSchema = z.object({
   sub: z.string(),
   title: z.string().optional(),
   message: z.string().optional(),
-  payload: z.looseObject({}),
+  payload: z.record(z.string(), z.unknown()),
   readAt: z.date().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -24,7 +24,9 @@ export const notificationSchema = z.object({
 export type TNotification = z.infer<typeof notificationSchema>
 
 export type TNotificationItem = Omit<TNotification, 'createdAt' | 'updatedAt' | 'readAt'> & {
+  _id?: string
   createdAt: string
   updatedAt: string
   readAt: string | null
+  expiresAt?: string | null
 }
