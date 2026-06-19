@@ -6,12 +6,11 @@
   import { getTrpcClient } from '$lib/stores/trpc-client'
   import { NOTIFICATIONS_PAGE_SIZE } from '$lib/constants'
   import { notificationStore } from '$lib/stores/notification.svelte'
-  import { NOTIFICATION_TYPE, type TNotificationItem } from '@repo/notifications'
-  import { findContent, getTokenId } from '$lib/services/content'
+  import { NOTIFICATION_TYPE } from '@repo/notifications'
 
   let activeMenuRow = $state<number | null>(null)
   let loading = $state(true)
-  let items = $state<TNotificationItem[]>([])
+  let items = $state<import('@repo/notifications').TNotificationItem[]>([])
 
   let cursorStack = $state<Array<string | undefined>>([undefined])
   let currentPage = $state(0)
@@ -68,13 +67,17 @@
     await loadPage(cursorStack[currentPage])
   }
 
-  const pageItems = $derived(
-    [...items].sort((a, b) => {
+  const pageItems = $derived.by(() => {
+    const merged = items.map((item) => {
+      const fromStore = $notificationStore.find((s) => s.id === item.id)
+      return fromStore ? { ...item, readAt: fromStore.readAt } : item
+    })
+    return merged.sort((a, b) => {
       if (!a.readAt && b.readAt) return -1
       if (a.readAt && !b.readAt) return 1
       return 0
-    }),
-  )
+    })
+  })
 
   async function markAsRead(id: string) {
     try {
@@ -125,6 +128,11 @@
             {:else}
               {#each pageItems as tx, i (tx.id)}
                 {@const isRead = !!tx.readAt}
+                {@const payload = tx.payload as Record<string, unknown> | undefined}
+                {@const metadata = payload?.['metadata'] as Record<string, unknown> | undefined}
+                {@const itemType = metadata?.['type'] as string | undefined}
+                {@const profile = metadata?.['profile'] as Record<string, unknown> | undefined}
+                {@const fullName = profile?.['fullLegalName'] as string | undefined}
                 <tr
                   class="border-b border-[#ddd] last:border-0 {activeMenuRow === i
                     ? 'bg-[#ece7df]'
@@ -136,21 +144,11 @@
                 >
                   <td class="px-4 py-1.5">{formatDate(tx.createdAt)}</td>
                   <td class="px-4 py-1.5">
-                    {#await findContent(getTokenId(tx))}
-                      <p class="text-[13px] font-semibold">Loading...</p>
-                    {:then value}
-                      {#if value}
-                        <p class="text-[13px] font-semibold min-w-0 leading-tight">
-                          {value.type ?? ''} [{value.name ?? ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
-                            ? 'added to your products'
-                            : 'was purchased'}
-                        </p>
-                      {:else}
-                        <p class="text-[13px] font-semibold">{tx.message ?? tx.title}</p>
-                      {/if}
-                    {:catch}
-                      <p class="text-[13px] font-semibold">{tx.message ?? tx.title}</p>
-                    {/await}
+                    <p class="text-[13px] font-semibold">
+                      {itemType ?? ''} [{fullName ?? ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
+                        ? 'added to your products'
+                        : 'was purchased'}
+                    </p>
                   </td>
                   <td class="px-4 py-1.5 text-right">
                     <RowActionMenu

@@ -1,23 +1,33 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import BellIcon from '$lib/assets/bell.svg'
-  import { findContent, getTokenId } from '$lib/services/content'
+  import { notificationStore } from '$lib/stores/notification.svelte'
+  import { getTrpcClient } from '$lib/stores/trpc-client'
+  import { NOTIFICATION_TYPE } from '@repo/notifications'
   import { NotificationsMenuItems } from '../../routes/authed/notifications/constants'
-  import { NOTIFICATION_TYPE, type TNotificationItem } from '@repo/notifications'
 
-  let {
-    notifications = [],
-    onMarkRead,
-    onMarkAllRead,
-  }: {
-    notifications: TNotificationItem[]
-    onMarkRead?: (id: string) => void
-    onMarkAllRead?: () => void
-  } = $props()
   let activeMenuRow = $state<number | null>(null)
 
+  async function markAsRead(id: string) {
+    try {
+      await getTrpcClient().notifications.markMyNotificationAsRead.mutate({ id })
+      notificationStore.update((n) => n.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x)))
+    } catch (err) {
+      console.error('Failed to mark notification as read', err)
+    }
+  }
+
+  async function markAllAsRead() {
+    try {
+      await getTrpcClient().notifications.markAllMyNotificationsAsRead.mutate()
+      notificationStore.update((n) => n.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() })))
+    } catch (err) {
+      console.error('Failed to mark all notifications as read', err)
+    }
+  }
+
   const sortedNotifications = $derived(
-    notifications.toSorted((a, b) => {
+    $notificationStore.toSorted((a, b) => {
       if (!a.readAt && b.readAt) return -1
       if (a.readAt && !b.readAt) return 1
       return 0
@@ -30,9 +40,9 @@
     return isRead ? NotificationsMenuItems.filter((item) => item.action !== 'mark-read') : NotificationsMenuItems
   }
 
-  function selectNotificationMenuItem(index: number, action?: string) {
+  function selectNotificationMenuItem(id: string, action?: string) {
     if (action === 'mark-read') {
-      onMarkRead?.(notifications[index].id)
+      markAsRead?.(id)
     }
     activeMenuRow = null
   }
@@ -79,32 +89,27 @@
   >
     <div class="flex items-center justify-between">
       <h2 class="text-[13px] font-semibold text-dark">Notifications</h2>
-      <button class="text-xs font-medium text-cream rounded-sm bg-primary px-3.75 py-2.5" onclick={onMarkAllRead}>
+      <button class="text-xs font-medium text-cream rounded-sm bg-primary px-3.75 py-2.5" onclick={markAllAsRead}>
         Mark {unreadNotifications.length} as read
       </button>
     </div>
     <div class="pt-9">
       {#each sortedNotifications as tx, i (tx.id)}
+        {@const payload = tx.payload as Record<string, unknown> | undefined}
+        {@const metadata = payload?.['metadata'] as Record<string, unknown> | undefined}
+        {@const itemType = metadata?.['type'] as string | undefined}
+        {@const profile = metadata?.['profile'] as Record<string, unknown> | undefined}
+        {@const fullName = profile?.['fullLegalName'] as string | undefined}
         <li>
           <div class="flex items-start leading-0">
             <div class="size-1.5 rounded-full bg-primary shrink-0 mt-1.5" class:invisible={!!tx.readAt}></div>
             <div class="flex flex-col items-between justify-start w-full">
               <div class="flex items-center justify-between w-full">
-                {#await findContent(getTokenId(tx))}
-                  <p class="text-[13px] font-semibold">Loading...</p>
-                {:then value}
-                  {#if value}
-                    <p class="text-[13px] font-semibold min-w-0 leading-tight">
-                      {value.type ?? ''} [{value.name ?? ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
-                        ? 'added to your products'
-                        : 'was purchased'}
-                    </p>
-                  {:else}
-                    <p class="text-[13px] font-semibold min-w-0 leading-tight">{tx.message ?? tx.title}</p>
-                  {/if}
-                {:catch}
-                  <p class="text-[13px] font-semibold min-w-0 leading-tight">{tx.message ?? tx.title}</p>
-                {/await}
+                <p class="text-[13px] font-semibold">
+                  {itemType ?? ''} [{fullName ?? ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
+                    ? 'added to your products'
+                    : 'was purchased'}
+                </p>
                 <div class="relative shrink-0">
                   <button
                     type="button"
@@ -133,7 +138,7 @@
                             class="block w-full rounded-sm px-3 py-2 text-left hover:bg-[#ece7df]"
                             onclick={(event) => {
                               event.stopPropagation()
-                              selectNotificationMenuItem(i, item.action)
+                              selectNotificationMenuItem(tx.id, item.action)
                             }}
                           >
                             {item.text}
