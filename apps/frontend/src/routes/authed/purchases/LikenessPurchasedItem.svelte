@@ -1,7 +1,7 @@
 <script lang="ts">
   import { downloadZip } from 'client-zip'
   import { showSaveFilePicker } from 'native-file-system-adapter'
-  import mime from 'mime'
+  import mime from 'mime/lite'
 
   import type { LikenessDetails } from '@repo/content-types/likeness'
   import LikenessLicenseModal from './LikenessLicenseModal.svelte'
@@ -89,6 +89,8 @@
       await zipResponse.body.pipeTo(writableStream)
     } catch (err) {
       console.error('Download failed:', err)
+    } finally {
+      await writableStream.close().catch(() => {})
     }
   }
 
