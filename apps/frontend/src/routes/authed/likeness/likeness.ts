@@ -30,7 +30,7 @@ export const DEFAULT_IMAGE_URL = r2Config.url + r2Config.defaultImage
 
 type ArrayFilterKey = 'ethnicity' | 'eyeColor' | 'hairColor' | 'union' | 'licenseType' | 'permittedUse'
 type FilterValue = string | number | boolean | null
-type FilterComparisonOperator = 'eq' | 'gt' | 'gte' | 'lt' | 'lte' | 'contains'
+type FilterComparisonOperator = 'eq' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'nin' | 'exists' | 'regex'
 
 export type LikenessFilterCondition = {
   field: string
@@ -39,12 +39,6 @@ export type LikenessFilterCondition = {
 }
 
 export type LikenessFilterNode = LikenessFilterCondition | { and: LikenessFilterNode[] } | { or: LikenessFilterNode[] }
-
-export type LikenessFilterInput = {
-  filter: {
-    and: LikenessFilterNode[]
-  }
-}
 
 export type LikenessItem = {
   id: string
@@ -71,6 +65,7 @@ const MULTI_FILTER_FIELDS = {
 
 const HEIGHT_FILTER_FIELD = 'profile.attributes.heightTotalInches'
 const WEIGHT_FILTER_FIELD = 'profile.attributes.weight'
+const REGEX_SPECIAL_CHARS = /[\\^$.*+?()[\]{}|]/g
 
 export type LikenessFilters = {
   query: string
@@ -185,6 +180,23 @@ function equalCondition(field: string, val: FilterValue): LikenessFilterConditio
   return { field, op: 'eq', val }
 }
 
+function escapeRegex(value: string): string {
+  return value.replace(REGEX_SPECIAL_CHARS, '\\$&')
+}
+
+function toCaseInsensitiveRegexPattern(value: string): string {
+  return Array.from(value)
+    .map((char) => {
+      const lower = char.toLowerCase()
+      const upper = char.toUpperCase()
+
+      if (lower !== upper && /^[a-z]$/i.test(char)) return `[${escapeRegex(lower)}${escapeRegex(upper)}]`
+
+      return escapeRegex(char)
+    })
+    .join('')
+}
+
 function appendMultiFilter(nodes: LikenessFilterNode[], field: string, values: string[]) {
   if (values.length === 0) return
   nodes.push({
@@ -210,11 +222,11 @@ function appendSearchFilter(nodes: LikenessFilterNode[], query: string) {
   if (!trimmedQuery) return
 
   nodes.push({
-    or: SEARCH_FIELDS.map((field) => ({ field, op: 'contains', val: trimmedQuery })),
+    or: SEARCH_FIELDS.map((field) => ({ field, op: 'regex', val: toCaseInsensitiveRegexPattern(trimmedQuery) })),
   })
 }
 
-export function buildLikenessFilterInput(filters: LikenessFilters): LikenessFilterInput {
+export function buildLikenessFilterInput(filters: LikenessFilters): LikenessFilterNode {
   const and: LikenessFilterNode[] = [equalCondition('type', 'likeness')]
 
   appendSearchFilter(and, filters.query)
@@ -227,13 +239,16 @@ export function buildLikenessFilterInput(filters: LikenessFilters): LikenessFilt
   appendRangeFilter(and, HEIGHT_FILTER_FIELD, getSelectedRange(filters.height, HEIGHT_RANGES))
   appendRangeFilter(and, WEIGHT_FILTER_FIELD, getSelectedRange(filters.weight, WEIGHT_RANGES))
 
-  return { filter: { and } }
+  return { and }
 }
 
-export function buildLikenessFindContentInput(contractAddress: string) {
+export function buildLikenessFindContentInput(
+  contractAddress: string,
+  filters: LikenessFilters = createEmptyLikenessFilters(),
+) {
   return {
     contractAddress,
-    metadata: { type: 'likeness' },
+    metadata: buildLikenessFilterInput(filters),
     limit: '100',
     sort: 'createdAt',
     order: 'desc' as const,
