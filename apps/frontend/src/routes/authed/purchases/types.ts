@@ -11,6 +11,12 @@ export type PurchasedContentFile = {
   key?: string | null
 }
 
+export type DownloadableContentFile = {
+  url: string
+  label: string
+  mimetype: string
+}
+
 export type PurchasedContentToken = {
   id: string
   tokenId: string

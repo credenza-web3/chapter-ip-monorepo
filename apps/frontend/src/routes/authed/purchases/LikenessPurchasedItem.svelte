@@ -1,12 +1,12 @@
 <script lang="ts">
+  import { downloadZip } from 'client-zip'
+  import { showSaveFilePicker } from 'native-file-system-adapter'
+  import mime from 'mime/lite'
+
   import type { LikenessDetails } from '@repo/content-types/likeness'
   import LikenessLicenseModal from './LikenessLicenseModal.svelte'
-  import type { ContentFilesLinkClient, PurchasedContentToken } from './types'
-
-  type DownloadableContentFile = {
-    url: string
-    label: string
-  }
+  import DownloadFilesModal from './DownloadFilesModal.svelte'
+  import type { ContentFilesLinkClient, DownloadableContentFile, PurchasedContentToken } from './types'
 
   let {
     purchase,
@@ -22,6 +22,8 @@
   let initializedLicenseTokenId = $state('')
   let isDownloading = $state(false)
   let isModalOpen = $state(false)
+  let isFallbackModalOpen = $state(false)
+  let fallbackFiles: DownloadableContentFile[] = []
   let errorMessage = $state('')
 
   const primaryImage = $derived(likeness.images[0])
@@ -43,21 +45,56 @@
     }
   }
 
-  function downloadContentFile({ url, label }: DownloadableContentFile) {
-    try {
-      const anchor = document.createElement('a')
-      anchor.href = url
-      anchor.download = label || 'download'
-      anchor.target = '_blank'
-      anchor.rel = 'noopener noreferrer'
-      document.body.append(anchor)
-      anchor.click()
-      anchor.remove()
-      return true
-    } catch (error) {
-      console.error('Error starting content file download:', { url, label }, error)
-      return false
+  async function* fileStreamGenerator(files: DownloadableContentFile[], tracker: { failed: number }) {
+    for (const file of files) {
+      try {
+        const response = await fetch(file.url)
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+        if (!response.body) throw new Error('No response body')
+
+        const safeLabel = file.label.replace(/[/\\]/g, '_')
+        yield {
+          name: `${safeLabel}.${mime.getExtension(file.mimetype) ?? 'bin'}`,
+          input: response.body,
+        }
+      } catch (error) {
+        tracker.failed++
+        console.error(`Skipping ${file.label}:`, error)
+      }
     }
+  }
+
+  async function downloadAllNativeStreaming(files: DownloadableContentFile[]) {
+    let fileHandle
+    try {
+      fileHandle = await showSaveFilePicker({
+        suggestedName: `${likeness.name}.zip`,
+        types: [
+          {
+            description: 'ZIP Archive',
+            accept: { 'application/zip': ['.zip'] },
+          },
+        ],
+      })
+    } catch {
+      console.log('User cancelled the save dialog.')
+      return 0
+    }
+
+    const tracker = { failed: 0 }
+    let writableStream
+    try {
+      writableStream = await fileHandle.createWritable()
+      const zipResponse = downloadZip(fileStreamGenerator(files, tracker))
+      if (!zipResponse.body) throw new Error('Streams are not supported')
+      await zipResponse.body.pipeTo(writableStream)
+    } catch (err) {
+      console.error('Download failed:', err)
+      throw err
+    } finally {
+      await writableStream?.close().catch(() => {})
+    }
+    return tracker.failed
   }
 
   async function downloadFiles() {
@@ -65,22 +102,36 @@
 
     errorMessage = ''
     isDownloading = true
+    let files: DownloadableContentFile[] = []
     try {
       if (!trpcClient) throw new Error('Missing TRPC client')
 
-      const { files } = await trpcClient.contents.getContentAllFilesLink.query(getFilesLinkInput())
+      const result = await trpcClient.contents.getContentAllFilesLink.query(getFilesLinkInput())
+      files = result.files
       if (!files.length) throw new Error('No content files available')
 
-      let startedDownloadCount = 0
-      for (const file of files) {
-        if (downloadContentFile(file)) startedDownloadCount += 1
+      if (typeof showSaveFilePicker !== 'function') {
+        fallbackFiles = files
+        isFallbackModalOpen = true
+        return
       }
-      if (!startedDownloadCount) throw new Error('No content file downloads started')
+
+      const failedCount = await downloadAllNativeStreaming(files)
+
+      if (failedCount > 0) {
+        fallbackFiles = files
+        isFallbackModalOpen = true
+      }
 
       if (purchase.licenseType === '2') isBlocked = true
     } catch (error) {
       console.error('Error downloading content files:', error)
-      errorMessage = 'Download is unavailable right now.'
+      if (files.length > 0) {
+        fallbackFiles = files
+        isFallbackModalOpen = true
+      } else {
+        errorMessage = 'Download is unavailable right now.'
+      }
     } finally {
       isDownloading = false
     }
@@ -90,8 +141,14 @@
     isModalOpen = false
   }
 
+  function closeFallbackModal() {
+    isFallbackModalOpen = false
+    fallbackFiles = []
+  }
+
   function handleKeydown(event: KeyboardEvent) {
     if (isModalOpen && event.key === 'Escape') closeModal()
+    if (isFallbackModalOpen && event.key === 'Escape') closeFallbackModal()
   }
 </script>
 
@@ -142,4 +199,8 @@
 
 {#if isModalOpen}
   <LikenessLicenseModal {likeness} {byline} titleId={modalTitleId} onClose={closeModal} />
+{/if}
+
+{#if isFallbackModalOpen}
+  <DownloadFilesModal files={fallbackFiles} title={likeness.name} onClose={closeFallbackModal} />
 {/if}

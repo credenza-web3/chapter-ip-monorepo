@@ -46,7 +46,10 @@
     "@credenza3/contracts": "^0.0.19",
     "@credenza3/passport-evm": "^0.4.29",
     "@tailwindcss/vite": "^4.3.0",
+    "client-zip": "^2.5.0",
     "daisyui": "^5.5.23",
+    "mime": "^4.1.0",
+    "native-file-system-adapter": "^3.0.1",
     "svelte-modals": "^2.0.1",
     "tailwindcss": "^4.3.0"
   }
