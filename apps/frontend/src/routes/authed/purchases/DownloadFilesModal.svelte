@@ -57,7 +57,7 @@
             href={file.url}
             target="_blank"
             rel="noreferrer"
-            download={`${file.label}.${mime.getExtension(file.mimetype) ?? 'bin'}`}
+            download={`${file.label.replace(/[/\\]/g, '_')}.${mime.getExtension(file.mimetype) ?? 'bin'}`}
             class="text-primary no-underline hover:underline"
           >
             Download
