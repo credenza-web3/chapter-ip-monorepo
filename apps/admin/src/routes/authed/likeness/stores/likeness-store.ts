@@ -44,7 +44,7 @@ export function getHeightTotalInches(
   return feet * 12 + inches
 }
 
-function getWeightLbs(value: unknown): number | null {
+export function getNormalizedWeight(value: unknown): number | null {
   if (value === null || value === undefined || value === '') return null
 
   const weight = Number(value)
@@ -60,9 +60,9 @@ export async function loadExistingFiles(
 
   if (!content.id) return existingFiles
 
-  const { files: fileLinks = [] } = await trpcClient.contents.getContentAllFilesLink.query({ contentId: content.id })
+  const { files } = await trpcClient.contents.getContentAllFilesLink.query({ contentId: content.id })
 
-  for (const file of fileLinks) {
+  for (const file of files ?? []) {
     const filename = file.label
     const bucket = resolveBucket(filename, uploadsByBucket)
     if (!bucket) continue
@@ -289,7 +289,7 @@ function createLikenessStore() {
           attributes: {
             ...s.profile.attributes,
             ...(profile.attributes ?? {}),
-            weight: getWeightLbs(profile.attributes?.weight ?? s.profile.attributes.weight),
+            weight: getNormalizedWeight(profile.attributes?.weight ?? s.profile.attributes.weight),
           },
           affiliations: profile.affiliations?.length ? profile.affiliations : s.profile.affiliations,
         },

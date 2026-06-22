@@ -1,6 +1,6 @@
 import { expect, test, vi } from 'vitest'
 import { get } from 'svelte/store'
-import { getHeightTotalInches, likenessStore, loadExistingFiles } from './likeness-store'
+import { getHeightTotalInches, getNormalizedWeight, likenessStore, loadExistingFiles } from './likeness-store'
 
 type LoadExistingFilesContent = Parameters<typeof loadExistingFiles>[0]
 type LoadExistingFilesClient = Parameters<typeof loadExistingFiles>[1]
@@ -18,6 +18,15 @@ test('omits heightTotalInches when height parts are incomplete or invalid', () =
   expect(getHeightTotalInches({ heightFt: '5', heightIn: '12' })).toBeUndefined()
   expect(getHeightTotalInches({ heightFt: 'abc', heightIn: '10' })).toBeUndefined()
   expect(getHeightTotalInches({ heightFt: '5', heightIn: '-1' })).toBeUndefined()
+})
+
+test('normalizes weight metadata to positive numbers or null', () => {
+  expect(getNormalizedWeight(165)).toBe(165)
+  expect(getNormalizedWeight('165')).toBe(165)
+  expect(getNormalizedWeight('')).toBeNull()
+  expect(getNormalizedWeight(null)).toBeNull()
+  expect(getNormalizedWeight(0)).toBeNull()
+  expect(getNormalizedWeight('abc')).toBeNull()
 })
 
 test('loads existing likeness file URLs through the all files link endpoint', async () => {
@@ -58,6 +67,30 @@ test('loads existing likeness file URLs through the all files link endpoint', as
 
 test('treats a missing files response as an empty existing files list', async () => {
   const query = vi.fn(async () => ({}))
+  const trpcClient = {
+    contents: {
+      getContentAllFilesLink: { query },
+    },
+  } as unknown as LoadExistingFilesClient
+  const content: LoadExistingFilesContent = {
+    id: 'content-1',
+    metadata: {
+      uploadsByBucket: {
+        headshots: ['headshot_1'],
+      },
+    },
+  }
+
+  await expect(loadExistingFiles(content, trpcClient)).resolves.toEqual({
+    headshots: [],
+    bodyShots: [],
+    voiceSamples: [],
+    videoReels: [],
+  })
+})
+
+test('treats a null files response as an empty existing files list', async () => {
+  const query = vi.fn(async () => ({ files: null }))
   const trpcClient = {
     contents: {
       getContentAllFilesLink: { query },
