@@ -105,11 +105,11 @@ function createLikenessStore() {
         bulk: false,
       },
       licensePrices: {
-        'single-use': '0',
-        'time-limited': '0',
-        perpetual: '0',
-        'ai-digital': '0',
-        bulk: '0',
+        'single-use': '',
+        'time-limited': '',
+        perpetual: '',
+        'ai-digital': '',
+        bulk: '',
       },
       licenseDropdowns: {
         'time-limited': '1 year',
@@ -217,8 +217,8 @@ function createLikenessStore() {
           ...s.licensing,
           licensePrices: { ...s.licensing.licensePrices, [id]: safeValue },
         }
-        if (id === 'single-use') nextLicensing.oneTimePrice = Number(safeValue || 0)
-        if (id === 'perpetual') nextLicensing.lifetimePrice = Number(safeValue || 0)
+        if (id === 'single-use') nextLicensing.oneTimePrice = Number(safeValue)
+        if (id === 'perpetual') nextLicensing.lifetimePrice = Number(safeValue)
         return { ...s, licensing: nextLicensing }
       }),
     setLicenseTypeDropdown: (id: string, value: string) =>
@@ -312,11 +312,11 @@ function createLikenessStore() {
             bulk: false,
           },
           licensePrices: {
-            'single-use': '0',
-            'time-limited': '0',
-            perpetual: '0',
-            'ai-digital': '0',
-            bulk: '0',
+            'single-use': '',
+            'time-limited': '',
+            perpetual: '',
+            'ai-digital': '',
+            bulk: '',
           },
           licenseDropdowns: {
             'time-limited': '1 year',

@@ -38,6 +38,14 @@
                   min="0"
                   value={$likenessStore.licensing.licensePrices[license.id]}
                   oninput={(e) => likenessStore.setLicenseTypePrice(license.id, e.currentTarget.value)}
+                  onblur={(e) => {
+                    const val = e.currentTarget.value
+                    if (val === '' || Number(val) < 0) {
+                      e.currentTarget.value = ''
+                      likenessStore.setLicenseTypePrice(license.id, '')
+                      setTimeout(() => likenessStore.setLicenseTypeEnabled(license.id, false), 0)
+                    }
+                  }}
                   onwheel={(e) => e.preventDefault()}
                   placeholder="USD"
                   class="flex-1 h-10.5 w-20 font-medium focus:outline-none pr-2"
