@@ -78,6 +78,7 @@ export type LikenessProfileAttributes = {
   ethnicity: string
   heightFt: string
   heightIn: string
+  heightTotalInches?: number
   weight: string
   eyeColor: string
   hairColor: string

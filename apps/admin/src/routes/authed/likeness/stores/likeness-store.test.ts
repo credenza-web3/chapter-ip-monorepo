@@ -1,10 +1,21 @@
 import { expect, test, vi } from 'vitest'
-import { loadExistingFiles } from './likeness-store'
+import { getHeightTotalInches, loadExistingFiles } from './likeness-store'
 
 type LoadExistingFilesContent = Parameters<typeof loadExistingFiles>[0]
 type LoadExistingFilesClient = Parameters<typeof loadExistingFiles>[1]
 type GetContentAllFilesLinkQuery = LoadExistingFilesClient['contents']['getContentAllFilesLink']['query']
 type GetContentAllFilesLinkInput = Parameters<GetContentAllFilesLinkQuery>[0]
+
+test('calculates total height inches from feet and inches metadata fields', () => {
+  expect(getHeightTotalInches({ heightFt: '5', heightIn: '10' })).toBe(70)
+  expect(getHeightTotalInches({ heightFt: ' 6 ', heightIn: '0' })).toBe(72)
+})
+
+test('omits heightTotalInches when height parts are incomplete or invalid', () => {
+  expect(getHeightTotalInches({ heightFt: '', heightIn: '10' })).toBeUndefined()
+  expect(getHeightTotalInches({ heightFt: '5', heightIn: '' })).toBeUndefined()
+  expect(getHeightTotalInches({ heightFt: '5', heightIn: '12' })).toBeUndefined()
+})
 
 test('loads existing likeness file URLs through the all files link endpoint', async () => {
   const queryInputs: GetContentAllFilesLinkInput[] = []

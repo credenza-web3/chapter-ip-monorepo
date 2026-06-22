@@ -29,6 +29,17 @@ function resolveBucket(
   return null
 }
 
+export function getHeightTotalInches(
+  attributes: Pick<LikenessProfileMetadata['attributes'], 'heightFt' | 'heightIn'>,
+): number | undefined {
+  const feet = Number(attributes.heightFt)
+  const inches = Number(attributes.heightIn)
+
+  if (feet === null || inches === null || inches > 11) return undefined
+
+  return feet * 12 + inches
+}
+
 export async function loadExistingFiles(
   content: { id: string; metadata?: LikenessMetadataInput },
   trpcClient: TRPCClient<AppRouter>,

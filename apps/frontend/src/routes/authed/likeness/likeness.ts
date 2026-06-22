@@ -11,7 +11,6 @@ import {
   type LikenessContent,
   type LikenessOption,
   type LikenessOptionValue,
-  type LikenessProfileAffiliation,
   type LikenessRange,
 } from '@repo/content-types/likeness'
 
@@ -30,28 +29,48 @@ export const RECENT_LIMIT = 10
 export const DEFAULT_IMAGE_URL = r2Config.url + r2Config.defaultImage
 
 type ArrayFilterKey = 'ethnicity' | 'eyeColor' | 'hairColor' | 'union' | 'licenseType' | 'permittedUse'
+type FilterValue = string | number | boolean | null
+type FilterComparisonOperator = 'eq' | 'gt' | 'gte' | 'lt' | 'lte' | 'contains'
+
+export type LikenessFilterCondition = {
+  field: string
+  op: FilterComparisonOperator
+  val: FilterValue
+}
+
+export type LikenessFilterNode = LikenessFilterCondition | { and: LikenessFilterNode[] } | { or: LikenessFilterNode[] }
+
+export type LikenessFilterInput = {
+  filter: {
+    and: LikenessFilterNode[]
+  }
+}
 
 export type LikenessItem = {
   id: string
   name: string
   bio: string
   imageUrl: string
-  filterData?: {
-    ethnicity: string
-    heightInches: number | null
-    weightLbs: number | null
-    eyeColor: string
-    hairColor: string
-    unions: string[]
-    licenseTypes: string[]
-    permittedUses: string[]
-  }
 }
 
 type ContentItem = {
   id: string
   metadata?: LikenessContent['metadata']
 }
+
+const SEARCH_FIELDS = ['profile.fullLegalName', 'profile.stageName', 'profile.bio'] as const
+
+const MULTI_FILTER_FIELDS = {
+  ethnicity: 'profile.attributes.ethnicity',
+  eyeColor: 'profile.attributes.eyeColor',
+  hairColor: 'profile.attributes.hairColor',
+  union: 'profile.affiliations.union',
+  licenseType: 'licensing.licenseTypes',
+  permittedUse: 'licensing.permittedUses',
+} as const satisfies Record<ArrayFilterKey, string>
+
+const HEIGHT_FILTER_FIELD = 'profile.attributes.heightTotalInches'
+const WEIGHT_FILTER_FIELD = 'profile.attributes.weight'
 
 export type LikenessFilters = {
   query: string
@@ -64,26 +83,6 @@ export type LikenessFilters = {
   height: LikenessOptionValue<typeof HEIGHT_RANGES> | null
   weight: LikenessOptionValue<typeof WEIGHT_RANGES> | null
 }
-
-function normalizeToken(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/&/g, 'and')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-}
-
-function getOptionLabels(options: readonly LikenessOption[]): Record<string, string> {
-  return Object.fromEntries(options.map((option) => [option.value, option.label]))
-}
-
-const ETHNICITY_LABELS = getOptionLabels(ETHNICITY_OPTIONS)
-const EYE_COLOR_LABELS = getOptionLabels(EYE_COLOR_OPTIONS)
-const HAIR_COLOR_LABELS = getOptionLabels(HAIR_COLOR_OPTIONS)
-const UNION_LABELS = getOptionLabels(UNION_OPTIONS)
-const LICENSE_TYPE_LABELS = getOptionLabels(LICENSE_TYPE_OPTIONS)
-const PERMITTED_USE_LABELS = getOptionLabels(PERMITTED_USE_OPTIONS)
 
 function selectedOptionValues<TOptions extends readonly LikenessOption[]>(
   searchParams: URLSearchParams,
@@ -105,69 +104,6 @@ function selectedOptionValue<TOptions extends readonly LikenessOption[]>(
   const selected = searchParams.getAll(key).find((value) => allowed.has(value))
 
   return (selected ?? null) as LikenessOptionValue<TOptions> | null
-}
-
-function hasMatchingValue(candidate: string, selected: string[], labels: Record<string, string>): boolean {
-  if (selected.length === 0) return true
-  if (!candidate) return false
-
-  const normalizedCandidate = normalizeToken(candidate)
-
-  return selected.some((value) => {
-    const label = labels[value] ?? value
-    return normalizedCandidate === normalizeToken(value) || normalizedCandidate === normalizeToken(label)
-  })
-}
-
-function hasMatchingList(candidates: string[], selected: string[], labels: Record<string, string>): boolean {
-  if (selected.length === 0) return true
-  return candidates.some((candidate) => hasMatchingValue(candidate, selected, labels))
-}
-
-function matchesSearchQuery(item: Pick<LikenessItem, 'name' | 'bio'>, query: string): boolean {
-  const normalizedQuery = query.trim().toLowerCase()
-  if (!normalizedQuery) return true
-
-  return item.name.toLowerCase().includes(normalizedQuery) || item.bio.toLowerCase().includes(normalizedQuery)
-}
-
-function getEnabledKeys(value: Record<string, boolean> | undefined): string[] {
-  if (!value) return []
-
-  return Object.entries(value).flatMap(([key, enabled]) => (enabled === true ? [key] : []))
-}
-
-function getAffiliationUnions(value: Array<Partial<LikenessProfileAffiliation>> | undefined): string[] {
-  return (
-    value?.flatMap((affiliation) => {
-      const union = affiliation.union?.trim()
-      return union ? [union] : []
-    }) ?? []
-  )
-}
-
-function matchesRange(value: number | null, selectedRange: string | null, ranges: readonly LikenessRange[]): boolean {
-  if (!selectedRange) return true
-  const range = ranges.find((item) => item.value === selectedRange)
-  if (!range) return true
-  if (!value) return false
-  if (range.min && value < range.min) return false
-  if (range.max && value >= range.max) return false
-
-  return true
-}
-
-function getFallbackFilterData(): NonNullable<LikenessItem['filterData']> {
-  return {
-    ethnicity: '',
-    heightInches: null,
-    weightLbs: null,
-    eyeColor: '',
-    hairColor: '',
-    unions: [],
-    licenseTypes: [],
-    permittedUses: [],
-  }
 }
 
 export function getPreviewUrl(contractAddress: string, contentId: string, filename: string): string {
@@ -238,20 +174,80 @@ export function getActiveFilterCount(filters: LikenessFilters): number {
   )
 }
 
+function getSelectedRange<TOptions extends readonly LikenessRange[]>(
+  value: LikenessOptionValue<TOptions> | null,
+  ranges: TOptions,
+): LikenessRange | null {
+  return ranges.find((range) => range.value === value) ?? null
+}
+
+function equalCondition(field: string, val: FilterValue): LikenessFilterCondition {
+  return { field, op: 'eq', val }
+}
+
+function appendMultiFilter(nodes: LikenessFilterNode[], field: string, values: string[]) {
+  if (values.length === 0) return
+  nodes.push({
+    or: values.map((value) => equalCondition(field, value)),
+  })
+}
+
+function appendBooleanMapFilter(nodes: LikenessFilterNode[], field: string, values: string[]) {
+  if (values.length === 0) return
+  nodes.push({
+    or: values.map((value) => equalCondition(`${field}.${value}`, true)),
+  })
+}
+
+function appendRangeFilter(nodes: LikenessFilterNode[], field: string, range: LikenessRange | null) {
+  if (!range) return
+  if (range.min !== null) nodes.push({ field, op: 'gte', val: range.min })
+  if (range.max !== null) nodes.push({ field, op: 'lt', val: range.max })
+}
+
+function appendSearchFilter(nodes: LikenessFilterNode[], query: string) {
+  const trimmedQuery = query.trim()
+  if (!trimmedQuery) return
+
+  nodes.push({
+    or: SEARCH_FIELDS.map((field) => ({ field, op: 'contains', val: trimmedQuery })),
+  })
+}
+
+export function buildLikenessFilterInput(filters: LikenessFilters): LikenessFilterInput {
+  const and: LikenessFilterNode[] = [equalCondition('type', 'likeness')]
+
+  appendSearchFilter(and, filters.query)
+  appendMultiFilter(and, MULTI_FILTER_FIELDS.ethnicity, filters.ethnicity)
+  appendMultiFilter(and, MULTI_FILTER_FIELDS.eyeColor, filters.eyeColor)
+  appendMultiFilter(and, MULTI_FILTER_FIELDS.hairColor, filters.hairColor)
+  appendMultiFilter(and, MULTI_FILTER_FIELDS.union, filters.union)
+  appendBooleanMapFilter(and, MULTI_FILTER_FIELDS.licenseType, filters.licenseType)
+  appendBooleanMapFilter(and, MULTI_FILTER_FIELDS.permittedUse, filters.permittedUse)
+  appendRangeFilter(and, HEIGHT_FILTER_FIELD, getSelectedRange(filters.height, HEIGHT_RANGES))
+  appendRangeFilter(and, WEIGHT_FILTER_FIELD, getSelectedRange(filters.weight, WEIGHT_RANGES))
+
+  return { filter: { and } }
+}
+
+export function buildLikenessFindContentInput(contractAddress: string) {
+  return {
+    contractAddress,
+    metadata: { type: 'likeness' },
+    limit: '100',
+    sort: 'createdAt',
+    order: 'desc' as const,
+  }
+}
+
 export function toLikenessItems(contentItems: ContentItem[], contractAddress: string): LikenessItem[] {
   return contentItems.flatMap((item) => {
     const metadata = item.metadata
     if (metadata?.type !== 'likeness') return []
 
     const profile = metadata.profile
-    const attributes = profile?.attributes
-    const licensing = metadata.licensing
     const name = profile?.fullLegalName ?? ''
     const bio = profile?.bio ?? ''
-    const heightFt = Number(attributes?.heightFt)
-    const heightIn = Number(attributes?.heightIn)
-    const heightInches = (Number.isFinite(heightFt) ? heightFt : 0) * 12 + (Number.isFinite(heightIn) ? heightIn : 0)
-    const weight = Number(attributes?.weight)
 
     return [
       {
@@ -259,16 +255,6 @@ export function toLikenessItems(contentItems: ContentItem[], contractAddress: st
         name,
         bio,
         imageUrl: getPreviewUrl(contractAddress, item.id, 'headshot_1'),
-        filterData: {
-          ethnicity: attributes?.ethnicity ?? '',
-          heightInches: heightInches > 0 ? heightInches : null,
-          weightLbs: Number.isFinite(weight) && weight > 0 ? weight : null,
-          eyeColor: attributes?.eyeColor ?? '',
-          hairColor: attributes?.hairColor ?? '',
-          unions: getAffiliationUnions(profile?.affiliations),
-          licenseTypes: getEnabledKeys(licensing?.licenseTypes),
-          permittedUses: getEnabledKeys(licensing?.permittedUses),
-        },
       },
     ]
   })
@@ -276,22 +262,4 @@ export function toLikenessItems(contentItems: ContentItem[], contractAddress: st
 
 export function getRecentLikenesses(items: LikenessItem[]): LikenessItem[] {
   return items.slice(0, RECENT_LIMIT)
-}
-
-export function filterLikenessItems(items: LikenessItem[], filters: LikenessFilters): LikenessItem[] {
-  return items.filter((item) => {
-    const filterData = item.filterData ?? getFallbackFilterData()
-
-    if (!matchesSearchQuery(item, filters.query)) return false
-    if (!hasMatchingValue(filterData.ethnicity, filters.ethnicity, ETHNICITY_LABELS)) return false
-    if (!hasMatchingValue(filterData.eyeColor, filters.eyeColor, EYE_COLOR_LABELS)) return false
-    if (!hasMatchingValue(filterData.hairColor, filters.hairColor, HAIR_COLOR_LABELS)) return false
-    if (!hasMatchingList(filterData.unions, filters.union, UNION_LABELS)) return false
-    if (!hasMatchingList(filterData.licenseTypes, filters.licenseType, LICENSE_TYPE_LABELS)) return false
-    if (!hasMatchingList(filterData.permittedUses, filters.permittedUse, PERMITTED_USE_LABELS)) return false
-    if (!matchesRange(filterData.heightInches, filters.height, HEIGHT_RANGES)) return false
-    if (!matchesRange(filterData.weightLbs, filters.weight, WEIGHT_RANGES)) return false
-
-    return true
-  })
 }
