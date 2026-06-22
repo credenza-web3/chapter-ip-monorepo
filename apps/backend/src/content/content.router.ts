@@ -234,21 +234,21 @@ export class ContentRouter {
       throw new TRPCError({ message: 'Object is not found in storage', code: 'NOT_FOUND' })
     }
 
-    const existingKey = await this.fileService.findOne({ key: input.key })
-    if (existingKey) {
-      throw new TRPCError({ message: 'This key is already registered', code: 'CONFLICT' })
-    }
-
-    const fileDoc = await this.fileService.create({
+    const fileData = {
       contentId: input.contentId,
       label: input.label ?? '',
       filename: input.filename,
       mimetype: input.mimetype,
       bucket,
       key: input.key,
-    })
+    }
 
-    return fileDoc
+    const existingKey = await this.fileService.findOne({ key: input.key, bucket })
+    if (existingKey) {
+      return (await this.fileService.updateById(existingKey.id, fileData))!
+    } else {
+      return await this.fileService.create(fileData)
+    }
   }
 
   @UseMiddlewares(AuthMiddleware)
