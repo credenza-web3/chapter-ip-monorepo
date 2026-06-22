@@ -27,6 +27,8 @@
         order: 'desc',
         ...(cursor ? { cursor } : {}),
       })
+      console.log('history loaded', result)
+
       if (cancelled) return
       items = result.items
       const nextCursor = result.cursor.next
