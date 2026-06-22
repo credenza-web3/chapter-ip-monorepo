@@ -42,8 +42,7 @@
   let canScrollBack = $state(false)
   let canScrollForward = $state(false)
   let openFilter = $state<FilterMenu | null>(null)
-  // svelte-ignore state_referenced_locally
-  let filters = $state(cloneFilters(initialFilters))
+  let filters = $derived(cloneFilters(initialFilters))
 
   const recentItems = $derived(getRecentLikenesses(items))
   const filteredItems = $derived(filterLikenessItems(items, filters))

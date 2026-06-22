@@ -116,11 +116,12 @@ describe('likeness data helpers', () => {
   it('parses and serializes shareable likeness filter query params', () => {
     const filters = parseLikenessFilters(
       new URLSearchParams(
-        'q=ignored&ethnicity=asian&ethnicity=unknown&eyeColor=brown&licenseType=single-use&height=5-8-6-0&weight=unknown',
+        'q=Toronto&ethnicity=asian&ethnicity=unknown&eyeColor=brown&licenseType=single-use&height=5-8-6-0&weight=unknown',
       ),
     )
 
     expect(filters).toMatchObject({
+      query: 'Toronto',
       ethnicity: ['asian'],
       eyeColor: ['brown'],
       licenseType: ['single-use'],
@@ -128,7 +129,7 @@ describe('likeness data helpers', () => {
       weight: null,
     })
     expect(filtersToSearchParams(filters).toString()).toBe(
-      'ethnicity=asian&eyeColor=brown&licenseType=single-use&height=5-8-6-0',
+      'q=Toronto&ethnicity=asian&eyeColor=brown&licenseType=single-use&height=5-8-6-0',
     )
   })
 
@@ -171,6 +172,32 @@ describe('likeness data helpers', () => {
     expect(filterLikenessItems([avery, mikey], filters)).toEqual([avery])
   })
 
+  it('filters likenesses by text query across name and bio', () => {
+    const avery = createItem({
+      id: '1',
+      name: 'Avery Stone',
+      bio: 'Performer based in Toronto.',
+    })
+    const mikey = createItem({
+      id: '2',
+      name: 'Mikey Berry',
+      bio: 'Studio vocalist in Austin.',
+    })
+
+    expect(
+      filterLikenessItems([avery, mikey], {
+        ...createEmptyLikenessFilters(),
+        query: 'toronto',
+      }),
+    ).toEqual([avery])
+    expect(
+      filterLikenessItems([avery, mikey], {
+        ...createEmptyLikenessFilters(),
+        query: 'berry',
+      }),
+    ).toEqual([mikey])
+  })
+
   it('matches range boundary values only in the higher bucket', () => {
     const boundary = createItem({
       id: 'boundary',
@@ -210,12 +237,13 @@ function createItem(
   item: Partial<NonNullable<LikenessItem['filterData']>> & {
     id: string
     name: string
+    bio?: string
   },
 ): LikenessItem {
   return {
     id: item.id,
     name: item.name,
-    bio: '',
+    bio: item.bio ?? '',
     imageUrl: DEFAULT_IMAGE_URL,
     filterData: {
       ethnicity: item.ethnicity ?? '',

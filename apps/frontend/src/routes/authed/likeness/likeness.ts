@@ -54,6 +54,7 @@ type ContentItem = {
 }
 
 export type LikenessFilters = {
+  query: string
   ethnicity: LikenessOptionValue<typeof ETHNICITY_OPTIONS>[]
   eyeColor: LikenessOptionValue<typeof EYE_COLOR_OPTIONS>[]
   hairColor: LikenessOptionValue<typeof HAIR_COLOR_OPTIONS>[]
@@ -123,6 +124,13 @@ function hasMatchingList(candidates: string[], selected: string[], labels: Recor
   return candidates.some((candidate) => hasMatchingValue(candidate, selected, labels))
 }
 
+function matchesSearchQuery(item: Pick<LikenessItem, 'name' | 'bio'>, query: string): boolean {
+  const normalizedQuery = query.trim().toLowerCase()
+  if (!normalizedQuery) return true
+
+  return item.name.toLowerCase().includes(normalizedQuery) || item.bio.toLowerCase().includes(normalizedQuery)
+}
+
 function getEnabledKeys(value: Record<string, boolean> | undefined): string[] {
   if (!value) return []
 
@@ -168,6 +176,7 @@ export function getPreviewUrl(contractAddress: string, contentId: string, filena
 
 export function createEmptyLikenessFilters(): LikenessFilters {
   return {
+    query: '',
     ethnicity: [],
     eyeColor: [],
     hairColor: [],
@@ -181,6 +190,7 @@ export function createEmptyLikenessFilters(): LikenessFilters {
 
 export function parseLikenessFilters(searchParams: URLSearchParams): LikenessFilters {
   return {
+    query: searchParams.get('q')?.trim() ?? '',
     ethnicity: selectedOptionValues(searchParams, 'ethnicity', ETHNICITY_OPTIONS),
     eyeColor: selectedOptionValues(searchParams, 'eyeColor', EYE_COLOR_OPTIONS),
     hairColor: selectedOptionValues(searchParams, 'hairColor', HAIR_COLOR_OPTIONS),
@@ -199,6 +209,8 @@ export function filtersToSearchParams(filters: LikenessFilters): URLSearchParams
     for (const value of filters[key]) searchParams.append(key, value)
   }
 
+  if (filters.query.trim()) searchParams.set('q', filters.query.trim())
+
   appendValues('ethnicity')
   appendValues('eyeColor')
   appendValues('hairColor')
@@ -214,6 +226,7 @@ export function filtersToSearchParams(filters: LikenessFilters): URLSearchParams
 
 export function getActiveFilterCount(filters: LikenessFilters): number {
   return (
+    (filters.query.trim() ? 1 : 0) +
     filters.ethnicity.length +
     filters.eyeColor.length +
     filters.hairColor.length +
@@ -269,6 +282,7 @@ export function filterLikenessItems(items: LikenessItem[], filters: LikenessFilt
   return items.filter((item) => {
     const filterData = item.filterData ?? getFallbackFilterData()
 
+    if (!matchesSearchQuery(item, filters.query)) return false
     if (!hasMatchingValue(filterData.ethnicity, filters.ethnicity, ETHNICITY_LABELS)) return false
     if (!hasMatchingValue(filterData.eyeColor, filters.eyeColor, EYE_COLOR_LABELS)) return false
     if (!hasMatchingValue(filterData.hairColor, filters.hairColor, HAIR_COLOR_LABELS)) return false
