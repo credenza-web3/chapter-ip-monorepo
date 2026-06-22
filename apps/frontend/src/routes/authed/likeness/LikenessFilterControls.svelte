@@ -82,14 +82,16 @@
 {/snippet}
 
 {#snippet filterButton(menu: FilterMenu, label: string)}
+  {@const selectedCount = getMenuCount(filters, menu)}
   <div class="relative">
     <button
       type="button"
       class={filterButtonClasses(openFilter === menu)}
       aria-expanded={openFilter === menu}
+      aria-label={selectedCount > 0 ? `${label} filter, ${selectedCount} selected` : `${label} filter`}
       onclick={() => onToggleFilter(menu)}
     >
-      <span>{label}{getMenuCount(filters, menu) > 0 ? ` (${getMenuCount(filters, menu)})` : ''}</span>
+      <span>{label}{selectedCount > 0 ? ` (${selectedCount})` : ''}</span>
       {@render chevron(openFilter === menu)}
     </button>
 

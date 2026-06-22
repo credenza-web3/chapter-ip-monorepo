@@ -34,7 +34,7 @@
   const thumbsToShow = $derived(rest.slice(0, 3))
   const remaining = $derived(rest.length > 3 ? rest.length - 3 : 0)
 
-  const lbsToKg = () => +(+$likenessStore.profile.attributes.weight * 0.453592).toFixed(1)
+  const lbsToKg = () => +(($likenessStore.profile.attributes.weight ?? 0) * 0.453592).toFixed(1)
 
   const feetInchesToCm = () =>
     +((+$likenessStore.profile.attributes.heightFt * 12 + +$likenessStore.profile.attributes.heightIn) * 2.54).toFixed(

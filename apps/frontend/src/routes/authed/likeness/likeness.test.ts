@@ -83,7 +83,6 @@ describe('likeness data helpers', () => {
     expect(buildLikenessFindContentInput(CONTRACT_ADDRESS)).toEqual({
       contractAddress: CONTRACT_ADDRESS,
       metadata: { and: [{ field: 'type', op: 'eq', val: 'likeness' }] },
-      limit: '100',
       sort: 'createdAt',
       order: 'desc',
     })

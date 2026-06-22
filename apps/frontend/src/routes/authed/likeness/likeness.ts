@@ -41,7 +41,6 @@ export type LikenessFilterNode = LikenessFilterCondition | { and: LikenessFilter
 type LikenessFindContentInput = {
   contractAddress: string
   metadata: LikenessFilterNode
-  limit: '100'
   sort: 'createdAt'
   order: 'desc'
 }
@@ -255,7 +254,6 @@ export function buildLikenessFindContentInput(
   return {
     contractAddress,
     metadata: buildLikenessFilterInput(filters),
-    limit: '100',
     sort: 'createdAt',
     order: 'desc' as const,
   }

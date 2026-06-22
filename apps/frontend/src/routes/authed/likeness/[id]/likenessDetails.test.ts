@@ -17,7 +17,7 @@ describe('likeness purchase mapper', () => {
               ethnicity: 'Mixed',
               heightFt: '5',
               heightIn: '10',
-              weight: '165',
+              weight: 165,
               eyeColor: 'Brown',
               hairColor: 'Black',
             },

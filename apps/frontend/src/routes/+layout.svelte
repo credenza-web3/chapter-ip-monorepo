@@ -8,18 +8,23 @@
 
   let { children } = $props()
 
+  type NavItem = {
+    label: string
+    href?: string
+    disabled?: boolean
+    searchable?: boolean
+  }
+
   const navItems = [
     { label: 'Creative Works', disabled: true },
     { label: 'Location', disabled: true },
     { label: 'Likeness', href: '/authed/likeness' },
-    { label: 'Purchases', href: '/authed/purchases' },
+    { label: 'Purchases', href: '/authed/purchases', searchable: false },
   ]
 
-  const searchTargets = [
-    { label: 'Creative Works', disabled: true },
-    { label: 'Location', disabled: true },
-    { label: 'Likeness', href: '/authed/likeness' },
-  ]
+  const searchTargets = navItems
+    .filter((item) => item.searchable !== false)
+    .map(({ label, href, disabled }) => ({ label, href, disabled })) satisfies NavItem[]
 </script>
 
 <svelte:head>

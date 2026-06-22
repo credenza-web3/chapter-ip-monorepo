@@ -17,10 +17,16 @@
   }>()
 
   let openFilter = $state<FilterMenu | null>(null)
-  let filters = $derived(cloneFilters(initialFilters))
+  // svelte-ignore state_referenced_locally
+  // eslint-disable-next-line svelte/prefer-writable-derived -- filter handlers assign before URL props reload.
+  let filters = $state<LikenessFilters>(cloneFilters(initialFilters))
 
   const recentItems = $derived(getRecentLikenesses(recentSourceItems))
   const activeFilterCount = $derived(getActiveFilterCount(filters))
+
+  $effect.pre(() => {
+    filters = cloneFilters(initialFilters)
+  })
 
   function applyFilters(nextFilters: LikenessFilters) {
     filters = nextFilters

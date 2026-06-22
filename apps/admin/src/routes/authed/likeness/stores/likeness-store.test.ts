@@ -1,5 +1,6 @@
 import { expect, test, vi } from 'vitest'
-import { getHeightTotalInches, loadExistingFiles } from './likeness-store'
+import { get } from 'svelte/store'
+import { getHeightTotalInches, likenessStore, loadExistingFiles } from './likeness-store'
 
 type LoadExistingFilesContent = Parameters<typeof loadExistingFiles>[0]
 type LoadExistingFilesClient = Parameters<typeof loadExistingFiles>[1]
@@ -55,6 +56,30 @@ test('loads existing likeness file URLs through the all files link endpoint', as
   expect(queryInputs).toEqual([{ contentId: 'content-1' }])
 })
 
+test('treats a missing files response as an empty existing files list', async () => {
+  const query = vi.fn(async () => ({}))
+  const trpcClient = {
+    contents: {
+      getContentAllFilesLink: { query },
+    },
+  } as unknown as LoadExistingFilesClient
+  const content: LoadExistingFilesContent = {
+    id: 'content-1',
+    metadata: {
+      uploadsByBucket: {
+        headshots: ['headshot_1'],
+      },
+    },
+  }
+
+  await expect(loadExistingFiles(content, trpcClient)).resolves.toEqual({
+    headshots: [],
+    bodyShots: [],
+    voiceSamples: [],
+    videoReels: [],
+  })
+})
+
 test('skips loading links when content id is missing', async () => {
   const query = vi.fn()
   const trpcClient = {
@@ -103,4 +128,13 @@ test('skips returned file links that are not tracked in uploads metadata', async
     videoReels: [],
   })
   expect(query).toHaveBeenCalledTimes(1)
+})
+
+test('keeps only the first decimal point when setting license prices', () => {
+  likenessStore.reset()
+
+  likenessStore.setLicenseTypePrice('single-use', '1.2.3')
+
+  expect(get(likenessStore).licensing.licensePrices['single-use']).toBe('1.23')
+  expect(get(likenessStore).licensing.oneTimePrice).toBe(1.23)
 })
