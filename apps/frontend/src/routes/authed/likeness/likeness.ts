@@ -29,16 +29,22 @@ export const RECENT_LIMIT = 10
 export const DEFAULT_IMAGE_URL = r2Config.url + r2Config.defaultImage
 
 type ArrayFilterKey = 'ethnicity' | 'eyeColor' | 'hairColor' | 'union' | 'licenseType' | 'permittedUse'
-type FilterValue = string | number | boolean | null
-type FilterComparisonOperator = 'eq' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'nin' | 'exists' | 'regex'
+type EqualityFilterValue = string | number | boolean | null
 
-export type LikenessFilterCondition = {
-  field: string
-  op: FilterComparisonOperator
-  val: FilterValue
-}
+export type LikenessFilterCondition =
+  | { field: string; op: 'eq'; val: EqualityFilterValue }
+  | { field: string; op: 'gte' | 'lt'; val: number }
+  | { field: string; op: 'regex'; val: string }
 
 export type LikenessFilterNode = LikenessFilterCondition | { and: LikenessFilterNode[] } | { or: LikenessFilterNode[] }
+
+type LikenessFindContentInput = {
+  contractAddress: string
+  metadata: LikenessFilterNode
+  limit: '100'
+  sort: 'createdAt'
+  order: 'desc'
+}
 
 export type LikenessItem = {
   id: string
@@ -176,7 +182,7 @@ function getSelectedRange<TOptions extends readonly LikenessRange[]>(
   return ranges.find((range) => range.value === value) ?? null
 }
 
-function equalCondition(field: string, val: FilterValue): LikenessFilterCondition {
+function equalCondition(field: string, val: EqualityFilterValue): LikenessFilterCondition {
   return { field, op: 'eq', val }
 }
 
@@ -245,7 +251,7 @@ export function buildLikenessFilterInput(filters: LikenessFilters): LikenessFilt
 export function buildLikenessFindContentInput(
   contractAddress: string,
   filters: LikenessFilters = createEmptyLikenessFilters(),
-) {
+): LikenessFindContentInput {
   return {
     contractAddress,
     metadata: buildLikenessFilterInput(filters),

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import { SvelteURLSearchParams } from 'svelte/reactivity'
+  import { currentUrlWithSearchParams } from '$lib/navigation/searchParams'
 
   type SearchTarget = {
     label: string
@@ -41,9 +42,7 @@
     if (!searchParams.has('q')) return
 
     searchParams.delete('q')
-    const queryString = searchParams.toString()
-    const nextUrl = `${window.location.pathname}${queryString ? `?${queryString}` : ''}${window.location.hash}`
-    void goto(nextUrl, { replaceState: true })
+    void goto(currentUrlWithSearchParams(searchParams), { replaceState: true })
   }
 
   function handleInput(event: Event) {

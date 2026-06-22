@@ -1,4 +1,5 @@
 import { goto } from '$app/navigation'
+import { currentUrlWithSearchParams } from '$lib/navigation/searchParams'
 import { DEFAULT_IMAGE_URL, createEmptyLikenessFilters, filtersToSearchParams, type LikenessFilters } from './likeness'
 import type { FilterMenu } from './LikenessDashboard.types'
 
@@ -56,9 +57,7 @@ export function useDefaultImage(event: Event) {
 
 export function updateLikenessFilterUrl(filters: LikenessFilters) {
   const searchParams = filtersToSearchParams(filters)
-  const query = searchParams.toString()
-  const nextUrl = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`
-  void goto(nextUrl, { replaceState: true, noScroll: true, keepFocus: true })
+  void goto(currentUrlWithSearchParams(searchParams), { replaceState: true, noScroll: true, keepFocus: true })
 }
 
 export function emptyFilters(): LikenessFilters {

@@ -15,6 +15,8 @@ test('omits heightTotalInches when height parts are incomplete or invalid', () =
   expect(getHeightTotalInches({ heightFt: '', heightIn: '10' })).toBeUndefined()
   expect(getHeightTotalInches({ heightFt: '5', heightIn: '' })).toBeUndefined()
   expect(getHeightTotalInches({ heightFt: '5', heightIn: '12' })).toBeUndefined()
+  expect(getHeightTotalInches({ heightFt: 'abc', heightIn: '10' })).toBeUndefined()
+  expect(getHeightTotalInches({ heightFt: '5', heightIn: '-1' })).toBeUndefined()
 })
 
 test('loads existing likeness file URLs through the all files link endpoint', async () => {

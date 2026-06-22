@@ -39,6 +39,32 @@
     onSetWeightRange: (value: WeightRangeValue) => void
   }>()
 
+  type OptionFilterDescriptor = {
+    kind: 'options'
+    menu: MultiFilterKey
+    label: string
+    options: readonly FilterOption[]
+  }
+
+  type RangeFilterDescriptor = {
+    kind: 'height' | 'weight'
+    menu: Extract<FilterMenu, 'height' | 'weight'>
+    label: string
+  }
+
+  type FilterDescriptor = OptionFilterDescriptor | RangeFilterDescriptor
+
+  const filterDescriptors = [
+    { kind: 'options', menu: 'ethnicity', label: 'Ethnicity', options: ETHNICITY_OPTIONS },
+    { kind: 'height', menu: 'height', label: 'Height' },
+    { kind: 'weight', menu: 'weight', label: 'Weight' },
+    { kind: 'options', menu: 'eyeColor', label: 'Eye Color', options: EYE_COLOR_OPTIONS },
+    { kind: 'options', menu: 'hairColor', label: 'Hair Color', options: HAIR_COLOR_OPTIONS },
+    { kind: 'options', menu: 'union', label: 'Union', options: UNION_OPTIONS },
+    { kind: 'options', menu: 'licenseType', label: 'License Type', options: LICENSE_TYPE_OPTIONS },
+    { kind: 'options', menu: 'permittedUse', label: 'Permitted Uses', options: PERMITTED_USE_OPTIONS },
+  ] satisfies readonly FilterDescriptor[]
+
   function isFilterSelected(key: MultiFilterKey, value: string): boolean {
     return (filters[key] as string[]).includes(value)
   }
@@ -68,29 +94,26 @@
     </button>
 
     {#if openFilter === menu}
-      <div
-        class="absolute left-0 top-full z-20 mt-2 w-max max-w-[min(82vw,520px)] rounded-lg border border-[#e4ded6] bg-[#f8f5f1] p-5 shadow-[0_18px_36px_rgba(42,36,30,0.14)]"
-      >
-        {#if menu === 'ethnicity'}
-          {@render optionPills('ethnicity', ETHNICITY_OPTIONS)}
-        {:else if menu === 'height'}
-          {@render heightRangePanel()}
-        {:else if menu === 'weight'}
-          {@render weightRangePanel()}
-        {:else if menu === 'eyeColor'}
-          {@render optionPills('eyeColor', EYE_COLOR_OPTIONS)}
-        {:else if menu === 'hairColor'}
-          {@render optionPills('hairColor', HAIR_COLOR_OPTIONS)}
-        {:else if menu === 'union'}
-          {@render optionPills('union', UNION_OPTIONS)}
-        {:else if menu === 'licenseType'}
-          {@render optionPills('licenseType', LICENSE_TYPE_OPTIONS)}
-        {:else if menu === 'permittedUse'}
-          {@render optionPills('permittedUse', PERMITTED_USE_OPTIONS)}
-        {/if}
-      </div>
+      {@render filterPanel(menu)}
     {/if}
   </div>
+{/snippet}
+
+{#snippet filterPanel(menu: FilterMenu)}
+  {@const descriptor = filterDescriptors.find((item) => item.menu === menu)}
+  {#if descriptor}
+    <div
+      class="absolute left-0 top-full z-20 mt-2 w-max max-w-[min(82vw,520px)] rounded-lg border border-[#e4ded6] bg-[#f8f5f1] p-5 shadow-[0_18px_36px_rgba(42,36,30,0.14)]"
+    >
+      {#if descriptor.kind === 'options'}
+        {@render optionPills(descriptor.menu, descriptor.options)}
+      {:else if descriptor.kind === 'height'}
+        {@render heightRangePanel()}
+      {:else}
+        {@render weightRangePanel()}
+      {/if}
+    </div>
+  {/if}
 {/snippet}
 
 {#snippet optionPills(key: MultiFilterKey, options: readonly FilterOption[])}
@@ -154,12 +177,7 @@
     </svg>
   </button>
 
-  {@render filterButton('ethnicity', 'Ethnicity')}
-  {@render filterButton('height', 'Height')}
-  {@render filterButton('weight', 'Weight')}
-  {@render filterButton('eyeColor', 'Eye Color')}
-  {@render filterButton('hairColor', 'Hair Color')}
-  {@render filterButton('union', 'Union')}
-  {@render filterButton('licenseType', 'License Type')}
-  {@render filterButton('permittedUse', 'Permitted Uses')}
+  {#each filterDescriptors as descriptor (descriptor.menu)}
+    {@render filterButton(descriptor.menu, descriptor.label)}
+  {/each}
 </div>
