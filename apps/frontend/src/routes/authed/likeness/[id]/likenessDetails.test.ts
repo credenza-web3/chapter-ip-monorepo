@@ -82,7 +82,7 @@ describe('likeness purchase mapper', () => {
           description: expect.stringContaining('One approved use'),
         },
       ],
-      permittedUses: ['AI', 'Digital'],
+      permittedUses: ['AI Training', 'Digital'],
       territories: ['United States only'],
       allowRetouching: false,
       approveFinalUse: true,

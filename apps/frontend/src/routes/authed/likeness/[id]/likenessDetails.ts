@@ -1,4 +1,5 @@
 import { getPreviewUrl } from '../likeness'
+import { LICENSE_TYPE_OPTIONS, PERMITTED_USE_OPTIONS } from '@repo/content-types/likeness'
 import type {
   LikenessAffiliation,
   LikenessContent,
@@ -22,11 +23,10 @@ const PREVIEW_AUXILIARY_BUCKETS = {
 } as const satisfies Record<PreviewAuxiliaryBucket, 'audio' | 'video'>
 
 const LICENSE_NAMES: Record<string, string> = {
-  'single-use': 'Single-use campaign',
   'time-limited': 'Time-limited commercial',
-  perpetual: 'Perpetual brand ambassador',
   'ai-digital': 'AI and digital use',
   bulk: 'Bulk licensing',
+  ...Object.fromEntries(LICENSE_TYPE_OPTIONS.map((option) => [option.value, option.label])),
 }
 
 const LICENSE_DESCRIPTIONS: Record<string, string> = {
@@ -39,10 +39,7 @@ const LICENSE_DESCRIPTIONS: Record<string, string> = {
 }
 
 const PERMITTED_USE_NAMES: Record<string, string> = {
-  ai: 'AI',
-  commercial: 'Commercial',
-  digital: 'Digital',
-  'film-tv': 'Film and TV',
+  ...Object.fromEntries(PERMITTED_USE_OPTIONS.map((option) => [option.value, option.label])),
 }
 
 function trimString(value: unknown): string {

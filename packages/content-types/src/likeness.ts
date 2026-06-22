@@ -44,13 +44,16 @@ export const UNION_OPTIONS = [
 
 export const LICENSE_TYPE_OPTIONS = [
   { value: 'single-use', label: 'Single-use campaign' },
+  // { value: 'time-limited', label: 'Time-limited commercial' },
   { value: 'perpetual', label: 'Perpetual brand ambassador' },
+  // { value: 'bulk', label: 'Bulk clean list' },
 ] as const satisfies readonly LikenessOption[]
 
 export const PERMITTED_USE_OPTIONS = [
-  { value: 'ai', label: 'AI (Artificial Intelligence)' },
-  { value: 'commercial', label: 'Commercial' },
+  { value: 'ai', label: 'AI Training' },
   { value: 'digital', label: 'Digital' },
+  // { value: 'print', label: 'Print' },
+  { value: 'commercial', label: 'Marketing' },
   { value: 'film-tv', label: 'Film/TV' },
 ] as const satisfies readonly LikenessOption[]
 

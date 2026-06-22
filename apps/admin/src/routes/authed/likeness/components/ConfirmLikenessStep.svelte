@@ -2,6 +2,7 @@
   import Checkmark from '$lib/assets/Checkmark.svelte'
   import Cross from '$lib/assets/Cross.svelte'
   import { likenessStore } from '../stores/likeness-store'
+  import { LICENSE_TYPES, PERMITTED_USES } from '../constants/constants'
   import { modals, type ModalProps } from 'svelte-modals'
   import { ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
 
@@ -33,6 +34,10 @@
 
   const thumbsToShow = $derived(rest.slice(0, 3))
   const remaining = $derived(rest.length > 3 ? rest.length - 3 : 0)
+  const enabledLicenseTypes = $derived(
+    LICENSE_TYPES.filter((license) => $likenessStore.licensing.licenseTypes[license.id]),
+  )
+  const enabledPermittedUses = $derived(PERMITTED_USES.filter((use) => $likenessStore.licensing.permittedUses[use.id]))
 
   const lbsToKg = () => +(($likenessStore.profile.attributes.weight ?? 0) * 0.453592).toFixed(1)
 
@@ -58,8 +63,9 @@
   <div class="pb-6">
     <h2 class="mb-2 text-[28px] font-medium text-left text-dark">Confirm your Likeness</h2>
     <p class="mt-3 text-basetext-left text-[#72717b]">
-      Vestibulum mollis lacinia ligula in pellentesque. Sed eu justo ligula. Donec vel nisl sit amet orci condimentum
-      egestas nec euismod diam. Interdum et malesuada fames ac ante ipsum primis in faucibus.
+      You're almost done. Before completing your likeness, take a moment to review the information you've provided. This
+      information will be used to create your likeness, helping brands, producers, partners, and licensing opportunities
+      identify and engage with you confidently.
     </p>
   </div>
 
@@ -218,63 +224,39 @@
         <div>
           <h2 class="text-[18px] font-semibold text-dark mb-3">Licensing types</h2>
           <div class="flex flex-col gap-4">
-            {#if $likenessStore.licensing.licenseTypes['single-use']}
-              <div class="flex justify-between">
+            {#each enabledLicenseTypes as license (license.id)}
+              <div class="flex justify-between gap-4">
                 <div class="flex-1">
                   <div class="flex items-center gap-2 mb-1.5">
                     <Checkmark />
-                    <span class="font-semibold text-dark">Single-use campaign</span>
+                    <span class="font-semibold text-dark">{license.label}</span>
                   </div>
                   <p class="text-[#747474] leading-relaxed pl-6">
-                    Morbi in tempor magna, eu semper urna. Nam vel ex non ex accumsan viverra. Vivamus hendrerit, neque
-                    et feugiat tempus, tortor libero congue ipsum.
+                    {license.description}
                   </p>
                 </div>
                 <div class="shrink-0 text-right">
                   <span class="text-sm font-semibold text-dark"
-                    >$ {$likenessStore.licensing.licensePrices['single-use']}</span
+                    >$ {$likenessStore.licensing.licensePrices[license.id]}</span
                   >
                   <span class="text-[10px] text-[#7a7a8a] ml-1">USD</span>
                 </div>
               </div>
-            {/if}
-
-            {#if $likenessStore.licensing.licenseTypes['perpetual']}
-              <div class="flex">
-                <div class="flex-1">
-                  <div class="flex items-center gap-2 mb-1.5">
-                    <Checkmark />
-                    <span class="font-semibold text-dark">Perpetual campaign</span>
-                  </div>
-                  <p class="text-[#747474] leading-relaxed pl-6">
-                    Morbi in tempor magna, eu semper urna. Nam vel ex non ex accumsan viverra. Vivamus hendrerit, neque
-                    et feugiat tempus, tortor libero congue ipsum.
-                  </p>
-                </div>
-                <div class="shrink-0 text-right">
-                  <span class="text-sm font-semibold text-dark"
-                    >$ {$likenessStore.licensing.licensePrices['perpetual']}</span
-                  >
-                  <span class="text-[10px] text-[#7a7a8a] ml-1">USD</span>
-                </div>
-              </div>
-            {/if}
+            {/each}
           </div>
         </div>
 
         <!-- Permitted uses -->
         <div>
           <h2 class="text-[18px] font-semibold text-dark mb-3">Permitted uses</h2>
-          {#each Object.entries($likenessStore.licensing.permittedUses) as [key, val] (key)}
-            {#if val}
-              <div class="flex items-center gap-2 mb-1.5">
-                <Checkmark />
-                <span class="font-semibold text-dark">{key}</span>
-              </div>
-              <p class=" text-[#747474] leading-relaxed pl-6">
-                Nunc erat elit, pulvinar ut accumsan id, pretium vel lectus. Etiam Leo ipsum, fermentum.
-              </p>
-            {/if}
+          {#each enabledPermittedUses as use (use.id)}
+            <div class="flex items-center gap-2 mb-1.5">
+              <Checkmark />
+              <span class="font-semibold text-dark">{use.label}</span>
+            </div>
+            <p class=" text-[#747474] leading-relaxed pl-6">
+              {use.description}
+            </p>
           {/each}
         </div>
 
