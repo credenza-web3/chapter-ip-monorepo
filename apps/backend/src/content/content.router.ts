@@ -3,12 +3,13 @@ import { Ctx, Input, Mutation, Query, Router, UseMiddlewares } from 'nestjs-trpc
 import { TRPCError } from '@trpc/server'
 import { extension } from 'mime-types'
 
+import { NOTIFICATION_TYPE } from '@repo/notifications'
+
 import { AuthMiddleware } from '../common/auth/auth.middleware'
 import type { TAppContextWithTokenPayload } from '../common/auth/auth.types'
 import { CommonEvmService } from '../common/evm/evm.service'
+import { CommonNotificationService } from '../common/notification/notification.service'
 import { ContentService } from './content.service'
-import { CommonLicenseService } from '../common/license/license.service'
-
 import { ContentModelService } from './content-model.service'
 import { ContentStatus } from './content.schema'
 import { FileService } from './file/file.service'
@@ -25,6 +26,8 @@ import {
   getContentByIdInputSchema,
   getContentByIdOutputSchema,
   getContentConfigOutputSchema,
+  getContentAllFilesLinkInputSchema,
+  getContentAllFilesLinkOutputSchema,
   getContentFileLinkInputSchema,
   getContentFileLinkOutputSchema,
   getContentStatisticInputSchema,
@@ -45,6 +48,8 @@ import {
   type TGetContentByIdInput,
   type TGetContentByIdOutput,
   type TGetContentConfigOutput,
+  type TGetContentAllFilesLinkInput,
+  type TGetContentAllFilesLinkOutput,
   type TGetContentFileLinkInput,
   type TGetContentFileLinkOutput,
   type TGetContentStatisticInput,
@@ -75,7 +80,7 @@ export class ContentRouter {
     private readonly fileService: FileService,
     private readonly commonEvmService: CommonEvmService,
     private readonly commonContentService: ContentService,
-    private readonly commonLicenseService: CommonLicenseService,
+    private readonly commonNotificationService: CommonNotificationService,
     private readonly purchaseHistoryService: PurchaseHistoryService,
   ) {}
 
@@ -157,6 +162,12 @@ export class ContentRouter {
       status: input.tokenId ? (input.status ?? ContentStatus.ACTIVE) : ContentStatus.DRAFT,
     })
 
+    void this.commonNotificationService.getModel().create({
+      sub,
+      type: NOTIFICATION_TYPE.CONTENT_CREATED,
+      payload: { ...contentDoc, _id: contentDoc.id },
+    })
+
     return contentDoc
   }
 
@@ -223,21 +234,21 @@ export class ContentRouter {
       throw new TRPCError({ message: 'Object is not found in storage', code: 'NOT_FOUND' })
     }
 
-    const existingKey = await this.fileService.findOne({ key: input.key })
-    if (existingKey) {
-      throw new TRPCError({ message: 'This key is already registered', code: 'CONFLICT' })
-    }
-
-    const fileDoc = await this.fileService.create({
+    const fileData = {
       contentId: input.contentId,
       label: input.label ?? '',
       filename: input.filename,
       mimetype: input.mimetype,
       bucket,
       key: input.key,
-    })
+    }
 
-    return fileDoc
+    const existingKey = await this.fileService.findOne({ key: input.key, bucket })
+    if (existingKey) {
+      return (await this.fileService.updateById(existingKey.id, fileData))!
+    } else {
+      return await this.fileService.create(fileData)
+    }
   }
 
   @UseMiddlewares(AuthMiddleware)
@@ -294,7 +305,7 @@ export class ContentRouter {
       throw new TRPCError({ message: 'Content is not found', code: 'NOT_FOUND' })
     }
 
-    const files = await this.fileService.find({ contentId: content._id.toString() })
+    const files = await this.fileService.find({ contentId: content._id })
     return {
       ...content.toJSON(),
       files,
@@ -326,39 +337,13 @@ export class ContentRouter {
     if (!contentFile) {
       throw new TRPCError({ message: 'File is not found', code: 'NOT_FOUND' })
     }
-    const parent = await this.contentService.findById(contentFile.contentId)
-    const subEvmAddress = await this.commonEvmService.getUserEvmAddressBySub(ctx.authTokenPayload.sub)
 
-    let hasMembership = false
-    if (parent!.tokenId) {
-      const publisherAddress = await this.commonContentService.getOwner(parent!.tokenId)
-      hasMembership = await this.commonContentService.verifyHasSubscription(publisherAddress, subEvmAddress)
-    }
-
-    let result = true,
-      err: string | null = null
-
-    if (!hasMembership) {
-      if (parent!.tokenId) {
-        if (input.licenseTokenId) {
-          ;[result, err] = await this.commonLicenseService.verify(
-            ctx.authTokenPayload.sub,
-            subEvmAddress,
-            parent!.tokenId,
-            input.licenseTokenId,
-          )
-        } else {
-          ;[result, err] = await this.commonContentService.verifyIsOwner(subEvmAddress, parent!.tokenId)
-        }
-      } else {
-        ;[result, err] = await this.commonContentService.verifyIsOwnerById(
-          ctx.authTokenPayload.sub,
-          contentFile.contentId,
-        )
-      }
-    }
-
-    if (!result) {
+    const [hasAccess, err] = await this.commonContentService.verifyContentFileAccess(
+      ctx.authTokenPayload.sub,
+      contentFile.contentId,
+      input.licenseTokenId,
+    )
+    if (!hasAccess) {
       throw new TRPCError({ message: err ?? 'Forbidden', code: 'FORBIDDEN' })
     }
 
@@ -368,6 +353,41 @@ export class ContentRouter {
     })
 
     return { url }
+  }
+
+  @UseMiddlewares(AuthMiddleware)
+  @Query({
+    input: getContentAllFilesLinkInputSchema,
+    output: getContentAllFilesLinkOutputSchema,
+  })
+  async getContentAllFilesLink(
+    @Ctx() ctx: TAppContextWithTokenPayload,
+    @Input() input: TGetContentAllFilesLinkInput,
+  ): Promise<TGetContentAllFilesLinkOutput> {
+    const [hasAccess, err] = await this.commonContentService.verifyContentFileAccess(
+      ctx.authTokenPayload.sub,
+      input.contentId,
+      input.licenseTokenId,
+    )
+    if (!hasAccess) {
+      throw new TRPCError({ message: err ?? 'Forbidden', code: 'FORBIDDEN' })
+    }
+
+    const files = await this.fileService.find({ contentId: input.contentId })
+    const fileLinks = await Promise.all(
+      files.map(async (file) => ({
+        id: file.id,
+        label: file.label,
+        filename: file.filename,
+        mimetype: file.mimetype,
+        url: await this.fileService.getSignedObjectUrl({
+          Bucket: file.bucket,
+          Key: file.key,
+        }),
+      })),
+    )
+
+    return { files: fileLinks }
   }
 
   @UseMiddlewares(AuthMiddleware)

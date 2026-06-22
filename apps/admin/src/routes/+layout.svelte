@@ -9,7 +9,7 @@
 
   import { getTrpcClient } from '$lib/stores/trpc-client'
   import { NOTIFICATIONS_DROPDOWN_LIMIT } from '$lib/constants'
-  import type { TNotificationItem } from '@repo/notifications'
+  import { NOTIFICATION_TYPE, type TNotificationItem } from '@repo/notifications'
   import NotificationsDropdown from '$lib/components/NotificationsDropdown.svelte'
 
   let { children } = $props()
@@ -42,7 +42,8 @@
     const trpcClient = getTrpcClient()
     const subscription = trpcClient.notifications.onMessage.subscribe(undefined, {
       onData(info) {
-        const data = info as TNotificationItem
+        const raw = info as Record<string, unknown>
+        const data = { ...raw, id: raw['id'] ?? raw['_id'] } as TNotificationItem
         notificationStore.update((n) => [data, ...n])
       },
     })
@@ -54,7 +55,10 @@
           sort: 'createdAt',
           order: 'desc',
         })
-        notificationStore.set(items)
+
+        const filtered = items.filter((item) => item.type !== NOTIFICATION_TYPE.LICENSE_PURCHASED)
+
+        notificationStore.set(filtered)
       } catch (err) {
         console.error('Failed to fetch notifications', err)
       }
@@ -62,24 +66,6 @@
 
     return () => subscription.unsubscribe()
   })
-
-  async function markAsRead(id: string) {
-    try {
-      await getTrpcClient().notifications.markMyNotificationAsRead.mutate({ id })
-      notificationStore.update((n) => n.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x)))
-    } catch (err) {
-      console.error('Failed to mark notification as read', err)
-    }
-  }
-
-  async function markAllAsRead() {
-    try {
-      await getTrpcClient().notifications.markAllMyNotificationsAsRead.mutate()
-      notificationStore.update((n) => n.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() })))
-    } catch (err) {
-      console.error('Failed to mark all notifications as read', err)
-    }
-  }
 </script>
 
 <svelte:head>
@@ -94,11 +80,7 @@
         <NavLink href="/authed/files">Dashboard</NavLink>
       </div>
       <div class="flex items-center md:gap-7.25 gap-4">
-        <NotificationsDropdown
-          notifications={$notificationStore}
-          onMarkRead={markAsRead}
-          onMarkAllRead={markAllAsRead}
-        />
+        <NotificationsDropdown />
         <a
           href="/authed/profile"
           aria-label="Open profile"

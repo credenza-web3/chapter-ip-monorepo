@@ -10,26 +10,12 @@
   let data = $derived(rawData)
   const contentContractAddress = configStore.getContractAddress(ContractName.CONTENT_NFT)
 
-  function getNormalizerFiles(files: PurchasedContentToken['files']): LikenessContent['files'] {
-    return files.flatMap((file) => {
-      const filename = file.filename?.trim() || file.label?.trim() || ''
-      const label = file.label?.trim() || filename
-      const id = file.id?.trim() || filename
-      const mimetype = file.mimetype?.trim() || ''
-
-      if (!filename || !mimetype) return []
-
-      return [{ id, filename, label, mimetype }]
-    })
-  }
-
   function toLikenessPurchaseRow(purchase: PurchasedContentToken): LikenessPurchaseRow[] {
     const likeness = normalizeLikeness(
       {
         id: purchase.id,
         tokenId: purchase.tokenId,
         metadata: purchase.metadata as LikenessContent['metadata'],
-        files: getNormalizerFiles(purchase.files),
       },
       contentContractAddress,
     )

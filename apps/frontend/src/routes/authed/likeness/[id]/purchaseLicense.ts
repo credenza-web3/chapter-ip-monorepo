@@ -59,20 +59,6 @@ function normalizeTokenId(tokenId: LikenessDetails['contentTokenId']): string {
   return tokenId == null ? '' : String(tokenId).trim()
 }
 
-function isLicenseVoucher(value: unknown): value is TLicenseVoucher {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
-
-  const entries = Object.entries(value)
-  return (
-    entries.length > 0 &&
-    entries.every(([, entryValue]) =>
-      typeof entryValue === 'number'
-        ? Number.isFinite(entryValue)
-        : typeof entryValue === 'string' && entryValue.trim() !== '',
-    )
-  )
-}
-
 export function canPurchaseLicense(purchase: LikenessDetails, license: LikenessLicense | undefined): boolean {
   return Boolean(license && getPurchaseLicenseType(license.id) && normalizeTokenId(purchase.contentTokenId))
 }
@@ -96,7 +82,8 @@ export function parsePassportPayment(payload: PassportPaymentEvent): PassportPay
 
   if (type === 'CARD' || type === 'STRIPE') {
     const { voucher, sig } = firstItem?.outcome ?? {}
-    if (!isLicenseVoucher(voucher) || typeof sig !== 'string' || !sig.trim()) {
+
+    if (!voucher || !voucher.nonce || !sig) {
       throw new Error('Missing card payment voucher outcome')
     }
     return { kind: 'card', voucher, sig }

@@ -8,6 +8,7 @@ import {
   type TRPCClient,
 } from '@trpc/client'
 import type { AppRouter } from '../server/server'
+import { contentQueryCacheLink } from './content-query-cache-link'
 
 export type { AppRouter }
 export type { TRPCClient }
@@ -60,6 +61,7 @@ export function createClient(opts: {
 
   return createTRPCProxyClient<AppRouter>({
     links: [
+      contentQueryCacheLink(),
       splitLink({
         condition: (op) => op.type === 'subscription',
         true: subLink,

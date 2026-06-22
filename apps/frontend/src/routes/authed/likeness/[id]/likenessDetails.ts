@@ -1,4 +1,4 @@
-import { DEFAULT_IMAGE_URL, getPreviewUrl } from '../likeness'
+import { getPreviewUrl } from '../likeness'
 import type {
   LikenessAffiliation,
   LikenessContent,
@@ -10,6 +10,16 @@ import type {
 } from '@repo/content-types/likeness'
 
 type LikenessContentInput = LikenessContent
+type LikenessImageMedia = Extract<LikenessDetails['media'][number], { type: 'image' }>
+type PreviewImageBucket = 'headshots' | 'bodyShots'
+type PreviewAuxiliaryBucket = 'voiceSamples' | 'videoReels'
+
+const DEFAULT_PREVIEW_IMAGE = 'headshot_1'
+const PREVIEW_IMAGE_BUCKETS = ['headshots', 'bodyShots'] as const satisfies readonly PreviewImageBucket[]
+const PREVIEW_AUXILIARY_BUCKETS = {
+  voiceSamples: 'audio',
+  videoReels: 'video',
+} as const satisfies Record<PreviewAuxiliaryBucket, 'audio' | 'video'>
 
 const LICENSE_NAMES: Record<string, string> = {
   'single-use': 'Single-use campaign',
@@ -103,32 +113,49 @@ function getPermittedUses(permittedUses: Record<string, boolean> | undefined): s
   )
 }
 
-function getMedia(content: LikenessContentInput, name: string, contractAddress: string): LikenessDetails['media'] {
-  return (content.files ?? []).map((file) => {
-    const filename = trimString(file.filename) || trimString(file.label)
-    const id = trimString(file.id) || filename
+function getPreviewNames(content: LikenessContentInput, buckets: readonly string[]): string[] {
+  return Array.from(
+    new Set(
+      buckets
+        .flatMap((bucket) => content.metadata?.uploadsByBucket?.[bucket] ?? [])
+        .map(trimString)
+        .filter(Boolean),
+    ),
+  )
+}
 
-    if (file.mimetype.startsWith('image/')) {
-      return {
-        id,
-        type: 'image' as const,
-        src: getPreviewUrl(contractAddress, content.id, filename),
-        alt: `${name} ${filename}`,
-      }
-    }
+function getPreviewImageNames(content: LikenessContentInput): string[] {
+  const names = getPreviewNames(content, PREVIEW_IMAGE_BUCKETS)
 
-    const type = file.mimetype.startsWith('video/')
-      ? ('video' as const)
-      : file.mimetype.startsWith('audio/')
-        ? ('audio' as const)
-        : ('file' as const)
+  return names.length > 0 ? names : [DEFAULT_PREVIEW_IMAGE]
+}
 
-    return {
-      id,
+function getImageMedia(content: LikenessContentInput, name: string, contractAddress: string): LikenessImageMedia[] {
+  return getPreviewImageNames(content).map((filename) => ({
+    id: filename,
+    type: 'image' as const,
+    src: getPreviewUrl(contractAddress, content.id, filename),
+    alt: `${name} ${filename}`,
+  }))
+}
+
+function getAuxiliaryMedia(content: LikenessContentInput): LikenessDetails['media'] {
+  return Object.entries(PREVIEW_AUXILIARY_BUCKETS).flatMap(([bucket, type]) =>
+    getPreviewNames(content, [bucket]).map((filename) => ({
+      id: filename,
       type,
       label: filename,
-    }
-  })
+    })),
+  )
+}
+
+function getMedia(content: LikenessContentInput, name: string, contractAddress: string): LikenessDetails['media'] {
+  const imageMedia = getImageMedia(content, name, contractAddress)
+  return [...imageMedia, ...getAuxiliaryMedia(content)]
+}
+
+function getImages(content: LikenessContentInput, name: string, contractAddress: string): LikenessDetails['images'] {
+  return getImageMedia(content, name, contractAddress).map((item) => ({ src: item.src, alt: item.alt }))
 }
 
 export function normalizeLikeness(content: LikenessContentInput, contractAddress: string): LikenessDetails | null {
@@ -140,7 +167,7 @@ export function normalizeLikeness(content: LikenessContentInput, contractAddress
   const licensing = metadata.licensing
   const name = trimString(profile?.fullLegalName) || 'Unnamed likeness'
   const media = getMedia(content, name, contractAddress)
-  const images = media.flatMap((item) => (item.type === 'image' ? [{ src: item.src, alt: item.alt }] : []))
+  const images = getImages(content, name, contractAddress)
 
   return {
     id: content.id,
@@ -161,7 +188,7 @@ export function normalizeLikeness(content: LikenessContentInput, contractAddress
     territories: (licensing?.territories ?? []).map(trimString).filter(Boolean),
     allowRetouching: licensing?.allowRetouching === 'yes',
     approveFinalUse: licensing?.approveFinalUse === 'yes',
-    images: images.length > 0 ? images : [{ src: DEFAULT_IMAGE_URL, alt: `${name} default likeness preview` }],
+    images,
     media,
   }
 }

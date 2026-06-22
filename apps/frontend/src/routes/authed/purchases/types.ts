@@ -11,6 +11,12 @@ export type PurchasedContentFile = {
   key?: string | null
 }
 
+export type DownloadableContentFile = {
+  url: string
+  label: string
+  mimetype: string
+}
+
 export type PurchasedContentToken = {
   id: string
   tokenId: string
@@ -22,8 +28,8 @@ export type PurchasedContentToken = {
   isBlocked: boolean
 }
 
-export type ContentFileLinkClient = {
-  contents: Pick<TRPCClient<AppRouter>['contents'], 'getContentFileLink'>
+export type ContentFilesLinkClient = {
+  contents: Pick<TRPCClient<AppRouter>['contents'], 'getContentAllFilesLink'>
 }
 
 export type LikenessPurchaseRow = {

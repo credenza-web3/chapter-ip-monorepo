@@ -1,16 +1,65 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { DEFAULT_IMAGE_URL, getRecentLikenesses, type LikenessItem } from './likeness'
+  import {
+    DEFAULT_IMAGE_URL,
+    ETHNICITY_OPTIONS,
+    EYE_COLOR_OPTIONS,
+    HAIR_COLOR_OPTIONS,
+    HEIGHT_RANGES,
+    LICENSE_TYPE_OPTIONS,
+    PERMITTED_USE_OPTIONS,
+    UNION_OPTIONS,
+    WEIGHT_RANGES,
+    createEmptyLikenessFilters,
+    filterLikenessItems,
+    filtersToSearchParams,
+    getActiveFilterCount,
+    getRecentLikenesses,
+    type LikenessFilters,
+    type LikenessItem,
+  } from './likeness'
 
-  let { items } = $props<{
+  type FilterMenu =
+    | 'ethnicity'
+    | 'height'
+    | 'weight'
+    | 'eyeColor'
+    | 'hairColor'
+    | 'union'
+    | 'licenseType'
+    | 'permittedUse'
+  type MultiFilterKey = 'ethnicity' | 'eyeColor' | 'hairColor' | 'union' | 'licenseType' | 'permittedUse'
+  type FilterOption = { value: string; label: string }
+  type HeightRangeValue = NonNullable<LikenessFilters['height']>
+  type WeightRangeValue = NonNullable<LikenessFilters['weight']>
+
+  let { items, filters: initialFilters = createEmptyLikenessFilters() } = $props<{
     items: LikenessItem[]
+    filters?: LikenessFilters
   }>()
 
   let carousel = $state<HTMLDivElement>()
   let canScrollBack = $state(false)
   let canScrollForward = $state(false)
+  let openFilter = $state<FilterMenu | null>(null)
+  // svelte-ignore state_referenced_locally
+  let filters = $state(cloneFilters(initialFilters))
 
   const recentItems = $derived(getRecentLikenesses(items))
+  const filteredItems = $derived(filterLikenessItems(items, filters))
+  const activeFilterCount = $derived(getActiveFilterCount(filters))
+
+  function cloneFilters(value: LikenessFilters): LikenessFilters {
+    return {
+      ...value,
+      ethnicity: [...value.ethnicity],
+      eyeColor: [...value.eyeColor],
+      hairColor: [...value.hairColor],
+      union: [...value.union],
+      licenseType: [...value.licenseType],
+      permittedUse: [...value.permittedUse],
+    }
+  }
 
   function updateCarouselState() {
     if (!carousel) return
@@ -27,6 +76,79 @@
     if (image.src !== DEFAULT_IMAGE_URL) image.src = DEFAULT_IMAGE_URL
   }
 
+  function updateUrl() {
+    const searchParams = filtersToSearchParams(filters)
+    const query = searchParams.toString()
+    const nextUrl = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`
+    window.history.replaceState(window.history.state, '', nextUrl)
+  }
+
+  function toggleFilter(menu: FilterMenu) {
+    openFilter = openFilter === menu ? null : menu
+  }
+
+  function toggleMultiFilter(key: MultiFilterKey, value: string) {
+    const values: string[] = filters[key]
+    const nextValues = values.includes(value) ? values.filter((item) => item !== value) : [...values, value]
+    filters = { ...filters, [key]: nextValues } as LikenessFilters
+    updateUrl()
+  }
+
+  function isFilterSelected(key: MultiFilterKey, value: string): boolean {
+    return (filters[key] as string[]).includes(value)
+  }
+
+  function setHeightRange(value: HeightRangeValue) {
+    filters.height = filters.height === value ? null : value
+    updateUrl()
+  }
+
+  function setWeightRange(value: WeightRangeValue) {
+    filters.weight = filters.weight === value ? null : value
+    updateUrl()
+  }
+
+  function clearFilters() {
+    filters = createEmptyLikenessFilters()
+    openFilter = null
+    updateUrl()
+  }
+
+  function getMenuCount(menu: FilterMenu): number {
+    switch (menu) {
+      case 'ethnicity':
+        return filters.ethnicity.length
+      case 'height':
+        return filters.height ? 1 : 0
+      case 'weight':
+        return filters.weight ? 1 : 0
+      case 'eyeColor':
+        return filters.eyeColor.length
+      case 'hairColor':
+        return filters.hairColor.length
+      case 'union':
+        return filters.union.length
+      case 'licenseType':
+        return filters.licenseType.length
+      case 'permittedUse':
+        return filters.permittedUse.length
+    }
+  }
+
+  function optionClasses(selected: boolean): string {
+    return [
+      'rounded-full border px-4 py-2 text-sm font-semibold transition-colors',
+      selected ? 'border-primary bg-[#eee8ff] text-primary' : 'border-[#e4ded6] bg-[#efebe5] text-[#77757d]',
+    ].join(' ')
+  }
+
+  function filterButtonClasses(active: boolean): string {
+    return [
+      'inline-flex h-9 items-center gap-2 rounded-sm border px-3.5 text-sm font-semibold transition-colors',
+      active ? 'border-[#d6d0c8] bg-[#efebe5] text-dark' : 'border-[#ddd8d1] bg-[#f8f5f1] text-[#77757d]',
+    ].join(' ')
+  }
+
   onMount(() => {
     updateCarouselState()
     const resizeObserver = new ResizeObserver(updateCarouselState)
@@ -35,6 +157,100 @@
     return () => resizeObserver.disconnect()
   })
 </script>
+
+{#snippet chevron(open: boolean)}
+  <svg
+    aria-hidden="true"
+    class={`size-4 transition-transform ${open ? 'rotate-180' : ''}`}
+    viewBox="0 0 20 20"
+    fill="none"
+  >
+    <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+  </svg>
+{/snippet}
+
+{#snippet filterButton(menu: FilterMenu, label: string)}
+  <div class="relative">
+    <button
+      type="button"
+      class={filterButtonClasses(openFilter === menu)}
+      aria-expanded={openFilter === menu}
+      onclick={() => toggleFilter(menu)}
+    >
+      <span>{label}{getMenuCount(menu) > 0 ? ` (${getMenuCount(menu)})` : ''}</span>
+      {@render chevron(openFilter === menu)}
+    </button>
+
+    {#if openFilter === menu}
+      <div
+        class="absolute left-0 top-full z-20 mt-2 w-max max-w-[min(82vw,520px)] rounded-lg border border-[#e4ded6] bg-[#f8f5f1] p-5 shadow-[0_18px_36px_rgba(42,36,30,0.14)]"
+      >
+        {#if menu === 'ethnicity'}
+          {@render optionPills('ethnicity', ETHNICITY_OPTIONS)}
+        {:else if menu === 'height'}
+          {@render heightRangePanel()}
+        {:else if menu === 'weight'}
+          {@render weightRangePanel()}
+        {:else if menu === 'eyeColor'}
+          {@render optionPills('eyeColor', EYE_COLOR_OPTIONS)}
+        {:else if menu === 'hairColor'}
+          {@render optionPills('hairColor', HAIR_COLOR_OPTIONS)}
+        {:else if menu === 'union'}
+          {@render optionPills('union', UNION_OPTIONS)}
+        {:else if menu === 'licenseType'}
+          {@render optionPills('licenseType', LICENSE_TYPE_OPTIONS)}
+        {:else if menu === 'permittedUse'}
+          {@render optionPills('permittedUse', PERMITTED_USE_OPTIONS)}
+        {/if}
+      </div>
+    {/if}
+  </div>
+{/snippet}
+
+{#snippet optionPills(key: MultiFilterKey, options: readonly FilterOption[])}
+  <div class="flex flex-wrap gap-2">
+    {#each options as option (option.value)}
+      <button
+        type="button"
+        class={optionClasses(isFilterSelected(key, option.value))}
+        aria-pressed={isFilterSelected(key, option.value)}
+        onclick={() => toggleMultiFilter(key, option.value)}
+      >
+        {option.label}
+      </button>
+    {/each}
+  </div>
+{/snippet}
+
+{#snippet heightRangePanel()}
+  <div class="grid max-w-xl grid-cols-1 gap-2 min-[420px]:grid-cols-2 md:grid-cols-3">
+    {#each HEIGHT_RANGES as range (range.value)}
+      <button
+        type="button"
+        class={optionClasses(filters.height === range.value)}
+        aria-pressed={filters.height === range.value}
+        onclick={() => setHeightRange(range.value)}
+      >
+        {range.label}
+      </button>
+    {/each}
+  </div>
+{/snippet}
+
+{#snippet weightRangePanel()}
+  <div class="grid max-w-xl grid-cols-1 gap-2 min-[420px]:grid-cols-2 md:grid-cols-3">
+    {#each WEIGHT_RANGES as range (range.value)}
+      <button
+        type="button"
+        class={optionClasses(filters.weight === range.value)}
+        aria-pressed={filters.weight === range.value}
+        onclick={() => setWeightRange(range.value)}
+      >
+        {range.label}
+      </button>
+    {/each}
+  </div>
+{/snippet}
 
 <div class="mx-auto w-full max-w-360 px-6">
   <section class="mb-7" aria-labelledby="recently-added-heading">
@@ -101,11 +317,38 @@
     aria-labelledby="likeness-heading"
   >
     <h2 id="likeness-heading" class="text-xl font-bold text-dark">Likeness</h2>
+
+    <div class="mt-6 flex flex-wrap items-center gap-2">
+      <button
+        type="button"
+        class="inline-flex size-9 items-center justify-center rounded-sm border border-[#ddd8d1] bg-[#f8f5f1] text-[#77757d] transition-colors disabled:opacity-40"
+        aria-label="Clear filters"
+        disabled={activeFilterCount === 0}
+        onclick={clearFilters}
+      >
+        <svg aria-hidden="true" class="size-5" viewBox="0 0 20 20" fill="none">
+          <path d="M4 6H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M4 14H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M7 4V8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M13 12V16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </button>
+
+      {@render filterButton('ethnicity', 'Ethnicity')}
+      {@render filterButton('height', 'Height')}
+      {@render filterButton('weight', 'Weight')}
+      {@render filterButton('eyeColor', 'Eye Color')}
+      {@render filterButton('hairColor', 'Hair Color')}
+      {@render filterButton('union', 'Union')}
+      {@render filterButton('licenseType', 'License Type')}
+      {@render filterButton('permittedUse', 'Permitted Uses')}
+    </div>
+
     <div class="my-6 border-t border-[#e5e0d9]"></div>
 
-    {#if items.length > 0}
+    {#if filteredItems.length > 0}
       <div class="grid grid-cols-1 gap-x-6 gap-y-12 min-[420px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
-        {#each items as item (item.id)}
+        {#each filteredItems as item (item.id)}
           <a href={`/authed/likeness/${item.id}`} class="group min-w-0">
             <img
               src={item.imageUrl}
@@ -122,7 +365,9 @@
       </div>
     {:else}
       <div class="py-16 text-center">
-        <p class="text-[#77757d]">No likenesses available.</p>
+        <p class="text-[#77757d]">
+          {items.length > 0 ? 'No likenesses match these filters.' : 'No likenesses available.'}
+        </p>
       </div>
     {/if}
   </section>

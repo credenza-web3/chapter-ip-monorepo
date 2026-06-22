@@ -2,6 +2,9 @@
   "name": "@repo/trpc",
   "version": "0.0.0",
   "private": true,
+  "scripts": {
+    "test": "vitest --run"
+  },
   "exports": {
     "./client": {
       "types": "./src/client/client.ts",
@@ -17,6 +20,9 @@
   "dependencies": {
     "@trpc/client": "^11.17.0",
     "@trpc/server": "^11.17.0"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.8"
   },
   "peerDependencies": {
     "zod": "^4"

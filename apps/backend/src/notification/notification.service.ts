@@ -69,6 +69,7 @@ export class NotificationService implements OnModuleInit {
                 contractAddress: contentNftContractAddress,
                 tokenId,
               })
+
               if (!content) {
                 this.logger.warn(`Cannot find content for contract: ${change.fullDocument.contractAddress}`)
                 return
@@ -80,33 +81,27 @@ export class NotificationService implements OnModuleInit {
                   .insertMany([
                     { ...notification, sub: toSub, type: NOTIFICATION_TYPE.LICENSE_PURCHASED },
                     ...(content.sub !== toSub
-                      ? [{ ...notification, sub: content.sub, type: NOTIFICATION_TYPE.LICENSE_PURCHASED }]
+                      ? [{ ...notification, sub: content.sub, type: NOTIFICATION_TYPE.LICENSE_SOLD }]
                       : []),
                   ]),
                 this.purchaseHistoryService.create({
                   buyerAddress: toAddress,
-                  contentId: String(content._id),
+                  contentId: content.id,
                   licenseType: Number(args[2]),
                   priceFiat: String(args[3] ?? '0'),
                   priceEther: String(args[4] ?? '0'),
                   priceToken: String(args[5] ?? '0'),
                   currencyTokenContract: String(args[6] ?? '').toLowerCase(),
+                  platformFeeAmount: String(args[7] ?? '0'),
+                  agencyFeeAmount: String(args[8] ?? '0'),
                   ownerId: content.sub,
                 }),
               ])
               break
             }
             case 'Transfer': {
-              if (change.fullDocument.contractAddress !== contentNftContractAddress) return
-
-              const toAddress = args[1]?.toLowerCase()
-              const toSub = await this.commonEvmService.getSubByEvmAddress(toAddress)
-
-              await this.commonNotificationService.getModel().create({
-                ...notification,
-                sub: toSub,
-                type: NOTIFICATION_TYPE.CONTENT_CREATED,
-              })
+              // PASS for now we'll trigger this later
+              // Currently not used but might be useful in the future
               break
             }
             default: {

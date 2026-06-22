@@ -59,6 +59,7 @@
           const { url, key } = await trpcClient.contents.createContentFileUploadUrl.mutate({
             contentId,
             mimetype: file.type,
+            filename: name,
           })
           await uploadFileToBucket(file, url)
           await trpcClient.contents.registerContentFile.mutate({

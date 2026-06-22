@@ -15,7 +15,7 @@ const t = initTRPC.create();
 const publicProcedure = t.procedure;
 import { healthOutputSchema } from "../../../../apps/backend/src/app.dto";
 import { refreshTokenInputSchema, authTokenOutputSchema, exchangeCodeInputSchema } from "../../../../apps/backend/src/auth/auth.dto";
-import { createUserFileUploadUrlInputSchema, presignedPutOutputSchema, createContentFileUploadUrlInputSchema, registerContentInputSchema, registerContentOutputSchema, updateContentMetadataInputSchema, updateContentMetadataOutputSchema, registerContentFileInputSchema, registerContentFileOutputSchema, removeContentFileInputSchema, removeContentFileOutputSchema, findContentInputSchema, findContentOutputSchema, getContentByIdInputSchema, getContentByIdOutputSchema, getContentStatisticInputSchema, getContentStatisticOutputSchema, getContentFileLinkInputSchema, getContentFileLinkOutputSchema, uploadTokenMetadataInputSchema, uploadTokenMetadataOutputSchema, requestLazyMintContentTokenInputSchema, requestLazyMintContentTokenOutputSchema, findPurchaseHistoryInputSchema, findPurchaseHistoryOutputSchema, getContentConfigOutputSchema } from "../../../../apps/backend/src/content/content.dto";
+import { createUserFileUploadUrlInputSchema, presignedPutOutputSchema, createContentFileUploadUrlInputSchema, registerContentInputSchema, registerContentOutputSchema, updateContentMetadataInputSchema, updateContentMetadataOutputSchema, registerContentFileInputSchema, registerContentFileOutputSchema, removeContentFileInputSchema, removeContentFileOutputSchema, findContentInputSchema, findContentOutputSchema, getContentByIdInputSchema, getContentByIdOutputSchema, getContentStatisticInputSchema, getContentStatisticOutputSchema, getContentFileLinkInputSchema, getContentFileLinkOutputSchema, getContentAllFilesLinkInputSchema, getContentAllFilesLinkOutputSchema, uploadTokenMetadataInputSchema, uploadTokenMetadataOutputSchema, requestLazyMintContentTokenInputSchema, requestLazyMintContentTokenOutputSchema, findPurchaseHistoryInputSchema, findPurchaseHistoryOutputSchema, getContentConfigOutputSchema } from "../../../../apps/backend/src/content/content.dto";
 import { findBlockedLicensesInputSchema, findBlockedLicensesOutputSchema } from "../../../../apps/backend/src/license/../common/license/blocked-license/blocked-license.dto";
 import { findNotificationsInputSchema, findNotificationsOutputSchema, markNotificationAsReadInputSchema, markNotificationAsReadOutputSchema, markAllMyNotificationsAsReadOutputSchema } from "../../../../apps/backend/src/notification/notification.dto";
 import { setPublisherInputSchema, setPublisherOutputSchema, getPublisherDataInputSchema, getPublisherDataOutputSchema, findPublishersInputSchema, findPublishersOutputSchema, mintContentNftTokenInputSchema, mintContentNftTokenOutputSchema } from "../../../../apps/backend/src/publisher/publisher.dto";
@@ -82,6 +82,10 @@ const appRouter = t.router({
     getContentFileLink: publicProcedure
       .input(getContentFileLinkInputSchema)
       .output(getContentFileLinkOutputSchema)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    getContentAllFilesLink: publicProcedure
+      .input(getContentAllFilesLinkInputSchema)
+      .output(getContentAllFilesLinkOutputSchema)
       .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     uploadTokenMetadata: publicProcedure
       .input(uploadTokenMetadataInputSchema)
