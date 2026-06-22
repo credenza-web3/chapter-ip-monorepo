@@ -36,7 +36,7 @@ const likenessDetails: LikenessPurchase = {
       description: 'Ongoing partnership.',
     },
   ],
-  permittedUses: ['AI', 'Digital'],
+  permittedUses: ['AI Training', 'Digital'],
   territories: ['United States only'],
   allowRetouching: false,
   approveFinalUse: false,

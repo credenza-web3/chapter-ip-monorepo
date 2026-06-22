@@ -1,5 +1,13 @@
 <script lang="ts">
   let { uses }: { uses: string[] } = $props()
+
+  const permittedUseDescriptions: Record<string, string> = {
+    'AI Training':
+      'Use of your likeness as training data for generative AI models. Every model trained on your data is logged on-chain, and you earn royalties on the outputs it produces.',
+    Digital: 'Web, social, streaming, in-app, and any other screen-based placement that lives online.',
+    Marketing: 'Advertising, brand campaigns, sponsorships, and any use tied to the sale of a product or service.',
+    'Film/TV': 'Scripted, unscripted, and documentary productions for theatrical, broadcast, or streaming release.',
+  }
 </script>
 
 {#if uses.length > 0}
@@ -13,10 +21,11 @@
           </svg>
           <div class="min-w-0">
             <h3 class="font-sans text-base leading-5.25 font-semibold text-[#202225]">{use}</h3>
-            <p class="mt-2 text-sm leading-5.25 font-medium text-[#747474]">
-              Ongoing partnership for buyers who want long-term association with your digital likeness. Priced as a
-              recurring fee. End the license at any time to stop all future use.
-            </p>
+            {#if permittedUseDescriptions[use]}
+              <p class="mt-2 text-sm leading-5.25 font-medium text-[#747474]">
+                {permittedUseDescriptions[use]}
+              </p>
+            {/if}
           </div>
         </li>
       {/each}

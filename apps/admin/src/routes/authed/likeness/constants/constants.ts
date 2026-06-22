@@ -18,16 +18,16 @@ type PermittedUseOption = {
 
 const LICENSE_TYPE_DESCRIPTIONS: Record<string, string> = {
   'single-use':
-    'Morbi in tempor magna, eu semper urna. Nam vel ex non ex accumsan viverra. Vivamus hendrerit, neque et feugiat tempus, tortor libero congue ipsum.',
+    'One approved use across a single campaign. Buyer cannot reuse the asset for a separate project, extend the run, or sublicense without purchasing a new license.',
   perpetual:
-    'Leo ipsum, fermentum eget sagittis eu, fermentum in est. Fusce gravida ipsum eget condimentum lacinia. Sed non efficitur risus.',
+    'Ongoing partnership for buyers who want long-term association with your digital likeness. Priced as a recurring fee. End the license at any time to stop all future use.',
 }
 
 const PERMITTED_USE_DESCRIPTIONS: Record<string, string> = {
-  ai: 'Donec sagittis, nulla ac placerat facilisis, ligula mi pretium ligula, at tincidunt magna dui id nunc.',
-  commercial: 'Donec sagittis, nulla ac placerat facilisis, ligula mi pretium ligula, at tincidunt magna dui id nunc.',
-  digital: 'Nunc erat elit, pulvinar ut accumsan id, pretium vel lectus. Etiam Leo ipsum, fermentum.',
-  'film-tv': 'Morbi in tempor magna, eu semper urna. Nam vel ex non ex accumsan viverra.',
+  ai: 'Use of your likeness as training data for generative AI models. Every model trained on your data is logged on-chain, and you earn royalties on the outputs it produces.',
+  digital: 'Web, social, streaming, in-app, and any other screen-based placement that lives online.',
+  commercial: 'Advertising, brand campaigns, sponsorships, and any use tied to the sale of a product or service.',
+  'film-tv': 'Scripted, unscripted, and documentary productions for theatrical, broadcast, or streaming release.',
 }
 
 export const LICENSE_TYPES: LicenseTypeOption[] = LICENSE_TYPE_OPTIONS.map((option) => ({
