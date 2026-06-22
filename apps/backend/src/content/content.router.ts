@@ -165,7 +165,7 @@ export class ContentRouter {
     void this.commonNotificationService.getModel().create({
       sub,
       type: NOTIFICATION_TYPE.CONTENT_CREATED,
-      payload: { ...contentDoc, _id: contentDoc.id },
+      payload: { content: { metadata: contentDoc.metadata, _id: contentDoc.id } },
     })
 
     return contentDoc
