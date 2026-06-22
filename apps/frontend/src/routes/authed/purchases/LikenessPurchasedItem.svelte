@@ -53,10 +53,11 @@
       try {
         const response = await fetch(file.url)
         if (!response.ok) throw new Error(`HTTP ${response.status}`)
+        if (!response.body) throw new Error('No response body')
 
         yield {
           name: `${file.label}.${mime.getExtension(file.mimetype) ?? 'bin'}`,
-          input: response.body!,
+          input: response.body,
         }
       } catch (error) {
         console.error(`Skipping ${file.label}:`, error)
@@ -81,16 +82,17 @@
       return
     }
 
-    const writableStream = await fileHandle.createWritable()
-
+    let writableStream
     try {
+      writableStream = await fileHandle.createWritable()
       const zipResponse = downloadZip(fileStreamGenerator(files))
       if (!zipResponse.body) throw new Error('Streams are not supported')
       await zipResponse.body.pipeTo(writableStream)
     } catch (err) {
       console.error('Download failed:', err)
+      throw err
     } finally {
-      await writableStream.close().catch(() => {})
+      await writableStream?.close().catch(() => {})
     }
   }
 
