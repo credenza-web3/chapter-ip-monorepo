@@ -66,19 +66,6 @@
     await loadPage(cursorStack[currentPage])
   }
 
-  const LICENSE_LABELS: Record<number, string> = {
-    0: 'Lifetime',
-    2: 'One-time',
-  }
-
-  function getLicenseLabel(type: number): string {
-    return LICENSE_LABELS[type] ?? `License #${type}`
-  }
-
-  function truncateAddress(address: string): string {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`
-  }
-
   async function handleMenuSelect(item: { text: string; href?: string; action?: string }, index: number) {
     if (item.action === 'view-content') {
       const purchase = items[index]
@@ -102,7 +89,6 @@
               <th class="px-4 py-2.75">Date</th>
               <th class="px-4 py-2.75">Event</th>
               <th class="px-4 py-2.75">Item</th>
-              <th class="px-4 py-2.75">Tx Hash</th>
               <th class="px-4 py-2.75">Credit</th>
               <th class="px-4 py-2.75">Debit</th>
               <th class="px-4 py-2.75"></th>
@@ -124,8 +110,7 @@
                 >
                   <td class="px-4 py-1.5">{formatDate(tx.createdAt)}</td>
                   <td class="px-4 py-1.5">Purchase</td>
-                  <td class="px-4 py-1.5">{tx.licenseType === 0 ? 'One-time license' : ''}</td>
-                  <td class="px-4 py-1.5">{getLicenseLabel(tx.licenseType)}</td>
+                  <td class="px-4 py-1.5">{tx.licenseType === 0 ? 'One-time license' : 'Full-time license'}</td>
                   <td class="px-4 py-1.5">
                     {tx.priceFiat
                       ? `$${tx.priceFiat}`
@@ -135,6 +120,7 @@
                           ? `${tx.priceToken} tokens`
                           : '—'}
                   </td>
+                  <td class="px-4 py-1.5">-</td>
                   <td class="px-4 py-1.5 text-right">
                     <RowActionMenu
                       items={HistoryMenuItems}
@@ -150,7 +136,7 @@
       </div>
     </div>
     <div class="pt-2.75 text-[13px] font-medium text-[#b6b4b7] flex justify-between">
-      <span class="text-[#1A1A2E]/60">Showing {items.length} purchases</span>
+      <span class="text-[#1A1A2E]/60">Showing {items.length} transactions</span>
       <div class="flex items-center gap-1.5">
         <button
           onclick={prevPage}
