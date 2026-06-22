@@ -129,7 +129,8 @@
               {#each pageItems as tx, i (tx.id)}
                 {@const isRead = !!tx.readAt}
                 {@const payload = tx.payload as Record<string, unknown> | undefined}
-                {@const metadata = payload?.['metadata'] as Record<string, unknown> | undefined}
+                {@const content = payload?.['content'] as Record<string, unknown> | undefined}
+                {@const metadata = content?.['metadata'] as Record<string, unknown> | undefined}
                 {@const itemType = metadata?.['type'] as string | undefined}
                 {@const profile = metadata?.['profile'] as Record<string, unknown> | undefined}
                 {@const fullName = profile?.['fullLegalName'] as string | undefined}

@@ -98,7 +98,8 @@
     <div class="pt-9">
       {#each sortedNotifications as tx, i (tx.id)}
         {@const payload = tx.payload as Record<string, unknown> | undefined}
-        {@const metadata = payload?.['metadata'] as Record<string, unknown> | undefined}
+        {@const content = payload?.['content'] as Record<string, unknown> | undefined}
+        {@const metadata = content?.['metadata'] as Record<string, unknown> | undefined}
         {@const itemType = metadata?.['type'] as string | undefined}
         {@const profile = metadata?.['profile'] as Record<string, unknown> | undefined}
         {@const fullName = profile?.['fullLegalName'] as string | undefined}
@@ -108,13 +109,9 @@
             <div class="flex flex-col items-between justify-start w-full">
               <div class="flex items-center justify-between w-full">
                 <p class="text-[13px] font-semibold">
-                  {#if itemType || fullName}
-                    {itemType ?? ''} [{fullName ?? ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
-                      ? 'added to your products'
-                      : 'was purchased'}
-                  {:else}
-                    {tx.message ?? tx.title}
-                  {/if}
+                  {itemType ?? ''} [{fullName ?? ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
+                    ? 'added to your products'
+                    : 'was purchased'}
                 </p>
                 <div class="relative shrink-0">
                   <button
