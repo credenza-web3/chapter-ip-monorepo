@@ -5,13 +5,8 @@
 
   import type { LikenessDetails } from '@repo/content-types/likeness'
   import LikenessLicenseModal from './LikenessLicenseModal.svelte'
-  import type { ContentFilesLinkClient, PurchasedContentToken } from './types'
-
-  type DownloadableContentFile = {
-    url: string
-    label: string
-    mimetype: string
-  }
+  import DownloadFilesModal from './DownloadFilesModal.svelte'
+  import type { ContentFilesLinkClient, DownloadableContentFile, PurchasedContentToken } from './types'
 
   let {
     purchase,
@@ -27,6 +22,8 @@
   let initializedLicenseTokenId = $state('')
   let isDownloading = $state(false)
   let isModalOpen = $state(false)
+  let isFallbackModalOpen = $state(false)
+  let fallbackFiles: DownloadableContentFile[] = []
   let errorMessage = $state('')
 
   const primaryImage = $derived(likeness.images[0])
@@ -107,6 +104,12 @@
       const { files } = await trpcClient.contents.getContentAllFilesLink.query(getFilesLinkInput())
       if (!files.length) throw new Error('No content files available')
 
+      if (typeof showSaveFilePicker !== 'function') {
+        fallbackFiles = files
+        isFallbackModalOpen = true
+        return
+      }
+
       await downloadAllNativeStreaming(files)
 
       if (purchase.licenseType === '2') isBlocked = true
@@ -122,8 +125,14 @@
     isModalOpen = false
   }
 
+  function closeFallbackModal() {
+    isFallbackModalOpen = false
+    fallbackFiles = []
+  }
+
   function handleKeydown(event: KeyboardEvent) {
     if (isModalOpen && event.key === 'Escape') closeModal()
+    if (isFallbackModalOpen && event.key === 'Escape') closeFallbackModal()
   }
 </script>
 
@@ -174,4 +183,8 @@
 
 {#if isModalOpen}
   <LikenessLicenseModal {likeness} {byline} titleId={modalTitleId} onClose={closeModal} />
+{/if}
+
+{#if isFallbackModalOpen}
+  <DownloadFilesModal files={fallbackFiles} title={likeness.name} onClose={closeFallbackModal} />
 {/if}
