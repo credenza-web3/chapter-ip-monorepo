@@ -44,7 +44,7 @@ export class ContentFile extends Document<ObjectId> {
 }
 
 export const ContentFileSchema: Mongooseschema = SchemaFactory.createForClass(ContentFile)
-ContentFileSchema.index({ key: 1 }, { unique: true })
+ContentFileSchema.index({ key: 1, bucket: 1 }, { unique: true })
 ContentFileSchema.index({ contentId: 1 })
 ContentFileSchema.index({ createdAt: 1 })
 ContentFileSchema.index({ updatedAt: 1 })

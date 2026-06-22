@@ -114,11 +114,55 @@ export const contentOutputSchema = registerContentOutputSchema.extend({
 })
 export type TContentOutput = z.infer<typeof contentOutputSchema>
 
+export const filterOpSchema = z.enum(['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'in', 'nin', 'exists', 'regex'])
+export type TFilterOp = z.infer<typeof filterOpSchema>
+
+export const filterConditionSchema = z
+  .object({
+    field: z.string().min(1),
+    op: filterOpSchema,
+    val: z.any(),
+  })
+  .superRefine((data, ctx) => {
+    if ((data.op === 'in' || data.op === 'nin') && !Array.isArray(data.val)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `'val' must be an array for the '${data.op}' operator`,
+        path: ['val'],
+      })
+    }
+    if (data.op === 'exists' && typeof data.val !== 'boolean') {
+      ctx.addIssue({
+        code: 'custom',
+        message: `'val' must be a boolean for the 'exists' operator`,
+        path: ['val'],
+      })
+    }
+    if (data.op === 'regex' && typeof data.val !== 'string') {
+      ctx.addIssue({
+        code: 'custom',
+        message: `'val' must be a string for the 'regex' operator`,
+        path: ['val'],
+      })
+    }
+  })
+export type TFilterCondition = z.infer<typeof filterConditionSchema>
+
+export type TFilterNode = TFilterCondition | { and: TFilterNode[] } | { or: TFilterNode[] }
+
+export const filterNodeSchema: z.ZodType<TFilterNode> = z.lazy(() =>
+  z.union([
+    filterConditionSchema,
+    z.object({ and: z.array(filterNodeSchema).min(1) }),
+    z.object({ or: z.array(filterNodeSchema).min(1) }),
+  ]),
+)
+
 export const findContentInputSchema = paginatedRequestWithCursorSchema.extend({
   sub: z.string().optional(),
   tokenId: z.string().optional(),
   contractAddress: z.string().optional(),
-  metadata: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])).optional(),
+  metadata: filterNodeSchema.optional(),
 })
 export type TFindContentInput = z.infer<typeof findContentInputSchema>
 
