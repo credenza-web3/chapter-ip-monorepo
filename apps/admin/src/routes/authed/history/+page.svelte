@@ -93,17 +93,18 @@
   <span class="text-sm font-medium text-[#1A1A2E]/60">No purchase history yet.</span>
 {:else}
   <div class="min-h-screen border border-[#1a1a2e0d] rounded-3xl bg-[#f8f5f1] p-8 md:p-12.5">
-    <h1 class="text-lg font-semibold mb-4.5">Purchase History</h1>
+    <h1 class="text-lg font-semibold mb-6.25">History</h1>
     <div class="border border-[#ddd] rounded-md overflow-visible">
       <div class="overflow-x-auto">
         <table class="w-full text-sm font-medium text-[#1A1A2E]/60 table-fixed">
           <thead>
             <tr class="text-left border-b border-[#ddd] bg-cream">
               <th class="px-4 py-2.75">Date</th>
-              <th class="px-4 py-2.75">Buyer</th>
-              <th class="px-4 py-2.75">Content</th>
-              <th class="px-4 py-2.75">License</th>
-              <th class="px-4 py-2.75">Price</th>
+              <th class="px-4 py-2.75">Event</th>
+              <th class="px-4 py-2.75">Item</th>
+              <th class="px-4 py-2.75">Tx Hash</th>
+              <th class="px-4 py-2.75">Credit</th>
+              <th class="px-4 py-2.75">Debit</th>
               <th class="px-4 py-2.75"></th>
             </tr>
           </thead>
@@ -116,14 +117,14 @@
               </tr>
             {:else}
               {#each items as tx, i (tx.id)}
-                <tr class="border-b border-[#ddd] last:border-0 {i % 2 === 0 ? 'bg-[#f8f5f1]' : 'bg-cream'}">
+                <tr
+                  class="border-b border-[#ddd] last:border-0 {i % 2 === 0
+                    ? 'bg-[#f8f5f1]'
+                    : 'bg-cream'} text-sm font-bold"
+                >
                   <td class="px-4 py-1.5">{formatDate(tx.createdAt)}</td>
-                  <td class="px-4 py-1.5 font-mono">{truncateAddress(tx.buyerAddress)}</td>
-                  <td class="px-4 py-1.5">
-                    <a href="/authed/files/{tx.contentId}" class="hover:text-[#555] underline underline-offset-2">
-                      {tx.contentId}
-                    </a>
-                  </td>
+                  <td class="px-4 py-1.5">Purchase</td>
+                  <td class="px-4 py-1.5">{tx.licenseType === 0 ? 'One-time license' : ''}</td>
                   <td class="px-4 py-1.5">{getLicenseLabel(tx.licenseType)}</td>
                   <td class="px-4 py-1.5">
                     {tx.priceFiat
