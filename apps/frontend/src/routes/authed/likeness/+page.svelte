@@ -4,4 +4,4 @@
   let { data } = $props()
 </script>
 
-<LikenessDashboard items={data.likenessItems} filters={data.filters} />
+<LikenessDashboard items={data.likenessItems} recentItems={data.recentLikenessItems} filters={data.filters} />

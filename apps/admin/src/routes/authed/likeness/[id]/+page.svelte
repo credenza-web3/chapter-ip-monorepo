@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createLikenessFileNames, LIKENESS_FILE_BUCKETS } from '$lib/constants/likenessFileBuckets'
   import { afterNavigate, beforeNavigate, goto } from '$app/navigation'
-  import { likenessStore } from '../stores/likeness-store'
+  import { getHeightTotalInches, getNormalizedWeight, likenessStore } from '../stores/likeness-store'
   import UploadStepHeader from '../components/UploadStepHeader.svelte'
   import UploadLikenessStep from '../components/UploadLikenessStep.svelte'
   import UploadLicensingStep from '../components/UploadLicensingStep.svelte'
@@ -71,11 +71,20 @@
           })
         }
       }
+      const heightTotalInches = getHeightTotalInches($likenessStore.profile.attributes)
+      const weight = getNormalizedWeight($likenessStore.profile.attributes.weight)
 
       await trpcClient.contents.updateContentMetadata.mutate({
         contentId,
         metadata: {
-          profile: $likenessStore.profile,
+          profile: {
+            ...$likenessStore.profile,
+            attributes: {
+              ...$likenessStore.profile.attributes,
+              weight,
+              ...(heightTotalInches !== undefined && { heightTotalInches }),
+            },
+          },
           licensing: $likenessStore.licensing,
           uploadsByBucket,
           type: 'likeness',

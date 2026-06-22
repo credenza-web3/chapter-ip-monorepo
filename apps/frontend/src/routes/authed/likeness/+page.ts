@@ -1,21 +1,29 @@
 import { configStore, ContractName } from '$lib/stores/config.svelte'
-import { parseLikenessFilters, toLikenessItems } from './likeness'
+import {
+  RECENT_LIMIT,
+  buildLikenessFindContentInput,
+  getRecentLikenesses,
+  parseLikenessFilters,
+  toLikenessItems,
+} from './likeness'
 
 export const load = async ({ parent, url }) => {
   const { trpcClient } = await parent()
   if (!trpcClient) throw new Error('tRPC client is not initialized')
 
   const contractAddress = configStore.getContractAddress(ContractName.CONTENT_NFT)
-  const { items: contentItems } = await trpcClient.contents.findContent.query({
-    contractAddress,
-    metadata: { type: 'likeness' },
-    limit: '100',
-    sort: 'createdAt',
-    order: 'desc',
-  })
+  const filters = parseLikenessFilters(url.searchParams)
+  const [filteredContent, recentContent] = await Promise.all([
+    trpcClient.contents.findContent.query(buildLikenessFindContentInput(contractAddress, filters)),
+    trpcClient.contents.findContent.query({
+      ...buildLikenessFindContentInput(contractAddress),
+      limit: String(RECENT_LIMIT),
+    }),
+  ])
 
   return {
-    filters: parseLikenessFilters(url.searchParams),
-    likenessItems: toLikenessItems(contentItems, contractAddress),
+    filters,
+    likenessItems: toLikenessItems(filteredContent.items, contractAddress),
+    recentLikenessItems: getRecentLikenesses(toLikenessItems(recentContent.items, contractAddress)),
   }
 }
