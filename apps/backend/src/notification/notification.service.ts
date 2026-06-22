@@ -53,9 +53,6 @@ export class NotificationService implements OnModuleInit {
       if (change.operationType !== 'insert') return
       void (async () => {
         try {
-          const notification: Partial<TCommonNotificationDocument> = {
-            payload: { ...change.fullDocument, _id: String(change.fullDocument._id) },
-          }
           const eventName = change.fullDocument.eventName
           const contentNftContractAddress = await this.contentService.getContentNftContractAddress()
           const args = change.fullDocument.args as string[]
@@ -73,6 +70,19 @@ export class NotificationService implements OnModuleInit {
               if (!content) {
                 this.logger.warn(`Cannot find content for contract: ${change.fullDocument.contractAddress}`)
                 return
+              }
+
+              const notification = {
+                payload: {
+                  tx: {
+                    ...change.fullDocument,
+                    _id: String(change.fullDocument._id),
+                  },
+                  content: {
+                    metadata: content.metadata,
+                    _id: content.id,
+                  },
+                },
               }
 
               await Promise.all([
