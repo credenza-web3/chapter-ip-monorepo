@@ -33,6 +33,9 @@ export class PurchaseHistoryItem extends Document<ObjectId> {
   @Prop({ required: false })
   declare priceFiat: string
 
+  @Prop({ required: true })
+  declare txHash: string
+
   @Prop({ required: false })
   declare priceToken: string
 

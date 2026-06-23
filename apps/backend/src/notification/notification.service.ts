@@ -98,6 +98,7 @@ export class NotificationService implements OnModuleInit {
                   buyerAddress: toAddress,
                   contentId: content.id,
                   licenseType: Number(args[2]),
+                  txHash: change.fullDocument.transactionHash,
                   priceFiat: String(args[3] ?? '0'),
                   priceEther: String(args[4] ?? '0'),
                   priceToken: String(args[5] ?? '0'),
