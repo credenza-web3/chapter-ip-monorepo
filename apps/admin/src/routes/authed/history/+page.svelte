@@ -3,6 +3,7 @@
   import { formatDate } from '../files/helper'
   import { HistoryMenuItems } from './constants'
   import { getTrpcClient } from '$lib/stores/trpc-client'
+  import { notify, ToastType } from '@repo/ui-components'
   import { HISTORY_PAGE_SIZE } from '$lib/constants'
   import type { TPurchaseHistoryItem } from './constants'
 
@@ -40,6 +41,7 @@
       if (cancelled) return
       console.error('Failed to load history', err)
       items = []
+      notify('Failed to load history. Please try again.', ToastType.FAIL)
     } finally {
       if (!cancelled) loading = false
     }
