@@ -8,6 +8,7 @@ export interface TPurchaseHistoryItem {
   priceEther: string
   currencyTokenContract: string
   txHash: string
+  metadata?: Record<string, unknown>
   ownerId: string
   createdAt: string
   updatedAt: string

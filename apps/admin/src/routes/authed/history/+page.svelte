@@ -92,7 +92,7 @@
               <th class="px-4 py-2.75">Date</th>
               <th class="px-4 py-2.75">Event</th>
               <th class="px-4 py-2.75">Item</th>
-              <th class="w-40 px-4 py-2.75">Tx Hash</th>
+              <th class="w-48 px-4 py-2.75">Tx Hash</th>
               <th class="px-4 py-2.75">Credit</th>
               <th class="px-4 py-2.75">Debit</th>
               <th class="px-4 py-2.75"></th>
@@ -107,6 +107,8 @@
               </tr>
             {:else}
               {#each items as tx, i (tx.id)}
+                {@const profile = tx.metadata?.profile as Record<string, unknown> | undefined}
+                {@const itemName = (profile?.['fullLegalName'] ?? profile?.['stageName'] ?? '') as string}
                 <tr
                   class="border-b border-[#ddd] last:border-0 {i % 2 === 0
                     ? 'bg-[#f8f5f1]'
@@ -116,9 +118,16 @@
                   <td class="px-4 py-1.5"
                     >{tx.licenseType === 0 || tx.licenseType === 2 ? 'Purchase' : 'Transaction fee'}</td
                   >
-                  <td class="px-4 py-1.5">{tx.licenseType === 0 ? 'One-time license' : 'Full-time license'}</td>
-                  <td class="w-40 whitespace-nowrap px-4 py-1.5 font-mono text-xs" title={tx.txHash || undefined}>
-                    {tx.txHash ? `${tx.txHash.slice(0, 6)}...${tx.txHash.slice(-4)}` : '—'}
+                  <td class="px-4 py-1.5">
+                    {#if itemName}
+                      <div>{itemName}</div>
+                      <div class="text-xs">{tx.licenseType === 0 ? 'One-time license' : 'Full-time license'}</div>
+                    {:else}
+                      {tx.licenseType === 0 ? 'One-time license' : 'Full-time license'}
+                    {/if}
+                  </td>
+                  <td class="w-56 px-4 py-1.5 font-mono text-xs" title={tx.txHash || undefined}>
+                    {tx.txHash ? `${tx.txHash.slice(0, 10)}...${tx.txHash.slice(-10)}` : '—'}
                   </td>
 
                   <td class="px-4 py-1.5">

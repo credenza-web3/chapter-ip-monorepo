@@ -267,6 +267,7 @@ export const purchaseHistoryItemOutputSchema = z.object({
   platformFeeAmount: z.string(),
   agencyFeeAmount: z.string(),
   txHash: z.string(),
+  metadata: contentMetadataRecordSchema,
   ownerId: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),

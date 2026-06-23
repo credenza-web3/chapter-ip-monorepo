@@ -97,6 +97,7 @@ export class NotificationService implements OnModuleInit {
                 this.purchaseHistoryService.create({
                   buyerAddress: toAddress,
                   contentId: content.id,
+                  metadata: content.metadata,
                   licenseType: Number(args[2]),
                   txHash: change.fullDocument.transactionHash,
                   priceFiat: String(args[3] ?? '0'),
