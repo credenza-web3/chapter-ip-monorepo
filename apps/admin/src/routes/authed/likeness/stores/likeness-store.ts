@@ -33,8 +33,8 @@ function resolveBucket(
 export function getHeightTotalInches(
   attributes: Pick<LikenessProfileMetadata['attributes'], 'heightFt' | 'heightIn'>,
 ): number | undefined {
-  const feetValue = attributes.heightFt.trim()
-  const inchesValue = attributes.heightIn.trim()
+  const feetValue = attributes.heightFt
+  const inchesValue = attributes.heightIn
   if (!feetValue || !inchesValue) return undefined
 
   const feet = Number(feetValue)
