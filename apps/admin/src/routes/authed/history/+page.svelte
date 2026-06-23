@@ -11,6 +11,8 @@
   let items = $state<TPurchaseHistoryItem[]>([])
   let totalCount = $state(0)
 
+  $inspect(items)
+
   let cursorStack = $state<Array<string | undefined>>([undefined])
   let currentPage = $state(0)
   let hasNext = $state(false)
@@ -111,7 +113,9 @@
                     : 'bg-cream'} text-sm font-bold"
                 >
                   <td class="px-4 py-1.5">{formatDate(tx.createdAt)}</td>
-                  <td class="px-4 py-1.5">Purchase</td>
+                  <td class="px-4 py-1.5"
+                    >{tx.licenseType === 0 || tx.licenseType === 2 ? 'Purchase' : 'Transaction fee'}</td
+                  >
                   <td class="px-4 py-1.5">{tx.licenseType === 0 ? 'One-time license' : 'Full-time license'}</td>
                   <td class="w-40 whitespace-nowrap px-4 py-1.5 font-mono text-xs" title={tx.txHash || undefined}>
                     {tx.txHash ? `${tx.txHash.slice(0, 6)}...${tx.txHash.slice(-4)}` : '—'}
