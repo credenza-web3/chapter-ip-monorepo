@@ -11,8 +11,6 @@
   let items = $state<TPurchaseHistoryItem[]>([])
   let totalCount = $state(0)
 
-  $inspect(items)
-
   let cursorStack = $state<Array<string | undefined>>([undefined])
   let currentPage = $state(0)
   let hasNext = $state(false)
