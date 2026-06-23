@@ -262,6 +262,7 @@ export const purchaseHistoryItemOutputSchema = z.object({
   licenseType: z.number().int().nonnegative(),
   priceFiat: z.string(),
   priceToken: z.string(),
+  txHash: z.string(),
   priceEther: z.string(),
   currencyTokenContract: z.string(),
   platformFeeAmount: z.string(),
