@@ -14,7 +14,7 @@ export interface TPurchaseHistoryItem {
 
 export const HistoryMenuItems = [
   {
-    text: 'View content',
+    text: 'View details',
     action: 'view-content',
   },
 ]
