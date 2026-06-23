@@ -29,6 +29,8 @@ export default class TransactionService {
     const ethersProvider = await this.blockchainService.getEthersProvider(accessToken)
     const receipt = await ethersProvider.waitForTransaction(txHash)
 
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+
     if (!receipt) {
       throw new Error('Transaction failed')
     }
