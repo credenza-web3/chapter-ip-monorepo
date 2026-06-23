@@ -266,6 +266,8 @@ export const purchaseHistoryItemOutputSchema = z.object({
   currencyTokenContract: z.string(),
   platformFeeAmount: z.string(),
   agencyFeeAmount: z.string(),
+  txHash: z.string(),
+  metadata: contentMetadataRecordSchema,
   ownerId: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -277,7 +279,9 @@ export const findPurchaseHistoryInputSchema = paginatedRequestWithCursorSchema.e
 })
 export type TFindPurchaseHistoryInput = z.infer<typeof findPurchaseHistoryInputSchema>
 
-export const findPurchaseHistoryOutputSchema = createPaginatedResponseSchema(purchaseHistoryItemOutputSchema)
+export const findPurchaseHistoryOutputSchema = createPaginatedResponseSchema(purchaseHistoryItemOutputSchema).extend({
+  totalCount: z.number().int().nonnegative(),
+})
 export type TFindPurchaseHistoryOutput = z.infer<typeof findPurchaseHistoryOutputSchema>
 
 export const getContentConfigOutputSchema = z.object({

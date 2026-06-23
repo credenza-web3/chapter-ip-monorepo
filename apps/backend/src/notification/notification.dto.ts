@@ -11,7 +11,9 @@ export const findNotificationsInputSchema = paginatedRequestWithCursorSchema.ext
 })
 export type TFindNotificationsInput = z.infer<typeof findNotificationsInputSchema>
 
-export const findNotificationsOutputSchema = createPaginatedResponseSchema(notificationSchema)
+export const findNotificationsOutputSchema = createPaginatedResponseSchema(notificationSchema).extend({
+  totalCount: z.number().int().nonnegative(),
+})
 export type TFindNotificationsOutput = z.infer<typeof findNotificationsOutputSchema>
 
 export const markNotificationAsReadInputSchema = z.object({

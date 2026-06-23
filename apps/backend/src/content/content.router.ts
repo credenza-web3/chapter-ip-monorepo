@@ -452,7 +452,9 @@ export class ContentRouter {
       ...input,
       ownerId: ctx.authTokenPayload.sub,
     })
-    return await this.purchaseHistoryService.paginate(paginationOptions)
+    const result = await this.purchaseHistoryService.paginate(paginationOptions)
+    const totalCount = await this.purchaseHistoryService.count(paginationOptions.query)
+    return { ...result, totalCount }
   }
 
   @Query({

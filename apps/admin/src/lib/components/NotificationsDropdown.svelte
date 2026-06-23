@@ -40,9 +40,11 @@
     return isRead ? NotificationsMenuItems.filter((item) => item.action !== 'mark-read') : NotificationsMenuItems
   }
 
-  function selectNotificationMenuItem(id: string, action?: string) {
+  function selectNotificationMenuItem(id: string, action?: string, href?: string) {
     if (action === 'mark-read') {
-      markAsRead?.(id)
+      markAsRead(id)
+    } else if (href) {
+      goto(href)
     }
     activeMenuRow = null
   }
@@ -96,7 +98,8 @@
     <div class="pt-9">
       {#each sortedNotifications as tx, i (tx.id)}
         {@const payload = tx.payload as Record<string, unknown> | undefined}
-        {@const metadata = payload?.['metadata'] as Record<string, unknown> | undefined}
+        {@const content = payload?.['content'] as Record<string, unknown> | undefined}
+        {@const metadata = content?.['metadata'] as Record<string, unknown> | undefined}
         {@const itemType = metadata?.['type'] as string | undefined}
         {@const profile = metadata?.['profile'] as Record<string, unknown> | undefined}
         {@const fullName = profile?.['fullLegalName'] as string | undefined}
@@ -138,7 +141,7 @@
                             class="block w-full rounded-sm px-3 py-2 text-left hover:bg-[#ece7df]"
                             onclick={(event) => {
                               event.stopPropagation()
-                              selectNotificationMenuItem(tx.id, item.action)
+                              selectNotificationMenuItem(tx.id, item.action, item.href)
                             }}
                           >
                             {item.text}

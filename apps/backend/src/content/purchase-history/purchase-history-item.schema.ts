@@ -51,6 +51,9 @@ export class PurchaseHistoryItem extends Document<ObjectId> {
   @Prop({ required: false })
   declare agencyFeeAmount: string
 
+  @Prop({ type: Mongooseschema.Types.Mixed, required: false })
+  declare metadata: Record<string, unknown>
+
   @Prop({ required: true })
   declare ownerId: string
 
