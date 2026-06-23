@@ -11,6 +11,8 @@
   let items = $state<TPurchaseHistoryItem[]>([])
   let totalCount = $state(0)
 
+  $inspect(items)
+
   let cursorStack = $state<Array<string | undefined>>([undefined])
   let currentPage = $state(0)
   let hasNext = $state(false)
@@ -85,12 +87,13 @@
     <h1 class="text-lg font-semibold mb-6.25">History</h1>
     <div class="border border-[#ddd] rounded-md overflow-visible">
       <div class="overflow-x-auto">
-        <table class="w-full text-sm font-medium text-[#1A1A2E]/60 table-fixed">
+        <table class="min-w-[760px] w-full table-fixed text-sm font-medium text-[#1A1A2E]/60">
           <thead>
             <tr class="text-left border-b border-[#ddd] bg-cream">
               <th class="px-4 py-2.75">Date</th>
               <th class="px-4 py-2.75">Event</th>
               <th class="px-4 py-2.75">Item</th>
+              <th class="w-40 px-4 py-2.75">Tx Hash</th>
               <th class="px-4 py-2.75">Credit</th>
               <th class="px-4 py-2.75">Debit</th>
               <th class="px-4 py-2.75"></th>
@@ -99,7 +102,7 @@
           <tbody>
             {#if loading}
               <tr>
-                <td colspan="6" class="px-4 py-6 text-center">
+                <td colspan="7" class="px-4 py-6 text-center">
                   <span class="loading loading-spinner loading-sm"></span>
                 </td>
               </tr>
@@ -113,6 +116,10 @@
                   <td class="px-4 py-1.5">{formatDate(tx.createdAt)}</td>
                   <td class="px-4 py-1.5">Purchase</td>
                   <td class="px-4 py-1.5">{tx.licenseType === 0 ? 'One-time license' : 'Full-time license'}</td>
+                  <td class="w-40 whitespace-nowrap px-4 py-1.5 font-mono text-xs" title={tx.txHash || undefined}>
+                    {tx.txHash ? `${tx.txHash.slice(0, 6)}...${tx.txHash.slice(-4)}` : '—'}
+                  </td>
+
                   <td class="px-4 py-1.5">
                     {tx.priceFiat
                       ? `$${Number(tx.priceFiat) / 100}`

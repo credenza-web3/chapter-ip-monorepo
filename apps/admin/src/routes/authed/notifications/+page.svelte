@@ -107,17 +107,17 @@
     <h1 class="text-lg font-semibold mb-4.5">Notifications</h1>
     <div class="border border-[#ddd] rounded-md overflow-visible">
       <div class="overflow-x-auto">
-        <table class="w-full text-sm font-medium text-[#1A1A2E]/60 table-fixed">
+        <table class="min-w-[640px] w-full table-fixed text-sm font-medium text-[#1A1A2E]/60">
           <thead>
             <tr class="text-left border-b border-[#ddd] bg-cream">
-              <th class="px-4 py-2.75 align-middle">
+              <th class="w-36 px-4 py-2.75 align-middle">
                 <div class="flex items-center gap-2.5 cursor-pointer select-none hover:text-[#555]">
                   Date
                   <img src={Code} alt="Sort" class="size-2.5 rotate-90" />
                 </div>
               </th>
               <th class="px-4 py-2.75">Message</th>
-              <th class="px-4 py-2.75"></th>
+              <th class="w-16 px-4 py-2.75"></th>
             </tr>
           </thead>
           <tbody>
@@ -145,15 +145,15 @@
                         ? 'bg-[#f8f5f1]'
                         : 'bg-cream'}"
                 >
-                  <td class="px-4 py-1.5">{formatDate(tx.createdAt)}</td>
+                  <td class="w-36 whitespace-nowrap px-4 py-1.5">{formatDate(tx.createdAt)}</td>
                   <td class="px-4 py-1.5">
-                    <p class="text-[13px] font-semibold">
+                    <p class="break-words text-[13px] font-semibold">
                       {itemType ?? ''} [{fullName ?? ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
                         ? 'added to your products'
                         : 'was purchased'}
                     </p>
                   </td>
-                  <td class="px-4 py-1.5 text-right">
+                  <td class="w-16 px-4 py-1.5 text-right">
                     <RowActionMenu
                       items={getMenuItems(isRead)}
                       buttonLabel={`Open actions for ${tx.message ?? tx.title}`}
