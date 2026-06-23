@@ -27,8 +27,6 @@
         order: 'desc',
         ...(cursor ? { cursor } : {}),
       })
-      console.log('history loaded', result)
-
       if (cancelled) return
       items = result.items
       totalCount = result.totalCount
@@ -77,11 +75,11 @@
   }
 </script>
 
-{#if !items.length && !loading}
-  <span class="text-sm font-medium text-[#1A1A2E]/60">No purchase history yet.</span>
-{:else}
-  <div class="min-h-screen border border-[#1a1a2e0d] rounded-3xl bg-[#f8f5f1] p-8 md:p-12.5">
-    <h1 class="text-lg font-semibold mb-6.25">History</h1>
+<div class="min-h-screen border border-[#1a1a2e0d] rounded-3xl bg-[#f8f5f1] p-8 md:p-12.5">
+  <h1 class="text-lg font-semibold mb-6.25">History</h1>
+  {#if !items.length && !loading}
+    <span class="text-sm font-medium text-[#1A1A2E]/60">No purchase history yet.</span>
+  {:else}
     <div class="border border-[#ddd] rounded-md overflow-visible">
       <div class="overflow-x-auto">
         <table class="min-w-190 w-full table-fixed text-sm font-medium text-[#1A1A2E]/60">
@@ -163,5 +161,5 @@
         </button>
       </div>
     </div>
-  </div>
-{/if}
+  {/if}
+</div>
