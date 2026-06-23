@@ -84,7 +84,7 @@
     <h1 class="text-lg font-semibold mb-6.25">History</h1>
     <div class="border border-[#ddd] rounded-md overflow-visible">
       <div class="overflow-x-auto">
-        <table class="min-w-[760px] w-full table-fixed text-sm font-medium text-[#1A1A2E]/60">
+        <table class="min-w-190 w-full table-fixed text-sm font-medium text-[#1A1A2E]/60">
           <thead>
             <tr class="text-left border-b border-[#ddd] bg-cream">
               <th class="px-4 py-2.75">Date</th>
