@@ -4,14 +4,11 @@
   import { HistoryMenuItems } from './constants'
   import { getTrpcClient } from '$lib/stores/trpc-client'
   import { HISTORY_PAGE_SIZE } from '$lib/constants'
-  import { goto } from '$app/navigation'
   import type { TPurchaseHistoryItem } from './constants'
 
   let loading = $state(true)
   let items = $state<TPurchaseHistoryItem[]>([])
   let totalCount = $state(0)
-
-  $inspect(items)
 
   let cursorStack = $state<Array<string | undefined>>([undefined])
   let currentPage = $state(0)
@@ -73,8 +70,8 @@
   async function handleMenuSelect(item: { text: string; href?: string; action?: string }, index: number) {
     if (item.action === 'view-content') {
       const purchase = items[index]
-      if (purchase?.contentId) {
-        await goto(`/authed/files/${purchase.contentId}`)
+      if (purchase?.txHash) {
+        window.open(`https://testnet.snowtrace.io/tx/${purchase.txHash}`, '_blank')
       }
     }
   }
