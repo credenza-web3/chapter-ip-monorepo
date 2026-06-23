@@ -23,7 +23,8 @@
     <h2 class="mb-2 text-[28px] font-medium text-left text-dark">Licensing</h2>
 
     <p class="mt-3 text-base text-[#72717b]">
-      Set licensing terms, permitted uses, territory, and approvals for this likeness before continuing.
+      Set the terms buyers must accept before they can license your likeness. You can update these anytime. Active
+      licenses remain governed by the terms in force at the time of purchase.
     </p>
   </div>
 

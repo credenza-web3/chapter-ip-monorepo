@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createLikenessFileNames, LIKENESS_FILE_BUCKETS } from '$lib/constants/likenessFileBuckets'
   import { afterNavigate, beforeNavigate, goto } from '$app/navigation'
-  import { likenessStore } from '../stores/likeness-store'
+  import { getHeightTotalInches, getNormalizedWeight, likenessStore } from '../stores/likeness-store'
   import UploadStepHeader from '../components/UploadStepHeader.svelte'
   import UploadLikenessStep from '../components/UploadLikenessStep.svelte'
   import UploadLicensingStep from '../components/UploadLicensingStep.svelte'
@@ -71,11 +71,20 @@
           })
         }
       }
+      const heightTotalInches = getHeightTotalInches($likenessStore.profile.attributes)
+      const weight = getNormalizedWeight($likenessStore.profile.attributes.weight)
 
       await trpcClient.contents.updateContentMetadata.mutate({
         contentId,
         metadata: {
-          profile: $likenessStore.profile,
+          profile: {
+            ...$likenessStore.profile,
+            attributes: {
+              ...$likenessStore.profile.attributes,
+              weight,
+              ...(heightTotalInches !== undefined && { heightTotalInches }),
+            },
+          },
           licensing: $likenessStore.licensing,
           uploadsByBucket,
           type: 'likeness',
@@ -85,7 +94,7 @@
       modals.open<ModalProps & TConfirmModalProps>(ConfirmModal, {
         title: 'Congratulations!',
         description:
-          'Vestibulum mollis lacinia ligula in pellentesque. Sed eu justo ligula. Donec vel nisl sit amet orci condimentum egestas nec euismod diam. Interdum et malesuada fames ac ante ipsum. Sed hendrerit libero vitae sem tristique auctor. Etiam quis quam rhoncus, vehicula ligula ut.',
+          "Your likeness has been added to Chapter IP. By completing this step, you've transformed your likeness into a secure, licensable digital asset that can be discovered, verified, and managed for future opportunities.",
         submitText: 'Go to Dashboard',
         onSubmit: async () => {
           await goto('/authed/files')

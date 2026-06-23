@@ -11,6 +11,7 @@ import type {
 
 export type ExistingFile = { id: string; name: string; url: string }
 export type ExistingFilesByBucket = Record<MultipleFileKey, ExistingFile[]>
+type LikenessProfileAttributeKey = keyof LikenessState['profile']['attributes']
 
 const emptyExistingFiles = (): ExistingFilesByBucket => ({
   headshots: [],
@@ -29,6 +30,27 @@ function resolveBucket(
   return null
 }
 
+export function getHeightTotalInches(
+  attributes: Pick<LikenessProfileMetadata['attributes'], 'heightFt' | 'heightIn'>,
+): number | undefined {
+  const feetValue = attributes.heightFt.trim()
+  const inchesValue = attributes.heightIn.trim()
+  if (!feetValue || !inchesValue) return undefined
+
+  const feet = Number(feetValue)
+  const inches = Number(inchesValue)
+  if (!Number.isFinite(feet) || !Number.isFinite(inches) || feet < 0 || inches < 0 || inches > 11) return undefined
+
+  return feet * 12 + inches
+}
+
+export function getNormalizedWeight(value: unknown): number | null {
+  if (value === null || value === undefined || value === '') return null
+
+  const weight = Number(value)
+  return Number.isFinite(weight) && weight > 0 ? weight : null
+}
+
 export async function loadExistingFiles(
   content: { id: string; metadata?: LikenessMetadataInput },
   trpcClient: TRPCClient<AppRouter>,
@@ -38,9 +60,9 @@ export async function loadExistingFiles(
 
   if (!content.id) return existingFiles
 
-  const { files: fileLinks } = await trpcClient.contents.getContentAllFilesLink.query({ contentId: content.id })
+  const { files } = await trpcClient.contents.getContentAllFilesLink.query({ contentId: content.id })
 
-  for (const file of fileLinks) {
+  for (const file of files ?? []) {
     const filename = file.label
     const bucket = resolveBucket(filename, uploadsByBucket)
     if (!bucket) continue
@@ -86,7 +108,7 @@ function createLikenessStore() {
         ethnicity: '',
         heightFt: '',
         heightIn: '',
-        weight: '',
+        weight: null,
         eyeColor: '',
         hairColor: '',
       },
@@ -165,7 +187,10 @@ function createLikenessStore() {
     setFullLegalName: (value: string) => update((s) => ({ ...s, profile: { ...s.profile, fullLegalName: value } })),
     setStageName: (value: string) => update((s) => ({ ...s, profile: { ...s.profile, stageName: value } })),
     setBio: (value: string) => update((s) => ({ ...s, profile: { ...s.profile, bio: value } })),
-    setAttribute: (key: keyof LikenessState['profile']['attributes'], value: string) =>
+    setAttribute: <TKey extends LikenessProfileAttributeKey>(
+      key: TKey,
+      value: LikenessState['profile']['attributes'][TKey],
+    ) =>
       update((s) => ({
         ...s,
         profile: {
@@ -212,7 +237,7 @@ function createLikenessStore() {
       }),
     setLicenseTypePrice: (id: string, value: string) =>
       update((s) => {
-        const safeValue = value.replace(/[^\d.]/g, '')
+        const safeValue = value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')
         const nextLicensing = {
           ...s.licensing,
           licensePrices: { ...s.licensing.licensePrices, [id]: safeValue },
@@ -261,7 +286,11 @@ function createLikenessStore() {
         profile: {
           ...s.profile,
           ...profile,
-          attributes: { ...s.profile.attributes, ...(profile.attributes ?? {}) },
+          attributes: {
+            ...s.profile.attributes,
+            ...(profile.attributes ?? {}),
+            weight: getNormalizedWeight(profile.attributes?.weight ?? s.profile.attributes.weight),
+          },
           affiliations: profile.affiliations?.length ? profile.affiliations : s.profile.affiliations,
         },
         licensing: {
@@ -293,7 +322,7 @@ function createLikenessStore() {
             ethnicity: '',
             heightFt: '',
             heightIn: '',
-            weight: '',
+            weight: null,
             eyeColor: '',
             hairColor: '',
           },
