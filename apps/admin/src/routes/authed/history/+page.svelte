@@ -1,75 +1,33 @@
 <script lang="ts">
   import RowActionMenu from '$lib/components/RowActionMenu.svelte'
+  import TablePagination from '$lib/components/TablePagination.svelte'
   import { formatDate } from '../files/helper'
   import { HistoryMenuItems } from './constants'
   import { getTrpcClient } from '$lib/stores/trpc-client'
+  import { useCursorPagination } from '$lib/hooks/useCursorPagination.svelte'
   import { notify, ToastType } from '@repo/ui-components'
-  import { HISTORY_PAGE_SIZE } from '$lib/constants'
+  import { TABLE_PAGE_SIZE } from '$lib/constants'
   import type { TPurchaseHistoryItem } from './constants'
-
-  let loading = $state(true)
-  let items = $state<TPurchaseHistoryItem[]>([])
-  let totalCount = $state(0)
-
-  let cursorStack = $state<Array<string | undefined>>([undefined])
-  let currentPage = $state(0)
-  let hasNext = $state(false)
 
   const trpcClient = getTrpcClient()
 
-  let cancelled = false
-
-  const loadPage = async (cursor?: string) => {
-    loading = true
-    try {
-      const result = await trpcClient.contents.findPurchaseHistory.query({
-        limit: String(HISTORY_PAGE_SIZE),
+  const pagination = useCursorPagination<TPurchaseHistoryItem>({
+    fetchPage: (cursor) =>
+      trpcClient.contents.findPurchaseHistory.query({
+        limit: String(TABLE_PAGE_SIZE),
         sort: 'createdAt',
         order: 'desc',
         ...(cursor ? { cursor } : {}),
-      })
-      if (cancelled) return
-      items = result.items
-      totalCount = result.totalCount
-      const nextCursor = result.cursor.next
-      hasNext = !!nextCursor && nextCursor !== result.cursor.current
-
-      if (hasNext) {
-        cursorStack = [...cursorStack.slice(0, currentPage + 1), nextCursor!]
-      }
-    } catch (err) {
-      if (cancelled) return
+      }),
+    onError: (err) => {
       console.error('Failed to load history', err)
-      items = []
       notify('Failed to load history. Please try again.', ToastType.FAIL)
-    } finally {
-      if (!cancelled) loading = false
-    }
-  }
-
-  $effect(() => {
-    cancelled = false
-    loadPage()
-    return () => {
-      cancelled = true
-    }
+    },
   })
-
-  const nextPage = async () => {
-    if (!hasNext || loading) return
-    currentPage += 1
-    await loadPage(cursorStack[currentPage])
-  }
-
-  const prevPage = async () => {
-    if (currentPage === 0 || loading) return
-    currentPage -= 1
-    await loadPage(cursorStack[currentPage])
-  }
 
   async function handleMenuSelect(item: { text: string; href?: string; action?: string }, purchaseId: string) {
     if (item.action === 'view-content') {
-      const purchase = items.find((x) => x.id === purchaseId)
+      const purchase = pagination.items.find((x) => x.id === purchaseId)
       if (purchase?.txHash) {
         window.open(`https://testnet.snowtrace.io/tx/${purchase.txHash}`, '_blank')
       }
@@ -79,7 +37,7 @@
 
 <div class="min-h-screen border border-[#1a1a2e0d] rounded-3xl bg-[#f8f5f1] p-8 md:p-12.5">
   <h1 class="text-lg font-semibold mb-6.25">History</h1>
-  {#if !items.length && !loading}
+  {#if !pagination.items.length && !pagination.loading}
     <span class="text-sm font-medium text-[#1A1A2E]/60">No purchase history yet.</span>
   {:else}
     <div class="border border-[#ddd] rounded-md overflow-visible">
@@ -97,14 +55,14 @@
             </tr>
           </thead>
           <tbody>
-            {#if loading}
+            {#if pagination.loading}
               <tr>
                 <td colspan="7" class="px-4 py-6 text-center">
                   <span class="loading loading-spinner loading-sm"></span>
                 </td>
               </tr>
             {:else}
-              {#each items as tx, i (tx.id)}
+              {#each pagination.items as tx, i (tx.id)}
                 {@const profile = tx.metadata?.profile as Record<string, unknown> | undefined}
                 {@const itemName = (profile?.['fullLegalName'] ?? profile?.['stageName'] ?? '') as string}
                 <tr
@@ -152,27 +110,15 @@
         </table>
       </div>
     </div>
-    <div class="pt-2.75 text-[13px] font-medium text-[#b6b4b7] flex justify-between">
-      <span class="text-[#1A1A2E]/60">
-        Showing {items.length ? currentPage * HISTORY_PAGE_SIZE + 1 : 0}-{currentPage * HISTORY_PAGE_SIZE +
-          items.length} of {totalCount} transactions
-      </span>
-      <div class="flex items-center gap-1.5">
-        <button
-          onclick={prevPage}
-          disabled={currentPage === 0 || loading}
-          class="flex items-center gap-1 cursor-pointer hover:text-[#555] disabled:opacity-30 disabled:cursor-default"
-        >
-          Previous
-        </button>
-        <button
-          onclick={nextPage}
-          disabled={!hasNext || loading}
-          class="flex items-center gap-1 cursor-pointer hover:text-[#555] disabled:opacity-30 disabled:cursor-default ml-4.75"
-        >
-          Next
-        </button>
-      </div>
-    </div>
+    <TablePagination
+      from={pagination.items.length ? pagination.currentPage * TABLE_PAGE_SIZE + 1 : 0}
+      to={pagination.currentPage * TABLE_PAGE_SIZE + pagination.items.length}
+      total={pagination.totalCount}
+      label="transactions"
+      previousDisabled={pagination.currentPage === 0 || pagination.loading}
+      nextDisabled={!pagination.hasNext || pagination.loading}
+      onPrevious={pagination.prevPage}
+      onNext={pagination.nextPage}
+    />
   {/if}
 </div>

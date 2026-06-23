@@ -8,9 +8,11 @@
 
   let activeMenuRow = $state<number | null>(null)
 
+  const trpcClient = getTrpcClient()
+
   async function markAsRead(id: string) {
     try {
-      await getTrpcClient().notifications.markMyNotificationAsRead.mutate({ id })
+      await trpcClient.notifications.markMyNotificationAsRead.mutate({ id })
       notificationStore.update((n) => n.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x)))
     } catch (err) {
       console.error('Failed to mark notification as read', err)
@@ -19,7 +21,7 @@
 
   async function markAllAsRead() {
     try {
-      await getTrpcClient().notifications.markAllMyNotificationsAsRead.mutate()
+      await trpcClient.notifications.markAllMyNotificationsAsRead.mutate()
       notificationStore.update((n) => n.map((x) => ({ ...x, readAt: x.readAt ?? new Date().toISOString() })))
     } catch (err) {
       console.error('Failed to mark all notifications as read', err)

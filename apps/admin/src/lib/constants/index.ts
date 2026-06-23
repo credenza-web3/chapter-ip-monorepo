@@ -1,6 +1,5 @@
 export const NOTIFICATIONS_DROPDOWN_LIMIT = 5
-export const NOTIFICATIONS_PAGE_SIZE = 20
-export const HISTORY_PAGE_SIZE = 20
+export const TABLE_PAGE_SIZE = 2
 
 export const chainConfig = {
   chainId: '0xa869',
