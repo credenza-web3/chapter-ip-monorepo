@@ -56,9 +56,7 @@
           order: 'desc',
         })
 
-        const filtered = items.filter((item) => item.type !== NOTIFICATION_TYPE.LICENSE_PURCHASED)
-
-        notificationStore.set(filtered)
+        notificationStore.set(items)
       } catch (err) {
         console.error('Failed to fetch notifications', err)
       }

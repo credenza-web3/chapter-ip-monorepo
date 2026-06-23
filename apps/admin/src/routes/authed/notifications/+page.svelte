@@ -31,7 +31,7 @@
         ...(cursor ? { cursor } : {}),
       })
       if (cancelled) return
-      items = result.items.filter((item) => item.type !== NOTIFICATION_TYPE.LICENSE_PURCHASED)
+      items = result.items
       totalCount = result.totalCount
 
       const nextCursor = result.cursor.next
