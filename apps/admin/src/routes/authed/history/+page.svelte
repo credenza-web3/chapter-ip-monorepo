@@ -119,7 +119,7 @@
 
                   <td class="px-4 py-1.5">
                     {tx.priceFiat
-                      ? `$${Number(tx.priceFiat) / 100}`
+                      ? `$${(Number(tx.priceFiat) / 100).toFixed(2)}`
                       : tx.priceEther
                         ? `${tx.priceEther} ETH`
                         : tx.priceToken
