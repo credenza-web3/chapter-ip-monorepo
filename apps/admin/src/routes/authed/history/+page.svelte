@@ -9,6 +9,7 @@
 
   let loading = $state(true)
   let items = $state<TPurchaseHistoryItem[]>([])
+  let totalCount = $state(0)
 
   let cursorStack = $state<Array<string | undefined>>([undefined])
   let currentPage = $state(0)
@@ -31,6 +32,7 @@
 
       if (cancelled) return
       items = result.items
+      totalCount = result.totalCount
       const nextCursor = result.cursor.next
       hasNext = !!nextCursor && nextCursor !== result.cursor.current
 
@@ -113,7 +115,7 @@
                   <td class="px-4 py-1.5">{tx.licenseType === 0 ? 'One-time license' : 'Full-time license'}</td>
                   <td class="px-4 py-1.5">
                     {tx.priceFiat
-                      ? `$${tx.priceFiat}`
+                      ? `$${Number(tx.priceFiat) / 100}`
                       : tx.priceEther
                         ? `${tx.priceEther} ETH`
                         : tx.priceToken
@@ -136,7 +138,10 @@
       </div>
     </div>
     <div class="pt-2.75 text-[13px] font-medium text-[#b6b4b7] flex justify-between">
-      <span class="text-[#1A1A2E]/60">Showing {items.length} transactions</span>
+      <span class="text-[#1A1A2E]/60">
+        Showing {items.length ? currentPage * HISTORY_PAGE_SIZE + 1 : 0}-{currentPage * HISTORY_PAGE_SIZE +
+          items.length} of {totalCount} transactions
+      </span>
       <div class="flex items-center gap-1.5">
         <button
           onclick={prevPage}

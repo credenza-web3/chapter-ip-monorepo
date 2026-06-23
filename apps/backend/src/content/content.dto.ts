@@ -277,7 +277,9 @@ export const findPurchaseHistoryInputSchema = paginatedRequestWithCursorSchema.e
 })
 export type TFindPurchaseHistoryInput = z.infer<typeof findPurchaseHistoryInputSchema>
 
-export const findPurchaseHistoryOutputSchema = createPaginatedResponseSchema(purchaseHistoryItemOutputSchema)
+export const findPurchaseHistoryOutputSchema = createPaginatedResponseSchema(purchaseHistoryItemOutputSchema).extend({
+  totalCount: z.number().int().nonnegative(),
+})
 export type TFindPurchaseHistoryOutput = z.infer<typeof findPurchaseHistoryOutputSchema>
 
 export const getContentConfigOutputSchema = z.object({

@@ -48,7 +48,9 @@ export class NotificationRouter {
       ...input,
       sub: ctx.authTokenPayload.sub,
     })
-    return await this.commonNotificationService.paginate(paginationOptions)
+    const result = await this.commonNotificationService.paginate(paginationOptions)
+    const totalCount = await this.commonNotificationService.count(paginationOptions.query)
+    return { ...result, totalCount }
   }
 
   @UseMiddlewares(AuthMiddleware)

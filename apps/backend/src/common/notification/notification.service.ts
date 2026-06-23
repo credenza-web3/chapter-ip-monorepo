@@ -43,6 +43,10 @@ export class CommonNotificationService extends CommonModelService<CommonNotifica
     }
   }
 
+  async count(query: Record<string, unknown>): Promise<number> {
+    return await this.commonNotificationModel.countDocuments(query)
+  }
+
   buildPaginationOptions(opts: TFindCommonNotificationsInput): TBuiltPaginationOptions {
     const result = super.buildPaginationOptions(opts)
     Object.assign(result.query, {

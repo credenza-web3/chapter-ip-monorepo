@@ -11,6 +11,7 @@
   let activeMenuRow = $state<number | null>(null)
   let loading = $state(true)
   let items = $state<import('@repo/notifications').TNotificationItem[]>([])
+  let totalCount = $state(0)
 
   let cursorStack = $state<Array<string | undefined>>([undefined])
   let currentPage = $state(0)
@@ -31,6 +32,7 @@
       })
       if (cancelled) return
       items = result.items.filter((item) => item.type !== NOTIFICATION_TYPE.LICENSE_PURCHASED)
+      totalCount = result.totalCount
 
       const nextCursor = result.cursor.next
       hasNext = !!nextCursor && nextCursor !== result.cursor.current
@@ -167,7 +169,11 @@
       </div>
     </div>
     <div class="pt-2.75 text-[13px] font-medium text-[#b6b4b7] flex justify-between">
-      <span class="text-[#1A1A2E]/60">Showing {pageItems.length} notifications</span>
+      <span class="text-[#1A1A2E]/60"
+        >Showing {pageItems.length ? currentPage * NOTIFICATIONS_PAGE_SIZE + 1 : 0}-{currentPage *
+          NOTIFICATIONS_PAGE_SIZE +
+          pageItems.length} of {totalCount} notifications</span
+      >
       <div class="flex items-center gap-1.5">
         <button
           onclick={prevPage}

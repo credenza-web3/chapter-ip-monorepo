@@ -23,4 +23,8 @@ export class PurchaseHistoryService extends CommonModelService<PurchaseHistoryIt
     }
     return result
   }
+
+  async count(query: Record<string, unknown>): Promise<number> {
+    return await this.purchaseHistoryItemModel.countDocuments(query)
+  }
 }
