@@ -67,9 +67,9 @@
     await loadPage(cursorStack[currentPage])
   }
 
-  async function handleMenuSelect(item: { text: string; href?: string; action?: string }, index: number) {
+  async function handleMenuSelect(item: { text: string; href?: string; action?: string }, purchaseId: string) {
     if (item.action === 'view-content') {
-      const purchase = items[index]
+      const purchase = items.find((x) => x.id === purchaseId)
       if (purchase?.txHash) {
         window.open(`https://testnet.snowtrace.io/tx/${purchase.txHash}`, '_blank')
       }
@@ -131,7 +131,7 @@
                     <RowActionMenu
                       items={HistoryMenuItems}
                       buttonLabel={`Open actions for purchase ${tx.id}`}
-                      onSelect={(item) => handleMenuSelect(item, i)}
+                      onSelect={(item) => handleMenuSelect(item, tx.id)}
                     />
                   </td>
                 </tr>
