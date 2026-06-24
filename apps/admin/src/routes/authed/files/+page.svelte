@@ -5,15 +5,17 @@
   import { formatDate } from './helper'
   import Code from '$lib/assets/code.svg'
   import RowActionMenu from '$lib/components/RowActionMenu.svelte'
+  import TablePagination from '$lib/components/TablePagination.svelte'
   import Edit from '$lib/assets/edit.svg'
   import { getMenuItems } from './constants'
+  import { TABLE_PAGE_SIZE } from '$lib/constants'
 
   let { data } = $props()
   let activeFilter = $state('All')
   let activeMenuRow = $state<string | null>(null)
   let currentPage = $state(1)
 
-  const pageSize = 50
+  const pageSize = TABLE_PAGE_SIZE
   const filters = ['All', 'Written works', 'Locations', 'Likeness'] as const
 
   const typeOrder = {
@@ -201,32 +203,20 @@
         </div>
       </div>
 
-      <div class="pt-2.75 text-[13px] font-medium text-[#b6b4b7] flex justify-between">
-        <span class="text-[#1A1A2E]/60">
-          Showing {paginatedRows.length ? (safeCurrentPage - 1) * pageSize + 1 : 0}-
-          {Math.min(safeCurrentPage * pageSize, filteredRows.length)} of {filteredRows.length} listings
-        </span>
-        <div class="flex items-center gap-1.5">
-          <button
-            type="button"
-            class="inline-flex items-center mr-4.75 disabled:opacity-40 disabled:cursor-not-allowed"
-            onclick={() => (currentPage = Math.max(1, safeCurrentPage - 1))}
-            disabled={safeCurrentPage === 1}
-          >
-            <img src={Code} alt="Previous" class="h-3 rotate-180 inline-block mr-1" />
-            <span class="cursor-pointer hover:text-[#555]">Previous</span>
-          </button>
-          <button
-            type="button"
-            class="inline-flex items-center disabled:opacity-40 disabled:cursor-not-allowed"
-            onclick={() => (currentPage = Math.min(totalPages, safeCurrentPage + 1))}
-            disabled={safeCurrentPage === totalPages}
-          >
-            <span class="cursor-pointer hover:text-[#555]">Next</span>
-            <img src={Code} alt="Next" class="size-3 inline-block ml-1" />
-          </button>
-        </div>
-      </div>
+      <TablePagination
+        from={paginatedRows.length ? (safeCurrentPage - 1) * pageSize + 1 : 0}
+        to={Math.min(safeCurrentPage * pageSize, filteredRows.length)}
+        total={filteredRows.length}
+        label="listings"
+        previousDisabled={safeCurrentPage === 1}
+        nextDisabled={safeCurrentPage === totalPages}
+        onPrevious={() => {
+          currentPage = Math.max(1, safeCurrentPage - 1)
+        }}
+        onNext={() => {
+          currentPage = Math.min(totalPages, safeCurrentPage + 1)
+        }}
+      />
     </div>
   {/if}
 </div>

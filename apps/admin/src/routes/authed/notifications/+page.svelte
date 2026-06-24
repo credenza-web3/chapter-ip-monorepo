@@ -1,76 +1,37 @@
 <script lang="ts">
   import Code from '$lib/assets/code.svg'
   import RowActionMenu from '$lib/components/RowActionMenu.svelte'
+  import TablePagination from '$lib/components/TablePagination.svelte'
   import { formatDate } from '../files/helper'
   import { NotificationsMenuItems } from './constants'
   import { getTrpcClient } from '$lib/stores/trpc-client'
-  import { NOTIFICATIONS_PAGE_SIZE } from '$lib/constants'
+  import { useCursorPagination } from '$lib/hooks/useCursorPagination.svelte'
+  import { TABLE_PAGE_SIZE } from '$lib/constants'
   import { notificationStore } from '$lib/stores/notification.svelte'
   import { NOTIFICATION_TYPE } from '@repo/notifications'
+  import { notify, ToastType } from '@repo/ui-components'
+  import type { TNotificationItem } from '@repo/notifications'
 
   let activeMenuRow = $state<number | null>(null)
-  let loading = $state(true)
-  let items = $state<import('@repo/notifications').TNotificationItem[]>([])
-  let totalCount = $state(0)
-
-  let cursorStack = $state<Array<string | undefined>>([undefined])
-  let currentPage = $state(0)
-  let hasNext = $state(false)
 
   const trpcClient = getTrpcClient()
 
-  let cancelled = false
-
-  const loadPage = async (cursor?: string) => {
-    loading = true
-    try {
-      const result = await trpcClient.notifications.findMyNotifications.query({
-        limit: String(NOTIFICATIONS_PAGE_SIZE),
+  const pagination = useCursorPagination<TNotificationItem>({
+    fetchPage: (cursor) =>
+      trpcClient.notifications.findMyNotifications.query({
+        limit: String(TABLE_PAGE_SIZE),
         sort: 'createdAt',
         order: 'desc',
         ...(cursor ? { cursor } : {}),
-      })
-      if (cancelled) return
-      items = result.items
-      totalCount = result.totalCount
-
-      const nextCursor = result.cursor.next
-      hasNext = !!nextCursor && nextCursor !== result.cursor.current
-
-      if (hasNext) {
-        cursorStack = [...cursorStack.slice(0, currentPage + 1), nextCursor!]
-      }
-    } catch (err) {
-      if (cancelled) return
+      }),
+    onError: (err) => {
       console.error('Failed to load notifications', err)
-      items = []
-    } finally {
-      if (!cancelled) loading = false
-    }
-  }
-
-  $effect(() => {
-    cancelled = false
-    loadPage()
-    return () => {
-      cancelled = true
-    }
+      notify('Failed to load notifications. Please try again.', ToastType.FAIL)
+    },
   })
 
-  const nextPage = async () => {
-    if (!hasNext || loading) return
-    currentPage += 1
-    await loadPage(cursorStack[currentPage])
-  }
-
-  const prevPage = async () => {
-    if (currentPage === 0 || loading) return
-    currentPage -= 1
-    await loadPage(cursorStack[currentPage])
-  }
-
   const pageItems = $derived.by(() => {
-    const merged = items.map((item) => {
+    const merged = pagination.items.map((item) => {
       const fromStore = $notificationStore.find((s) => s.id === item.id)
       return fromStore ? { ...item, readAt: fromStore.readAt } : item
     })
@@ -84,7 +45,7 @@
   async function markAsRead(id: string) {
     try {
       await trpcClient.notifications.markMyNotificationAsRead.mutate({ id })
-      items = items.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x))
+      pagination.setItems(pagination.items.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x)))
       notificationStore.update((n) => n.map((x) => (x.id === id ? { ...x, readAt: new Date().toISOString() } : x)))
     } catch (err) {
       console.error('Failed to mark notification as read', err)
@@ -100,7 +61,7 @@
   }
 </script>
 
-{#if !pageItems.length && !loading}
+{#if !pageItems.length && !pagination.loading}
   <span class="text-sm font-medium text-[#1A1A2E]/60">You have no notifications yet.</span>
 {:else}
   <div class="min-h-screen border border-[#1a1a2e0d] rounded-3xl bg-[#f8f5f1] p-8 md:p-12.5">
@@ -121,7 +82,7 @@
             </tr>
           </thead>
           <tbody>
-            {#if loading}
+            {#if pagination.loading}
               <tr>
                 <td colspan="3" class="px-4 py-6 text-center">
                   <span class="loading loading-spinner loading-sm"></span>
@@ -168,30 +129,15 @@
         </table>
       </div>
     </div>
-    <div class="pt-2.75 text-[13px] font-medium text-[#b6b4b7] flex justify-between">
-      <span class="text-[#1A1A2E]/60"
-        >Showing {pageItems.length ? currentPage * NOTIFICATIONS_PAGE_SIZE + 1 : 0}-{currentPage *
-          NOTIFICATIONS_PAGE_SIZE +
-          pageItems.length} of {totalCount} notifications</span
-      >
-      <div class="flex items-center gap-1.5">
-        <button
-          onclick={prevPage}
-          disabled={currentPage === 0 || loading}
-          class="flex items-center gap-1 cursor-pointer hover:text-[#555] disabled:opacity-30 disabled:cursor-default"
-        >
-          <img src={Code} alt="Previous" class="h-3 rotate-180 inline-block mr-1" />
-          Previous
-        </button>
-        <button
-          onclick={nextPage}
-          disabled={!hasNext || loading}
-          class="flex items-center gap-1 cursor-pointer hover:text-[#555] disabled:opacity-30 disabled:cursor-default ml-4.75"
-        >
-          Next
-          <img src={Code} alt="Next" class="size-3 inline-block ml-1" />
-        </button>
-      </div>
-    </div>
+    <TablePagination
+      from={pageItems.length ? pagination.currentPage * TABLE_PAGE_SIZE + 1 : 0}
+      to={pagination.currentPage * TABLE_PAGE_SIZE + pageItems.length}
+      total={pagination.totalCount}
+      label="notifications"
+      previousDisabled={pagination.currentPage === 0 || pagination.loading}
+      nextDisabled={!pagination.hasNext || pagination.loading}
+      onPrevious={pagination.prevPage}
+      onNext={pagination.nextPage}
+    />
   </div>
 {/if}
