@@ -224,6 +224,7 @@ function createLikenessStore() {
         const nextLicensing = {
           ...s.licensing,
           licenseTypes: { ...s.licensing.licenseTypes, [id]: value },
+          licensePrices: { ...s.licensing.licensePrices, [id]: value ? s.licensing.licensePrices[id] : '' },
         }
         if (id === 'single-use') {
           nextLicensing.isOneTime = value
@@ -377,7 +378,7 @@ export const isFormValid = derived(likenessStore, ($s) => {
     return hasHeadshots && hasLicenseType
   }
 
-  const hasValidLicensePrice = enabledLicenseTypes.some(([id]) => Number($s.licensing.licensePrices[id] || 0) > 0)
+  const hasValidLicensePrice = enabledLicenseTypes.every(([id]) => Number($s.licensing.licensePrices[id] || 0) >= 0.5)
   const hasPermittedUse = Object.values($s.licensing.permittedUses).some(Boolean)
 
   return (

@@ -110,7 +110,7 @@
             <div class="size-1.5 rounded-full bg-primary shrink-0 mt-1.5" class:invisible={!!tx.readAt}></div>
             <div class="flex flex-col items-between justify-start w-full">
               <div class="flex items-center justify-between w-full">
-                <p class="text-[13px] font-semibold">
+                <p class="text-[13px] font-semibold flex-1 min-w-0 wrap-break-word leading-normal">
                   {itemType ?? ''} [{fullName ?? ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
                     ? 'added to your products'
                     : 'was purchased'}
@@ -169,7 +169,7 @@
     <div class="flex flex-col h-full mt-auto px-3 pb-3.75">
       <div class="border-t border-[#DDD7D1] mb-3.5"></div>
       <div class="flex items-center justify-between">
-        <span class="text-[13px] text-[#1A1A2E99] font-semibold">
+        <span class="text-[13px] text-[#1A1A2E99] font-semibold wrap-break-word min-w-0">
           {unreadNotifications.length} of {sortedNotifications.length} unread notifications
         </span>
         <button

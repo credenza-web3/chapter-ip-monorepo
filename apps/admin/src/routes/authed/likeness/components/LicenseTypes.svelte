@@ -2,6 +2,10 @@
   import { LICENSE_TYPES } from '../constants/constants'
   import { likenessStore } from '../stores/likeness-store'
   import Toggle from './Toggle.svelte'
+
+  const MIN_PRICE = 0.5
+
+  const isPriceTooLow = (value: string) => value !== '' && Number(value) < MIN_PRICE
 </script>
 
 <div class="space-y-4">
@@ -22,7 +26,7 @@
         </div>
 
         <div class="flex flex-col w-full">
-          <div class="flex flex-col items-start md:items-center gap-3 md:flex-row justify-between md:h-10.5">
+          <div class="flex flex-col items-start md:items-start gap-3 md:flex-row justify-between">
             <p class="text-sm font-semibold text-[#1A1A2E]">{license.label}</p>
 
             <div
@@ -31,26 +35,31 @@
               class:opacity-40={!$likenessStore.licensing.licenseTypes[license.id]}
               class:pointer-events-none={!$likenessStore.licensing.licenseTypes[license.id]}
             >
-              <div class="flex items-center border border-[#ddd4cc] rounded-sm bg-white overflow-hidden text-sm">
-                <span class="px-2">$</span>
-                <input
-                  type="number"
-                  min="0"
-                  value={$likenessStore.licensing.licensePrices[license.id]}
-                  oninput={(e) => likenessStore.setLicenseTypePrice(license.id, e.currentTarget.value)}
-                  onblur={(e) => {
-                    const val = e.currentTarget.value
-                    if (val === '' || Number(val) < 0) {
-                      e.currentTarget.value = ''
-                      likenessStore.setLicenseTypePrice(license.id, '')
-                      setTimeout(() => likenessStore.setLicenseTypeEnabled(license.id, false), 0)
-                    }
-                  }}
-                  onwheel={(e) => e.preventDefault()}
-                  placeholder="USD"
-                  class="flex-1 h-10.5 w-20 font-medium focus:outline-none pr-2"
-                />
-                <span class="px-2 h-full">USD</span>
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center border border-[#ddd4cc] rounded-sm bg-white overflow-hidden text-sm">
+                  <span class="px-2">$</span>
+                  <input
+                    type="number"
+                    min="0.5"
+                    value={$likenessStore.licensing.licensePrices[license.id]}
+                    oninput={(e) => likenessStore.setLicenseTypePrice(license.id, e.currentTarget.value)}
+                    onblur={(e) => {
+                      const val = e.currentTarget.value
+                      if (val !== '' && Number(val) < MIN_PRICE) {
+                        e.currentTarget.value = String(MIN_PRICE)
+                        likenessStore.setLicenseTypePrice(license.id, String(MIN_PRICE))
+                      }
+                    }}
+                    onwheel={(e) => e.preventDefault()}
+                    placeholder="USD"
+                    class="flex-1 h-10.5 w-20 font-medium focus:outline-none pr-2"
+                  />
+                  <span class="px-2 h-full">USD</span>
+                </div>
+
+                {#if $likenessStore.licensing.licenseTypes[license.id] && ($likenessStore.licensing.licensePrices[license.id] === '' || isPriceTooLow($likenessStore.licensing.licensePrices[license.id]))}
+                  <p class="text-xs font-medium text-red-600">Minimum price is $0.50</p>
+                {/if}
               </div>
 
               {#if license.hasDropdown && license.dropdownOptions}
