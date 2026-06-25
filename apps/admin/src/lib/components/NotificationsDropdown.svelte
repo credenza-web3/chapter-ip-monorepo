@@ -110,7 +110,7 @@
             <div class="size-1.5 rounded-full bg-primary shrink-0 mt-1.5" class:invisible={!!tx.readAt}></div>
             <div class="flex flex-col items-between justify-start w-full">
               <div class="flex items-center justify-between w-full">
-                <p class="text-[13px] font-semibold flex-1 min-w-0 wrap-break-wor leading-normal">
+                <p class="text-[13px] font-semibold flex-1 min-w-0 wrap-break-word leading-normal">
                   {itemType ?? ''} [{fullName ?? ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
                     ? 'added to your products'
                     : 'was purchased'}
