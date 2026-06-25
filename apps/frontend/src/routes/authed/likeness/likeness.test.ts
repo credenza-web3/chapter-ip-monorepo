@@ -85,6 +85,7 @@ describe('likeness data helpers', () => {
       metadata: { and: [{ field: 'type', op: 'eq', val: 'likeness' }] },
       sort: 'createdAt',
       order: 'desc',
+      status: 'ACTIVE',
     })
   })
 

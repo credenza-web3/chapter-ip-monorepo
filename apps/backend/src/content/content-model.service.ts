@@ -25,6 +25,7 @@ export class ContentModelService extends CommonModelService<Content> {
       ...(opts.tokenId && { tokenId: opts.tokenId }),
       ...(opts.sub && { sub: opts.sub }),
       ...(opts.contractAddress && { contractAddress: opts.contractAddress }),
+      ...(opts.status && { status: opts.status }),
       ...filterQuery,
     }
     return result

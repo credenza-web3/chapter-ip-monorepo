@@ -163,6 +163,7 @@ export const findContentInputSchema = paginatedRequestWithCursorSchema.extend({
   tokenId: z.string().optional(),
   contractAddress: z.string().optional(),
   metadata: filterNodeSchema.optional(),
+  status: z.string().optional(),
 })
 export type TFindContentInput = z.infer<typeof findContentInputSchema>
 
@@ -260,13 +261,14 @@ export const purchaseHistoryItemOutputSchema = z.object({
   buyerAddress: z.string(),
   contentId: z.string(),
   licenseType: z.number().int().nonnegative(),
-  priceFiat: z.string(),
-  priceToken: z.string(),
+  priceFiat: z.string().optional(),
+  priceToken: z.string().optional(),
   txHash: z.string(),
-  priceEther: z.string(),
-  currencyTokenContract: z.string(),
-  platformFeeAmount: z.string(),
-  agencyFeeAmount: z.string(),
+  priceEther: z.string().optional(),
+  currencyTokenContract: z.string().optional(),
+  platformFeeAmount: z.string().optional(),
+  agencyFeeAmount: z.string().optional(),
+
   metadata: contentMetadataRecordSchema,
   ownerId: z.string(),
   createdAt: z.date(),
