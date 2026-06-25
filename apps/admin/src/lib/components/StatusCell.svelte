@@ -2,7 +2,7 @@
   import Edit from '$lib/assets/edit.svg'
   import { getTrpcClient } from '$lib/stores/trpc-client'
   import { notify, ToastType } from '@repo/ui-components'
-  import type { ContentStatus } from '../../../../backend/src/content/content.schema'
+  import type { ContentStatus } from 'backend/content-status'
 
   const STATUS_MAP = {
     DRAFT: { label: 'Draft', classes: 'border-[#D58B00]/20 bg-[#f2e3c8] text-[#d58b00]', img: Edit },

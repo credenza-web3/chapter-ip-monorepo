@@ -4,6 +4,13 @@
   "description": "",
   "author": "",
   "private": true,
+  "exports": {
+    "./content-status": {
+      "types": "./src/content/content.schema.ts",
+      "import": "./src/content/content.schema.ts",
+      "default": "./src/content/content.schema.ts"
+    }
+  },
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",

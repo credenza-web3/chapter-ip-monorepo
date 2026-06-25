@@ -16,6 +16,7 @@
     "test": "npm run test:unit -- --run"
   },
   "devDependencies": {
+    "backend": "workspace:^",
     "@repo/content-types": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/fe-auth": "workspace:*",
