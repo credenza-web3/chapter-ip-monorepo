@@ -10,7 +10,7 @@
     SALE_DISABLED: { label: '✗ Disabled', classes: 'border-[#DE8C8C]/25 bg-[#fccaca] text-[#d14e4e]', img: undefined },
   }
 
-  const STATUS_OPTIONS = ['ACTIVE', 'DRAFT', 'SALE_DISABLED'] as const
+  const STATUS_OPTIONS = ['ACTIVE', 'SALE_DISABLED'] as const
 
   let { status = $bindable(), contentId }: { contentId: string; status: string } = $props()
 
