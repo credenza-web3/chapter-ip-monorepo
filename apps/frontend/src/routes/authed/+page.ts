@@ -11,6 +11,7 @@ export const load = async ({ parent }) => {
     limit: '100',
     sort: 'createdAt',
     order: 'desc',
+    status: 'ACTIVE',
   })
 
   return {
