@@ -6,7 +6,7 @@
   import Code from '$lib/assets/code.svg'
   import RowActionMenu from '$lib/components/RowActionMenu.svelte'
   import TablePagination from '$lib/components/TablePagination.svelte'
-  import Edit from '$lib/assets/edit.svg'
+  import StatusCell from '$lib/components/StatusCell.svelte'
   import { getMenuItems } from './constants'
   import { TABLE_PAGE_SIZE } from '$lib/constants'
 
@@ -36,27 +36,23 @@
     return 'Written works'
   }
 
-  const rows = $derived(
-    data.items
-      .map((item) => {
-        const licensing = item.metadata?.licensing ?? {}
-        const licenseTypes = licensing.licenseTypes ?? {}
-        const getLicenseTypes = (metadata: TMetadata): string[] =>
-          Object.entries(metadata?.licensing?.licenseTypes ?? {})
-            .filter(([, value]) => value)
-            .map(([key]) => key)
+  const getLicenseTypes = (metadata: TMetadata): string[] =>
+    Object.entries(metadata?.licensing?.licenseTypes ?? {})
+      .filter(([, value]) => value)
+      .map(([key]) => key)
 
-        return {
-          id: item.id,
-          item,
-          listingName: item?.metadata?.profile.fullLegalName || item?.metadata?.profile.stageName || 'Untitled',
-          fileType: normalizeFileType(item?.metadata?.type),
-          licenseType: getLicenseTypes(item.metadata as TMetadata),
-          status: 'Active',
-          sales: item.statistic?.boughtLicensesAmount ?? 0,
-          revenue: item.statistic?.revenue ?? { fiat: '0', token: '0', eth: '0' },
-        }
-      })
+  let rows = $state(
+    data.items
+      .map((item) => ({
+        id: item.id,
+        item,
+        listingName: item?.metadata?.profile.fullLegalName || item?.metadata?.profile.stageName || 'Untitled',
+        fileType: normalizeFileType(item?.metadata?.type),
+        licenseType: getLicenseTypes(item.metadata as TMetadata),
+        status: item.status,
+        sales: item.statistic?.boughtLicensesAmount ?? 0,
+        revenue: item.statistic?.revenue ?? { fiat: '0', token: '0', eth: '0' },
+      }))
       .sort(
         (a, b) =>
           (typeOrder[a.fileType as keyof typeof typeOrder] ?? 0) -
@@ -157,28 +153,7 @@
                       {row.sales}
                     </td>
                     <td class="px-4 py-1.5">
-                      {#if row.status === 'Active'}
-                        <span
-                          class="inline-flex items-center gap-1 px-2.5 py-1.25
-                          rounded-sm border border-[#93C4A1]/25 bg-[#f1fbf5] text-[#499b60] text-sm"
-                        >
-                          ✓ Active
-                        </span>
-                      {:else if row.status === 'Disabled'}
-                        <span
-                          class="inline-flex items-center gap-1 px-2.5 py-1.25
-                          rounded-sm border border-[#DE8C8C]/25 bg-[#fccaca] text-[#d14e4e] text-sm"
-                        >
-                          ✗ Disabled
-                        </span>
-                      {:else}
-                        <span
-                          class="inline-flex items-center gap-1 px-2.5 py-1.25
-                          rounded-sm border border-[#D58B00]/20 bg-[#f2e3c8] text-[#d58b00] text-sm"
-                        >
-                          <img src={Edit} alt="Edit" class="size-2.5" /> Draft
-                        </span>
-                      {/if}
+                      <StatusCell contentId={row.id} bind:status={row.status} />
                     </td>
 
                     <td class="px-4 py-1.5">

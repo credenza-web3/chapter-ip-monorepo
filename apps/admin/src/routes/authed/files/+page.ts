@@ -13,6 +13,7 @@ export const load = async (): Promise<{
     createdAt: string
     updatedAt: string
     metadata?: Record<string, any> | undefined
+    status: string
     statistic?: TContentStatistic
   }[]
 }> => {
