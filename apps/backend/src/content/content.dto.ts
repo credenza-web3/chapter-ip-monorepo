@@ -163,6 +163,7 @@ export const findContentInputSchema = paginatedRequestWithCursorSchema.extend({
   tokenId: z.string().optional(),
   contractAddress: z.string().optional(),
   metadata: filterNodeSchema.optional(),
+  status: z.string().optional(),
 })
 export type TFindContentInput = z.infer<typeof findContentInputSchema>
 
