@@ -138,29 +138,36 @@
     try {
       likenessStore.setLoading(true)
 
-      if (!data.tokenId) {
+      let trpcClient = uploadService.createTrpcClient()
+      let currentTokenId = data.tokenId
+      let currentKeys: string[] = []
+      if (!currentTokenId) {
         const draft = await saveCurrentContent()
         const tokenId = await uploadService.mintContent({
           lifetimePrice: Number($likenessStore.licensing.licensePrices['perpetual']),
           oneTimePrice: Number($likenessStore.licensing.licensePrices['single-use']),
         })
+
+        currentTokenId = tokenId
+        currentKeys = draft.keys
         await draft.trpcClient.contents.updateContentMetadata.mutate({
           contentId: draft.contentId,
           metadata: draft.metadata,
           tokenId,
           status: STATUS.ACTIVE as any,
         })
-        const stagename = $likenessStore.profile.stageName
-        await uploadService.saveMetadata({
-          tokenId,
-          keys: draft.keys,
-          title: `${$likenessStore.profile.fullLegalName} ${stagename ? `(${stagename})` : ''}`,
-          description: $likenessStore.profile.bio,
-          trpcClient: draft.trpcClient,
-        })
       } else {
-        await saveCurrentContent()
+        const { keys } = await saveCurrentContent()
+        currentKeys = keys
       }
+      const stagename = $likenessStore.profile.stageName
+      await uploadService.saveMetadata({
+        tokenId: currentTokenId,
+        keys: currentKeys,
+        title: `${$likenessStore.profile.fullLegalName} ${stagename ? `(${stagename})` : ''}`,
+        description: $likenessStore.profile.bio,
+        trpcClient,
+      })
 
       modals.open<ModalProps & TConfirmModalProps>(ConfirmModal, {
         title: 'Congratulations!',
