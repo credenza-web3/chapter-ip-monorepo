@@ -12,27 +12,11 @@ export type NamedUpload = {
   name: string
 }
 
-type ContentMetadata = Record<string, any>
 type ContentFileReference = {
   id: string
   key: string
 }
-
-function getTokenMetadata(metadata: ContentMetadata | undefined, keys: string[]) {
-  const profile = metadata?.profile ?? {}
-  const stageName = profile.stageName
-
-  return {
-    title: `${profile.fullLegalName ?? 'Untitled'} ${stageName ? `(${stageName})` : ''}`.trim(),
-    description: profile.bio ?? '',
-    keys,
-    image: r2Config.url + r2Config.defaultImage,
-  }
-}
-
-function getLicensePrice(metadata: ContentMetadata | undefined, key: 'perpetual' | 'single-use'): number {
-  return Number(metadata?.licensing?.licensePrices?.[key] ?? 0)
-}
+type UpdateContentMetadataInput = Parameters<TRPCClient<AppRouter>['contents']['updateContentMetadata']['mutate']>[0]
 
 export default class UploadService {
   constructor(private readonly transactionService: TransactionService) {}
@@ -180,39 +164,16 @@ export default class UploadService {
     contentId: string
     tokenId?: string
     status?: StatusValue
-    metadata: Record<string, unknown>
+    metadata?: UpdateContentMetadataInput['metadata']
     trpcClient: TRPCClient<AppRouter>
   }): Promise<void> {
-    await trpcClient.contents.updateContentMetadata.mutate({
+    const input: UpdateContentMetadataInput = {
       contentId,
-      metadata,
+      ...(metadata !== undefined ? { metadata } : {}),
       ...(tokenId ? { tokenId } : {}),
-      ...(status ? { status: status as any } : {}),
-    })
-  }
-
-  async activateDraftContent({
-    contentId,
-    trpcClient,
-  }: {
-    contentId: string
-    trpcClient: TRPCClient<AppRouter>
-  }): Promise<void> {
-    const content = await trpcClient.contents.getContentById.query({ id: contentId })
-    const metadata = (content.metadata ?? {}) as ContentMetadata
-    const tokenId = await this.mintContent({
-      lifetimePrice: getLicensePrice(metadata, 'perpetual'),
-      oneTimePrice: getLicensePrice(metadata, 'single-use'),
-    })
-    await this.finalizeContent({ contentId, metadata, tokenId, trpcClient })
-    await this.uploadTokenMetadata({
-      tokenId,
-      metadata: getTokenMetadata(
-        metadata,
-        content.files.filter((file) => file.bucket === 'content').map((file) => file.key),
-      ),
-      trpcClient,
-    })
+      ...(status ? { status } : {}),
+    }
+    await trpcClient.contents.updateContentMetadata.mutate(input)
   }
 
   async uploadTokenMetadata({

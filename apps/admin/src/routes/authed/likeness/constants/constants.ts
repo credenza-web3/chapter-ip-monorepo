@@ -1,6 +1,10 @@
 import { LICENSE_TYPE_OPTIONS, PERMITTED_USE_OPTIONS } from '@repo/content-types/likeness'
+import type { AppRouter, TRPCClient } from '@repo/trpc/client'
 
 export { ETHNICITY_OPTIONS, EYE_COLOR_OPTIONS, HAIR_COLOR_OPTIONS, UNION_OPTIONS } from '@repo/content-types/likeness'
+
+type UpdateContentMetadataInput = Parameters<TRPCClient<AppRouter>['contents']['updateContentMetadata']['mutate']>[0]
+export type StatusValue = NonNullable<UpdateContentMetadataInput['status']>
 
 type LicenseTypeOption = {
   id: string
@@ -55,8 +59,7 @@ export const TERRITORIES = [
 ]
 
 export const STATUS = {
-  DRAFT: 'DRAFT',
-  ACTIVE: 'ACTIVE',
-  SALE_DISABLED: 'SALE_DISABLED',
+  DRAFT: 'DRAFT' as StatusValue,
+  ACTIVE: 'ACTIVE' as StatusValue,
+  SALE_DISABLED: 'SALE_DISABLED' as StatusValue,
 } as const
-export type StatusValue = (typeof STATUS)[keyof typeof STATUS]

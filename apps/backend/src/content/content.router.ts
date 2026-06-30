@@ -192,7 +192,7 @@ export class ContentRouter {
     const tokenId = existing?.tokenId ?? input.tokenId
 
     const updated = await this.contentService.updateById(input.contentId, {
-      metadata: input.metadata,
+      ...(input.metadata !== undefined ? { metadata: input.metadata } : {}),
       ...(tokenId ? { tokenId } : {}),
       ...(input.status ? { status: input.status } : {}),
     })

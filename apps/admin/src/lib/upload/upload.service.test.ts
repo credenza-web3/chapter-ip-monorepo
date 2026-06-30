@@ -256,43 +256,19 @@ describe('UploadService', () => {
     })
   })
 
-  it('activates a saved draft by minting from saved prices and uploading token metadata', async () => {
+  it('updates content status without sending metadata', async () => {
     const { client } = createTrpcClient()
-    const transactionService = {
-      mintWithPrices: vi.fn().mockResolvedValue('token-id'),
-    }
-    const service = new UploadService(transactionService as never)
+    const service = new UploadService({ mintWithPrices: vi.fn() } as never)
 
-    await service.activateDraftContent({ contentId: 'content-id', trpcClient: client as never })
+    await service.updateContentMetadata({
+      contentId: 'content-id',
+      status: STATUS.SALE_DISABLED,
+      trpcClient: client as never,
+    })
 
-    expect(client.contents.getContentById.query).toHaveBeenCalledWith({ id: 'content-id' })
-    expect(transactionService.mintWithPrices).toHaveBeenCalledWith('access-token', 10, 5)
     expect(client.contents.updateContentMetadata.mutate).toHaveBeenCalledWith({
       contentId: 'content-id',
-      metadata: {
-        profile: {
-          fullLegalName: 'Jane Actor',
-          stageName: 'J. A.',
-          bio: 'Bio',
-        },
-        licensing: {
-          licensePrices: {
-            perpetual: 10,
-            'single-use': 5,
-          },
-        },
-      },
-      tokenId: 'token-id',
-      status: STATUS.ACTIVE,
-    })
-    expect(client.contents.uploadTokenMetadata.mutate).toHaveBeenCalledWith({
-      tokenId: 'token-id',
-      metadata: {
-        title: 'Jane Actor (J. A.)',
-        description: 'Bio',
-        keys: ['content-key'],
-        image: 'https://example.com/default.png',
-      },
+      status: STATUS.SALE_DISABLED,
     })
   })
 

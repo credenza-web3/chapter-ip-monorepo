@@ -7,19 +7,16 @@
   const STATUS_MAP = {
     DRAFT: { label: 'Draft', classes: 'border-[#D58B00]/20 bg-[#f2e3c8] text-[#d58b00]', img: Edit },
     ACTIVE: { label: '✓ Active', classes: 'border-[#93C4A1]/25 bg-[#f1fbf5] text-[#499b60]', img: undefined },
-    SALE_DISABLED: { label: 'Inactive', classes: 'border-[#DE8C8C]/25 bg-[#fccaca] text-[#d14e4e]', img: undefined },
+    SALE_DISABLED: { label: '✗ Disabled', classes: 'border-[#DE8C8C]/25 bg-[#fccaca] text-[#d14e4e]', img: undefined },
   }
 
-  const STATUS_OPTIONS_BY_STATUS = {
+  const STATUS_OPTIONS_BY_STATUS: Record<StatusValue, readonly StatusValue[]> = {
+    DRAFT: [],
     ACTIVE: [STATUS.SALE_DISABLED],
     SALE_DISABLED: [STATUS.ACTIVE],
-  } as const
+  }
 
-  let {
-    status = $bindable(),
-    contentId,
-    metadata,
-  }: { contentId: string; status: string; metadata: Record<string, unknown> | undefined } = $props()
+  let { status = $bindable(), contentId }: { contentId: string; status: string } = $props()
 
   let open = $state(false)
   let top = $state(0)
@@ -29,10 +26,13 @@
 
   const trpcClient = getTrpcClient()
 
-  const cfg = $derived(STATUS_MAP[status as keyof typeof STATUS_MAP] ?? STATUS_MAP.ACTIVE)
-  const statusOptions = $derived(
-    STATUS_OPTIONS_BY_STATUS[status as keyof typeof STATUS_OPTIONS_BY_STATUS] ?? ([] as const),
-  )
+  function isStatusValue(value: string): value is StatusValue {
+    return value === STATUS.DRAFT || value === STATUS.ACTIVE || value === STATUS.SALE_DISABLED
+  }
+
+  const currentStatus = $derived(isStatusValue(status) ? status : STATUS.ACTIVE)
+  const cfg = $derived(STATUS_MAP[currentStatus])
+  const statusOptions = $derived(STATUS_OPTIONS_BY_STATUS[currentStatus])
 
   function toggle(event: MouseEvent) {
     if (status === STATUS.DRAFT) return
@@ -60,7 +60,7 @@
     updating = true
     closeMenu()
     try {
-      await trpcClient.contents.updateContentMetadata.mutate({ contentId, status: newStatus as any, metadata })
+      await trpcClient.contents.updateContentMetadata.mutate({ contentId, status: newStatus })
       status = newStatus
       notify('Status updated', ToastType.SUCCESS)
     } catch {
