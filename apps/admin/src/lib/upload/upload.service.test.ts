@@ -53,6 +53,9 @@ const createTrpcClient = () => {
       registerContentFile: {
         mutate: registerContentFile,
       },
+      removeContentFile: {
+        mutate: vi.fn().mockResolvedValue({ ok: true }),
+      },
       getContentById: {
         query: vi.fn().mockResolvedValue({
           id: 'content-id',
@@ -172,6 +175,37 @@ describe('UploadService', () => {
     })
   })
 
+  it('updates existing content files by removing deleted files and uploading new files', async () => {
+    const newFile = new File(['original'], 'headshot.png', { type: 'image/png' })
+    const { client, createContentFileUploadUrl, registerContentFile } = createTrpcClient()
+    mocks.createImagePreview.mockResolvedValue(new File(['preview'], 'headshot.png', { type: 'image/jpeg' }))
+    const service = new UploadService({ mintWithPrices: vi.fn() } as never)
+
+    await expect(
+      service.updateContentFiles({
+        contentId: 'content-id',
+        currentFiles: [
+          { id: 'kept-file-id', key: 'kept-key' },
+          { id: 'removed-file-id', key: 'removed-key' },
+        ],
+        keptFileIds: new Set(['kept-file-id']),
+        uploads: [{ file: newFile, name: 'headshot_2' }],
+        trpcClient: client as never,
+      }),
+    ).resolves.toEqual({ keys: ['kept-key', 'original-key'] })
+
+    expect(client.contents.removeContentFile.mutate).toHaveBeenCalledWith({ fileId: 'removed-file-id' })
+    expect(createContentFileUploadUrl).toHaveBeenCalledTimes(1)
+    expect(registerContentFile).toHaveBeenCalledWith({
+      contentId: 'content-id',
+      key: 'original-key',
+      filename: 'headshot_2',
+      mimetype: 'image/png',
+      label: 'headshot_2',
+    })
+    expect(mocks.createImagePreview).not.toHaveBeenCalled()
+  })
+
   it('mints content with the current access token and requested prices', async () => {
     const transactionService = {
       mintWithPrices: vi.fn().mockResolvedValue('token-id'),
@@ -199,6 +233,26 @@ describe('UploadService', () => {
       metadata: { type: 'likeness' },
       tokenId: 'token-id',
       status: STATUS.ACTIVE,
+    })
+  })
+
+  it('updates content metadata with optional status and token id', async () => {
+    const { client } = createTrpcClient()
+    const service = new UploadService({ mintWithPrices: vi.fn() } as never)
+
+    await service.updateContentMetadata({
+      contentId: 'content-id',
+      tokenId: 'token-id',
+      status: STATUS.DRAFT,
+      metadata: { type: 'likeness' },
+      trpcClient: client as never,
+    })
+
+    expect(client.contents.updateContentMetadata.mutate).toHaveBeenCalledWith({
+      contentId: 'content-id',
+      metadata: { type: 'likeness' },
+      tokenId: 'token-id',
+      status: STATUS.DRAFT,
     })
   })
 

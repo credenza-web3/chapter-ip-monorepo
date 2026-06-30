@@ -3,7 +3,7 @@ import { authStore } from '$lib'
 import TransactionService from './transaction.service'
 import uploadFileToBucket from './file-upload.service'
 import { createImagePreview, isPreviewImage } from './image-preview.service'
-import { STATUS } from '../../routes/authed/likeness/constants/constants'
+import { STATUS, type StatusValue } from '../../routes/authed/likeness/constants/constants'
 
 import { r2Config } from '@repo/fe-services'
 
@@ -13,6 +13,10 @@ export type NamedUpload = {
 }
 
 type ContentMetadata = Record<string, any>
+type ContentFileReference = {
+  id: string
+  key: string
+}
 
 function getTokenMetadata(metadata: ContentMetadata | undefined, keys: string[]) {
   const profile = metadata?.profile ?? {}
@@ -51,10 +55,12 @@ export default class UploadService {
     contentId,
     uploads,
     trpcClient,
+    includePreviews = true,
   }: {
     contentId: string
     uploads: NamedUpload[]
     trpcClient: TRPCClient<AppRouter>
+    includePreviews?: boolean
   }): Promise<{ keys: string[] }> {
     const keys: string[] = []
 
@@ -75,7 +81,7 @@ export default class UploadService {
         label: name,
       })
 
-      if (isPreviewImage(file)) {
+      if (includePreviews && isPreviewImage(file)) {
         try {
           const preview = await createImagePreview(file)
           const { url: previewUrl } = await trpcClient.contents.createContentFileUploadUrl.mutate({
@@ -92,6 +98,37 @@ export default class UploadService {
     }
 
     return { keys }
+  }
+
+  async updateContentFiles({
+    contentId,
+    currentFiles,
+    keptFileIds,
+    uploads,
+    trpcClient,
+  }: {
+    contentId: string
+    currentFiles: ContentFileReference[]
+    keptFileIds: Set<string>
+    uploads: NamedUpload[]
+    trpcClient: TRPCClient<AppRouter>
+  }): Promise<{ keys: string[] }> {
+    const keys = currentFiles.filter((file) => keptFileIds.has(file.id)).map((file) => file.key)
+
+    for (const file of currentFiles) {
+      if (!keptFileIds.has(file.id)) {
+        await trpcClient.contents.removeContentFile.mutate({ fileId: file.id })
+      }
+    }
+
+    const uploaded = await this.uploadContentFiles({
+      contentId,
+      uploads,
+      trpcClient,
+      includePreviews: false,
+    })
+
+    return { keys: [...keys, ...uploaded.keys] }
   }
 
   async saveDraftContent({
@@ -124,11 +161,33 @@ export default class UploadService {
     metadata: Record<string, unknown>
     trpcClient: TRPCClient<AppRouter>
   }): Promise<void> {
-    await trpcClient.contents.updateContentMetadata.mutate({
+    await this.updateContentMetadata({
       contentId,
       metadata,
       tokenId,
-      status: STATUS.ACTIVE as any,
+      status: STATUS.ACTIVE,
+      trpcClient,
+    })
+  }
+
+  async updateContentMetadata({
+    contentId,
+    tokenId,
+    status,
+    metadata,
+    trpcClient,
+  }: {
+    contentId: string
+    tokenId?: string
+    status?: StatusValue
+    metadata: Record<string, unknown>
+    trpcClient: TRPCClient<AppRouter>
+  }): Promise<void> {
+    await trpcClient.contents.updateContentMetadata.mutate({
+      contentId,
+      metadata,
+      ...(tokenId ? { tokenId } : {}),
+      ...(status ? { status: status as any } : {}),
     })
   }
 
