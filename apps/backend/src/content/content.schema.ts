@@ -48,7 +48,11 @@ export const ContentSchema: Mongooseschema = SchemaFactory.createForClass(Conten
 ContentSchema.index({ sub: 1 })
 ContentSchema.index(
   { contractAddress: 1, tokenId: 1 },
-  { unique: true, partialFilterExpression: { tokenId: { $exists: true, $type: 'string' } } },
+  {
+    unique: true,
+    name: 'contractAddress_tokenId_unique_partial',
+    partialFilterExpression: { tokenId: { $exists: true, $ne: null, $type: 'string' } },
+  },
 )
 ContentSchema.index({ createdAt: 1 })
 ContentSchema.index({ updatedAt: 1 })
