@@ -5,7 +5,13 @@
   import PermittedUses from './PermittedUses.svelte'
   // import TerritorySelector from './TerritorySelector.svelte'
 
-  let { currentStep = $bindable() } = $props()
+  let {
+    currentStep = $bindable(),
+    onSaveDraft,
+  }: {
+    currentStep: number
+    onSaveDraft?: () => Promise<void>
+  } = $props()
 
   const primaryLikenessFile = $derived($likenessStore.files.headshots)
 
@@ -66,6 +72,15 @@
 </div>
 
 <div class="flex justify-end gap-1.5 mt-12.5">
+  {#if onSaveDraft}
+    <button
+      class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-cream border border-[#ddd4cc] disabled:bg-[#e1dddb] text-dark"
+      onclick={onSaveDraft}
+      disabled={$likenessStore.ui.loading}
+    >
+      Save as draft
+    </button>
+  {/if}
   <button
     class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary disabled:bg-[#e1dddb] text-cream"
     onclick={() => (currentStep = 1)}

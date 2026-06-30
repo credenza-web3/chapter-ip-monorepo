@@ -53,3 +53,10 @@ export const TERRITORIES = [
   'South America',
   'United States only',
 ]
+
+export const STATUS = {
+  DRAFT: 'DRAFT',
+  ACTIVE: 'ACTIVE',
+  SALE_DISABLED: 'SALE_DISABLED',
+} as const
+export type StatusValue = (typeof STATUS)[keyof typeof STATUS]

@@ -106,7 +106,7 @@ importers:
         specifier: ^10.5.0
         version: 10.5.0(postcss@8.5.15)
       backend:
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../backend
       eslint:
         specifier: ^10.4.1

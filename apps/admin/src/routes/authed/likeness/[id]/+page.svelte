@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { createLikenessFileNames, LIKENESS_FILE_BUCKETS } from '$lib/constants/likenessFileBuckets'
+  import {
+    createLikenessFileNames,
+    LIKENESS_FILE_BUCKETS,
+    type MultipleFileKey,
+  } from '$lib/constants/likenessFileBuckets'
   import { afterNavigate, beforeNavigate, goto } from '$app/navigation'
   import { getHeightTotalInches, getNormalizedWeight, likenessStore } from '../stores/likeness-store'
   import UploadStepHeader from '../components/UploadStepHeader.svelte'
@@ -15,6 +19,7 @@
   import { notify, ToastType, ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
   import { modals, type ModalProps } from 'svelte-modals'
   import { onDestroy, onMount } from 'svelte'
+  import { STATUS, type StatusValue } from '../constants/constants'
 
   let { data } = $props()
 
@@ -29,67 +34,133 @@
   beforeNavigate(() => likenessStore.setLoading(true))
   afterNavigate(() => likenessStore.setLoading(false))
 
+  const buildLikenessMetadata = (uploadsByBucket: Record<MultipleFileKey, string[]>) => {
+    const heightTotalInches = getHeightTotalInches($likenessStore.profile.attributes)
+    const weight = getNormalizedWeight($likenessStore.profile.attributes.weight)
+
+    return {
+      profile: {
+        ...$likenessStore.profile,
+        attributes: {
+          ...$likenessStore.profile.attributes,
+          weight,
+          ...(heightTotalInches !== undefined && { heightTotalInches }),
+        },
+      },
+      licensing: $likenessStore.licensing,
+      uploadsByBucket,
+      type: 'likeness',
+    }
+  }
+
+  const saveCurrentContent = async ({
+    status,
+    tokenId,
+  }: {
+    status?: StatusValue
+    tokenId?: string
+  } = {}) => {
+    const trpcClient = uploadService.createTrpcClient()
+    const contentId = data.id
+    const buckets = LIKENESS_FILE_BUCKETS
+
+    const keptFileIds = new Set(buckets.flatMap((bucket) => $likenessStore.existingFiles[bucket].map((f) => f.id)))
+    const keys = (data.files ?? []).filter((file) => keptFileIds.has(file.id)).map((file) => file.key)
+
+    for (const file of data.files ?? []) {
+      if (!keptFileIds.has(file.id)) {
+        await trpcClient.contents.removeContentFile.mutate({ fileId: file.id })
+      }
+    }
+
+    const uploadsByBucket = Object.fromEntries(
+      buckets.map((bucket) => {
+        const existingNames = $likenessStore.existingFiles[bucket].map((file) => file.name)
+        const newNames = createLikenessFileNames(bucket, $likenessStore.files[bucket].length, existingNames)
+        return [bucket, [...existingNames, ...newNames]]
+      }),
+    ) as Record<MultipleFileKey, string[]>
+
+    for (const bucket of buckets) {
+      const existingFileCount = $likenessStore.existingFiles[bucket].length
+
+      for (const [index, file] of $likenessStore.files[bucket].entries()) {
+        const name = uploadsByBucket[bucket][existingFileCount + index]
+        const { url, key } = await trpcClient.contents.createContentFileUploadUrl.mutate({
+          contentId,
+          mimetype: file.type,
+          filename: name,
+        })
+        keys.push(key)
+        await uploadFileToBucket(file, url)
+        await trpcClient.contents.registerContentFile.mutate({
+          contentId,
+          key,
+          filename: name,
+          mimetype: file.type,
+          label: name,
+        })
+      }
+    }
+
+    const metadata = buildLikenessMetadata(uploadsByBucket)
+
+    await trpcClient.contents.updateContentMetadata.mutate({
+      contentId,
+      metadata,
+      ...(tokenId ? { tokenId } : {}),
+      ...(status ? { status: status as any } : {}),
+    })
+
+    return { contentId, keys, metadata, trpcClient }
+  }
+
+  const goToFiles = async () => {
+    await goto('/authed/files')
+    likenessStore.reset()
+  }
+
+  const onSaveDraftClick = async () => {
+    try {
+      likenessStore.setLoading(true)
+      await saveCurrentContent({ status: STATUS.DRAFT })
+      notify('Draft saved', ToastType.SUCCESS)
+      await goToFiles()
+    } catch (error) {
+      console.error('Error saving draft:', error)
+      notify('Failed to save draft.', ToastType.FAIL)
+    } finally {
+      likenessStore.setLoading(false)
+    }
+  }
+
   const onSubmitClick = async () => {
     try {
       likenessStore.setLoading(true)
-      const trpcClient = uploadService.createTrpcClient()
-      const contentId = data.id
-      const buckets = LIKENESS_FILE_BUCKETS
 
-      const keptFileIds = new Set(buckets.flatMap((bucket) => $likenessStore.existingFiles[bucket].map((f) => f.id)))
-      for (const file of data.files ?? []) {
-        if (!keptFileIds.has(file.id)) {
-          await trpcClient.contents.removeContentFile.mutate({ fileId: file.id })
-        }
+      if (!data.tokenId) {
+        const draft = await saveCurrentContent()
+        const tokenId = await uploadService.mintContent({
+          lifetimePrice: Number($likenessStore.licensing.licensePrices['perpetual']),
+          oneTimePrice: Number($likenessStore.licensing.licensePrices['single-use']),
+        })
+        await draft.trpcClient.contents.updateContentMetadata.mutate({
+          contentId: draft.contentId,
+          metadata: draft.metadata,
+          tokenId,
+          status: STATUS.ACTIVE as any,
+        })
+        const stagename = $likenessStore.profile.stageName
+        await uploadService.saveMetadata({
+          tokenId,
+          keys: draft.keys,
+          title: `${$likenessStore.profile.fullLegalName} ${stagename ? `(${stagename})` : ''}`,
+          description: $likenessStore.profile.bio,
+          trpcClient: draft.trpcClient,
+        })
+      } else {
+        await saveCurrentContent()
       }
-
-      const uploadsByBucket = Object.fromEntries(
-        buckets.map((bucket) => {
-          const existingNames = $likenessStore.existingFiles[bucket].map((file) => file.name)
-          const newNames = createLikenessFileNames(bucket, $likenessStore.files[bucket].length, existingNames)
-          return [bucket, [...existingNames, ...newNames]]
-        }),
-      )
-
-      for (const bucket of buckets) {
-        const existingFileCount = $likenessStore.existingFiles[bucket].length
-
-        for (const [index, file] of $likenessStore.files[bucket].entries()) {
-          const name = uploadsByBucket[bucket][existingFileCount + index]
-          const { url, key } = await trpcClient.contents.createContentFileUploadUrl.mutate({
-            contentId,
-            mimetype: file.type,
-            filename: name,
-          })
-          await uploadFileToBucket(file, url)
-          await trpcClient.contents.registerContentFile.mutate({
-            contentId,
-            key,
-            filename: name,
-            mimetype: file.type,
-            label: name,
-          })
-        }
-      }
-      const heightTotalInches = getHeightTotalInches($likenessStore.profile.attributes)
-      const weight = getNormalizedWeight($likenessStore.profile.attributes.weight)
-
-      await trpcClient.contents.updateContentMetadata.mutate({
-        contentId,
-        metadata: {
-          profile: {
-            ...$likenessStore.profile,
-            attributes: {
-              ...$likenessStore.profile.attributes,
-              weight,
-              ...(heightTotalInches !== undefined && { heightTotalInches }),
-            },
-          },
-          licensing: $likenessStore.licensing,
-          uploadsByBucket,
-          type: 'likeness',
-        },
-      })
 
       modals.open<ModalProps & TConfirmModalProps>(ConfirmModal, {
         title: 'Congratulations!',
@@ -97,12 +168,10 @@
           "Your likeness has been added to Chapter IP. By completing this step, you've transformed your likeness into a secure, licensable digital asset that can be discovered, verified, and managed for future opportunities.",
         submitText: 'Go to Dashboard',
         onSubmit: async () => {
-          await goto('/authed/files')
-          likenessStore.reset()
+          await goToFiles()
         },
         onClose: async () => {
-          await goto('/authed/files')
-          likenessStore.reset()
+          await goToFiles()
         },
         withBackButton: false,
       })
@@ -119,10 +188,14 @@
   <UploadStepHeader {currentStep} />
 
   {#if currentStep === 1}
-    <UploadLikenessStep bind:currentStep />
+    <UploadLikenessStep bind:currentStep onSaveDraft={!data.tokenId ? onSaveDraftClick : undefined} />
   {:else if currentStep === 2}
-    <UploadLicensingStep bind:currentStep />
+    <UploadLicensingStep bind:currentStep onSaveDraft={!data.tokenId ? onSaveDraftClick : undefined} />
   {:else}
-    <ConfirmLikenessStep bind:currentStep onFormSubmit={onSubmitClick} />
+    <ConfirmLikenessStep
+      bind:currentStep
+      onFormSubmit={onSubmitClick}
+      onSaveDraft={!data.tokenId ? onSaveDraftClick : undefined}
+    />
   {/if}
 </div>

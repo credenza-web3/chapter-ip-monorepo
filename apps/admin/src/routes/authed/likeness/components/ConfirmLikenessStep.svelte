@@ -9,9 +9,11 @@
   let {
     currentStep = $bindable(),
     onFormSubmit,
+    onSaveDraft,
   }: {
     currentStep: number
     onFormSubmit: () => Promise<void>
+    onSaveDraft?: () => Promise<void>
   } = $props()
 
   type PreviewItem = { src: string; name: string }
@@ -294,6 +296,15 @@
 </div>
 
 <div class="flex justify-end gap-1.5 mt-12.5">
+  {#if onSaveDraft}
+    <button
+      class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-cream border border-[#ddd4cc] disabled:bg-[#e1dddb] text-dark"
+      disabled={$likenessStore.ui.loading}
+      onclick={onSaveDraft}
+    >
+      Save as draft
+    </button>
+  {/if}
   <button
     class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary disabled:bg-[#e1dddb] text-cream"
     disabled={$likenessStore.ui.loading}

@@ -153,7 +153,7 @@
                       {row.sales}
                     </td>
                     <td class="px-4 py-1.5">
-                      <StatusCell contentId={row.id} bind:status={row.status} />
+                      <StatusCell contentId={row.id} metadata={row.item.metadata} bind:status={row.status} />
                     </td>
 
                     <td class="px-4 py-1.5">

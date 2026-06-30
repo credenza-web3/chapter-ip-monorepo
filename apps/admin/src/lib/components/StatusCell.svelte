@@ -2,17 +2,24 @@
   import Edit from '$lib/assets/edit.svg'
   import { getTrpcClient } from '$lib/stores/trpc-client'
   import { notify, ToastType } from '@repo/ui-components'
-  import type { ContentStatus } from 'backend/content-status'
+  import { STATUS, type StatusValue } from '../../routes/authed/likeness/constants/constants'
 
   const STATUS_MAP = {
     DRAFT: { label: 'Draft', classes: 'border-[#D58B00]/20 bg-[#f2e3c8] text-[#d58b00]', img: Edit },
     ACTIVE: { label: '✓ Active', classes: 'border-[#93C4A1]/25 bg-[#f1fbf5] text-[#499b60]', img: undefined },
-    SALE_DISABLED: { label: '✗ Disabled', classes: 'border-[#DE8C8C]/25 bg-[#fccaca] text-[#d14e4e]', img: undefined },
+    SALE_DISABLED: { label: 'Inactive', classes: 'border-[#DE8C8C]/25 bg-[#fccaca] text-[#d14e4e]', img: undefined },
   }
 
-  const STATUS_OPTIONS = ['ACTIVE', 'SALE_DISABLED'] as const
+  const STATUS_OPTIONS_BY_STATUS = {
+    ACTIVE: [STATUS.SALE_DISABLED],
+    SALE_DISABLED: [STATUS.ACTIVE],
+  } as const
 
-  let { status = $bindable(), contentId }: { contentId: string; status: string } = $props()
+  let {
+    status = $bindable(),
+    contentId,
+    metadata,
+  }: { contentId: string; status: string; metadata: Record<string, unknown> | undefined } = $props()
 
   let open = $state(false)
   let top = $state(0)
@@ -23,8 +30,12 @@
   const trpcClient = getTrpcClient()
 
   const cfg = $derived(STATUS_MAP[status as keyof typeof STATUS_MAP] ?? STATUS_MAP.ACTIVE)
+  const statusOptions = $derived(
+    STATUS_OPTIONS_BY_STATUS[status as keyof typeof STATUS_OPTIONS_BY_STATUS] ?? ([] as const),
+  )
 
   function toggle(event: MouseEvent) {
+    if (status === STATUS.DRAFT) return
     trigger = event.currentTarget as HTMLElement | null
     if (!trigger) return
     if (open) {
@@ -41,7 +52,7 @@
     open = false
   }
 
-  async function handleSelect(newStatus: (typeof STATUS_OPTIONS)[number]) {
+  async function handleSelect(newStatus: StatusValue) {
     if (newStatus === status) {
       closeMenu()
       return
@@ -49,7 +60,7 @@
     updating = true
     closeMenu()
     try {
-      await trpcClient.contents.updateContentMetadata.mutate({ contentId, status: newStatus as ContentStatus })
+      await trpcClient.contents.updateContentMetadata.mutate({ contentId, status: newStatus as any, metadata })
       status = newStatus
       notify('Status updated', ToastType.SUCCESS)
     } catch {
@@ -91,7 +102,7 @@
     class="menu fixed z-50 w-38 rounded-md border border-[#1A1A2E]/10 bg-cream p-2 text-left text-sm font-medium text-[#1A1A2E99] shadow-[3px_6px_8px_0_rgba(21,34,50,0.08)]"
     style="top: {top}px; left: {left}px;"
   >
-    {#each STATUS_OPTIONS as option (option)}
+    {#each statusOptions as option (option)}
       {@const opt = STATUS_MAP[option]}
       <li>
         <button
