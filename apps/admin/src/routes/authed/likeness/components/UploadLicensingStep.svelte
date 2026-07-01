@@ -18,6 +18,10 @@
   function toggleAgreement() {
     likenessStore.setAgreedToFee(!$likenessStore.licensing.agreedToFee)
   }
+
+  const canContinueFromStepTwo = $derived(
+    Boolean(!$likenessStore.ui.loading && primaryLikenessFile && $likenessStore.licensing.agreedToFee),
+  )
 </script>
 
 {#snippet divider(className = '')}
@@ -92,7 +96,7 @@
     <button
       class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary disabled:bg-[#e1dddb] text-cream"
       onclick={() => (currentStep = 3)}
-      disabled={$likenessStore.ui.loading || !primaryLikenessFile}
+      disabled={!canContinueFromStepTwo}
     >
       Save and Continue
     </button>
