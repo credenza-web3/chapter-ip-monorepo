@@ -26,46 +26,73 @@
   beforeNavigate(() => likenessStore.setLoading(true))
   afterNavigate(() => likenessStore.setLoading(false))
 
+  const buildLikenessPayload = () => {
+    const uploadsByBucket = LIKENESS_FILE_BUCKETS.reduce(
+      (acc, bucket) => {
+        acc[bucket] = createLikenessFileNames(bucket, $likenessStore.files[bucket].length)
+        return acc
+      },
+      {} as Record<MultipleFileKey, string[]>,
+    )
+    const uploads = LIKENESS_FILE_BUCKETS.flatMap((bucket) =>
+      $likenessStore.files[bucket].map((file, index) => ({
+        file,
+        name: uploadsByBucket[bucket][index],
+      })),
+    )
+    const heightTotalInches = getHeightTotalInches($likenessStore.profile.attributes)
+    const weight = getNormalizedWeight($likenessStore.profile.attributes.weight)
+    const metadata = {
+      profile: {
+        ...$likenessStore.profile,
+        attributes: {
+          ...$likenessStore.profile.attributes,
+          weight,
+          ...(heightTotalInches !== undefined && { heightTotalInches }),
+        },
+      },
+      licensing: $likenessStore.licensing,
+      uploadsByBucket,
+      type: 'likeness',
+    }
+
+    return { uploadsByBucket, uploads, metadata }
+  }
+
+  const onSaveDraftClick = async () => {
+    try {
+      likenessStore.setLoading(true)
+      const trpcClient = uploadService.createTrpcClient()
+      const { uploads, metadata } = buildLikenessPayload()
+
+      await uploadService.saveDraftContent({
+        trpcClient,
+        uploads,
+        metadata,
+      })
+      notify('Draft saved', ToastType.SUCCESS)
+      await goto('/authed/files')
+      likenessStore.reset()
+    } catch (error) {
+      console.error('Error saving draft:', error)
+      notify('Failed to save draft.', ToastType.FAIL)
+    } finally {
+      likenessStore.setLoading(false)
+    }
+  }
+
   const onSubmitClick = async () => {
     try {
       likenessStore.setLoading(true)
       const trpcClient = uploadService.createTrpcClient()
+      const { uploads, metadata } = buildLikenessPayload()
+      const { contentId, keys } = await uploadService.saveDraftContent({ trpcClient, uploads, metadata })
 
-      const uploadsByBucket = LIKENESS_FILE_BUCKETS.reduce(
-        (acc, bucket) => {
-          acc[bucket] = createLikenessFileNames(bucket, $likenessStore.files[bucket].length)
-          return acc
-        },
-        {} as Record<MultipleFileKey, string[]>,
-      )
-      const uploads = LIKENESS_FILE_BUCKETS.flatMap((bucket) =>
-        $likenessStore.files[bucket].map((file, index) => ({
-          file,
-          name: uploadsByBucket[bucket][index],
-        })),
-      )
-      const heightTotalInches = getHeightTotalInches($likenessStore.profile.attributes)
-      const weight = getNormalizedWeight($likenessStore.profile.attributes.weight)
-
-      const { tokenId, keys } = await uploadService.uploadContent({
-        trpcClient,
-        uploads,
-        metadata: {
-          profile: {
-            ...$likenessStore.profile,
-            attributes: {
-              ...$likenessStore.profile.attributes,
-              weight,
-              ...(heightTotalInches !== undefined && { heightTotalInches }),
-            },
-          },
-          licensing: $likenessStore.licensing,
-          uploadsByBucket,
-          type: 'likeness',
-        },
+      const tokenId = await uploadService.mintContent({
         lifetimePrice: Number($likenessStore.licensing.licensePrices['perpetual']),
         oneTimePrice: Number($likenessStore.licensing.licensePrices['single-use']),
       })
+      await uploadService.finalizeContent({ trpcClient, contentId, metadata, tokenId })
 
       const stagename = $likenessStore.profile.stageName
       await uploadService.saveMetadata({
@@ -108,10 +135,10 @@
   <UploadStepHeader {currentStep} />
 
   {#if currentStep === 1}
-    <UploadLikenessStep bind:currentStep />
+    <UploadLikenessStep bind:currentStep onSaveDraft={onSaveDraftClick} />
   {:else if currentStep === 2}
-    <UploadLicensingStep bind:currentStep />
+    <UploadLicensingStep bind:currentStep onSaveDraft={onSaveDraftClick} />
   {:else}
-    <ConfirmLikenessStep bind:currentStep onFormSubmit={onSubmitClick} />
+    <ConfirmLikenessStep bind:currentStep onFormSubmit={onSubmitClick} onSaveDraft={onSaveDraftClick} />
   {/if}
 </div>

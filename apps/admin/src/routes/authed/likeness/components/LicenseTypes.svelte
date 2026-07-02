@@ -26,7 +26,7 @@
         </div>
 
         <div class="flex flex-col w-full">
-          <div class="flex flex-col items-start md:items-start gap-3 md:flex-row justify-between">
+          <div class="flex items-center gap-3 flex-row justify-between">
             <p class="text-sm font-semibold text-[#1A1A2E]">{license.label}</p>
 
             <div

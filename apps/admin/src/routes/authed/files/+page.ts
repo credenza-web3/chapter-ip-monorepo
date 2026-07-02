@@ -33,9 +33,11 @@ export const load = async (): Promise<{
 
   const items = await Promise.all(
     paginatedResponse.items.map(async (item) => {
-      const statistic = await trpcClient.contents.getContentStatistic.query({
-        tokenId: item.tokenId!,
-      })
+      const statistic = item.tokenId
+        ? await trpcClient.contents.getContentStatistic.query({
+            tokenId: item.tokenId,
+          })
+        : undefined
 
       return { ...item, statistic }
     }),

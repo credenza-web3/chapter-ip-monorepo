@@ -1,7 +1,6 @@
 import type { TAccountUser, TAuthStore, TAuthConfig } from './types'
 import { generateRandomString, sha256, base64urlencode } from './helper'
 import { createClient } from '@repo/trpc/client'
-import { authStore } from '$lib'
 
 export function createAuthStore<T>(
   config: TAuthConfig,

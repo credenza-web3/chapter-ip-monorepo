@@ -30,6 +30,7 @@ vi.mock('./file-upload.service', () => ({
 }))
 
 import UploadService from './upload.service'
+import { STATUS } from '../../routes/authed/likeness/constants/constants'
 
 const createTrpcClient = () => {
   const createContentFileUploadUrl = vi
@@ -43,11 +44,42 @@ const createTrpcClient = () => {
       registerContent: {
         mutate: vi.fn().mockResolvedValue({ id: 'content-id' }),
       },
+      updateContentMetadata: {
+        mutate: vi.fn().mockResolvedValue({}),
+      },
       createContentFileUploadUrl: {
         mutate: createContentFileUploadUrl,
       },
       registerContentFile: {
         mutate: registerContentFile,
+      },
+      removeContentFile: {
+        mutate: vi.fn().mockResolvedValue({ ok: true }),
+      },
+      getContentById: {
+        query: vi.fn().mockResolvedValue({
+          id: 'content-id',
+          metadata: {
+            profile: {
+              fullLegalName: 'Jane Actor',
+              stageName: 'J. A.',
+              bio: 'Bio',
+            },
+            licensing: {
+              licensePrices: {
+                perpetual: 10,
+                'single-use': 5,
+              },
+            },
+          },
+          files: [
+            { id: 'file-1', key: 'content-key', bucket: 'content' },
+            { id: 'file-2', key: 'preview-key', bucket: 'preview' },
+          ],
+        }),
+      },
+      uploadTokenMetadata: {
+        mutate: vi.fn().mockResolvedValue({}),
       },
     },
   }
@@ -55,7 +87,7 @@ const createTrpcClient = () => {
   return { client, createContentFileUploadUrl, registerContentFile }
 }
 
-describe('UploadService.uploadContent', () => {
+describe('UploadService', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -72,14 +104,12 @@ describe('UploadService.uploadContent', () => {
     const service = new UploadService(transactionService as never)
 
     await expect(
-      service.uploadContent({
+      service.uploadContentFiles({
+        contentId: 'content-id',
         uploads: [{ file: original, name: 'headshot_1' }],
-        metadata: {},
-        lifetimePrice: 1,
-        oneTimePrice: 2,
         trpcClient: client as never,
       }),
-    ).resolves.toEqual({ tokenId: 'token-id', keys: ['original-key'] })
+    ).resolves.toEqual({ keys: ['original-key'] })
 
     expect(createContentFileUploadUrl).toHaveBeenNthCalledWith(2, {
       contentId: 'content-id',
@@ -110,18 +140,158 @@ describe('UploadService.uploadContent', () => {
     const service = new UploadService(transactionService as never)
 
     await expect(
-      service.uploadContent({
+      service.uploadContentFiles({
+        contentId: 'content-id',
         uploads: [{ file: original, name: 'bodyshot_1' }],
-        metadata: {},
-        lifetimePrice: 1,
-        oneTimePrice: 2,
         trpcClient: client as never,
       }),
-    ).resolves.toEqual({ tokenId: 'token-id', keys: ['original-key'] })
+    ).resolves.toEqual({ keys: ['original-key'] })
 
     expect(createContentFileUploadUrl).toHaveBeenCalledTimes(1)
     expect(mocks.uploadFileToBucket).toHaveBeenCalledTimes(1)
     expect(registerContentFile).toHaveBeenCalledTimes(1)
     expect(console.error).toHaveBeenCalledWith('Failed to upload preview for image.png', previewError)
+  })
+
+  it('saves a draft without minting a token', async () => {
+    const original = new File(['original'], 'voice.mp3', { type: 'audio/mpeg' })
+    const { client } = createTrpcClient()
+    const transactionService = {
+      mintWithPrices: vi.fn(),
+    }
+    const service = new UploadService(transactionService as never)
+
+    await expect(
+      service.saveDraftContent({
+        uploads: [{ file: original, name: 'voice_1' }],
+        metadata: { type: 'likeness' },
+        trpcClient: client as never,
+      }),
+    ).resolves.toEqual({ contentId: 'content-id', keys: ['original-key'] })
+
+    expect(transactionService.mintWithPrices).not.toHaveBeenCalled()
+    expect(client.contents.registerContent.mutate).toHaveBeenCalledWith({
+      metadata: { type: 'likeness' },
+    })
+  })
+
+  it('updates existing content files by removing deleted files and uploading new files', async () => {
+    const newFile = new File(['original'], 'headshot.png', { type: 'image/png' })
+    const { client, createContentFileUploadUrl, registerContentFile } = createTrpcClient()
+    mocks.createImagePreview.mockResolvedValue(new File(['preview'], 'headshot.png', { type: 'image/jpeg' }))
+    const service = new UploadService({ mintWithPrices: vi.fn() } as never)
+
+    await expect(
+      service.updateContentFiles({
+        contentId: 'content-id',
+        currentFiles: [
+          { id: 'kept-file-id', key: 'kept-key' },
+          { id: 'removed-file-id', key: 'removed-key' },
+        ],
+        keptFileIds: new Set(['kept-file-id']),
+        uploads: [{ file: newFile, name: 'headshot_2' }],
+        trpcClient: client as never,
+      }),
+    ).resolves.toEqual({ keys: ['kept-key', 'original-key'] })
+
+    expect(client.contents.removeContentFile.mutate).toHaveBeenCalledWith({ fileId: 'removed-file-id' })
+    expect(createContentFileUploadUrl).toHaveBeenCalledTimes(1)
+    expect(registerContentFile).toHaveBeenCalledWith({
+      contentId: 'content-id',
+      key: 'original-key',
+      filename: 'headshot_2',
+      mimetype: 'image/png',
+      label: 'headshot_2',
+    })
+    expect(mocks.createImagePreview).not.toHaveBeenCalled()
+  })
+
+  it('mints content with the current access token and requested prices', async () => {
+    const transactionService = {
+      mintWithPrices: vi.fn().mockResolvedValue('token-id'),
+    }
+    const service = new UploadService(transactionService as never)
+
+    await expect(service.mintContent({ lifetimePrice: 10, oneTimePrice: 5 })).resolves.toBe('token-id')
+
+    expect(transactionService.mintWithPrices).toHaveBeenCalledWith('access-token', 10, 5)
+  })
+
+  it('finalizes content as active with metadata and token id', async () => {
+    const { client } = createTrpcClient()
+    const service = new UploadService({ mintWithPrices: vi.fn() } as never)
+
+    await service.finalizeContent({
+      contentId: 'content-id',
+      tokenId: 'token-id',
+      metadata: { type: 'likeness' },
+      trpcClient: client as never,
+    })
+
+    expect(client.contents.updateContentMetadata.mutate).toHaveBeenCalledWith({
+      contentId: 'content-id',
+      metadata: { type: 'likeness' },
+      tokenId: 'token-id',
+      status: STATUS.ACTIVE,
+    })
+  })
+
+  it('updates content metadata with optional status and token id', async () => {
+    const { client } = createTrpcClient()
+    const service = new UploadService({ mintWithPrices: vi.fn() } as never)
+
+    await service.updateContentMetadata({
+      contentId: 'content-id',
+      tokenId: 'token-id',
+      status: STATUS.DRAFT,
+      metadata: { type: 'likeness' },
+      trpcClient: client as never,
+    })
+
+    expect(client.contents.updateContentMetadata.mutate).toHaveBeenCalledWith({
+      contentId: 'content-id',
+      metadata: { type: 'likeness' },
+      tokenId: 'token-id',
+      status: STATUS.DRAFT,
+    })
+  })
+
+  it('updates content status without sending metadata', async () => {
+    const { client } = createTrpcClient()
+    const service = new UploadService({ mintWithPrices: vi.fn() } as never)
+
+    await service.updateContentMetadata({
+      contentId: 'content-id',
+      status: STATUS.SALE_DISABLED,
+      trpcClient: client as never,
+    })
+
+    expect(client.contents.updateContentMetadata.mutate).toHaveBeenCalledWith({
+      contentId: 'content-id',
+      status: STATUS.SALE_DISABLED,
+    })
+  })
+
+  it('saves token metadata with the default image', async () => {
+    const { client } = createTrpcClient()
+    const service = new UploadService({ mintWithPrices: vi.fn() } as never)
+
+    await service.saveMetadata({
+      tokenId: 'token-id',
+      title: 'Title',
+      description: 'Description',
+      keys: ['content-key'],
+      trpcClient: client as never,
+    })
+
+    expect(client.contents.uploadTokenMetadata.mutate).toHaveBeenCalledWith({
+      tokenId: 'token-id',
+      metadata: {
+        title: 'Title',
+        description: 'Description',
+        keys: ['content-key'],
+        image: 'https://example.com/default.png',
+      },
+    })
   })
 })
