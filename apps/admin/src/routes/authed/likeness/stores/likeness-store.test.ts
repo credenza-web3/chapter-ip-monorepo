@@ -169,5 +169,4 @@ test('keeps only the first decimal point when setting license prices', () => {
   likenessStore.setLicenseTypePrice('single-use', '1.2.3')
 
   expect(get(likenessStore).licensing.licensePrices['single-use']).toBe('1.23')
-  expect(get(likenessStore).licensing.oneTimePrice).toBe(1.23)
 })

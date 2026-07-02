@@ -86,7 +86,6 @@ function getAffiliations(affiliations: Array<Partial<LikenessProfileAffiliation>
 function getLicenses(licensing: LikenessLicensingMetadataInput | undefined): LikenessLicense[] {
   const enabledTypes = licensing?.licenseTypes ?? {}
   const prices = licensing?.licensePrices ?? {}
-  const details = licensing?.licenseDropdowns ?? {}
 
   return Object.entries(enabledTypes).flatMap(([id, enabled]) => {
     if (enabled !== true) return []
@@ -97,7 +96,6 @@ function getLicenses(licensing: LikenessLicensingMetadataInput | undefined): Lik
         id,
         name: LICENSE_NAMES[id] ?? formatLabel(id),
         price,
-        detail: trimString(details[id]),
         description: LICENSE_DESCRIPTIONS[id] ?? '',
       },
     ]

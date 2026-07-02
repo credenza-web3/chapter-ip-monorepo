@@ -10,8 +10,6 @@ type LicenseTypeOption = {
   id: string
   label: string
   description: string
-  hasDropdown?: boolean
-  dropdownOptions?: string[]
 }
 
 type PermittedUseOption = {
@@ -38,7 +36,6 @@ export const LICENSE_TYPES: LicenseTypeOption[] = LICENSE_TYPE_OPTIONS.map((opti
   id: option.value,
   label: option.label,
   description: LICENSE_TYPE_DESCRIPTIONS[option.value],
-  hasDropdown: false,
 }))
 
 export const PERMITTED_USES: PermittedUseOption[] = PERMITTED_USE_OPTIONS.map((option) => ({

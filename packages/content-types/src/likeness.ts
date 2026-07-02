@@ -101,13 +101,8 @@ export type LikenessProfileMetadata = {
 }
 
 export type LikenessLicensingMetadata = {
-  isLifetime: boolean
-  isOneTime: boolean
-  lifetimePrice: number
-  oneTimePrice: number
   licenseTypes: Record<string, boolean>
   licensePrices: Record<string, string>
-  licenseDropdowns: Record<string, string>
   permittedUses: Record<string, boolean>
   territories: string[]
   allowRetouching: YesNo
@@ -148,6 +143,9 @@ export type LikenessContent = {
   tokenId?: string
   metadata?: LikenessMetadataInput
   files?: ContentFile[]
+  sub: string
+  status: string
+  contractAddress: string
 }
 
 export type LikenessAffiliation = {
@@ -164,7 +162,6 @@ export type LikenessLicense = {
   id: string
   name: string
   price: string
-  detail: string
   description: string
 }
 

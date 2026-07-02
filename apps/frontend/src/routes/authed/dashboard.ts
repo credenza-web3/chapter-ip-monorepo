@@ -1,5 +1,6 @@
 import { DEFAULT_IMAGE_URL } from './likeness/likeness'
 import type { LikenessItem } from './likeness/likeness'
+import type { LocationItem } from './location/location'
 
 export type DashboardCard = {
   id: string
@@ -49,44 +50,20 @@ export const MOCK_CREATIVE_WORKS: DashboardCard[] = [
   },
 ]
 
-export const MOCK_LOCATIONS: DashboardCard[] = [
-  {
-    id: 'madison-square-garden',
-    title: 'Madison Square Garden',
-    description: 'A landmark arena ready for premium licensing opportunities.',
-    imageUrl: DEFAULT_IMAGE_URL,
-  },
-  {
-    id: 'montreal-forum',
-    title: 'Montreal Forum',
-    description: 'Historic venue energy with archival and cultural appeal.',
-    imageUrl: DEFAULT_IMAGE_URL,
-  },
-  {
-    id: 'downtown-amsterdam',
-    title: 'Downtown Amsterdam',
-    description: 'Canals, bikes, and city texture for place-based campaigns.',
-    imageUrl: DEFAULT_IMAGE_URL,
-  },
-  {
-    id: 'cn-tower',
-    title: 'CN Tower',
-    description: 'An unmistakable skyline icon with global recognition.',
-    imageUrl: DEFAULT_IMAGE_URL,
-  },
-  {
-    id: 'nashville',
-    title: 'Nashville',
-    description: 'A neon-lit music district with an immediately readable mood.',
-    imageUrl: DEFAULT_IMAGE_URL,
-  },
-]
-
 export function toDashboardCards(items: LikenessItem[]): DashboardCard[] {
   return items.slice(0, 5).map((item) => ({
     id: item.id,
     title: item.name || 'Unnamed likeness',
     description: item.bio || 'No biography available yet.',
+    imageUrl: item.imageUrl,
+  }))
+}
+
+export function toLocationDashboardCards(items: LocationItem[]): DashboardCard[] {
+  return items.slice(0, 5).map((item) => ({
+    id: item.id,
+    title: item.name || 'Unnamed location',
+    description: item.description || 'No description available yet.',
     imageUrl: item.imageUrl,
   }))
 }

@@ -17,8 +17,8 @@
 
   const navItems = [
     { label: 'Creative Works', disabled: true },
-    { label: 'Location', disabled: true },
     { label: 'Likeness', href: '/authed/likeness' },
+    { label: 'Location', href: '/authed/location' },
     { label: 'Purchases', href: '/authed/purchases', searchable: false },
   ]
 

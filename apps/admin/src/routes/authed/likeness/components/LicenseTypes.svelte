@@ -61,18 +61,6 @@
                   <p class="text-xs font-medium text-red-600">Minimum price is $0.50</p>
                 {/if}
               </div>
-
-              {#if license.hasDropdown && license.dropdownOptions}
-                <select
-                  value={$likenessStore.licensing.licenseDropdowns[license.id]}
-                  onchange={(e) => likenessStore.setLicenseTypeDropdown(license.id, e.currentTarget.value)}
-                  class="select h-10.5 w-31.25 border border-[#ddd4cc] rounded-sm bg-white px-2 text-sm text-[#1A1A2E] focus:outline-none focus:border-primary"
-                >
-                  {#each license.dropdownOptions as opt (opt)}
-                    <option value={opt}>{opt}</option>
-                  {/each}
-                </select>
-              {/if}
             </div>
           </div>
           <p class="text-xs text-[#71707a] mt-1 max-w-md">{license.description}</p>

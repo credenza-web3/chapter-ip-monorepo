@@ -1,0 +1,92 @@
+import { describe, expect, it } from 'vitest'
+import {
+  DEFAULT_IMAGE_URL,
+  RECENT_LIMIT,
+  buildLocationFindContentInput,
+  getPreviewUrl,
+  getRecentLocations,
+  toLocationItems,
+} from './location'
+
+const CONTRACT_ADDRESS = '0xcontent'
+
+describe('location data helpers', () => {
+  it('maps location metadata with the location preview and excludes other content types', () => {
+    const items = toLocationItems(
+      [
+        {
+          id: 'location-1',
+          metadata: {
+            type: 'location',
+            name: 'Madison Square Garden',
+            description: 'A landmark arena.',
+            file_name: 'location_1.jpg',
+          },
+        },
+        { id: 'other', metadata: { type: 'likeness' } },
+      ],
+      CONTRACT_ADDRESS,
+    )
+
+    expect(items).toMatchObject([
+      {
+        id: 'location-1',
+        name: 'Madison Square Garden',
+        description: 'A landmark arena.',
+        imageUrl: getPreviewUrl(CONTRACT_ADDRESS, 'location-1', 'location_1.jpg'),
+      },
+    ])
+  })
+
+  it('uses the default image when file_name is missing', () => {
+    const items = toLocationItems(
+      [
+        {
+          id: 'location-2',
+          metadata: {
+            type: 'location',
+            name: 'Empty Preview',
+            description: 'No preview file yet.',
+          },
+        },
+      ],
+      CONTRACT_ADDRESS,
+    )
+
+    expect(items).toMatchObject([
+      {
+        id: 'location-2',
+        name: 'Empty Preview',
+        imageUrl: DEFAULT_IMAGE_URL,
+      },
+    ])
+  })
+
+  it('builds preview URLs from the contract, content id, and technical filename', () => {
+    expect(getPreviewUrl(CONTRACT_ADDRESS, 'location-1', 'location_1')).toBe(
+      'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/location-1/location_1',
+    )
+  })
+
+  it('limits recent locations without changing grid items', () => {
+    const items = Array.from({ length: RECENT_LIMIT + 3 }, (_, index) => ({
+      id: String(index),
+      name: `Name ${index}`,
+      description: '',
+      imageUrl: DEFAULT_IMAGE_URL,
+    }))
+
+    expect(getRecentLocations(items)).toHaveLength(RECENT_LIMIT)
+    expect(items).toHaveLength(RECENT_LIMIT + 3)
+  })
+
+  it('builds a backend-compatible findContent query with the location metadata filter', () => {
+    expect(buildLocationFindContentInput(CONTRACT_ADDRESS)).toEqual({
+      contractAddress: CONTRACT_ADDRESS,
+      metadata: { and: [{ field: 'type', op: 'eq', val: 'location' }] },
+      sort: 'createdAt',
+      order: 'desc',
+      status: 'ACTIVE',
+    })
+  })
+})

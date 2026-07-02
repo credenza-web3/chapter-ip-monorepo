@@ -7,6 +7,9 @@ describe('likeness purchase mapper', () => {
       {
         id: 'likeness-1',
         tokenId: '123',
+        sub: 'sub-1',
+        status: 'active',
+        contractAddress: '0xcontent',
         metadata: {
           type: 'likeness',
           profile: {
@@ -29,7 +32,6 @@ describe('likeness purchase mapper', () => {
           licensing: {
             licenseTypes: { 'single-use': true, perpetual: false },
             licensePrices: { 'single-use': '10' },
-            licenseDropdowns: {},
             permittedUses: { ai: true, commercial: false, digital: true },
             territories: ['United States only'],
             allowRetouching: 'no',
@@ -118,7 +120,18 @@ describe('likeness purchase mapper', () => {
   })
 
   it('rejects content that is not a likeness', () => {
-    expect(normalizeLikeness({ id: 'other', metadata: { type: 'written-work' } }, '0xcontent')).toBeNull()
+    expect(
+      normalizeLikeness(
+        {
+          id: 'other',
+          metadata: { type: 'written-work' },
+          sub: 'sub-1',
+          status: 'active',
+          contractAddress: '0xcontent',
+        },
+        '0xcontent',
+      ),
+    ).toBeNull()
   })
 
   it('uses defaults for partial likeness metadata and falls back when no image media exists', () => {
@@ -126,6 +139,9 @@ describe('likeness purchase mapper', () => {
       {
         id: 'partial-likeness',
         tokenId: ' 456 ',
+        sub: 'sub-1',
+        status: 'active',
+        contractAddress: '0xcontent',
         metadata: {
           type: 'likeness',
           profile: {
@@ -193,6 +209,9 @@ describe('likeness purchase mapper', () => {
     const purchase = normalizeLikeness(
       {
         id: 'empty-likeness',
+        sub: 'sub-1',
+        status: 'active',
+        contractAddress: '0xcontent',
         metadata: { type: 'likeness' },
       },
       '0xcontent',

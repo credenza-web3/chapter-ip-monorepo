@@ -1,10 +1,12 @@
 <script lang="ts">
-  import { MOCK_CREATIVE_WORKS, MOCK_LOCATIONS, toDashboardCards, type DashboardSection } from './dashboard'
+  import { MOCK_CREATIVE_WORKS, toDashboardCards, toLocationDashboardCards, type DashboardSection } from './dashboard'
   import { DEFAULT_IMAGE_URL } from './likeness/likeness'
   import type { LikenessItem } from './likeness/likeness'
+  import type { LocationItem } from './location/location'
 
-  let { likenessItems } = $props<{
+  let { likenessItems, locationItems } = $props<{
     likenessItems: LikenessItem[]
+    locationItems: LocationItem[]
   }>()
 
   const sections = $derived<DashboardSection[]>([
@@ -15,16 +17,10 @@
       items: toDashboardCards(likenessItems),
     },
     {
-      title: 'Creative Works',
-      ctaLabel: 'View all Creative Works',
-      disabled: true,
-      items: MOCK_CREATIVE_WORKS,
-    },
-    {
       title: 'Locations',
       ctaLabel: 'View all Locations',
-      disabled: true,
-      items: MOCK_LOCATIONS,
+      href: '/authed/location',
+      items: toLocationDashboardCards(locationItems),
     },
   ])
 
@@ -67,8 +63,8 @@
           <div class="grid grid-cols-1 gap-x-7 gap-y-8 min-[480px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
             {#each section.items as item (item.id)}
               <article class="min-w-0">
-                {#if section.title === 'Likeness'}
-                  <a href={`/authed/likeness/${item.id}`} class="group block">
+                {#if section.href && section.title === 'Likeness'}
+                  <a href={`${section.href}/${item.id}`} class="group block">
                     <img
                       src={item.imageUrl}
                       alt={item.title}
