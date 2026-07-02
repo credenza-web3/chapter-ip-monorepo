@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { useDefaultImage } from './LikenessDashboard.helpers'
+  import { useDefaultImage } from '$lib/content/image'
   import type { LikenessItem } from './likeness'
 
   let { items } = $props<{

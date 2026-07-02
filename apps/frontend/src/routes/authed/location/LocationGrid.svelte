@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { useDefaultImage } from './LocationDashboard.helpers'
+  import { useDefaultImage } from '$lib/content/image'
   import type { LocationItem } from './location'
 
   let { items } = $props<{

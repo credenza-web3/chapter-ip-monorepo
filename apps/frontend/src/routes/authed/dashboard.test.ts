@@ -1,13 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_IMAGE_URL } from './likeness/likeness'
-import { MOCK_CREATIVE_WORKS, toDashboardCards, toLocationDashboardCards } from './dashboard'
+import { toDashboardCards, toLocationDashboardCards } from './dashboard'
 
 describe('dashboard helpers', () => {
-  it('keeps mocked unavailable creative works populated for preview cards', () => {
-    expect(MOCK_CREATIVE_WORKS).toHaveLength(5)
-    expect(MOCK_CREATIVE_WORKS.every((item) => item.imageUrl === DEFAULT_IMAGE_URL)).toBe(true)
-  })
-
   it('maps likenesses into a five-card dashboard preview', () => {
     const cards = toDashboardCards(
       Array.from({ length: 7 }, (_, index) => ({

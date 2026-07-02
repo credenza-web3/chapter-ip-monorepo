@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { useDefaultImage } from './LocationDashboard.helpers'
+  import { useDefaultImage } from '$lib/content/image'
   import type { LocationItem } from './location'
 
   let { items } = $props<{

@@ -1,6 +1,6 @@
 import { goto } from '$app/navigation'
 import { currentUrlWithSearchParams } from '$lib/navigation/searchParams'
-import { DEFAULT_IMAGE_URL, createEmptyLikenessFilters, filtersToSearchParams, type LikenessFilters } from './likeness'
+import { createEmptyLikenessFilters, filtersToSearchParams, type LikenessFilters } from './likeness'
 import type { FilterMenu } from './LikenessDashboard.types'
 
 export function cloneFilters(value: LikenessFilters): LikenessFilters {
@@ -48,11 +48,6 @@ export function optionClasses(selected: boolean): string {
     'rounded-full border px-4 py-2 text-sm font-semibold transition-colors',
     selected ? 'border-primary bg-[#eee8ff] text-primary' : 'border-[#e4ded6] bg-[#efebe5] text-[#77757d]',
   ].join(' ')
-}
-
-export function useDefaultImage(event: Event) {
-  const image = event.currentTarget as HTMLImageElement
-  if (image.src !== DEFAULT_IMAGE_URL) image.src = DEFAULT_IMAGE_URL
 }
 
 export function updateLikenessFilterUrl(filters: LikenessFilters) {

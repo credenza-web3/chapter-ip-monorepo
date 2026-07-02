@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { MOCK_CREATIVE_WORKS, toDashboardCards, toLocationDashboardCards, type DashboardSection } from './dashboard'
-  import { DEFAULT_IMAGE_URL } from './likeness/likeness'
+  import { useDefaultImage } from '$lib/content/image'
+  import { toDashboardCards, toLocationDashboardCards, type DashboardSection } from './dashboard'
   import type { LikenessItem } from './likeness/likeness'
   import type { LocationItem } from './location/location'
 
@@ -23,11 +23,6 @@
       items: toLocationDashboardCards(locationItems),
     },
   ])
-
-  function useDefaultImage(event: Event) {
-    const image = event.currentTarget as HTMLImageElement
-    if (image.src !== DEFAULT_IMAGE_URL) image.src = DEFAULT_IMAGE_URL
-  }
 </script>
 
 <div class="mx-auto w-full max-w-360 px-2 py-5 sm:px-4 lg:px-8">

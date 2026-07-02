@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { useDefaultImage } from './LikenessDashboard.helpers'
+  import { useDefaultImage } from '$lib/content/image'
   import type { LikenessItem } from './likeness'
 
   let { items, hasActiveFilters } = $props<{
