@@ -18,8 +18,8 @@
       title: 'Location',
       description: '3D scans of real-world locations for virtual production.',
       icon: LocationIcon,
-      path: '/authed/upload',
-      disabled: true,
+      path: '/authed/locations',
+      disabled: false,
     },
     {
       id: 'likeness',

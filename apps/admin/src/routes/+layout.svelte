@@ -9,7 +9,7 @@
 
   import { getTrpcClient } from '$lib/stores/trpc-client'
   import { NOTIFICATIONS_DROPDOWN_LIMIT } from '$lib/constants'
-  import { NOTIFICATION_TYPE, type TNotificationItem } from '@repo/notifications'
+  import { type TNotificationItem } from '@repo/notifications'
   import NotificationsDropdown from '$lib/components/NotificationsDropdown.svelte'
 
   let { children } = $props()
@@ -76,6 +76,7 @@
     <div class="flex h-full items-stretch w-full justify-between md:pl-15 pl-2">
       <div class="flex items-stretch">
         <NavLink href="/authed/files">Dashboard</NavLink>
+        <NavLink href="/authed/locations">Location</NavLink>
       </div>
       <div class="flex items-center md:gap-7.25 gap-4">
         <NotificationsDropdown />
