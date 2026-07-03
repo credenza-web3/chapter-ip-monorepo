@@ -1,12 +1,6 @@
-import type { YesNo } from './likeness'
-
 export type LocationLicensingMetadata = {
   licenseTypes: Record<string, boolean>
   licensePrices: Record<string, string>
-  permittedUses: Record<string, boolean>
-  territories: string[]
-  allowRetouching: YesNo
-  approveFinalUse: YesNo
   agreedToFee: boolean
 }
 

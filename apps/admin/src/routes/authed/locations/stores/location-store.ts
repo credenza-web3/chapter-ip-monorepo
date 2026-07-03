@@ -1,7 +1,6 @@
 import { writable, derived } from 'svelte/store'
 import type { AppRouter, TRPCClient } from '@repo/trpc/client'
 import { type LocationFileKey } from '$lib/constants/locationFileBuckets'
-import type { YesNo } from '@repo/content-types/likeness'
 import type { LocationLicensingMetadata, LocationMetadataInput } from '@repo/content-types/location'
 
 export type ExistingFile = { id: string; name: string; url: string }
@@ -69,10 +68,6 @@ function createLocationStore() {
         'ai-digital': '',
         bulk: '',
       },
-      permittedUses: {},
-      territories: ['United States only'],
-      allowRetouching: null,
-      approveFinalUse: null,
       agreedToFee: false,
     },
     confirmations: {
@@ -136,21 +131,6 @@ function createLocationStore() {
         }
         return { ...s, licensing: nextLicensing }
       }),
-    setPermittedUse: (id: string, value: boolean) =>
-      update((s) => ({
-        ...s,
-        licensing: { ...s.licensing, permittedUses: { ...s.licensing.permittedUses, [id]: value } },
-      })),
-    setAllPermittedUses: (ids: string[], value: boolean) =>
-      update((s) => ({
-        ...s,
-        licensing: { ...s.licensing, permittedUses: Object.fromEntries(ids.map((id) => [id, value])) },
-      })),
-    setTerritories: (territories: string[]) => update((s) => ({ ...s, licensing: { ...s.licensing, territories } })),
-    setAllowRetouching: (value: YesNo) =>
-      update((s) => ({ ...s, licensing: { ...s.licensing, allowRetouching: value } })),
-    setApproveFinalUse: (value: YesNo) =>
-      update((s) => ({ ...s, licensing: { ...s.licensing, approveFinalUse: value } })),
     setAgreedToFee: (value: boolean) => update((s) => ({ ...s, licensing: { ...s.licensing, agreedToFee: value } })),
     setRightsConfirmed: (value: boolean) =>
       update((s) => ({ ...s, confirmations: { ...s.confirmations, rightsConfirmed: value } })),
@@ -175,7 +155,6 @@ function createLocationStore() {
           ...licensing,
           licenseTypes: { ...s.licensing.licenseTypes, ...(licensing.licenseTypes ?? {}) },
           licensePrices: { ...s.licensing.licensePrices, ...(licensing.licensePrices ?? {}) },
-          permittedUses: { ...s.licensing.permittedUses, ...(licensing.permittedUses ?? {}) },
         },
         confirmations: { rightsConfirmed: true },
         existingFiles,
@@ -205,10 +184,6 @@ function createLocationStore() {
             'ai-digital': '',
             bulk: '',
           },
-          permittedUses: {},
-          territories: ['United States only'],
-          allowRetouching: null,
-          approveFinalUse: null,
           agreedToFee: false,
         },
         confirmations: { rightsConfirmed: false },

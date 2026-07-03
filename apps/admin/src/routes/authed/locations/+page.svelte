@@ -30,13 +30,14 @@
       file,
       name: uploadNames[index],
     }))
+    const { licenseTypes, licensePrices, agreedToFee } = $locationStore.licensing
     const metadata = {
       type: 'location' as const,
       name: $locationStore.name,
       description: $locationStore.description,
       tags: $locationStore.tags,
       file_name: LOCATION_FILENAME,
-      licensing: $locationStore.licensing,
+      licensing: { licenseTypes, licensePrices, agreedToFee },
     }
 
     return { uploads, metadata }
