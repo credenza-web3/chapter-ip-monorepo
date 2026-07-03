@@ -76,6 +76,10 @@
     imageInput?.click()
   }
 
+  function toggleRightsConfirmed() {
+    locationStore.setRightsConfirmed(!$locationStore.confirmations.rightsConfirmed)
+  }
+
   function removeFile(e: MouseEvent, index: number) {
     e.stopPropagation()
     locationStore.removeMediaFile('locations', index)
@@ -141,7 +145,7 @@
       Add keywords so creators can find this location — style, setting, era, or standout features.
     </p>
 
-    <div class="space-y-3">
+    <div class="space-y-3.5">
       <div class="w-full max-w-137.5">
         <input
           type="text"
@@ -153,15 +157,28 @@
         />
       </div>
 
+      <button
+        type="button"
+        onclick={addTag}
+        class="flex items-center gap-2 text-sm text-primary hover:underline mb-[25px]"
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 1V13M1 7H13" stroke="#6734FF" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        <span>Add another tag</span>
+      </button>
+
       {#if $locationStore.tags.length > 0}
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-wrap gap-2 mt-3.5">
           {#each $locationStore.tags as tag, i (tag + i)}
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#f2e3c8] text-sm text-dark">
+            <span
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 h-7.25 rounded-full bg-[#eae6e2] border border-[#ddd] text-base font-semibold text-[#202225] opacity-50"
+            >
               {tag}
               <button
                 type="button"
                 onclick={() => removeTag(i)}
-                class="text-[#d58b00] hover:text-red-500 transition-colors text-xs"
+                class="text-[#d58b00] hover:text-red-500 transition-colors text-xs leading-none"
                 aria-label="Remove tag {tag}"
               >
                 ✕
@@ -170,13 +187,6 @@
           {/each}
         </div>
       {/if}
-
-      <button type="button" onclick={addTag} class="flex items-center gap-2 text-sm text-primary hover:underline">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-          <path d="M7 1V13M1 7H13" stroke="#6734FF" stroke-width="2" stroke-linecap="round" />
-        </svg>
-        <span>Add another tag</span>
-      </button>
     </div>
   </div>
 
@@ -254,16 +264,31 @@
   </div>
 
   <!-- Legal disclaimer -->
-  <div class="flex gap-5 justify-center items-center">
-    <input
-      type="checkbox"
-      class="checkbox checkbox-primar"
-      bind:checked={$locationStore.confirmations.rightsConfirmed}
-    />
-    <p class="text-sm font-medium text-left text-[#747474]">
-      By uploading this content, you confirm that you are the author or rights holder and have the legal right to
-      license it.<span class="text-[#ff0000] pl-0.5">*</span>
-    </p>
+  <div class="flex justify-center">
+    <label class="flex items-center gap-3 cursor-pointer">
+      <button
+        type="button"
+        onclick={toggleRightsConfirmed}
+        class="w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors
+          {$locationStore.confirmations.rightsConfirmed ? 'bg-primary border-primary' : 'border-[#ddd] bg-white'}"
+      >
+        {#if $locationStore.confirmations.rightsConfirmed}
+          <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+            <path
+              d="M1 4L3.5 6.5L9 1"
+              stroke="white"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        {/if}
+      </button>
+      <span class="text-sm font-medium text-left text-[#747474]">
+        By uploading this content, you confirm that you are the author or rights holder and have the legal right to
+        license it.<span class="text-[#ff0000]">*</span>
+      </span>
+    </label>
   </div>
 </div>
 
