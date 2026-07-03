@@ -3,10 +3,10 @@ export interface TPurchaseHistoryItem {
   buyerAddress: string
   contentId: string
   licenseType: number
-  priceFiat: string
-  priceToken: string
-  priceEther: string
-  currencyTokenContract: string
+  priceFiat?: string
+  priceToken?: string
+  priceEther?: string
+  currencyTokenContract?: string
   txHash: string
   metadata?: Record<string, unknown>
   ownerId: string
