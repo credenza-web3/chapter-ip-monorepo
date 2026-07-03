@@ -1,8 +1,6 @@
 <script lang="ts">
   import { locationStore, isFormValid } from '../stores/location-store'
   import { LICENSE_TYPES } from '../constants/constants'
-  import ApprovalSettings from './ApprovalSettings.svelte'
-  import PermittedUses from './PermittedUses.svelte'
   import LicenseTypeRow from './LicenseTypeRow.svelte'
 
   let {
@@ -30,7 +28,7 @@
 
 <div class="space-y-12 mt-7.25 text-dark">
   <!-- Title Section -->
-  <div class="pb-6">
+  <div>
     <h2 class="mb-2 text-[28px] font-medium text-left text-dark font-heading">Licensing</h2>
     <p class="mt-3 text-base text-[#72717b]">
       Set how creators can license this location. Pick at least one and name your price. Royalties route to you.
@@ -43,17 +41,11 @@
     <h3 class="text-base font-semibold text-dark font-heading">License types <span class="text-[#ff0000]">*</span></h3>
 
     <div class="space-y-6">
-      {#each LICENSE_TYPES as license (license.id)}
+      {#each LICENSE_TYPES.filter((l) => l.id !== 'perpetual') as license (license.id)}
         <LicenseTypeRow {license} />
       {/each}
     </div>
   </div>
-
-  {@render divider('mx-10')}
-  <PermittedUses />
-  {@render divider()}
-  <ApprovalSettings />
-  {@render divider()}
 
   <!-- Fee Agreement -->
   <div class="flex justify-center">

@@ -145,9 +145,7 @@
               <span class="text-sm font-semibold text-dark">
                 $ {Number($locationStore.licensing.licensePrices[license.id] || 0).toLocaleString()}
               </span>
-              <span class="text-[10px] text-[#7a7a8a] ml-1">
-                {license.id === 'perpetual' ? 'USD/MO' : 'USD'}
-              </span>
+              <span class="text-[10px] text-[#7a7a8a] ml-1"> USD </span>
             </div>
           </div>
         {/each}

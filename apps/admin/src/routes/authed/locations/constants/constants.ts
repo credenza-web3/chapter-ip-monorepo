@@ -16,9 +16,13 @@ type PermittedUseOption = {
   description: string
 }
 
+const LICENSE_TYPE_LABELS: Record<string, string> = {
+  'single-use': 'One-time license',
+  perpetual: 'Subscription',
+}
+
 const LICENSE_TYPE_DESCRIPTIONS: Record<string, string> = {
-  'single-use':
-    'One approved use across a single campaign. Buyer cannot reuse the asset for a separate project, extend the run, or sublicense without purchasing a new license.',
+  'single-use': 'Clears this location for a single project. One use, one payment — no ongoing rights.',
   perpetual:
     'Ongoing partnership for buyers who want long-term association with your location. Priced as a recurring fee. End the license at any time to stop all future use.',
 }
@@ -32,7 +36,7 @@ const PERMITTED_USE_DESCRIPTIONS: Record<string, string> = {
 
 export const LICENSE_TYPES: LicenseTypeOption[] = LICENSE_TYPE_OPTIONS.map((option) => ({
   id: option.value,
-  label: option.label,
+  label: LICENSE_TYPE_LABELS[option.value] ?? option.label,
   description: LICENSE_TYPE_DESCRIPTIONS[option.value],
 }))
 

@@ -230,15 +230,6 @@ export const isFormValid = derived(locationStore, ($s) => {
   }
 
   const hasValidLicensePrice = enabledLicenseTypes.every(([id]) => Number($s.licensing.licensePrices[id] || 0) >= 0.5)
-  const hasPermittedUse = Object.values($s.licensing.permittedUses).some(Boolean)
 
-  return (
-    hasLicenseType &&
-    hasValidLicensePrice &&
-    hasPermittedUse &&
-    $s.licensing.territories.length > 0 &&
-    $s.licensing.allowRetouching !== null &&
-    $s.licensing.approveFinalUse !== null &&
-    $s.licensing.agreedToFee
-  )
+  return hasLicenseType && hasValidLicensePrice && $s.licensing.agreedToFee
 })
