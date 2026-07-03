@@ -1,0 +1,60 @@
+import { LICENSE_TYPE_OPTIONS, PERMITTED_USE_OPTIONS } from '@repo/content-types/likeness'
+import type { AppRouter, TRPCClient } from '@repo/trpc/client'
+
+type UpdateContentMetadataInput = Parameters<TRPCClient<AppRouter>['contents']['updateContentMetadata']['mutate']>[0]
+export type StatusValue = NonNullable<UpdateContentMetadataInput['status']>
+
+type LicenseTypeOption = {
+  id: string
+  label: string
+  description: string
+}
+
+type PermittedUseOption = {
+  id: string
+  label: string
+  description: string
+}
+
+const LICENSE_TYPE_DESCRIPTIONS: Record<string, string> = {
+  'single-use':
+    'One approved use across a single campaign. Buyer cannot reuse the asset for a separate project, extend the run, or sublicense without purchasing a new license.',
+  perpetual:
+    'Ongoing partnership for buyers who want long-term association with your location. Priced as a recurring fee. End the license at any time to stop all future use.',
+}
+
+const PERMITTED_USE_DESCRIPTIONS: Record<string, string> = {
+  ai: 'Use of your location as training data for generative AI models. Every model trained on your data is logged on-chain, and you earn royalties on the outputs it produces.',
+  digital: 'Web, social, streaming, in-app, and any other screen-based placement that lives online.',
+  commercial: 'Advertising, brand campaigns, sponsorships, and any use tied to the sale of a product or service.',
+  'film-tv': 'Scripted, unscripted, and documentary productions for theatrical, broadcast, or streaming release.',
+}
+
+export const LICENSE_TYPES: LicenseTypeOption[] = LICENSE_TYPE_OPTIONS.map((option) => ({
+  id: option.value,
+  label: option.label,
+  description: LICENSE_TYPE_DESCRIPTIONS[option.value],
+}))
+
+export const PERMITTED_USES: PermittedUseOption[] = PERMITTED_USE_OPTIONS.map((option) => ({
+  id: option.value,
+  label: option.label,
+  description: PERMITTED_USE_DESCRIPTIONS[option.value],
+}))
+
+export const TERRITORIES = [
+  'Select all',
+  'Africa',
+  'Asia',
+  'Australia',
+  'Europe',
+  'North America',
+  'South America',
+  'United States only',
+]
+
+export const STATUS = {
+  DRAFT: 'DRAFT' as StatusValue,
+  ACTIVE: 'ACTIVE' as StatusValue,
+  SALE_DISABLED: 'SALE_DISABLED' as StatusValue,
+} as const

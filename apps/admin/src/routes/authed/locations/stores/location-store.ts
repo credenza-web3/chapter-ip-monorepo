@@ -1,0 +1,244 @@
+import { writable, derived } from 'svelte/store'
+import type { AppRouter, TRPCClient } from '@repo/trpc/client'
+import { type LocationFileKey } from '$lib/constants/locationFileBuckets'
+import type { YesNo } from '@repo/content-types/likeness'
+import type { LocationLicensingMetadata, LocationMetadataInput } from '@repo/content-types/location'
+
+export type ExistingFile = { id: string; name: string; url: string }
+export type ExistingFilesByBucket = Record<LocationFileKey, ExistingFile[]>
+
+const emptyExistingFiles = (): ExistingFilesByBucket => ({
+  locations: [],
+})
+
+export async function loadExistingFiles(
+  content: { id: string; metadata?: LocationMetadataInput },
+  trpcClient: TRPCClient<AppRouter>,
+): Promise<ExistingFilesByBucket> {
+  const existingFiles = emptyExistingFiles()
+
+  if (!content.id) return existingFiles
+
+  const { files } = await trpcClient.contents.getContentAllFilesLink.query({ contentId: content.id })
+
+  for (const file of files ?? []) {
+    existingFiles.locations.push({ id: file.id, name: file.label, url: file.url })
+  }
+
+  return existingFiles
+}
+
+interface LocationState {
+  files: {
+    locations: File[]
+  }
+  name: string
+  description: string
+  tags: string[]
+  licensing: LocationLicensingMetadata
+  confirmations: {
+    rightsConfirmed: boolean
+  }
+  existingFiles: ExistingFilesByBucket
+  isEditing: boolean
+  ui: {
+    loading: boolean
+  }
+}
+
+function createLocationStore() {
+  const { subscribe, set, update } = writable<LocationState>({
+    files: {
+      locations: [],
+    },
+    name: '',
+    description: '',
+    tags: [],
+    licensing: {
+      licenseTypes: {
+        'single-use': false,
+        'time-limited': false,
+        perpetual: false,
+        'ai-digital': false,
+        bulk: false,
+      },
+      licensePrices: {
+        'single-use': '',
+        'time-limited': '',
+        perpetual: '',
+        'ai-digital': '',
+        bulk: '',
+      },
+      permittedUses: {},
+      territories: ['United States only'],
+      allowRetouching: null,
+      approveFinalUse: null,
+      agreedToFee: false,
+    },
+    confirmations: {
+      rightsConfirmed: false,
+    },
+    existingFiles: emptyExistingFiles(),
+    isEditing: false,
+    ui: {
+      loading: false,
+    },
+  })
+
+  return {
+    subscribe,
+    set,
+    appendMediaFiles(key: LocationFileKey, newFiles: File[]) {
+      update((s) => ({
+        ...s,
+        files: {
+          ...s.files,
+          [key]: [...(s.files[key] as File[]), ...newFiles],
+        },
+      }))
+    },
+    removeMediaFile(key: LocationFileKey, index: number) {
+      update((s) => ({
+        ...s,
+        files: {
+          ...s.files,
+          [key]: (s.files[key] as File[]).filter((_, i) => i !== index),
+        },
+      }))
+    },
+    removeExistingFile(key: LocationFileKey, index: number) {
+      update((s) => ({
+        ...s,
+        existingFiles: {
+          ...s.existingFiles,
+          [key]: s.existingFiles[key].filter((_, i) => i !== index),
+        },
+      }))
+    },
+    setName: (value: string) => update((s) => ({ ...s, name: value })),
+    setDescription: (value: string) => update((s) => ({ ...s, description: value })),
+    setTags: (value: string[]) => update((s) => ({ ...s, tags: value })),
+    setLicenseTypeEnabled: (id: string, value: boolean) =>
+      update((s) => {
+        const nextLicensing = {
+          ...s.licensing,
+          licenseTypes: { ...s.licensing.licenseTypes, [id]: value },
+          licensePrices: { ...s.licensing.licensePrices, [id]: value ? s.licensing.licensePrices[id] : '' },
+        }
+        return { ...s, licensing: nextLicensing }
+      }),
+    setLicenseTypePrice: (id: string, value: string) =>
+      update((s) => {
+        const safeValue = value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')
+        const nextLicensing = {
+          ...s.licensing,
+          licensePrices: { ...s.licensing.licensePrices, [id]: safeValue },
+        }
+        return { ...s, licensing: nextLicensing }
+      }),
+    setPermittedUse: (id: string, value: boolean) =>
+      update((s) => ({
+        ...s,
+        licensing: { ...s.licensing, permittedUses: { ...s.licensing.permittedUses, [id]: value } },
+      })),
+    setAllPermittedUses: (ids: string[], value: boolean) =>
+      update((s) => ({
+        ...s,
+        licensing: { ...s.licensing, permittedUses: Object.fromEntries(ids.map((id) => [id, value])) },
+      })),
+    setTerritories: (territories: string[]) => update((s) => ({ ...s, licensing: { ...s.licensing, territories } })),
+    setAllowRetouching: (value: YesNo) =>
+      update((s) => ({ ...s, licensing: { ...s.licensing, allowRetouching: value } })),
+    setApproveFinalUse: (value: YesNo) =>
+      update((s) => ({ ...s, licensing: { ...s.licensing, approveFinalUse: value } })),
+    setAgreedToFee: (value: boolean) => update((s) => ({ ...s, licensing: { ...s.licensing, agreedToFee: value } })),
+    setRightsConfirmed: (value: boolean) =>
+      update((s) => ({ ...s, confirmations: { ...s.confirmations, rightsConfirmed: value } })),
+    setLoading: (loading: boolean) => update((s) => ({ ...s, ui: { ...s.ui, loading } })),
+    hydrateFromContent(
+      content: { metadata?: LocationMetadataInput },
+      existingFiles: ExistingFilesByBucket = emptyExistingFiles(),
+    ) {
+      const metadata = (content.metadata ?? {}) as Record<string, unknown>
+      const name = (metadata.name as string) ?? ''
+      const description = (metadata.description as string) ?? ''
+      const tags = (metadata.tags as string[]) ?? []
+      const licensing = (metadata.licensing ?? {}) as Partial<LocationLicensingMetadata>
+
+      update((s) => ({
+        ...s,
+        name,
+        description,
+        tags,
+        licensing: {
+          ...s.licensing,
+          ...licensing,
+          licenseTypes: { ...s.licensing.licenseTypes, ...(licensing.licenseTypes ?? {}) },
+          licensePrices: { ...s.licensing.licensePrices, ...(licensing.licensePrices ?? {}) },
+          permittedUses: { ...s.licensing.permittedUses, ...(licensing.permittedUses ?? {}) },
+        },
+        confirmations: { rightsConfirmed: true },
+        existingFiles,
+        isEditing: Object.values(existingFiles).some((files) => files.length > 0),
+      }))
+    },
+    reset: () =>
+      set({
+        files: {
+          locations: [],
+        },
+        name: '',
+        description: '',
+        tags: [],
+        licensing: {
+          licenseTypes: {
+            'single-use': true,
+            'time-limited': false,
+            perpetual: false,
+            'ai-digital': false,
+            bulk: false,
+          },
+          licensePrices: {
+            'single-use': '',
+            'time-limited': '',
+            perpetual: '',
+            'ai-digital': '',
+            bulk: '',
+          },
+          permittedUses: {},
+          territories: ['United States only'],
+          allowRetouching: null,
+          approveFinalUse: null,
+          agreedToFee: false,
+        },
+        confirmations: { rightsConfirmed: false },
+        existingFiles: emptyExistingFiles(),
+        isEditing: false,
+        ui: { loading: false },
+      }),
+  }
+}
+
+export const locationStore = createLocationStore()
+
+export const isFormValid = derived(locationStore, ($s) => {
+  const enabledLicenseTypes = Object.entries($s.licensing.licenseTypes).filter(([, enabled]) => enabled)
+  const hasLicenseType = enabledLicenseTypes.length > 0
+
+  if ($s.isEditing) {
+    return hasLicenseType
+  }
+
+  const hasValidLicensePrice = enabledLicenseTypes.every(([id]) => Number($s.licensing.licensePrices[id] || 0) >= 0.5)
+  const hasPermittedUse = Object.values($s.licensing.permittedUses).some(Boolean)
+
+  return (
+    hasLicenseType &&
+    hasValidLicensePrice &&
+    hasPermittedUse &&
+    $s.licensing.territories.length > 0 &&
+    $s.licensing.allowRetouching !== null &&
+    $s.licensing.approveFinalUse !== null &&
+    $s.licensing.agreedToFee
+  )
+})
