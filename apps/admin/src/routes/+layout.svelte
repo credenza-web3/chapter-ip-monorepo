@@ -76,7 +76,6 @@
     <div class="flex h-full items-stretch w-full justify-between md:pl-15 pl-2">
       <div class="flex items-stretch">
         <NavLink href="/authed/files">Dashboard</NavLink>
-        <NavLink href="/authed/locations">Location</NavLink>
       </div>
       <div class="flex items-center md:gap-7.25 gap-4">
         <NotificationsDropdown />
