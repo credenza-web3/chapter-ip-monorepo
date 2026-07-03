@@ -1,9 +1,10 @@
 export function getMenuItems(contentId: string, contentType?: string) {
-  const editHref = String(contentType ?? '')
-    .toLowerCase()
-    .includes('likeness')
+  const type = String(contentType ?? '').toLowerCase()
+  const editHref = type.includes('likeness')
     ? `/authed/likeness/${contentId}`
-    : `/authed/files/${contentId}`
+    : type.includes('location')
+      ? `/authed/locations/${contentId}`
+      : `/authed/files/${contentId}`
 
   return [
     // {
