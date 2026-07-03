@@ -78,12 +78,32 @@
     <MediaUpload label="Voice samples" fileKey="voiceSamples" mediaKind="audio" />
     <MediaUpload label="Video reels" fileKey="videoReels" mediaKind="video" />
   </div>
-  <div class="flex gap-5 justify-center items-center">
-    <input type="checkbox" class="checkbox" bind:checked={$likenessStore.confirmations.rightsConfirmed} />
-    <p class="text-sm font-medium text-left text-[#747474]">
-      By uploading this content, you confirm that you are the author or rights holder and have the legal right to
-      license it.<span class="text-[#ff0000] pl-0.5">*</span>
-    </p>
+
+  <div class="flex justify-center">
+    <label class="flex items-center gap-3 cursor-pointer">
+      <button
+        type="button"
+        onclick={() => likenessStore.setRightsConfirmed(!$likenessStore.confirmations.rightsConfirmed)}
+        class="w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors
+            {$likenessStore.confirmations.rightsConfirmed ? 'bg-primary border-primary' : 'border-[#ddd] bg-white'}"
+      >
+        {#if $likenessStore.confirmations.rightsConfirmed}
+          <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+            <path
+              d="M1 4L3.5 6.5L9 1"
+              stroke="white"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        {/if}
+      </button>
+      <span class="text-sm font-medium text-left text-[#747474]">
+        By uploading this content, you confirm that you are the author or rights holder and have the legal right to
+        license it.<span class="text-[#ff0000]">*</span>
+      </span>
+    </label>
   </div>
 </div>
 
