@@ -99,6 +99,7 @@
     </div>
     <div class="pt-9">
       {#each sortedNotifications as tx, i (tx.id)}
+        {console.log(tx)}
         {@const payload = tx.payload as Record<string, unknown> | undefined}
         {@const content = payload?.['content'] as Record<string, unknown> | undefined}
         {@const metadata = content?.['metadata'] as Record<string, unknown> | undefined}

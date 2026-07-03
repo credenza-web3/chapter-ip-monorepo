@@ -26,12 +26,12 @@
     //   text: 'New Written Works',
     //   href: '/authed/',
     // },
-    // {
-    //   text: 'New Location',
-    //   href: '/authed/location',
-    // },
     {
-      text: 'New Likeness',
+      text: 'New Location',
+      href: '/authed/locations',
+    },
+    {
+      text: 'New Likenes',
       href: '/authed/likeness',
     },
   ]
