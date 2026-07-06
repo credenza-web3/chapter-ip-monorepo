@@ -22,7 +22,7 @@ test('renders active likeness and location dashboard links with real cards', asy
     ],
   })
 
-  await expect.element(screen.getByRole('heading', { name: 'ChapterIP' })).toBeVisible()
+  await expect.element(screen.getByRole('img', { name: 'ChapterIP' })).toBeVisible()
   await expect.element(screen.getByRole('heading', { name: 'Locations' })).toBeVisible()
   await expect.element(screen.getByRole('heading', { name: 'Likeness' })).toBeVisible()
   await expect

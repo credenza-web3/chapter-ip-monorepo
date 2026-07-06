@@ -1,6 +1,6 @@
 <script lang="ts">
+  import CompatiblePlatforms from '$lib/content/CompatiblePlatforms.svelte'
   import type { LocationDetails } from '@repo/content-types/location'
-  import { COMPATIBLE_PLATFORMS } from '@repo/content-types/location'
 
   let {
     location,
@@ -85,10 +85,10 @@
         </section>
       {/if}
 
-      <section aria-label="Compatible platforms">
-        <h3 class="text-base leading-5 font-semibold text-[#1a1a2e]">Compatible with</h3>
-        <p class="mt-2">{COMPATIBLE_PLATFORMS.join(', ')}</p>
-      </section>
+      <CompatiblePlatforms
+        headingClass="text-base leading-5 font-semibold text-[#1a1a2e]"
+        gridClass="mt-3 grid grid-cols-2 gap-3"
+      />
     </div>
   </div>
 </div>

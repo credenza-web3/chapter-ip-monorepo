@@ -35,8 +35,6 @@ export const LOCATION_LICENSE_DESCRIPTIONS: Record<string, string> = {
   'single-use': 'Clears this location for a single project. One use, one payment — no ongoing rights.',
 }
 
-export const COMPATIBLE_PLATFORMS = ['DaVinci', 'Luma', 'Runway', 'Flowith'] as const
-
 export type LocationLicense = {
   id: string
   name: string

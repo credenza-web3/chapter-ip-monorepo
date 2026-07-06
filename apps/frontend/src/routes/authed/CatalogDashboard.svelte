@@ -1,4 +1,5 @@
 <script lang="ts">
+  import chapterLogoUrl from '$lib/assets/chapter-new-logo.png'
   import { useDefaultImage } from '$lib/content/image'
   import { toDashboardCards, toLocationDashboardCards, type DashboardSection } from './dashboard'
   import type { LikenessItem } from './likeness/likeness'
@@ -27,8 +28,12 @@
 
 <div class="mx-auto w-full max-w-360 px-2 py-5 sm:px-4 lg:px-8">
   <header class="mb-8">
-    <h1 class="text-2xl font-bold leading-tight text-dark">ChapterIP</h1>
-    <p class="mt-1 text-sm font-medium text-[#7b7881] sm:text-base">What do you want to license today?</p>
+    <div class="flex justify-center">
+      <img src={chapterLogoUrl} alt="ChapterIP" class="w-[300px] object-contain" />
+    </div>
+    <p class="mt-1 text-center text-base font-medium text-[#7b7881]">
+      Infrastructure for media IP licensing in the AI age.
+    </p>
   </header>
 
   <div class="space-y-12 lg:space-y-14">
