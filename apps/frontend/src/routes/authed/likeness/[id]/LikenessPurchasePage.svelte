@@ -1,10 +1,10 @@
 <script lang="ts">
-  import ImageLightbox from './ImageLightbox.svelte'
+  import ImageLightbox from '$lib/content/ImageLightbox.svelte'
+  import LicenseSelection from '$lib/content/LicenseSelection.svelte'
+  import { canPurchaseLicense, purchaseLicense } from '$lib/content/purchaseLicense'
   import LikenessMediaGrid from './LikenessMediaGrid.svelte'
   import LikenessProfileDetails from './LikenessProfileDetails.svelte'
-  import LicenseSelection from './LicenseSelection.svelte'
   import PermittedUses from './PermittedUses.svelte'
-  import { canPurchaseLicense, purchaseLicense } from './purchaseLicense'
   import type { LikenessDetails } from './types'
 
   let { likenessDetails }: { likenessDetails: LikenessDetails } = $props()
@@ -62,5 +62,5 @@
 </article>
 
 {#if selectedImage}
-  <ImageLightbox image={selectedImage} onClose={() => (selectedImage = null)} />
+  <ImageLightbox image={selectedImage} dialogLabel="Enlarged likeness image" onClose={() => (selectedImage = null)} />
 {/if}

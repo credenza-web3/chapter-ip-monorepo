@@ -58,7 +58,7 @@
           <div class="grid grid-cols-1 gap-x-7 gap-y-8 min-[480px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
             {#each section.items as item (item.id)}
               <article class="min-w-0">
-                {#if section.href && section.title === 'Likeness'}
+                {#if section.href && !section.disabled}
                   <a href={`${section.href}/${item.id}`} class="group block">
                     <img
                       src={item.imageUrl}

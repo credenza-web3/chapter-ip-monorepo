@@ -143,9 +143,6 @@ export type LikenessContent = {
   tokenId?: string
   metadata?: LikenessMetadataInput
   files?: ContentFile[]
-  sub: string
-  status: string
-  contractAddress: string
 }
 
 export type LikenessAffiliation = {

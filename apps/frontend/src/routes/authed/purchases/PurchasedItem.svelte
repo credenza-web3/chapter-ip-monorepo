@@ -3,18 +3,23 @@
   import { showSaveFilePicker } from 'native-file-system-adapter'
   import mime from 'mime/lite'
 
-  import type { LikenessDetails } from '@repo/content-types/likeness'
-  import LikenessLicenseModal from './LikenessLicenseModal.svelte'
   import DownloadFilesModal from './DownloadFilesModal.svelte'
-  import type { ContentFilesLinkClient, DownloadableContentFile, PurchasedContentToken } from './types'
+  import LikenessLicenseModal from './LikenessLicenseModal.svelte'
+  import LocationLicenseModal from './LocationLicenseModal.svelte'
+  import type {
+    ContentFilesLinkClient,
+    DownloadableContentFile,
+    PurchasedItemView,
+    PurchasedContentToken,
+  } from './types'
 
   let {
     purchase,
-    likeness,
+    item,
     trpcClient,
   }: {
     purchase: PurchasedContentToken
-    likeness: LikenessDetails
+    item: PurchasedItemView
     trpcClient: ContentFilesLinkClient | undefined
   } = $props()
 
@@ -23,12 +28,10 @@
   let isDownloading = $state(false)
   let isModalOpen = $state(false)
   let isFallbackModalOpen = $state(false)
-  let fallbackFiles: DownloadableContentFile[] = []
+  let fallbackFiles: DownloadableContentFile[] = $state([])
   let errorMessage = $state('')
 
-  const primaryImage = $derived(likeness.images[0])
-  const byline = $derived(`by ${likeness.stageName || likeness.name}`)
-  const modalTitleId = $derived(`likeness-license-${purchase.licenseTokenId}`)
+  const modalTitleId = $derived(`${item.type}-license-${purchase.licenseTokenId}`)
   const canDownload = $derived(!isBlocked && !isDownloading)
 
   $effect(() => {
@@ -68,7 +71,7 @@
     let fileHandle
     try {
       fileHandle = await showSaveFilePicker({
-        suggestedName: `${likeness.name}.zip`,
+        suggestedName: `${item.downloadName}.zip`,
         types: [
           {
             description: 'ZIP Archive',
@@ -158,13 +161,15 @@
   class="grid gap-4 py-6 md:grid-cols-[160px_minmax(0,1fr)_auto] md:items-center md:gap-6 md:py-8 lg:grid-cols-[168px_minmax(0,1fr)_auto]"
 >
   <div class="size-24 overflow-hidden bg-[#1a1a2e] md:size-[160px] lg:size-[168px]">
-    <img src={primaryImage.src} alt={primaryImage.alt} class="size-full object-cover" />
+    <img src={item.image.src} alt={item.image.alt} class="size-full object-cover" />
   </div>
 
   <div class="min-w-0">
-    <p class="text-xs leading-4 font-semibold tracking-[0.14em] text-primary uppercase">Likeness</p>
-    <h2 class="mt-1 truncate font-heading text-xl leading-6 font-semibold text-[#1a1a2e]">{likeness.name}</h2>
-    <p class="mt-1 truncate text-sm leading-5 text-[#6d6a73]">{byline}</p>
+    <p class="text-xs leading-4 font-semibold tracking-[0.14em] text-primary uppercase">{item.categoryLabel}</p>
+    <h2 class="mt-1 truncate font-heading text-xl leading-6 font-semibold text-[#1a1a2e]">{item.name}</h2>
+    {#if item.byline}
+      <p class="mt-1 truncate text-sm leading-5 text-[#6d6a73]">{item.byline}</p>
+    {/if}
     {#if isBlocked}
       <p class="mt-2 text-sm leading-5 font-medium text-[#9f2f2f]">Already used</p>
     {:else if errorMessage}
@@ -198,9 +203,13 @@
 </article>
 
 {#if isModalOpen}
-  <LikenessLicenseModal {likeness} {byline} titleId={modalTitleId} onClose={closeModal} />
+  {#if item.type === 'likeness'}
+    <LikenessLicenseModal likeness={item.likeness} byline={item.byline} titleId={modalTitleId} onClose={closeModal} />
+  {:else}
+    <LocationLicenseModal location={item.location} byline={item.byline} titleId={modalTitleId} onClose={closeModal} />
+  {/if}
 {/if}
 
 {#if isFallbackModalOpen}
-  <DownloadFilesModal files={fallbackFiles} title={likeness.name} onClose={closeFallbackModal} />
+  <DownloadFilesModal files={fallbackFiles} title={item.downloadName} onClose={closeFallbackModal} />
 {/if}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { LikenessLicense } from './types'
+  import type { ContentLicense } from './licensing'
 
   let {
     licenses,
@@ -8,13 +8,15 @@
     onPurchase,
     purchaseDisabled,
     purchasePending,
+    purchaseLabel = 'Buy License',
   }: {
-    licenses: LikenessLicense[]
+    licenses: ContentLicense[]
     selectedLicenseId: string
     onSelect: (licenseId: string) => void
     onPurchase: () => void
     purchaseDisabled: boolean
     purchasePending: boolean
+    purchaseLabel?: string
   } = $props()
 
   const selectedLicense = $derived(licenses.find((license) => license.id === selectedLicenseId))
@@ -26,7 +28,7 @@
     <div class="mt-6.25 overflow-hidden rounded-xs bg-cream">
       {#each licenses as license, i (license.id)}
         <label
-          class={`relative flex min-h-32.75 cursor-pointer gap-2.5 border px-3.75 py-3.5 font-sans transition-colors ${i === 0 ? 'rounded-t-lg' : ''} ${i === 1 ? 'rounded-b-lg' : ''} ${
+          class={`relative flex min-h-32.75 cursor-pointer gap-2.5 border px-3.75 py-3.5 font-sans transition-colors ${i === 0 ? 'rounded-t-lg' : ''} ${i === licenses.length - 1 ? 'rounded-b-lg' : ''} ${
             selectedLicenseId === license.id ? 'z-10 border-primary bg-[#f8f5f1]' : '-mt-px border-[#1a1a2e1a] bg-cream'
           }`}
         >
@@ -55,10 +57,7 @@
               class="flex flex-col gap-1 min-[480px]:flex-row min-[480px]:items-start min-[480px]:justify-between min-[480px]:gap-4"
             >
               <span class="font-semibold leading-5.25 text-[#202225]">{license.name}</span>
-              <span class="font-semibold leading-5.25 text-[#202225] min-[480px]:shrink-0">
-                ${license.price}{#if license.detail}
-                  / {license.detail}{/if}
-              </span>
+              <span class="font-semibold leading-5.25 text-[#202225] min-[480px]:shrink-0">${license.price}</span>
             </span>
             {#if license.description}
               <span class="mt-2 block max-w-112.5 text-sm leading-5.25 font-medium text-[#747474]">
@@ -85,7 +84,7 @@
       onclick={onPurchase}
       class={`mt-1.75 h-13 w-full rounded-[3px] bg-primary px-5 font-heading text-base font-medium text-cream transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${purchaseDisabled ? 'cursor-not-allowed opacity-50' : 'hover:opacity-90'}`}
     >
-      {purchasePending ? 'Processing...' : 'Buy License'}
+      {purchasePending ? 'Processing...' : purchaseLabel}
     </button>
   </section>
 {/if}

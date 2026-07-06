@@ -48,6 +48,7 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
         licenseTokenId: licenseTokenIdString,
         isBlocked: blockedLicensesIds.includes(licenseTokenIdString),
         contentTokenId: Number(contentTokenId),
+        sub: content.sub,
         metadata: content.metadata ?? {},
         files: contentWithFiles.files ?? [],
         licenseType: licenseType.toString(),

@@ -4,8 +4,14 @@ import { configStore, ContractName } from '$lib/stores/config.svelte'
 import { ethers, getSigner, initProvider } from '@repo/fe-evm-provider'
 import { forwardTransaction } from '@repo/fe-services'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { canPurchaseLicense, getPurchaseLicenseType, parsePassportPayment, purchaseLicense } from './purchaseLicense'
-import type { LikenessLicense, LikenessPurchase } from './types'
+import {
+  canPurchaseLicense,
+  getPurchaseLicenseType,
+  parsePassportPayment,
+  purchaseLicense,
+  type PurchasableContent,
+  type PurchasableLicense,
+} from './purchaseLicense'
 
 type PaymentCallback = (payload: unknown) => void
 
@@ -64,45 +70,24 @@ vi.mock('svelte/store', () => ({
   get: vi.fn((store: object) => (store === mocks.passportStoreValue ? mocks.passportMock : undefined)),
 }))
 
-const basePurchase: LikenessPurchase = {
-  id: 'likeness-1',
+const basePurchase: PurchasableContent = {
   contentTokenId: '123',
   name: 'Avery Stone',
-  stageName: 'Avery',
-  bio: '',
-  attributes: [],
-  affiliations: [],
-  licenses: [],
-  permittedUses: [],
-  territories: [],
-  allowRetouching: false,
-  approveFinalUse: false,
-  images: [],
-  media: [],
 }
 
-const perpetualLicense: LikenessLicense = {
+const perpetualLicense: PurchasableLicense = {
   id: 'perpetual',
   name: 'Perpetual',
-  price: '100',
-  detail: '',
-  description: '',
 }
 
-const singleUseLicense: LikenessLicense = {
+const singleUseLicense: PurchasableLicense = {
   id: 'single-use',
   name: 'Single-use',
-  price: '10',
-  detail: '',
-  description: '',
 }
 
-const unsupportedLicense: LikenessLicense = {
+const unsupportedLicense: PurchasableLicense = {
   id: 'limited-run',
   name: 'Limited run',
-  price: '25',
-  detail: '',
-  description: '',
 }
 
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0))

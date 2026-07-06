@@ -7,7 +7,7 @@ import type { LikenessPurchase } from './types'
 const canPurchaseLicenseMock = vi.hoisted(() => vi.fn(() => true))
 const purchaseLicenseMock = vi.hoisted(() => vi.fn())
 
-vi.mock('./purchaseLicense', () => ({
+vi.mock('$lib/content/purchaseLicense', () => ({
   canPurchaseLicense: canPurchaseLicenseMock,
   purchaseLicense: purchaseLicenseMock,
 }))

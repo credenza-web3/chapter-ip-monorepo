@@ -28,3 +28,36 @@ export type LocationContent = {
   status: string
   contractAddress: string
 }
+
+export const LICENSE_TYPE_OPTIONS = [{ value: 'single-use', label: 'One-time license' }] as const
+
+export const LOCATION_LICENSE_DESCRIPTIONS: Record<string, string> = {
+  'single-use': 'Clears this location for a single project. One use, one payment — no ongoing rights.',
+}
+
+export const COMPATIBLE_PLATFORMS = ['DaVinci', 'Luma', 'Runway', 'Flowith'] as const
+
+export type LocationLicense = {
+  id: string
+  name: string
+  price: string
+  description: string
+}
+
+export type LocationImage = {
+  src: string
+  alt: string
+}
+
+export type LocationDetails = {
+  id: string
+  contentTokenId?: string
+  name: string
+  description: string
+  tags: string[]
+  authorName: string
+  licenses: LocationLicense[]
+  image: LocationImage
+}
+
+export type LocationPurchase = LocationDetails
