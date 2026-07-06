@@ -1,7 +1,7 @@
 <script lang="ts">
+  import CompatiblePlatforms from '$lib/content/CompatiblePlatforms.svelte'
   import ImageLightbox from '$lib/content/ImageLightbox.svelte'
   import { canPurchaseLicense, purchaseLicense } from '$lib/content/purchaseLicense'
-  import { COMPATIBLE_PLATFORMS } from '@repo/content-types/location'
   import type { LocationDetails } from './types'
 
   let { locationDetails }: { locationDetails: LocationDetails } = $props()
@@ -76,20 +76,11 @@
         </ul>
       {/if}
 
-      <section aria-labelledby="compatible-heading" class="mt-8.75">
-        <h2 id="compatible-heading" class="font-sans text-base leading-5.25 font-semibold text-[#202225]">
-          Compatible with
-        </h2>
-        <div class="mt-4 grid grid-cols-2 gap-3 sm:max-w-md">
-          {#each COMPATIBLE_PLATFORMS as platform (platform)}
-            <div
-              class="flex h-11 items-center justify-center rounded-3xl border border-[#1a1a2e1a] bg-white px-4 text-sm font-semibold text-[#202225]"
-            >
-              {platform}
-            </div>
-          {/each}
-        </div>
-      </section>
+      <CompatiblePlatforms
+        headingId="compatible-heading"
+        class="mt-8.75"
+        headingClass="font-sans text-base leading-5.25 font-semibold text-[#202225]"
+      />
     </div>
 
     <div class="min-w-0">

@@ -199,7 +199,10 @@ test('opens location license details in an accessible modal', async () => {
   await expect.element(dialog).toBeVisible()
   await expect.element(dialog.getByText('A baseball stadium in Queens, New York.')).toBeVisible()
   await expect.element(dialog.getByText('One-time license')).toBeVisible()
-  await expect.element(dialog.getByText('DaVinci, Luma, Runway, Flowith')).toBeVisible()
+  await expect.element(dialog.getByRole('img', { name: 'DaVinci' })).toBeVisible()
+  await expect.element(dialog.getByRole('img', { name: 'Luma' })).toBeVisible()
+  await expect.element(dialog.getByRole('img', { name: 'Runway' })).toBeVisible()
+  await expect.element(dialog.getByRole('img', { name: 'Flowith' })).toBeVisible()
 })
 
 test('downloads all content files and blocks one-time licenses locally', async () => {
