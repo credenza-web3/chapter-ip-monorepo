@@ -25,6 +25,7 @@ export type LocationItem = {
   name: string
   description: string
   imageUrl: string
+  authorName?: string
 }
 
 type ContentItem = {
