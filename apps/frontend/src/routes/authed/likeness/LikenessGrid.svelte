@@ -15,12 +15,12 @@
         <img
           src={item.imageUrl}
           alt={item.name || 'Likeness'}
-          class="aspect-square w-full rounded-lg object-cover transition-opacity group-hover:opacity-85"
+          class="aspect-square w-full rounded-lg object-contain transition-opacity group-hover:opacity-85"
           onerror={useDefaultImage}
         />
         <h3 class="mt-3 truncate text-base font-semibold text-dark">{item.name || 'Unnamed likeness'}</h3>
         {#if item.bio}
-          <p class="mt-1 line-clamp-2 text-sm leading-[18px] text-[#77757d]">{item.bio}</p>
+          <p class="mt-1 line-clamp-2 text-sm leading-4.5 text-[#77757d]">{item.bio}</p>
         {/if}
       </a>
     {/each}

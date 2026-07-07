@@ -14,12 +14,12 @@
         <img
           src={item.imageUrl}
           alt={item.name || 'Location'}
-          class="aspect-square w-full rounded-lg object-cover transition-opacity group-hover:opacity-85"
+          class="aspect-square w-full rounded-lg object-contain transition-opacity group-hover:opacity-85"
           onerror={useDefaultImage}
         />
         <h3 class="mt-3 truncate text-base font-semibold text-dark">{item.name || 'Unnamed location'}</h3>
         {#if item.description}
-          <p class="mt-1 line-clamp-2 text-sm leading-[18px] text-[#77757d]">{item.description}</p>
+          <p class="mt-1 line-clamp-2 text-sm leading-4.5 text-[#77757d]">{item.description}</p>
         {/if}
       </a>
     {/each}
