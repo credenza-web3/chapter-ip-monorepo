@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import { useDefaultImage } from '$lib/content/image'
   import type { LikenessItem } from './likeness'
+  import forwardBackwardArrow from '$lib/assets/back.svg'
 
   let { items } = $props<{
     items: LikenessItem[]
@@ -39,20 +40,20 @@
         <button
           type="button"
           aria-label="Previous likenesses"
-          class="flex size-7 items-center justify-center rounded-md border border-[#ddd8d1] bg-transparent text-lg disabled:opacity-30"
+          class="flex size-7 items-center justify-center rounded-[5px] text-lg disabled:opacity-30 border border-[#1A1A2E1A] bg-cream"
           disabled={!canScrollBack}
           onclick={() => scrollCarousel(-1)}
         >
-          ‹
+          <img src={forwardBackwardArrow} alt="Previous" />
         </button>
         <button
           type="button"
           aria-label="Next likenesses"
-          class="flex size-7 items-center justify-center rounded-md border border-[#ddd8d1] bg-transparent text-lg disabled:opacity-30"
+          class="flex size-7 items-center justify-center rounded-[5px] text-lg disabled:opacity-30 border border-[#1A1A2E1A] bg-cream"
           disabled={!canScrollForward}
           onclick={() => scrollCarousel(1)}
         >
-          ›
+          <img src={forwardBackwardArrow} alt="Next" class="rotate-180" />
         </button>
       </div>
     {/if}
@@ -96,5 +97,9 @@
 
   .carousel-track::-webkit-scrollbar {
     display: none;
+  }
+
+  .rotate-180 {
+    transform: rotate(180deg);
   }
 </style>
