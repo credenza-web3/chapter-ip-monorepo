@@ -95,7 +95,7 @@
                 {@const metadata = content?.['metadata'] as Record<string, unknown> | undefined}
                 {@const itemType = metadata?.['type'] as string | undefined}
                 {@const profile = metadata?.['profile'] as Record<string, unknown> | undefined}
-                {@const fullLikenesName = profile?.['fullLegalName'] as string | undefined}
+                {@const fullLikenessName = profile?.['fullLegalName'] as string | undefined}
                 {@const fullLocationsName = metadata?.['name'] as string | undefined}
                 <tr
                   class="border-b border-[#ddd] last:border-0 {activeMenuRow === i
@@ -109,7 +109,7 @@
                   <td class="px-4 py-1.5">{formatDate(tx.createdAt)}</td>
                   <td class="px-4 py-1.5">
                     <p class="text-[13px] font-semibold">
-                      {itemType ?? ''} [{fullLikenesName ?? fullLocationsName ?? ''}] {tx.type ===
+                      {itemType ?? ''} [{fullLikenessName ?? fullLocationsName ?? ''}] {tx.type ===
                       NOTIFICATION_TYPE.CONTENT_CREATED
                         ? 'added to your products'
                         : 'was purchased'}

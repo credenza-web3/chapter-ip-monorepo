@@ -104,7 +104,7 @@
         {@const metadata = content?.['metadata'] as Record<string, unknown> | undefined}
         {@const itemType = metadata?.['type'] as string | undefined}
         {@const profile = metadata?.['profile'] as Record<string, unknown> | undefined}
-        {@const fullLikenesName = profile?.['fullLegalName'] as string | undefined}
+        {@const fullLikenessName = profile?.['fullLegalName'] as string | undefined}
         {@const fullLocationsName = metadata?.['name'] as string | undefined}
         <li>
           <div class="flex items-start leading-0">
@@ -112,7 +112,7 @@
             <div class="flex flex-col items-between justify-start w-full">
               <div class="flex items-center justify-between w-full">
                 <p class="text-[13px] font-semibold flex-1 min-w-0 wrap-break-word leading-normal">
-                  {itemType ?? ''} [{fullLikenesName ?? fullLocationsName}] {tx.type ===
+                  {itemType ?? ''} [{fullLikenessName ?? fullLocationsName}] {tx.type ===
                   NOTIFICATION_TYPE.CONTENT_CREATED
                     ? 'added to your products'
                     : 'was purchased'}
