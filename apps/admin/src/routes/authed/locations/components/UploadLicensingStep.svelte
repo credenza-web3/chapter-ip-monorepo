@@ -37,7 +37,7 @@
     <h3 class="text-base font-semibold text-dark font-heading">License types <span class="text-[#ff0000]">*</span></h3>
 
     <div class="space-y-6">
-      {#each LICENSE_TYPES.filter((l) => l.id !== 'perpetual') as license (license.id)}
+      {#each LICENSE_TYPES as license (license.id)}
         <LicenseTypeRow {license} />
       {/each}
     </div>

@@ -56,17 +56,9 @@ function createLocationStore() {
     licensing: {
       licenseTypes: {
         'single-use': true,
-        'time-limited': false,
-        perpetual: false,
-        'ai-digital': false,
-        bulk: false,
       },
       licensePrices: {
         'single-use': '',
-        'time-limited': '',
-        perpetual: '',
-        'ai-digital': '',
-        bulk: '',
       },
       agreedToFee: false,
     },
@@ -170,17 +162,9 @@ function createLocationStore() {
         licensing: {
           licenseTypes: {
             'single-use': true,
-            'time-limited': false,
-            perpetual: false,
-            'ai-digital': false,
-            bulk: false,
           },
           licensePrices: {
             'single-use': '',
-            'time-limited': '',
-            perpetual: '',
-            'ai-digital': '',
-            bulk: '',
           },
           agreedToFee: false,
         },

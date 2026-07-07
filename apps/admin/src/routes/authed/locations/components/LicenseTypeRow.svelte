@@ -12,8 +12,6 @@
   let { license }: { license: LicenseType } = $props()
 
   const isEnabled = $derived($locationStore.licensing.licenseTypes[license.id])
-  const priceSuffix = $derived(license.id === 'perpetual' ? 'USD/MO' : 'USD')
-
   const isPriceTooLow = (value: string) => value !== '' && Number(value) < MIN_PRICE
 </script>
 
@@ -85,10 +83,10 @@
               }
             }}
             onwheel={(e) => e.preventDefault()}
-            placeholder={license.id === 'perpetual' ? '5,000' : '2,000'}
+            placeholder="2,000"
             class="flex-1 h-full w-20 font-medium focus:outline-none pr-2 text-[#30364b]"
           />
-          <span class="px-2.5 text-[10px] text-[#30364b]/50 whitespace-nowrap">{priceSuffix}</span>
+          <span class="px-2.5 text-[10px] text-[#30364b]/50 whitespace-nowrap">USD</span>
         </div>
 
         {#if isEnabled && ($locationStore.licensing.licensePrices[license.id] === '' || isPriceTooLow($locationStore.licensing.licensePrices[license.id]))}
