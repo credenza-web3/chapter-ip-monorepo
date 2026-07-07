@@ -1,4 +1,5 @@
 <script lang="ts">
+  import chapterLogoUrl from '$lib/assets/chapter-new-logo.png'
   import { useDefaultImage } from '$lib/content/image'
   import { toDashboardCards, toLocationDashboardCards, type DashboardSection } from './dashboard'
   import type { LikenessItem } from './likeness/likeness'
@@ -27,8 +28,12 @@
 
 <div class="mx-auto w-full max-w-360 px-2 py-5 sm:px-4 lg:px-8">
   <header class="mb-8">
-    <h1 class="text-2xl font-bold leading-tight text-dark">ChapterIP</h1>
-    <p class="mt-1 text-sm font-medium text-[#7b7881] sm:text-base">What do you want to license today?</p>
+    <div class="flex justify-center">
+      <img src={chapterLogoUrl} alt="ChapterIP" class="w-[300px] object-contain" />
+    </div>
+    <p class="mt-1 text-center text-base font-medium text-[#7b7881]">
+      Infrastructure for media IP licensing in the AI age.
+    </p>
   </header>
 
   <div class="space-y-12 lg:space-y-14">
@@ -58,7 +63,7 @@
           <div class="grid grid-cols-1 gap-x-7 gap-y-8 min-[480px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
             {#each section.items as item (item.id)}
               <article class="min-w-0">
-                {#if section.href && section.title === 'Likeness'}
+                {#if section.href && !section.disabled}
                   <a href={`${section.href}/${item.id}`} class="group block">
                     <img
                       src={item.imageUrl}

@@ -65,7 +65,8 @@
       onscroll={updateCarouselState}
     >
       {#each items as item (item.id)}
-        <article
+        <a
+          href={`/authed/location/${item.id}`}
           class="flex w-[min(88vw,382px)] shrink-0 snap-start gap-3 rounded-sm border border-[#ddd8d1] p-2.5 sm:w-[382px]"
         >
           <img
@@ -80,7 +81,7 @@
               <p class="mt-1 line-clamp-2 text-sm leading-5 text-[#77757d]">{item.description}</p>
             {/if}
           </div>
-        </article>
+        </a>
       {/each}
     </div>
   {:else}

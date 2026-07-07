@@ -22,8 +22,7 @@ test('renders active likeness and location dashboard links with real cards', asy
     ],
   })
 
-  await expect.element(screen.getByRole('heading', { name: 'ChapterIP' })).toBeVisible()
-  await expect.element(screen.getByRole('heading', { name: 'Creative Works' })).toBeVisible()
+  await expect.element(screen.getByRole('img', { name: 'ChapterIP' })).toBeVisible()
   await expect.element(screen.getByRole('heading', { name: 'Locations' })).toBeVisible()
   await expect.element(screen.getByRole('heading', { name: 'Likeness' })).toBeVisible()
   await expect
@@ -32,9 +31,9 @@ test('renders active likeness and location dashboard links with real cards', asy
   await expect
     .element(screen.getByRole('link', { name: 'View all Locations' }))
     .toHaveAttribute('href', '/authed/location')
-  expect(document.querySelectorAll('[aria-disabled="true"]')).toHaveLength(1)
+  expect(document.querySelectorAll('[aria-disabled="true"]')).toHaveLength(0)
   expect(document.querySelectorAll('a[href="/authed/likeness/likeness-1"]')).toHaveLength(1)
-  expect(document.querySelectorAll('a[href="/authed/location/location-1"]')).toHaveLength(0)
+  expect(document.querySelectorAll('a[href="/authed/location/location-1"]')).toHaveLength(1)
   expect(document.querySelector('img[alt="Avery Stone"]')?.getAttribute('src')).toBe('/avery.jpg')
   expect(document.querySelector('img[alt="Madison Square Garden"]')?.getAttribute('src')).toBe('/msg.jpg')
 })

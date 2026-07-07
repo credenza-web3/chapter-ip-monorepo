@@ -6,13 +6,22 @@ import { Passport } from '@credenza3/passport-evm'
 import { ethers, initProvider, getSigner } from '@repo/fe-evm-provider'
 import { forwardTransaction } from '@repo/fe-services'
 import { get } from 'svelte/store'
-import type { LikenessDetails, LikenessLicense } from '@repo/content-types/likeness'
 
 type PurchaseLicenseType = '0' | '2'
 
+export type PurchasableContent = {
+  contentTokenId?: string | number | null
+  name: string
+}
+
+export type PurchasableLicense = {
+  id: string
+  name: string
+}
+
 type PurchaseLicenseInput = {
-  purchase: LikenessDetails
-  license: LikenessLicense
+  purchase: PurchasableContent
+  license: PurchasableLicense
 }
 
 type PassportPaymentEvent = {
@@ -36,8 +45,8 @@ type TLicenseVoucher = Record<string, number | string>
 type PurchaseContext = {
   passport: Passport
   accessToken: string
-  purchase: LikenessDetails
-  license: LikenessLicense
+  purchase: PurchasableContent
+  license: PurchasableLicense
   licenseType: PurchaseLicenseType
   contentTokenId: string
   contentContract: string
@@ -55,11 +64,11 @@ export function getPurchaseLicenseType(licenseId: string): PurchaseLicenseType |
   return LICENSE_TYPES[licenseId] ?? null
 }
 
-function normalizeTokenId(tokenId: LikenessDetails['contentTokenId']): string {
+function normalizeTokenId(tokenId: PurchasableContent['contentTokenId']): string {
   return tokenId == null ? '' : String(tokenId).trim()
 }
 
-export function canPurchaseLicense(purchase: LikenessDetails, license: LikenessLicense | undefined): boolean {
+export function canPurchaseLicense(purchase: PurchasableContent, license: PurchasableLicense | undefined): boolean {
   return Boolean(license && getPurchaseLicenseType(license.id) && normalizeTokenId(purchase.contentTokenId))
 }
 
