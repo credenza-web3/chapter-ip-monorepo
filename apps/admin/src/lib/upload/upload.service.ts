@@ -23,14 +23,17 @@ export default class UploadService {
 
   async registerDraftContent({
     metadata,
+    tags,
     trpcClient,
   }: {
     metadata: Record<string, unknown>
+    tags?: string[]
     trpcClient: TRPCClient<AppRouter>
   }): Promise<{ contentId: string }> {
     const { id } = await trpcClient.contents.registerContent.mutate({
       metadata,
-    })
+      ...(tags !== undefined ? { tags } : {}),
+    } as Parameters<TRPCClient<AppRouter>['contents']['registerContent']['mutate']>[0])
 
     return { contentId: id }
   }
@@ -118,13 +121,15 @@ export default class UploadService {
   async saveDraftContent({
     uploads,
     metadata,
+    tags,
     trpcClient,
   }: {
     uploads: NamedUpload[]
     metadata: Record<string, unknown>
+    tags?: string[]
     trpcClient: TRPCClient<AppRouter>
   }): Promise<{ contentId: string; keys: string[] }> {
-    const { contentId } = await this.registerDraftContent({ metadata, trpcClient })
+    const { contentId } = await this.registerDraftContent({ metadata, tags, trpcClient })
     const { keys } = await this.uploadContentFiles({ contentId, uploads, trpcClient })
 
     return { contentId, keys }
@@ -138,16 +143,19 @@ export default class UploadService {
     contentId,
     tokenId,
     metadata,
+    tags,
     trpcClient,
   }: {
     contentId: string
     tokenId: string
     metadata: Record<string, unknown>
+    tags?: string[]
     trpcClient: TRPCClient<AppRouter>
   }): Promise<void> {
     await this.updateContentMetadata({
       contentId,
       metadata,
+      tags,
       tokenId,
       status: STATUS.ACTIVE,
       trpcClient,
@@ -159,20 +167,23 @@ export default class UploadService {
     tokenId,
     status,
     metadata,
+    tags,
     trpcClient,
   }: {
     contentId: string
     tokenId?: string
     status?: StatusValue
     metadata?: UpdateContentMetadataInput['metadata']
+    tags?: string[]
     trpcClient: TRPCClient<AppRouter>
   }): Promise<void> {
-    const input: UpdateContentMetadataInput = {
+    const input = {
       contentId,
       ...(metadata !== undefined ? { metadata } : {}),
+      ...(tags !== undefined ? { tags } : {}),
       ...(tokenId ? { tokenId } : {}),
       ...(status ? { status } : {}),
-    }
+    } as UpdateContentMetadataInput
     await trpcClient.contents.updateContentMetadata.mutate(input)
   }
 

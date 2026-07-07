@@ -126,13 +126,13 @@ function createLocationStore() {
       update((s) => ({ ...s, confirmations: { ...s.confirmations, rightsConfirmed: value } })),
     setLoading: (loading: boolean) => update((s) => ({ ...s, ui: { ...s.ui, loading } })),
     hydrateFromContent(
-      content: { metadata?: LocationMetadataInput },
+      content: { metadata?: LocationMetadataInput; tags?: string[] },
       existingFiles: ExistingFilesByBucket = emptyExistingFiles(),
     ) {
       const metadata = (content.metadata ?? {}) as Record<string, unknown>
       const name = (metadata.name as string) ?? ''
       const description = (metadata.description as string) ?? ''
-      const tags = (metadata.tags as string[]) ?? []
+      const tags = content.tags ?? (metadata.tags as string[] | undefined) ?? []
       const licensing = (metadata.licensing ?? {}) as Partial<LocationLicensingMetadata>
 
       update((s) => ({

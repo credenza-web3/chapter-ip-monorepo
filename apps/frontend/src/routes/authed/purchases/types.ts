@@ -23,6 +23,7 @@ export type PurchasedContentToken = {
   tokenId: string
   contentTokenId: number
   sub?: string
+  tags?: string[]
   metadata: ContentTokenMetadata
   files: PurchasedContentFile[]
   licenseType: string

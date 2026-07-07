@@ -1,3 +1,7 @@
+import type { Content, ContentFile } from './content'
+
+export type { ContentFile } from './content'
+
 export type YesNo = 'yes' | 'no' | null
 
 export type LikenessOption = { value: string; label: string }
@@ -131,19 +135,7 @@ export type LikenessMetadataInput = {
   uploadsByBucket?: Record<string, string[]>
 }
 
-export type ContentFile = {
-  id: string
-  filename: string
-  label: string
-  mimetype: string
-}
-
-export type LikenessContent = {
-  id: string
-  tokenId?: string
-  metadata?: LikenessMetadataInput
-  files?: ContentFile[]
-}
+export type LikenessContent = Content<LikenessMetadataInput>
 
 export type LikenessAffiliation = {
   union: string

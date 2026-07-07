@@ -34,11 +34,11 @@ const locationPurchase: PurchasedContentToken = {
   tokenId: '202',
   contentTokenId: 202,
   sub: 'publisher-2',
+  tags: ['Baseball'],
   metadata: {
     type: 'location',
     name: 'Citi Field',
     description: 'A baseball stadium in Queens, New York.',
-    tags: ['Baseball'],
     file_name: 'citi-field.jpg',
     licensing: {
       licenseTypes: { 'single-use': true, perpetual: true },

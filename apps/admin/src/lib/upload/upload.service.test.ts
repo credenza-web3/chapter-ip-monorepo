@@ -175,6 +175,24 @@ describe('UploadService', () => {
     })
   })
 
+  it('passes tags to registerContent when saving a draft', async () => {
+    const original = new File(['original'], 'location.jpg', { type: 'image/jpeg' })
+    const { client } = createTrpcClient()
+    const service = new UploadService({ mintWithPrices: vi.fn() } as never)
+
+    await service.saveDraftContent({
+      uploads: [{ file: original, name: 'location' }],
+      metadata: { type: 'location', name: 'Citi Field' },
+      tags: ['Baseball', 'Queens'],
+      trpcClient: client as never,
+    })
+
+    expect(client.contents.registerContent.mutate).toHaveBeenCalledWith({
+      metadata: { type: 'location', name: 'Citi Field' },
+      tags: ['Baseball', 'Queens'],
+    })
+  })
+
   it('updates existing content files by removing deleted files and uploading new files', async () => {
     const newFile = new File(['original'], 'headshot.png', { type: 'image/png' })
     const { client, createContentFileUploadUrl, registerContentFile } = createTrpcClient()
@@ -253,6 +271,24 @@ describe('UploadService', () => {
       metadata: { type: 'likeness' },
       tokenId: 'token-id',
       status: STATUS.DRAFT,
+    })
+  })
+
+  it('passes tags to updateContentMetadata when provided', async () => {
+    const { client } = createTrpcClient()
+    const service = new UploadService({ mintWithPrices: vi.fn() } as never)
+
+    await service.updateContentMetadata({
+      contentId: 'content-id',
+      metadata: { type: 'location', name: 'Citi Field' },
+      tags: ['Baseball'],
+      trpcClient: client as never,
+    })
+
+    expect(client.contents.updateContentMetadata.mutate).toHaveBeenCalledWith({
+      contentId: 'content-id',
+      metadata: { type: 'location', name: 'Citi Field' },
+      tags: ['Baseball'],
     })
   })
 
