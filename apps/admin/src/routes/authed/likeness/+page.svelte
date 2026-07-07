@@ -89,7 +89,6 @@
       const { contentId, keys } = await uploadService.saveDraftContent({ trpcClient, uploads, metadata })
 
       const tokenId = await uploadService.mintContent({
-        lifetimePrice: Number($likenessStore.licensing.licensePrices['perpetual']),
         oneTimePrice: Number($likenessStore.licensing.licensePrices['single-use']),
       })
       await uploadService.finalizeContent({ trpcClient, contentId, metadata, tokenId })

@@ -73,7 +73,6 @@
       const { contentId, keys } = await uploadService.saveDraftContent({ trpcClient, uploads, metadata })
 
       const tokenId = await uploadService.mintContent({
-        lifetimePrice: Number($locationStore.licensing.licensePrices['perpetual']),
         oneTimePrice: Number($locationStore.licensing.licensePrices['single-use']),
       })
       await uploadService.finalizeContent({ trpcClient, contentId, metadata, tokenId })

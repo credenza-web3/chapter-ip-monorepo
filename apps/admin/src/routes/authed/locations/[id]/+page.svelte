@@ -81,7 +81,6 @@
   }
 
   const getLicensePrices = () => ({
-    lifetimePrice: Number($locationStore.licensing.licensePrices['perpetual']),
     oneTimePrice: Number($locationStore.licensing.licensePrices['single-use']),
   })
 

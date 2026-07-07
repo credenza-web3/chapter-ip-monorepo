@@ -130,8 +130,8 @@ export default class UploadService {
     return { contentId, keys }
   }
 
-  async mintContent({ lifetimePrice, oneTimePrice }: { lifetimePrice: number; oneTimePrice: number }): Promise<string> {
-    return await this.transactionService.mintWithPrices(authStore.state.accessToken!, lifetimePrice, oneTimePrice)
+  async mintContent({ oneTimePrice }: { oneTimePrice: number }): Promise<string> {
+    return await this.transactionService.mintWithPrices(authStore.state.accessToken!, oneTimePrice)
   }
 
   async finalizeContent({

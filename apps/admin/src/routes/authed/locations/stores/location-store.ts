@@ -55,7 +55,7 @@ function createLocationStore() {
     tags: [],
     licensing: {
       licenseTypes: {
-        'single-use': false,
+        'single-use': true,
         'time-limited': false,
         perpetual: false,
         'ai-digital': false,
