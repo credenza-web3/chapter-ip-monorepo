@@ -31,7 +31,7 @@
       href: '/authed/locations',
     },
     {
-      text: 'New Likenes',
+      text: 'New Likeness',
       href: '/authed/likeness',
     },
   ]
