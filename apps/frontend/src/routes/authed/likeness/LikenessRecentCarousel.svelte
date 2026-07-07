@@ -68,7 +68,7 @@
       {#each items as item (item.id)}
         <a
           href={`/authed/likeness/${item.id}`}
-          class="flex w-[min(88vw,382px)] shrink-0 snap-start gap-3 rounded-sm border border-[#ddd8d1] p-2.5 sm:w-[382px]"
+          class="flex w-[min(88vw,382px)] shrink-0 snap-start gap-3 rounded-sm border border-[#ddd8d1] p-2.5 sm:w-95.5"
         >
           <img
             src={item.imageUrl}

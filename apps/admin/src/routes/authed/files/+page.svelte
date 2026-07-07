@@ -41,7 +41,7 @@
       .filter(([, value]) => value)
       .map(([key]) => key)
 
-  let rows = $state(
+  const rows = $derived(
     data.items
       .map((item) => ({
         id: item.id,
@@ -67,8 +67,6 @@
   const writtenWorksCount = $derived(rows.filter((row) => row.fileType === 'Written works').length)
   const locationsCount = $derived(rows.filter((row) => row.fileType === 'Locations').length)
   const likenessCount = $derived(rows.filter((row) => row.fileType === 'Likeness').length)
-
-  $inspect(paginatedRows)
 </script>
 
 <div class="min-h-xl md:p-8 p-y-6 border border-[#eef2f6] rounded-3xl bg-[#f8f5f1]">
