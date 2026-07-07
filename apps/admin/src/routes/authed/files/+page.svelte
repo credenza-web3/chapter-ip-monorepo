@@ -46,7 +46,11 @@
       .map((item) => ({
         id: item.id,
         item,
-        listingName: item?.metadata?.profile?.fullLegalName || item?.metadata?.profile?.stageName || 'Untitled',
+        listingName:
+          item?.metadata?.profile?.fullLegalName ||
+          item?.metadata?.profile?.stageName ||
+          item?.metadata?.name ||
+          'Untitled',
         fileType: normalizeFileType(item?.metadata?.type),
         licenseType: getLicenseTypes(item.metadata as TMetadata),
         status: item.status,
