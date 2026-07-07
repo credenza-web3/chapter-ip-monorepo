@@ -67,6 +67,8 @@
   const writtenWorksCount = $derived(rows.filter((row) => row.fileType === 'Written works').length)
   const locationsCount = $derived(rows.filter((row) => row.fileType === 'Locations').length)
   const likenessCount = $derived(rows.filter((row) => row.fileType === 'Likeness').length)
+
+  $inspect(paginatedRows)
 </script>
 
 <div class="min-h-xl md:p-8 p-y-6 border border-[#eef2f6] rounded-3xl bg-[#f8f5f1]">
@@ -157,7 +159,7 @@
                     </td>
 
                     <td class="px-4 py-1.5">
-                      ${formatKM(Number(row.revenue.token) / 1e6)}
+                      ${formatKM(Number(row.revenue.fiat) / 1e2)}
                     </td>
                     <td class="px-4 py-1.5 text-right">
                       <RowActionMenu
