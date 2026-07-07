@@ -17,9 +17,7 @@
     locationStore.setAgreedToFee(!$locationStore.licensing.agreedToFee)
   }
 
-  const canContinueFromStepTwo = $derived(
-    Boolean(!$locationStore.ui.loading && primaryLocationFile && $locationStore.licensing.agreedToFee),
-  )
+  const canContinue = $derived(Boolean($isFormValid && !$locationStore.ui.loading && primaryLocationFile))
 </script>
 
 <div class="space-y-12 mt-7.25 text-dark">
@@ -90,17 +88,13 @@
   >
     Go back
   </button>
-  {#if $isFormValid}
-    <button
-      class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-primary disabled:bg-[#e1dddb] text-cream cursor-pointer"
-      onclick={() => (currentStep = 3)}
-      disabled={!canContinueFromStepTwo}
-    >
-      Save and Continue
-    </button>
-  {:else}
-    <button class="text-sm font-medium rounded-sm h-9.5 px-7.5 bg-[#e1dddb] text-cream cursor-not-allowed" disabled>
-      Save and Continue
-    </button>
-  {/if}
+  <button
+    class="text-sm font-medium rounded-sm h-9.5 px-7.5 {canContinue
+      ? 'bg-primary cursor-pointer'
+      : 'bg-[#e1dddb] cursor-not-allowed'} text-cream"
+    onclick={() => canContinue && (currentStep = 3)}
+    disabled={!canContinue}
+  >
+    Save and Continue
+  </button>
 </div>
