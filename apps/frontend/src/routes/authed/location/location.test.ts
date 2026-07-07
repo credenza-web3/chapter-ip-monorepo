@@ -2,10 +2,14 @@ import { describe, expect, it } from 'vitest'
 import {
   DEFAULT_IMAGE_URL,
   RECENT_LIMIT,
+  buildLocationFilterInput,
   buildLocationFindContentInput,
+  createEmptyLocationFilters,
   getPreviewUrl,
   getRecentLocations,
+  parseLocationFilters,
   toLocationItems,
+  type LocationFilters,
 } from './location'
 
 const CONTRACT_ADDRESS = '0xcontent'
@@ -87,6 +91,32 @@ describe('location data helpers', () => {
       sort: 'createdAt',
       order: 'desc',
       status: 'ACTIVE',
+    })
+  })
+
+  it('parses location search query params', () => {
+    expect(parseLocationFilters(new URLSearchParams('q=Madison'))).toEqual({
+      query: 'Madison',
+    })
+    expect(parseLocationFilters(new URLSearchParams())).toEqual(createEmptyLocationFilters())
+  })
+
+  it('builds the backend filter tree from location search filters', () => {
+    const filters: LocationFilters = {
+      ...createEmptyLocationFilters(),
+      query: 'Madison',
+    }
+
+    expect(buildLocationFilterInput(filters)).toEqual({
+      and: [
+        { field: 'type', op: 'eq', val: 'location' },
+        {
+          or: [
+            { field: 'name', op: 'regex', val: '[mM][aA][dD][iI][sS][oO][nN]' },
+            { field: 'description', op: 'regex', val: '[mM][aA][dD][iI][sS][oO][nN]' },
+          ],
+        },
+      ],
     })
   })
 })

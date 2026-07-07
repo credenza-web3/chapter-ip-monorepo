@@ -137,14 +137,14 @@ function createLocationStore() {
 
       update((s) => ({
         ...s,
-        name,
-        description,
-        tags,
+        name: name ?? '',
+        description: description ?? '',
+        tags: tags ?? [],
         licensing: {
           ...s.licensing,
           ...licensing,
-          licenseTypes: { ...s.licensing.licenseTypes, ...(licensing.licenseTypes ?? {}) },
-          licensePrices: { ...s.licensing.licensePrices, ...(licensing.licensePrices ?? {}) },
+          licenseTypes: { ...s.licensing.licenseTypes, ...(licensing?.licenseTypes ?? {}) },
+          licensePrices: { ...s.licensing.licensePrices, ...(licensing?.licensePrices ?? {}) },
         },
         confirmations: { rightsConfirmed: true },
         existingFiles,

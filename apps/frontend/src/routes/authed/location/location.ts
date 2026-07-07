@@ -8,9 +8,11 @@ export const RECENT_LIMIT = 10
 
 type EqualityFilterValue = string | number | boolean | null
 
-export type LocationFilterCondition = { field: string; op: 'eq'; val: EqualityFilterValue }
+export type LocationFilterCondition =
+  | { field: string; op: 'eq'; val: EqualityFilterValue }
+  | { field: string; op: 'regex'; val: string }
 
-export type LocationFilterNode = LocationFilterCondition | { and: LocationFilterNode[] }
+export type LocationFilterNode = LocationFilterCondition | { and: LocationFilterNode[] } | { or: LocationFilterNode[] }
 
 type LocationFindContentInput = {
   contractAddress: string
@@ -25,6 +27,11 @@ export type LocationItem = {
   name: string
   description: string
   imageUrl: string
+  authorName?: string
+}
+
+export type LocationFilters = {
+  query: string
 }
 
 type ContentItem = {
@@ -32,14 +39,68 @@ type ContentItem = {
   metadata?: LocationContent['metadata']
 }
 
+const SEARCH_FIELDS = ['name', 'description'] as const
+const REGEX_SPECIAL_CHARS = /[\\^$.*+?()[\]{}|]/g
+
 export function getPreviewUrl(contractAddress: string, contentId: string, filename: string): string {
   return `${r2Config.url}${contractAddress}/${contentId}/${filename}`
 }
 
-export function buildLocationFindContentInput(contractAddress: string): LocationFindContentInput {
+export function createEmptyLocationFilters(): LocationFilters {
+  return { query: '' }
+}
+
+export function parseLocationFilters(searchParams: URLSearchParams): LocationFilters {
+  return {
+    query: searchParams.get('q')?.trim() ?? '',
+  }
+}
+
+function equalCondition(field: string, val: EqualityFilterValue): LocationFilterCondition {
+  return { field, op: 'eq', val }
+}
+
+function escapeRegex(value: string): string {
+  return value.replace(REGEX_SPECIAL_CHARS, '\\$&')
+}
+
+function toCaseInsensitiveRegexPattern(value: string): string {
+  return Array.from(value)
+    .map((char) => {
+      const lower = char.toLowerCase()
+      const upper = char.toUpperCase()
+
+      if (lower !== upper && /^[a-z]$/i.test(char)) return `[${escapeRegex(lower)}${escapeRegex(upper)}]`
+
+      return escapeRegex(char)
+    })
+    .join('')
+}
+
+function appendSearchFilter(nodes: LocationFilterNode[], query: string) {
+  const trimmedQuery = query.trim()
+  if (!trimmedQuery) return
+
+  nodes.push({
+    or: SEARCH_FIELDS.map((field) => ({ field, op: 'regex', val: toCaseInsensitiveRegexPattern(trimmedQuery) })),
+  })
+}
+
+export function buildLocationFilterInput(filters: LocationFilters): LocationFilterNode {
+  const and: LocationFilterNode[] = [equalCondition('type', 'location')]
+
+  appendSearchFilter(and, filters.query)
+
+  return { and }
+}
+
+export function buildLocationFindContentInput(
+  contractAddress: string,
+  filters: LocationFilters = createEmptyLocationFilters(),
+): LocationFindContentInput {
   return {
     contractAddress,
-    metadata: { and: [{ field: 'type', op: 'eq', val: 'location' }] },
+    metadata: buildLocationFilterInput(filters),
     sort: 'createdAt',
     order: 'desc',
     status: 'ACTIVE',

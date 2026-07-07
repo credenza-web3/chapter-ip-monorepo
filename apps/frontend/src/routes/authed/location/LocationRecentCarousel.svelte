@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import { useDefaultImage } from '$lib/content/image'
   import type { LocationItem } from './location'
+  import forwardBackwardArrow from '$lib/assets/back.svg'
 
   let { items } = $props<{
     items: LocationItem[]
@@ -43,7 +44,7 @@
           disabled={!canScrollBack}
           onclick={() => scrollCarousel(-1)}
         >
-          ‹
+          <img src={forwardBackwardArrow} alt="Previous" />
         </button>
         <button
           type="button"
@@ -52,7 +53,7 @@
           disabled={!canScrollForward}
           onclick={() => scrollCarousel(1)}
         >
-          ›
+          <img src={forwardBackwardArrow} alt="Next" class="rotate-180" />
         </button>
       </div>
     {/if}
@@ -67,7 +68,7 @@
       {#each items as item (item.id)}
         <a
           href={`/authed/location/${item.id}`}
-          class="flex w-[min(88vw,382px)] shrink-0 snap-start gap-3 rounded-sm border border-[#ddd8d1] p-2.5 sm:w-[382px]"
+          class="flex w-[min(88vw,382px)] shrink-0 snap-start gap-3 rounded-sm border border-[#ddd8d1] p-2.5 sm:w-95.5"
         >
           <img
             src={item.imageUrl}

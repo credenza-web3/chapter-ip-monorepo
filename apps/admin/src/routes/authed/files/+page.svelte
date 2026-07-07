@@ -41,12 +41,16 @@
       .filter(([, value]) => value)
       .map(([key]) => key)
 
-  let rows = $state(
+  const rows = $derived(
     data.items
       .map((item) => ({
         id: item.id,
         item,
-        listingName: item?.metadata?.profile?.fullLegalName || item?.metadata?.profile?.stageName || 'Untitled',
+        listingName:
+          item?.metadata?.profile?.fullLegalName ||
+          item?.metadata?.profile?.stageName ||
+          item?.metadata?.name ||
+          'Untitled',
         fileType: normalizeFileType(item?.metadata?.type),
         licenseType: getLicenseTypes(item.metadata as TMetadata),
         status: item.status,
@@ -157,7 +161,7 @@
                     </td>
 
                     <td class="px-4 py-1.5">
-                      ${formatKM(Number(row.revenue.token) / 1e6)}
+                      ${formatKM(Number(row.revenue.fiat) / 1e2)}
                     </td>
                     <td class="px-4 py-1.5 text-right">
                       <RowActionMenu

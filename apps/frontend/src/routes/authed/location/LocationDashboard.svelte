@@ -1,14 +1,20 @@
 <script lang="ts">
   import LocationGrid from './LocationGrid.svelte'
   import LocationRecentCarousel from './LocationRecentCarousel.svelte'
-  import { getRecentLocations, type LocationItem } from './location'
+  import { createEmptyLocationFilters, getRecentLocations, type LocationFilters, type LocationItem } from './location'
 
-  let { items, recentItems: recentSourceItems = items } = $props<{
+  let {
+    items,
+    recentItems: recentSourceItems = items,
+    filters = createEmptyLocationFilters(),
+  } = $props<{
     items: LocationItem[]
     recentItems?: LocationItem[]
+    filters?: LocationFilters
   }>()
 
   const recentItems = $derived(getRecentLocations(recentSourceItems))
+  const hasActiveSearch = $derived(filters.query.trim().length > 0)
 </script>
 
 <div class="mx-auto w-full max-w-360 px-6">
@@ -22,6 +28,6 @@
 
     <div class="my-6 border-t border-[#e5e0d9]"></div>
 
-    <LocationGrid {items} />
+    <LocationGrid {items} hasActiveFilters={hasActiveSearch} />
   </section>
 </div>

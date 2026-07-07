@@ -254,7 +254,14 @@
           >
         {/if}
 
-        <input type="file" class="hidden" bind:this={imageInput} onchange={handleFileInput} accept="image/*" multiple />
+        <input
+          type="file"
+          class="hidden"
+          bind:this={imageInput}
+          onchange={handleFileInput}
+          accept="image/*,.mp4,.mov,.webm,.splat,.ply,.obj,.mtl,.glb"
+          multiple
+        />
       </div>
 
       <span class="text-[10px] text-right text-[#747474] w-full block">
