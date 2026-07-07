@@ -129,22 +129,18 @@ function createLocationStore() {
       content: { metadata?: LocationMetadataInput },
       existingFiles: ExistingFilesByBucket = emptyExistingFiles(),
     ) {
-      const metadata = (content.metadata ?? {}) as Record<string, unknown>
-      const name = (metadata.name as string) ?? ''
-      const description = (metadata.description as string) ?? ''
-      const tags = (metadata.tags as string[]) ?? []
-      const licensing = (metadata.licensing ?? {}) as Partial<LocationLicensingMetadata>
+      const { name, description, tags, licensing } = content.metadata ?? {}
 
       update((s) => ({
         ...s,
-        name,
-        description,
-        tags,
+        name: name ?? '',
+        description: description ?? '',
+        tags: tags ?? [],
         licensing: {
           ...s.licensing,
           ...licensing,
-          licenseTypes: { ...s.licensing.licenseTypes, ...(licensing.licenseTypes ?? {}) },
-          licensePrices: { ...s.licensing.licensePrices, ...(licensing.licensePrices ?? {}) },
+          licenseTypes: { ...s.licensing.licenseTypes, ...(licensing?.licenseTypes ?? {}) },
+          licensePrices: { ...s.licensing.licensePrices, ...(licensing?.licensePrices ?? {}) },
         },
         confirmations: { rightsConfirmed: true },
         existingFiles,
