@@ -164,7 +164,7 @@
 {/snippet}
 
 <div class="mt-6 flex flex-wrap items-center gap-2">
-  <button
+  <!-- <button
     type="button"
     class="inline-flex size-9 items-center justify-center rounded-sm border border-[#ddd8d1] bg-[#f8f5f1] text-[#77757d] transition-colors disabled:opacity-40"
     aria-label="Clear filters"
@@ -177,7 +177,7 @@
       <path d="M7 4V8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
       <path d="M13 12V16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
     </svg>
-  </button>
+  </button> -->
 
   {#each filterDescriptors as descriptor (descriptor.menu)}
     {@render filterButton(descriptor.menu, descriptor.label)}

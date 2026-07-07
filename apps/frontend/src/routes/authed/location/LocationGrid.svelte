@@ -2,8 +2,9 @@
   import { useDefaultImage } from '$lib/content/image'
   import type { LocationItem } from './location'
 
-  let { items } = $props<{
+  let { items, hasActiveFilters } = $props<{
     items: LocationItem[]
+    hasActiveFilters: boolean
   }>()
 </script>
 
@@ -31,6 +32,8 @@
   </div>
 {:else}
   <div class="py-16 text-center">
-    <p class="text-[#747474]">No locations available.</p>
+    <p class="text-[#747474]">
+      {hasActiveFilters ? 'No locations match your search.' : 'No locations available.'}
+    </p>
   </div>
 {/if}
