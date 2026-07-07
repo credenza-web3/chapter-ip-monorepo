@@ -1,10 +1,10 @@
 <script lang="ts">
   import { afterNavigate, beforeNavigate, goto } from '$app/navigation'
-  import { getHeightTotalInches, getNormalizedWeight, likenessStore } from './stores/likeness-store'
+  import { locationStore } from './stores/location-store'
   import UploadStepHeader from './components/UploadStepHeader.svelte'
-  import UploadLikenessStep from './components/UploadLikenessStep.svelte'
+  import UploadLocationStep from './components/UploadLocationStep.svelte'
   import UploadLicensingStep from './components/UploadLicensingStep.svelte'
-  import ConfirmLikenessStep from './components/ConfirmLikenessStep.svelte'
+  import ConfirmLocationStep from './components/ConfirmLocationStep.svelte'
   import { authStore } from '$lib'
   import UploadService from '$lib/upload/upload.service'
   import TransactionService from '$lib/upload/transaction.service'
@@ -12,58 +12,42 @@
   import { notify, ToastType } from '@repo/ui-components'
   import { modals, type ModalProps } from 'svelte-modals'
   import { ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
-  import {
-    createLikenessFileNames,
-    LIKENESS_FILE_BUCKETS,
-    type MultipleFileKey,
-  } from '$lib/constants/likenessFileBuckets'
+
+  const LOCATION_FILENAME = 'location'
 
   let currentStep = $state(1)
   const blockchainService = new BlockchainService(authStore.state.accessToken!)
   const transactionService = new TransactionService(blockchainService)
   const uploadService = new UploadService(transactionService)
 
-  beforeNavigate(() => likenessStore.setLoading(true))
-  afterNavigate(() => likenessStore.setLoading(false))
+  beforeNavigate(() => locationStore.setLoading(true))
+  afterNavigate(() => locationStore.setLoading(false))
 
-  const buildLikenessPayload = () => {
-    const uploadsByBucket = LIKENESS_FILE_BUCKETS.reduce(
-      (acc, bucket) => {
-        acc[bucket] = createLikenessFileNames(bucket, $likenessStore.files[bucket].length)
-        return acc
-      },
-      {} as Record<MultipleFileKey, string[]>,
-    )
-    const uploads = LIKENESS_FILE_BUCKETS.flatMap((bucket) =>
-      $likenessStore.files[bucket].map((file, index) => ({
-        file,
-        name: uploadsByBucket[bucket][index],
-      })),
-    )
-    const heightTotalInches = getHeightTotalInches($likenessStore.profile.attributes)
-    const weight = getNormalizedWeight($likenessStore.profile.attributes.weight)
+  const buildLocationPayload = () => {
+    const newFileCount = $locationStore.files.locations.length
+    const uploadNames = Array.from({ length: newFileCount }, () => LOCATION_FILENAME)
+    const uploads = $locationStore.files.locations.map((file, index) => ({
+      file,
+      name: uploadNames[index],
+    }))
+    const { licenseTypes, licensePrices, agreedToFee } = $locationStore.licensing
     const metadata = {
-      profile: {
-        ...$likenessStore.profile,
-        attributes: {
-          ...$likenessStore.profile.attributes,
-          weight,
-          ...(heightTotalInches !== undefined && { heightTotalInches }),
-        },
-      },
-      licensing: $likenessStore.licensing,
-      uploadsByBucket,
-      type: 'likeness',
+      type: 'location' as const,
+      name: $locationStore.name,
+      description: $locationStore.description,
+      tags: $locationStore.tags,
+      file_name: LOCATION_FILENAME,
+      licensing: { licenseTypes, licensePrices, agreedToFee },
     }
 
-    return { uploadsByBucket, uploads, metadata }
+    return { uploads, metadata }
   }
 
   const onSaveDraftClick = async () => {
     try {
-      likenessStore.setLoading(true)
+      locationStore.setLoading(true)
       const trpcClient = uploadService.createTrpcClient()
-      const { uploads, metadata } = buildLikenessPayload()
+      const { uploads, metadata } = buildLocationPayload()
 
       await uploadService.saveDraftContent({
         trpcClient,
@@ -72,48 +56,47 @@
       })
       notify('Draft saved', ToastType.SUCCESS)
       await goto('/authed/files')
-      likenessStore.reset()
+      locationStore.reset()
     } catch (error) {
       console.error('Error saving draft:', error)
       notify('Failed to save draft.', ToastType.FAIL)
     } finally {
-      likenessStore.setLoading(false)
+      locationStore.setLoading(false)
     }
   }
 
   const onSubmitClick = async () => {
     try {
-      likenessStore.setLoading(true)
+      locationStore.setLoading(true)
       const trpcClient = uploadService.createTrpcClient()
-      const { uploads, metadata } = buildLikenessPayload()
+      const { uploads, metadata } = buildLocationPayload()
       const { contentId, keys } = await uploadService.saveDraftContent({ trpcClient, uploads, metadata })
 
       const tokenId = await uploadService.mintContent({
-        oneTimePrice: Number($likenessStore.licensing.licensePrices['single-use']),
+        oneTimePrice: Number($locationStore.licensing.licensePrices['single-use']),
       })
       await uploadService.finalizeContent({ trpcClient, contentId, metadata, tokenId })
 
-      const stagename = $likenessStore.profile.stageName
       await uploadService.saveMetadata({
         tokenId,
         keys,
-        title: `${$likenessStore.profile.fullLegalName} ${stagename ? `(${stagename})` : ''}`,
-        description: $likenessStore.profile.bio,
+        title: $locationStore.name,
+        description: $locationStore.description,
         trpcClient,
       })
 
       modals.open<ModalProps & TConfirmModalProps>(ConfirmModal, {
         title: 'Congratulations!',
         description:
-          "Your likeness has been added to Chapter IP. By completing this step, you've transformed your likeness into a secure, licensable digital asset that can be discovered, verified, and managed for future opportunities.",
+          "Your location has been added to Chapter IP. By completing this step, you've transformed your location into a secure, licensable digital asset that can be discovered, verified, and managed for future opportunities.",
         submitText: 'Go to Dashboard',
         onSubmit: async () => {
-          await goto(`/authed/files`)
-          likenessStore.reset()
+          await goto('/authed/files')
+          locationStore.reset()
         },
         onClose: async () => {
-          await goto(`/authed/files`)
-          likenessStore.reset()
+          await goto('/authed/files')
+          locationStore.reset()
         },
         withBackButton: false,
       })
@@ -125,7 +108,7 @@
       }
       notify(errorMessage, ToastType.FAIL)
     } finally {
-      likenessStore.setLoading(false)
+      locationStore.setLoading(false)
     }
   }
 </script>
@@ -134,10 +117,10 @@
   <UploadStepHeader {currentStep} />
 
   {#if currentStep === 1}
-    <UploadLikenessStep bind:currentStep onSaveDraft={onSaveDraftClick} />
+    <UploadLocationStep bind:currentStep onSaveDraft={onSaveDraftClick} />
   {:else if currentStep === 2}
     <UploadLicensingStep bind:currentStep onSaveDraft={onSaveDraftClick} />
   {:else}
-    <ConfirmLikenessStep bind:currentStep onFormSubmit={onSubmitClick} onSaveDraft={onSaveDraftClick} />
+    <ConfirmLocationStep bind:currentStep onFormSubmit={onSubmitClick} onSaveDraft={onSaveDraftClick} />
   {/if}
 </div>

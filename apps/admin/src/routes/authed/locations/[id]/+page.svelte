@@ -1,15 +1,11 @@
 <script lang="ts">
-  import {
-    createLikenessFileNames,
-    LIKENESS_FILE_BUCKETS,
-    type MultipleFileKey,
-  } from '$lib/constants/likenessFileBuckets'
+  import { LOCATION_FILE_BUCKETS } from '$lib/constants/locationFileBuckets'
   import { afterNavigate, beforeNavigate, goto } from '$app/navigation'
-  import { getHeightTotalInches, getNormalizedWeight, likenessStore } from '../stores/likeness-store'
+  import { locationStore } from '../stores/location-store'
   import UploadStepHeader from '../components/UploadStepHeader.svelte'
-  import UploadLikenessStep from '../components/UploadLikenessStep.svelte'
+  import UploadLocationStep from '../components/UploadLocationStep.svelte'
   import UploadLicensingStep from '../components/UploadLicensingStep.svelte'
-  import ConfirmLikenessStep from '../components/ConfirmLikenessStep.svelte'
+  import ConfirmLocationStep from '../components/ConfirmLocationStep.svelte'
 
   import { authStore } from '$lib'
   import UploadService, { type NamedUpload } from '$lib/upload/upload.service'
@@ -32,77 +28,67 @@
   const transactionService = new TransactionService(blockchainService)
   const uploadService = new UploadService(transactionService)
 
-  onMount(() => likenessStore.hydrateFromContent(data, data.existingFiles))
-  onDestroy(() => likenessStore.reset())
+  onMount(() => locationStore.hydrateFromContent(data, data.existingFiles))
+  onDestroy(() => locationStore.reset())
 
-  beforeNavigate(() => likenessStore.setLoading(true))
-  afterNavigate(() => likenessStore.setLoading(false))
+  beforeNavigate(() => locationStore.setLoading(true))
+  afterNavigate(() => locationStore.setLoading(false))
 
-  const buildLikenessMetadata = (uploadsByBucket: Record<MultipleFileKey, string[]>) => {
-    const heightTotalInches = getHeightTotalInches($likenessStore.profile.attributes)
-    const weight = getNormalizedWeight($likenessStore.profile.attributes.weight)
+  const LOCATION_FILENAME = 'location'
 
+  const buildLocationMetadata = () => {
     return {
-      profile: {
-        ...$likenessStore.profile,
-        attributes: {
-          ...$likenessStore.profile.attributes,
-          weight,
-          ...(heightTotalInches !== undefined && { heightTotalInches }),
-        },
-      },
-      licensing: $likenessStore.licensing,
-      uploadsByBucket,
-      type: 'likeness',
+      type: 'location' as const,
+      name: $locationStore.name,
+      description: $locationStore.description,
+      tags: $locationStore.tags,
+      file_name: LOCATION_FILENAME,
+      licensing: $locationStore.licensing,
     }
   }
 
-  const buildUploadsByBucket = () =>
-    Object.fromEntries(
-      LIKENESS_FILE_BUCKETS.map((bucket) => {
-        const existingNames = $likenessStore.existingFiles[bucket].map((file) => file.name)
-        const newNames = createLikenessFileNames(bucket, $likenessStore.files[bucket].length, existingNames)
+  const buildUploadNames = () => {
+    const existingNames = $locationStore.existingFiles.locations.map((file) => file.name)
+    const newCount = $locationStore.files.locations.length
+    const names: string[] = [...existingNames]
+    for (let i = 0; i < newCount; i++) {
+      names.push(LOCATION_FILENAME)
+    }
+    return names
+  }
 
-        return [bucket, [...existingNames, ...newNames]]
-      }),
-    ) as Record<MultipleFileKey, string[]>
-
-  const buildNamedUploads = (uploadsByBucket: Record<MultipleFileKey, string[]>): NamedUpload[] =>
-    LIKENESS_FILE_BUCKETS.flatMap((bucket) => {
-      const existingFileCount = $likenessStore.existingFiles[bucket].length
-
-      return $likenessStore.files[bucket].map((file, index) => ({
-        file,
-        name: uploadsByBucket[bucket][existingFileCount + index],
-      }))
-    })
+  const buildNamedUploads = (uploadNames: string[]): NamedUpload[] => {
+    const existingCount = $locationStore.existingFiles.locations.length
+    return $locationStore.files.locations.map((file, index) => ({
+      file,
+      name: uploadNames[existingCount + index],
+    }))
+  }
 
   const getKeptFileIds = () =>
-    new Set(LIKENESS_FILE_BUCKETS.flatMap((bucket) => $likenessStore.existingFiles[bucket].map((file) => file.id)))
+    new Set(LOCATION_FILE_BUCKETS.flatMap((bucket) => $locationStore.existingFiles[bucket].map((file) => file.id)))
 
   const getCurrentFiles = () => (data.files ?? []) as ExistingContentFile[]
 
-  const buildLikenessPayload = () => {
-    const uploadsByBucket = buildUploadsByBucket()
+  const buildLocationPayload = () => {
+    const uploadNames = buildUploadNames()
 
     return {
       keptFileIds: getKeptFileIds(),
-      metadata: buildLikenessMetadata(uploadsByBucket),
-      uploads: buildNamedUploads(uploadsByBucket),
+      metadata: buildLocationMetadata(),
+      uploads: buildNamedUploads(uploadNames),
     }
   }
 
   const getLicensePrices = () => ({
-    oneTimePrice: Number($likenessStore.licensing.licensePrices['single-use']),
+    oneTimePrice: Number($locationStore.licensing.licensePrices['single-use']),
   })
 
   const buildTokenMetadata = (keys: string[]) => {
-    const stagename = $likenessStore.profile.stageName
-
     return {
       keys,
-      title: `${$likenessStore.profile.fullLegalName} ${stagename ? `(${stagename})` : ''}`,
-      description: $likenessStore.profile.bio,
+      title: $locationStore.name,
+      description: $locationStore.description,
     }
   }
 
@@ -115,7 +101,7 @@
   } = {}) => {
     const trpcClient = uploadService.createTrpcClient()
     const contentId = data.id
-    const { keptFileIds, metadata, uploads } = buildLikenessPayload()
+    const { keptFileIds, metadata, uploads } = buildLocationPayload()
     const { keys } = await uploadService.updateContentFiles({
       contentId,
       currentFiles: getCurrentFiles(),
@@ -137,23 +123,23 @@
 
   const goToFiles = async () => {
     await goto('/authed/files')
-    likenessStore.reset()
+    locationStore.reset()
   }
 
-  const withLikenessLoading = async (action: () => Promise<void>, logMessage: string, userMessage: string) => {
+  const withLocationLoading = async (action: () => Promise<void>, logMessage: string, userMessage: string) => {
     try {
-      likenessStore.setLoading(true)
+      locationStore.setLoading(true)
       await action()
     } catch (error) {
       console.error(logMessage, error)
       notify(userMessage, ToastType.FAIL)
     } finally {
-      likenessStore.setLoading(false)
+      locationStore.setLoading(false)
     }
   }
 
   const onSaveDraftClick = async () => {
-    await withLikenessLoading(
+    await withLocationLoading(
       async () => {
         await saveCurrentContent({ status: STATUS.DRAFT })
         notify('Draft saved', ToastType.SUCCESS)
@@ -197,7 +183,7 @@
     modals.open<ModalProps & TConfirmModalProps>(ConfirmModal, {
       title: 'Congratulations!',
       description:
-        "Your likeness has been added to Chapter IP. By completing this step, you've transformed your likeness into a secure, licensable digital asset that can be discovered, verified, and managed for future opportunities.",
+        "Your location has been added to Chapter IP. By completing this step, you've transformed your location into a secure, licensable digital asset that can be discovered, verified, and managed for future opportunities.",
       submitText: 'Go to Dashboard',
       onSubmit: async () => {
         await goToFiles()
@@ -210,7 +196,7 @@
   }
 
   const onSubmitClick = async () => {
-    await withLikenessLoading(
+    await withLocationLoading(
       async () => {
         const savedContent = await saveCurrentContent()
         const tokenId = data.tokenId ?? (await activateContent(savedContent))
@@ -228,11 +214,11 @@
   <UploadStepHeader {currentStep} />
 
   {#if currentStep === 1}
-    <UploadLikenessStep bind:currentStep onSaveDraft={!data.tokenId ? onSaveDraftClick : undefined} />
+    <UploadLocationStep bind:currentStep onSaveDraft={!data.tokenId ? onSaveDraftClick : undefined} />
   {:else if currentStep === 2}
     <UploadLicensingStep bind:currentStep onSaveDraft={!data.tokenId ? onSaveDraftClick : undefined} />
   {:else}
-    <ConfirmLikenessStep
+    <ConfirmLocationStep
       bind:currentStep
       onFormSubmit={onSubmitClick}
       onSaveDraft={!data.tokenId ? onSaveDraftClick : undefined}
