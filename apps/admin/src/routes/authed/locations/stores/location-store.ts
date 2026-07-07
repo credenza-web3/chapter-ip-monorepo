@@ -3,8 +3,8 @@ import type { AppRouter, TRPCClient } from '@repo/trpc/client'
 import { type LocationFileKey } from '$lib/constants/locationFileBuckets'
 import type { LocationLicensingMetadata, LocationMetadataInput } from '@repo/content-types/location'
 
-export type ExistingFile = { id: string; name: string; url: string }
-export type ExistingFilesByBucket = Record<LocationFileKey, ExistingFile[]>
+type ExistingFile = { id: string; name: string; url: string }
+type ExistingFilesByBucket = Record<LocationFileKey, ExistingFile[]>
 
 const emptyExistingFiles = (): ExistingFilesByBucket => ({
   locations: [],
@@ -110,8 +110,6 @@ function createLocationStore() {
         },
       }))
     },
-    setName: (value: string) => update((s) => ({ ...s, name: value })),
-    setDescription: (value: string) => update((s) => ({ ...s, description: value })),
     setTags: (value: string[]) => update((s) => ({ ...s, tags: value })),
     setLicenseTypeEnabled: (id: string, value: boolean) =>
       update((s) => {

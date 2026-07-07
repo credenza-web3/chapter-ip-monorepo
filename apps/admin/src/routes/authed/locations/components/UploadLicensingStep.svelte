@@ -22,10 +22,6 @@
   )
 </script>
 
-{#snippet divider(className = '')}
-  <div class="border-t border-dashed border-[#ddd] {className}"></div>
-{/snippet}
-
 <div class="space-y-12 mt-7.25 text-dark">
   <!-- Title Section -->
   <div>
