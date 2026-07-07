@@ -99,20 +99,21 @@
     </div>
     <div class="pt-9">
       {#each sortedNotifications as tx, i (tx.id)}
-        {console.log(tx)}
         {@const payload = tx.payload as Record<string, unknown> | undefined}
         {@const content = payload?.['content'] as Record<string, unknown> | undefined}
         {@const metadata = content?.['metadata'] as Record<string, unknown> | undefined}
         {@const itemType = metadata?.['type'] as string | undefined}
         {@const profile = metadata?.['profile'] as Record<string, unknown> | undefined}
-        {@const fullName = profile?.['fullLegalName'] as string | undefined}
+        {@const fullLikenesName = profile?.['fullLegalName'] as string | undefined}
+        {@const fullLocationsName = metadata?.['name'] as string | undefined}
         <li>
           <div class="flex items-start leading-0">
             <div class="size-1.5 rounded-full bg-primary shrink-0 mt-1.5" class:invisible={!!tx.readAt}></div>
             <div class="flex flex-col items-between justify-start w-full">
               <div class="flex items-center justify-between w-full">
                 <p class="text-[13px] font-semibold flex-1 min-w-0 wrap-break-word leading-normal">
-                  {itemType ?? ''} [{fullName ?? ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
+                  {itemType ?? ''} [{fullLikenesName ?? fullLocationsName}] {tx.type ===
+                  NOTIFICATION_TYPE.CONTENT_CREATED
                     ? 'added to your products'
                     : 'was purchased'}
                 </p>
