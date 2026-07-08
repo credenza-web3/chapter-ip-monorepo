@@ -1,6 +1,7 @@
 <script lang="ts">
   import { publisherStore } from '$lib/stores/publisher.svelte'
   import EditPublisher from './components/EditPublisher.svelte'
+  import SubscriptionPriceInput from '$lib/components/SubscriptionPriceInput.svelte'
   import { useProfileSave } from '$lib/hooks/useProfileSave.svelte'
   import { authStore } from '$lib'
   import { onMount } from 'svelte'
@@ -120,6 +121,10 @@
       </div>
     </div>
   </div>
+</section>
+
+<section class="mt-8 min-h-xl w-full rounded-3xl bg-[#f8f5f1] px-5 py-8 sm:px-10 sm:py-10 lg:px-14 lg:py-12">
+  <SubscriptionPriceInput />
 </section>
 
 <input
