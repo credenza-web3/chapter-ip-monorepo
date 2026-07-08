@@ -11,6 +11,7 @@
 
   const canContinueFromStepOne = $derived(
     Boolean(
+      currentStep === 1 &&
       $locationStore.name &&
       ($locationStore.files.locations.length || $locationStore.existingFiles.locations.length) &&
       $locationStore.confirmations.rightsConfirmed,
@@ -217,14 +218,14 @@
               class="w-full h-11.75 bg-white rounded-sm border border-[#ddd] px-3.75 text-sm font-medium text-[#71707a] focus:border-primary focus:outline-none focus:shadow-[0_3px_6px_0_rgba(0,0,0,0.16)] transition-shadow"
             />
           </div>
-          <div class="w-[200px] space-y-3">
+          <div class="w-50 space-y-3">
             <span class="mb-2 block text-sm text-[#71707a]">State</span>
             <select
               bind:value={$locationStore.address.state}
               class="w-full h-11.75 bg-white rounded-sm border border-[#ddd] px-3.75 text-sm font-medium text-[#71707a] focus:border-primary focus:outline-none focus:shadow-[0_3px_6px_0_rgba(0,0,0,0.16)] transition-shadow appearance-none"
             >
               <option value="" disabled selected>State</option>
-              {#each US_STATES as st}
+              {#each US_STATES as st (st)}
                 <option value={st}>{st}</option>
               {/each}
             </select>
@@ -279,7 +280,7 @@
       <button
         type="button"
         onclick={addTag}
-        class="flex items-center gap-2 text-sm text-primary hover:underline mb-[25px]"
+        class="flex items-center gap-2 text-sm text-primary hover:underline mb-6.25"
       >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M7 1V13M1 7H13" stroke="#6734FF" stroke-width="2" stroke-linecap="round" />

@@ -29,7 +29,7 @@
     class:border-[#ddd]={!isEnabled}
   >
     <span
-      class="pointer-events-none relative inline-flex h-[22px] w-[22px] items-center justify-center rounded-full bg-white shadow-sm transition-transform duration-200 ease-in-out"
+      class="pointer-events-none relative inline-flex h-5.5 w-5.5 items-center justify-center rounded-full bg-white shadow-sm transition-transform duration-200 ease-in-out"
       class:translate-x-[24px]={isEnabled}
       class:translate-x-[1px]={!isEnabled}
     >
