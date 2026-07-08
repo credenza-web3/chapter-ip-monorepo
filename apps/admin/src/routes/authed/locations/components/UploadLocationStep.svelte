@@ -385,7 +385,7 @@
       </div>
 
       <span class="text-[10px] text-right text-[#747474] w-full block">
-        .mp4, .mov, .webm, .splat, .ply, .obj, .mtl, .glb files accepted
+        .jpg, .png, .webp, .mp4, .mov, .webm, .splat, .ply, .obj, .mtl, .glb files accepted
       </span>
     </div>
   </div>
