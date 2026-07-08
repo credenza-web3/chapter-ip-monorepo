@@ -1,0 +1,41 @@
+name: Create or Update Production Branch for railway on Tag
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  create-or-update-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+
+    - name: Set up Git
+      run: |
+        git config --global user.name "${{ github.actor }}"
+        git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+
+    - name: Create or update branch
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Extract tag name
+        TAG_NAME=${GITHUB_REF#refs/tags/}
+        BRANCH_NAME="production"
+
+        # Check if branch exists
+        if git show-ref --verify --quiet refs/heads/$BRANCH_NAME; then
+          echo "Branch $BRANCH_NAME exists. Updating branch."
+          git fetch origin $BRANCH_NAME
+          git checkout $BRANCH_NAME
+          git reset --hard $GITHUB_SHA
+        else
+          echo "Branch $BRANCH_NAME does not exist. Creating branch."
+          git checkout -b $BRANCH_NAME
+        fi
+
+        # Push branch to origin
+        git push origin $BRANCH_NAME --force
