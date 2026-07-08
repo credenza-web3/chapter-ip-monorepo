@@ -159,6 +159,7 @@ export class ContentRouter {
       ...(input.tokenId && { tokenId: input.tokenId }),
       contractAddress,
       metadata: input.metadata,
+      tags: input.tags,
       status: input.tokenId ? (input.status ?? ContentStatus.ACTIVE) : ContentStatus.DRAFT,
     })
 
@@ -193,6 +194,7 @@ export class ContentRouter {
 
     const updated = await this.contentService.updateById(input.contentId, {
       ...(input.metadata !== undefined ? { metadata: input.metadata } : {}),
+      ...(input.tags !== undefined ? { tags: input.tags } : {}),
       ...(tokenId ? { tokenId } : {}),
       ...(input.status ? { status: input.status } : {}),
     })
@@ -305,10 +307,14 @@ export class ContentRouter {
       throw new TRPCError({ message: 'Content is not found', code: 'NOT_FOUND' })
     }
 
-    const files = await this.fileService.find({ contentId: content._id })
+    const [files, similarContents] = await Promise.all([
+      this.fileService.find({ contentId: content._id }),
+      this.contentService.findSimilarByTags(content.id, content.tags ?? []),
+    ])
     return {
       ...content.toJSON(),
       files,
+      similarContents,
     }
   }
 
