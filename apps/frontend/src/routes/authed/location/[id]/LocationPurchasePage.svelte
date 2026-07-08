@@ -48,7 +48,7 @@
       <section aria-label="Location preview" class="relative">
         <button
           type="button"
-          class="relative block aspect-[400/216] w-full overflow-hidden bg-[#202225]"
+          class="relative block aspect-400/216 w-full overflow-hidden bg-[#202225]"
           aria-label={`Enlarge ${locationDetails.image.alt}`}
           onclick={() => (showLightbox = true)}
         >

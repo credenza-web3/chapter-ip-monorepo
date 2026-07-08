@@ -71,8 +71,8 @@
         <div class="flex items-center border border-[#dbdbdb] rounded-sm bg-white overflow-hidden text-sm h-10.5">
           <span class="px-2.5 text-[#30364b]">$</span>
           <input
-            type="text"
-            inputmode="numeric"
+            type="number"
+            min="0.5"
             value={$locationStore.licensing.licensePrices[license.id]}
             oninput={(e) => locationStore.setLicenseTypePrice(license.id, e.currentTarget.value)}
             onblur={(e) => {
@@ -83,7 +83,7 @@
               }
             }}
             onwheel={(e) => e.preventDefault()}
-            placeholder="2,000"
+            placeholder="USD"
             class="flex-1 h-full w-20 font-medium focus:outline-none pr-2 text-[#30364b]"
           />
           <span class="px-2.5 text-[10px] text-[#30364b]/50 whitespace-nowrap">USD</span>

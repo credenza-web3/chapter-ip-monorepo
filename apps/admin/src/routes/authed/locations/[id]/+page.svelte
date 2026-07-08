@@ -37,6 +37,8 @@
   const LOCATION_FILENAME = 'location'
 
   const buildLocationMetadata = () => {
+    const { street, apt, city, state, zip } = $locationStore.address
+    const address = street || city || state || zip ? { street, apt, city, state, zip } : undefined
     return {
       type: 'location' as const,
       name: $locationStore.name,
@@ -44,6 +46,7 @@
       tags: $locationStore.tags,
       file_name: LOCATION_FILENAME,
       licensing: $locationStore.licensing,
+      ...(address && { address }),
     }
   }
 

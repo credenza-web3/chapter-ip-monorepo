@@ -1,7 +1,7 @@
 import { writable, derived } from 'svelte/store'
 import type { AppRouter, TRPCClient } from '@repo/trpc/client'
 import { type LocationFileKey } from '$lib/constants/locationFileBuckets'
-import type { LocationLicensingMetadata, LocationMetadataInput } from '@repo/content-types/location'
+import type { LocationAddress, LocationLicensingMetadata, LocationMetadataInput } from '@repo/content-types/location'
 
 type ExistingFile = { id: string; name: string; url: string }
 type ExistingFilesByBucket = Record<LocationFileKey, ExistingFile[]>
@@ -34,6 +34,7 @@ interface LocationState {
   name: string
   description: string
   tags: string[]
+  address: LocationAddress
   licensing: LocationLicensingMetadata
   confirmations: {
     rightsConfirmed: boolean
@@ -53,12 +54,13 @@ function createLocationStore() {
     name: '',
     description: '',
     tags: [],
+    address: { street: '', apt: '', city: '', state: '', zip: '' },
     licensing: {
       licenseTypes: {
         'single-use': true,
       },
       licensePrices: {
-        'single-use': '',
+        'single-use': '0.5',
       },
       agreedToFee: false,
     },
@@ -103,12 +105,13 @@ function createLocationStore() {
       }))
     },
     setTags: (value: string[]) => update((s) => ({ ...s, tags: value })),
+    setAddress: (value: LocationAddress) => update((s) => ({ ...s, address: value })),
     setLicenseTypeEnabled: (id: string, value: boolean) =>
       update((s) => {
         const nextLicensing = {
           ...s.licensing,
           licenseTypes: { ...s.licensing.licenseTypes, [id]: value },
-          licensePrices: { ...s.licensing.licensePrices, [id]: value ? s.licensing.licensePrices[id] : '' },
+          licensePrices: { ...s.licensing.licensePrices, [id]: value ? s.licensing.licensePrices[id] || '0.5' : '' },
         }
         return { ...s, licensing: nextLicensing }
       }),
@@ -129,13 +132,20 @@ function createLocationStore() {
       content: { metadata?: LocationMetadataInput },
       existingFiles: ExistingFilesByBucket = emptyExistingFiles(),
     ) {
-      const { name, description, tags, licensing } = content.metadata ?? {}
+      const { name, description, tags, licensing, address } = content.metadata ?? {}
 
       update((s) => ({
         ...s,
         name: name ?? '',
         description: description ?? '',
         tags: tags ?? [],
+        address: {
+          street: address?.street ?? '',
+          apt: address?.apt ?? '',
+          city: address?.city ?? '',
+          state: address?.state ?? '',
+          zip: address?.zip ?? '',
+        },
         licensing: {
           ...s.licensing,
           ...licensing,
@@ -155,12 +165,13 @@ function createLocationStore() {
         name: '',
         description: '',
         tags: [],
+        address: { street: '', apt: '', city: '', state: '', zip: '' },
         licensing: {
           licenseTypes: {
             'single-use': true,
           },
           licensePrices: {
-            'single-use': '',
+            'single-use': '0.5',
           },
           agreedToFee: false,
         },
