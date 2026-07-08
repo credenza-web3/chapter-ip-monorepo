@@ -17,7 +17,7 @@
     locationStore.setAgreedToFee(!$locationStore.licensing.agreedToFee)
   }
 
-  const canContinue = $derived(Boolean($isFormValid && !$locationStore.ui.loading && primaryLocationFile))
+  const canContinue = $derived(Boolean($isFormValid && !$locationStore.ui.loading))
 </script>
 
 <div class="space-y-12 mt-7.25 text-dark">
