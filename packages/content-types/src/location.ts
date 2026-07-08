@@ -1,3 +1,5 @@
+import type { Content } from './content'
+
 export type LocationLicensingMetadata = {
   licenseTypes: Record<string, boolean>
   licensePrices: Record<string, string>
@@ -16,7 +18,6 @@ export type LocationMetadata = {
   type: 'location'
   name: string
   description: string
-  tags: string[]
   file_name: string
   licensing: LocationLicensingMetadata
   address?: LocationAddress
@@ -29,10 +30,7 @@ export type LocationMetadataInput = Partial<Omit<LocationMetadata, 'type' | 'lic
   licensing?: LocationLicensingMetadataInput
 }
 
-export type LocationContent = {
-  id: string
-  tokenId?: string
-  metadata?: LocationMetadataInput
+export type LocationContent = Content<LocationMetadataInput> & {
   sub: string
   status: string
   contractAddress: string

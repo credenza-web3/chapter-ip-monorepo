@@ -43,7 +43,6 @@
       type: 'location' as const,
       name: $locationStore.name,
       description: $locationStore.description,
-      tags: $locationStore.tags,
       file_name: LOCATION_FILENAME,
       licensing: $locationStore.licensing,
       ...(address && { address }),
@@ -80,6 +79,7 @@
       keptFileIds: getKeptFileIds(),
       metadata: buildLocationMetadata(),
       uploads: buildNamedUploads(uploadNames),
+      tags: $locationStore.tags,
     }
   }
 
@@ -104,7 +104,7 @@
   } = {}) => {
     const trpcClient = uploadService.createTrpcClient()
     const contentId = data.id
-    const { keptFileIds, metadata, uploads } = buildLocationPayload()
+    const { keptFileIds, metadata, uploads, tags } = buildLocationPayload()
     const { keys } = await uploadService.updateContentFiles({
       contentId,
       currentFiles: getCurrentFiles(),
@@ -117,11 +117,12 @@
       contentId,
       trpcClient,
       metadata,
+      tags,
       tokenId,
       status,
     })
 
-    return { contentId, keys, metadata, trpcClient }
+    return { contentId, keys, metadata, trpcClient, tags }
   }
 
   const goToFiles = async () => {
@@ -157,6 +158,7 @@
     contentId,
     metadata,
     trpcClient,
+    tags,
   }: Awaited<ReturnType<typeof saveCurrentContent>>) => {
     const tokenId = await uploadService.mintContent(getLicensePrices())
 
@@ -165,6 +167,7 @@
       metadata,
       tokenId,
       trpcClient,
+      tags,
     })
 
     return tokenId

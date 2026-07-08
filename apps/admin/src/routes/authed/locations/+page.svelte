@@ -37,25 +37,25 @@
       type: 'location' as const,
       name: $locationStore.name,
       description: $locationStore.description,
-      tags: $locationStore.tags,
       file_name: LOCATION_FILENAME,
       licensing: { licenseTypes, licensePrices, agreedToFee },
       ...(address && { address }),
     }
 
-    return { uploads, metadata }
+    return { uploads, metadata, tags: $locationStore.tags }
   }
 
   const onSaveDraftClick = async () => {
     try {
       locationStore.setLoading(true)
       const trpcClient = uploadService.createTrpcClient()
-      const { uploads, metadata } = buildLocationPayload()
+      const { uploads, metadata, tags } = buildLocationPayload()
 
       await uploadService.saveDraftContent({
         trpcClient,
         uploads,
         metadata,
+        tags,
       })
       notify('Draft saved', ToastType.SUCCESS)
       await goto('/authed/files')
@@ -72,13 +72,13 @@
     try {
       locationStore.setLoading(true)
       const trpcClient = uploadService.createTrpcClient()
-      const { uploads, metadata } = buildLocationPayload()
-      const { contentId, keys } = await uploadService.saveDraftContent({ trpcClient, uploads, metadata })
+      const { uploads, metadata, tags } = buildLocationPayload()
+      const { contentId, keys } = await uploadService.saveDraftContent({ trpcClient, uploads, metadata, tags })
 
       const tokenId = await uploadService.mintContent({
         oneTimePrice: Number($locationStore.licensing.licensePrices['single-use']),
       })
-      await uploadService.finalizeContent({ trpcClient, contentId, metadata, tokenId })
+      await uploadService.finalizeContent({ trpcClient, contentId, metadata, tokenId, tags })
 
       await uploadService.saveMetadata({
         tokenId,

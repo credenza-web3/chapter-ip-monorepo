@@ -29,9 +29,7 @@
     <h2 id={headingId} class={headingClass}>Compatible with</h2>
     <div class={gridClass}>
       {#each PLATFORMS as platform (platform.name)}
-        <div class="flex h-11 items-center justify-center rounded-3xl border border-[#1a1a2e1a] bg-white px-4">
-          <img src={platform.src} alt={platform.name} class="max-h-7 w-full object-contain" />
-        </div>
+        <img src={platform.src} alt={platform.name} class="w-full object-contain" />
       {/each}
     </div>
   </section>
@@ -40,9 +38,7 @@
     <h3 class={headingClass}>Compatible with</h3>
     <div class={gridClass}>
       {#each PLATFORMS as platform (platform.name)}
-        <div class="flex h-11 items-center justify-center rounded-3xl border border-[#1a1a2e1a] bg-white px-4">
-          <img src={platform.src} alt={platform.name} class="max-h-7 w-full object-contain" />
-        </div>
+        <img src={platform.src} alt={platform.name} class="w-full object-contain" />
       {/each}
     </div>
   </section>

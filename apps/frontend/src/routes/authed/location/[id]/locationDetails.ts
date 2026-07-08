@@ -16,13 +16,15 @@ export function normalizeLocation(
 
   const name = trimString(metadata.name) || 'Unnamed location'
   const fileName = trimString(metadata.file_name)
+  const legacyTags = (metadata as Record<string, unknown>).tags
+  const rawTags = content.tags ?? (Array.isArray(legacyTags) ? (legacyTags as string[]) : [])
 
   return {
     id: content.id,
     contentTokenId: trimString(content.tokenId),
     name,
     description: trimString(metadata.description),
-    tags: (metadata.tags ?? []).map(trimString).filter(Boolean),
+    tags: rawTags.map(trimString).filter(Boolean),
     authorName: trimString(authorName),
     licenses: getLicenses(metadata.licensing, {
       licenseNames: LICENSE_NAMES,

@@ -4,6 +4,11 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./content": {
+      "types": "./src/content.ts",
+      "import": "./src/content.ts",
+      "default": "./src/content.ts"
+    },
     "./likeness": {
       "types": "./src/likeness.ts",
       "import": "./src/likeness.ts",

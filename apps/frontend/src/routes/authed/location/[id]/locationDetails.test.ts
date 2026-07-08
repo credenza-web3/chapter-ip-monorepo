@@ -3,6 +3,12 @@ import { DEFAULT_IMAGE_URL } from '$lib/content/image'
 import { getPreviewUrl } from '../location'
 import { normalizeLocation } from './locationDetails'
 
+import type { LocationContent } from '@repo/content-types/location'
+
+type LegacyLocationContent = LocationContent & {
+  metadata?: LocationContent['metadata'] & { tags?: string[] }
+}
+
 const CONTRACT_ADDRESS = '0xcontent'
 
 describe('location purchase mapper', () => {
@@ -26,7 +32,7 @@ describe('location purchase mapper', () => {
             agreedToFee: true,
           },
         },
-      },
+      } as LegacyLocationContent,
       CONTRACT_ADDRESS,
       'The City of New York',
     )
@@ -68,6 +74,59 @@ describe('location purchase mapper', () => {
     ).toBeNull()
   })
 
+  it('reads tags from root content with metadata fallback', () => {
+    const fromRoot = normalizeLocation(
+      {
+        id: 'location-3',
+        sub: 'sub-1',
+        status: 'ACTIVE',
+        contractAddress: CONTRACT_ADDRESS,
+        tags: ['Stadium', ' NYC '],
+        metadata: {
+          type: 'location',
+          name: 'Root Tags',
+          description: 'Tags on root object.',
+          tags: ['Legacy'],
+          file_name: 'root-tags.jpg',
+          licensing: {
+            licenseTypes: { 'single-use': true },
+            licensePrices: { 'single-use': '100' },
+            agreedToFee: true,
+          },
+        },
+      } as LegacyLocationContent,
+      CONTRACT_ADDRESS,
+    )
+
+    expect(fromRoot?.tags).toEqual(['Stadium', 'NYC'])
+  })
+
+  it('falls back to metadata tags when root tags are missing', () => {
+    const fromMetadata = normalizeLocation(
+      {
+        id: 'location-4',
+        sub: 'sub-1',
+        status: 'ACTIVE',
+        contractAddress: CONTRACT_ADDRESS,
+        metadata: {
+          type: 'location',
+          name: 'Metadata Tags',
+          description: 'Legacy tags in metadata.',
+          tags: ['Legacy', ' Queens '],
+          file_name: 'metadata-tags.jpg',
+          licensing: {
+            licenseTypes: { 'single-use': true },
+            licensePrices: { 'single-use': '100' },
+            agreedToFee: true,
+          },
+        },
+      } as LegacyLocationContent,
+      CONTRACT_ADDRESS,
+    )
+
+    expect(fromMetadata?.tags).toEqual(['Legacy', 'Queens'])
+  })
+
   it('uses the default image when file_name is missing', () => {
     const purchase = normalizeLocation(
       {
@@ -87,7 +146,7 @@ describe('location purchase mapper', () => {
             agreedToFee: true,
           },
         },
-      },
+      } as LegacyLocationContent,
       CONTRACT_ADDRESS,
     )
 
