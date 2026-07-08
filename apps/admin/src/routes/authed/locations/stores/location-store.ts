@@ -190,7 +190,7 @@ export const isFormValid = derived(locationStore, ($s) => {
   const hasLicenseType = enabledLicenseTypes.length > 0
 
   if ($s.isEditing) {
-    return hasLicenseType
+    return hasLicenseType && $s.licensing.agreedToFee
   }
 
   const hasValidLicensePrice = enabledLicenseTypes.every(([id]) => Number($s.licensing.licensePrices[id] || 0) >= 0.5)
