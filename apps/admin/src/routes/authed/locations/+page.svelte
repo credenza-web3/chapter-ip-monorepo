@@ -31,12 +31,15 @@
       name: uploadNames[index],
     }))
     const { licenseTypes, licensePrices, agreedToFee } = $locationStore.licensing
-    const metadata = {
+    const { street, apt, city, state, zip } = $locationStore.address
+    const address = street || city || state || zip ? { street, apt, city, state, zip } : undefined
+    const metadata: Record<string, unknown> = {
       type: 'location' as const,
       name: $locationStore.name,
       description: $locationStore.description,
       file_name: LOCATION_FILENAME,
       licensing: { licenseTypes, licensePrices, agreedToFee },
+      ...(address && { address }),
     }
 
     return { uploads, metadata, tags: $locationStore.tags }

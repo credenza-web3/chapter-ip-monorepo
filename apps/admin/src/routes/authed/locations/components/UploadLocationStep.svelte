@@ -11,6 +11,7 @@
 
   const canContinueFromStepOne = $derived(
     Boolean(
+      currentStep === 1 &&
       $locationStore.name &&
       ($locationStore.files.locations.length || $locationStore.existingFiles.locations.length) &&
       $locationStore.confirmations.rightsConfirmed,
@@ -19,6 +20,60 @@
 
   let tagInput = $state('')
   let imageInput: HTMLInputElement | null = $state(null)
+  let showAddress = $state(false)
+
+  const US_STATES = [
+    'AL',
+    'AK',
+    'AZ',
+    'AR',
+    'CA',
+    'CO',
+    'CT',
+    'DE',
+    'FL',
+    'GA',
+    'HI',
+    'ID',
+    'IL',
+    'IN',
+    'IA',
+    'KS',
+    'KY',
+    'LA',
+    'ME',
+    'MD',
+    'MA',
+    'MI',
+    'MN',
+    'MS',
+    'MO',
+    'MT',
+    'NE',
+    'NV',
+    'NH',
+    'NJ',
+    'NM',
+    'NY',
+    'NC',
+    'ND',
+    'OH',
+    'OK',
+    'OR',
+    'PA',
+    'RI',
+    'SC',
+    'SD',
+    'TN',
+    'TX',
+    'UT',
+    'VT',
+    'VA',
+    'WA',
+    'WV',
+    'WI',
+    'WY',
+  ]
 
   function addTag() {
     const tag = tagInput.trim()
@@ -116,13 +171,78 @@
       />
     </label>
 
-    <!-- Add address link (visual only) -->
-    <button type="button" class="flex items-center gap-2 text-sm text-primary hover:underline">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+    <!-- Address -->
+    <button
+      type="button"
+      onclick={() => (showAddress = !showAddress)}
+      class="flex items-center gap-2 text-sm text-primary hover:underline"
+    >
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 14 14"
+        fill="none"
+        class="transition-transform {showAddress ? 'rotate-45' : ''}"
+      >
         <path d="M7 1V13M1 7H13" stroke="#6734FF" stroke-width="2" stroke-linecap="round" />
       </svg>
-      <span>Add address</span>
+      <span>{showAddress ? 'Remove address' : 'Add address'}</span>
     </button>
+
+    {#if showAddress}
+      <div class="space-y-6">
+        <div class="space-y-3">
+          <span class="mb-2 block text-sm text-[#71707a]">Address</span>
+          <input
+            type="text"
+            bind:value={$locationStore.address.street}
+            placeholder="Street address"
+            class="w-full max-w-137.5 h-11.75 bg-white rounded-sm border border-[#ddd] px-3.75 text-sm font-medium text-[#71707a] focus:border-primary focus:outline-none focus:shadow-[0_3px_6px_0_rgba(0,0,0,0.16)] transition-shadow"
+          />
+        </div>
+
+        <input
+          type="text"
+          bind:value={$locationStore.address.apt}
+          placeholder="Apt, Suite, Unit, Building"
+          class="w-full max-w-137.5 h-11.75 bg-white rounded-sm border border-[#ddd] px-3.75 text-sm font-medium text-[#71707a] focus:border-primary focus:outline-none focus:shadow-[0_3px_6px_0_rgba(0,0,0,0.16)] transition-shadow"
+        />
+
+        <div class="flex gap-4 max-w-137.5">
+          <div class="flex-1 space-y-3">
+            <span class="mb-2 block text-sm text-[#71707a]">City</span>
+            <input
+              type="text"
+              bind:value={$locationStore.address.city}
+              placeholder="City"
+              class="w-full h-11.75 bg-white rounded-sm border border-[#ddd] px-3.75 text-sm font-medium text-[#71707a] focus:border-primary focus:outline-none focus:shadow-[0_3px_6px_0_rgba(0,0,0,0.16)] transition-shadow"
+            />
+          </div>
+          <div class="w-50 space-y-3">
+            <span class="mb-2 block text-sm text-[#71707a]">State</span>
+            <select
+              bind:value={$locationStore.address.state}
+              class="w-full h-11.75 bg-white rounded-sm border border-[#ddd] px-3.75 text-sm font-medium text-[#71707a] focus:border-primary focus:outline-none focus:shadow-[0_3px_6px_0_rgba(0,0,0,0.16)] transition-shadow appearance-none"
+            >
+              <option value="" disabled selected>State</option>
+              {#each US_STATES as st (st)}
+                <option value={st}>{st}</option>
+              {/each}
+            </select>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <span class="mb-2 block text-sm text-[#71707a]">Zip Code</span>
+          <input
+            type="text"
+            bind:value={$locationStore.address.zip}
+            placeholder="Zip Code"
+            class="w-full max-w-137.5 h-11.75 bg-white rounded-sm border border-[#ddd] px-3.75 text-sm font-medium text-[#71707a] focus:border-primary focus:outline-none focus:shadow-[0_3px_6px_0_rgba(0,0,0,0.16)] transition-shadow"
+          />
+        </div>
+      </div>
+    {/if}
 
     <label class="block space-y-3">
       <span class="mb-2 block text-sm text-[#71707a]">Description <span class="text-[#ff0000]">*</span></span>
@@ -160,7 +280,7 @@
       <button
         type="button"
         onclick={addTag}
-        class="flex items-center gap-2 text-sm text-primary hover:underline mb-[25px]"
+        class="flex items-center gap-2 text-sm text-primary hover:underline mb-6.25"
       >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M7 1V13M1 7H13" stroke="#6734FF" stroke-width="2" stroke-linecap="round" />
@@ -265,7 +385,7 @@
       </div>
 
       <span class="text-[10px] text-right text-[#747474] w-full block">
-        .mp4, .mov, .webm, .splat, .ply, .obj, .mtl, .glb files accepted
+        .jpg, .png, .webp, .mp4, .mov, .webm, .splat, .ply, .obj, .mtl, .glb files accepted
       </span>
     </div>
   </div>

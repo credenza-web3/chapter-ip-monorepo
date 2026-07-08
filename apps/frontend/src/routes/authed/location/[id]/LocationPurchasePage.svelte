@@ -48,7 +48,7 @@
       <section aria-label="Location preview" class="relative">
         <button
           type="button"
-          class="relative block aspect-[400/216] w-full overflow-hidden bg-[#202225]"
+          class="relative block aspect-400/216 w-full overflow-hidden bg-[#202225]"
           aria-label={`Enlarge ${locationDetails.image.alt}`}
           onclick={() => (showLightbox = true)}
         >
@@ -93,7 +93,7 @@
             {#each locationDetails.licenses as license (license.id)}
               <label
                 class={`relative flex min-h-27.5 cursor-pointer gap-2.5 rounded-md border px-3.75 py-3.5 font-sans transition-colors ${
-                  selectedLicenseId === license.id ? 'border-primary bg-[#f5f1ec]' : 'border-[#1a1a2e1a] bg-[#f5f1ec]'
+                  selectedLicenseId === license.id ? 'border-primary bg-cream' : 'border-[#1a1a2e1a] bg-cream'
                 }`}
               >
                 <input
@@ -138,10 +138,8 @@
         <button
           disabled={purchaseDisabled}
           onclick={handlePurchase}
-          class={`mt-5.5 h-13 w-full rounded-[4px] px-5 font-heading text-base font-medium transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
-            purchaseDisabled
-              ? 'cursor-not-allowed bg-[#e1dddb] text-[#f5f1ec]'
-              : 'bg-primary text-cream hover:opacity-90'
+          class={`mt-5.5 h-13 w-full rounded-sm px-5 font-heading text-base font-medium transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+            purchaseDisabled ? 'cursor-not-allowed bg-[#e1dddb] text-cream' : 'bg-primary text-cream hover:opacity-90'
           }`}
         >
           {purchasePending ? 'Processing...' : 'Purchase'}

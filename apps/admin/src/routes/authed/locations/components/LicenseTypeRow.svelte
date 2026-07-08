@@ -29,7 +29,7 @@
     class:border-[#ddd]={!isEnabled}
   >
     <span
-      class="pointer-events-none relative inline-flex h-[22px] w-[22px] items-center justify-center rounded-full bg-white shadow-sm transition-transform duration-200 ease-in-out"
+      class="pointer-events-none relative inline-flex h-5.5 w-5.5 items-center justify-center rounded-full bg-white shadow-sm transition-transform duration-200 ease-in-out"
       class:translate-x-[24px]={isEnabled}
       class:translate-x-[1px]={!isEnabled}
     >
@@ -71,8 +71,8 @@
         <div class="flex items-center border border-[#dbdbdb] rounded-sm bg-white overflow-hidden text-sm h-10.5">
           <span class="px-2.5 text-[#30364b]">$</span>
           <input
-            type="text"
-            inputmode="numeric"
+            type="number"
+            min="0.5"
             value={$locationStore.licensing.licensePrices[license.id]}
             oninput={(e) => locationStore.setLicenseTypePrice(license.id, e.currentTarget.value)}
             onblur={(e) => {
@@ -83,7 +83,7 @@
               }
             }}
             onwheel={(e) => e.preventDefault()}
-            placeholder="2,000"
+            placeholder="USD"
             class="flex-1 h-full w-20 font-medium focus:outline-none pr-2 text-[#30364b]"
           />
           <span class="px-2.5 text-[10px] text-[#30364b]/50 whitespace-nowrap">USD</span>

@@ -17,7 +17,7 @@
     locationStore.setAgreedToFee(!$locationStore.licensing.agreedToFee)
   }
 
-  const canContinue = $derived(Boolean($isFormValid && !$locationStore.ui.loading && primaryLocationFile))
+  const canContinue = $derived(Boolean($isFormValid && !$locationStore.ui.loading))
 </script>
 
 <div class="space-y-12 mt-7.25 text-dark">
@@ -31,7 +31,6 @@
 
   <!-- License Types -->
   <div class="space-y-4">
-    <p class="text-sm font-medium text-[#747474]">A minimum of one must be selected</p>
     <h3 class="text-base font-semibold text-dark font-heading">License types <span class="text-[#ff0000]">*</span></h3>
 
     <div class="space-y-6">

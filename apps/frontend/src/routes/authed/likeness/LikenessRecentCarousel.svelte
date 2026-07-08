@@ -98,8 +98,4 @@
   .carousel-track::-webkit-scrollbar {
     display: none;
   }
-
-  .rotate-180 {
-    transform: rotate(180deg);
-  }
 </style>

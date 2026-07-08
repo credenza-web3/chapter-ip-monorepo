@@ -6,12 +6,21 @@ export type LocationLicensingMetadata = {
   agreedToFee: boolean
 }
 
+export type LocationAddress = {
+  street: string
+  apt: string
+  city: string
+  state: string
+  zip: string
+}
+
 export type LocationMetadata = {
   type: 'location'
   name: string
   description: string
   file_name: string
   licensing: LocationLicensingMetadata
+  address?: LocationAddress
 }
 
 export type LocationLicensingMetadataInput = Partial<LocationLicensingMetadata>
