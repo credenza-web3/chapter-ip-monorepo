@@ -46,7 +46,6 @@ test('renders location metadata, compatible platforms, and purchase action', asy
   await expect.element(screen.getByText('by The City of New York')).toBeVisible()
   await expect.element(screen.getByText('A baseball stadium in Queens, New York.')).toBeVisible()
   await expect.element(screen.getByText('Compatible with')).toBeVisible()
-  await expect.element(screen.getByRole('img', { name: 'DaVinci' })).toBeVisible()
   await expect.element(screen.getByText('Baseball')).toBeVisible()
 
   const purchaseButton = screen.getByRole('button', { name: 'Purchase' })

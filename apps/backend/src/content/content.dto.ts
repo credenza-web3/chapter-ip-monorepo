@@ -57,7 +57,7 @@ export const registerContentOutputSchema = z.object({
   tokenId: z.string().optional(),
   contractAddress: z.string(),
   metadata: contentMetadataRecordSchema,
-  tags: z.array(z.string()),
+  tags: z.array(z.string()).optional(),
   status: z.enum(ContentStatus),
   createdAt: z.date(),
   updatedAt: z.date(),
