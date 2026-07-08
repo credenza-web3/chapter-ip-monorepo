@@ -46,6 +46,7 @@ export type TCreateContentFileUploadUrlInput = z.infer<typeof createContentFileU
 export const registerContentInputSchema = z.object({
   tokenId: z.string().optional(),
   metadata: contentMetadataRecordSchema,
+  tags: z.array(z.string()).optional(),
   status: z.enum(ContentStatus).optional(),
 })
 export type TRegisterContentInput = z.infer<typeof registerContentInputSchema>
@@ -56,6 +57,7 @@ export const registerContentOutputSchema = z.object({
   tokenId: z.string().optional(),
   contractAddress: z.string(),
   metadata: contentMetadataRecordSchema,
+  tags: z.array(z.string()),
   status: z.enum(ContentStatus),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -66,6 +68,7 @@ export const updateContentMetadataInputSchema = z.object({
   contentId: z.string(),
   tokenId: z.string().optional(),
   metadata: contentMetadataRecordSchema,
+  tags: z.array(z.string()).optional(),
   status: z.enum(ContentStatus).optional(),
 })
 export type TUpdateContentMetadataInput = z.infer<typeof updateContentMetadataInputSchema>
@@ -175,7 +178,9 @@ export const getContentByIdInputSchema = z.object({
 })
 export type TGetContentByIdInput = z.infer<typeof getContentByIdInputSchema>
 
-export const getContentByIdOutputSchema = contentOutputSchema
+export const getContentByIdOutputSchema = contentOutputSchema.extend({
+  similarContents: z.array(registerContentOutputSchema),
+})
 export type TGetContentByIdOutput = z.infer<typeof getContentByIdOutputSchema>
 
 export const getContentFileLinkInputSchema = z

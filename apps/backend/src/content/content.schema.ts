@@ -37,6 +37,9 @@ export class Content extends Document<ObjectId> {
   @Prop({ type: Mongooseschema.Types.Mixed, default: {} })
   declare metadata: Record<string, unknown>
 
+  @Prop({ type: [String], default: [] })
+  declare tags: string[]
+
   @Prop({ required: true, enum: ContentStatus, default: ContentStatus.ACTIVE })
   declare status: ContentStatus
 
@@ -56,4 +59,5 @@ ContentSchema.index(
 )
 ContentSchema.index({ createdAt: 1 })
 ContentSchema.index({ updatedAt: 1 })
+ContentSchema.index({ tags: 1 })
 ContentSchema.index({ 'metadata.$**': 1 })

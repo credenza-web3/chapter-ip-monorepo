@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { Model, Types } from 'mongoose'
 
 import { CommonModelService } from '../common/model/model.service'
 
@@ -68,5 +68,33 @@ export class ContentModelService extends CommonModelService<Content> {
       case 'regex':
         return { [field]: { $regex: condition.val } }
     }
+  }
+
+  async findSimilarByTags(contentId: string, tags: string[], limit = 20) {
+    if (!tags.length) {
+      return []
+    }
+
+    const results = await this.contentModel.aggregate([
+      {
+        $match: {
+          _id: { $ne: new Types.ObjectId(contentId) },
+          tags: { $in: tags },
+        },
+      },
+      {
+        $addFields: {
+          matchingTagsCount: {
+            $size: { $setIntersection: ['$tags', tags] },
+          },
+        },
+      },
+      { $match: { matchingTagsCount: { $gt: 0 } } },
+      { $sort: { matchingTagsCount: -1, createdAt: -1 } },
+      { $limit: limit },
+      { $project: { matchingTagsCount: 0 } },
+    ])
+
+    return results.map((item) => ({ ...item, id: String(item._id) }))
   }
 }
