@@ -212,9 +212,9 @@ describe('UploadService', () => {
     }
     const service = new UploadService(transactionService as never)
 
-    await expect(service.mintContent({ lifetimePrice: 10, oneTimePrice: 5 })).resolves.toBe('token-id')
+    await expect(service.mintContent({ oneTimePrice: 5 })).resolves.toBe('token-id')
 
-    expect(transactionService.mintWithPrices).toHaveBeenCalledWith('access-token', 10, 5)
+    expect(transactionService.mintWithPrices).toHaveBeenCalledWith('access-token', 5)
   })
 
   it('finalizes content as active with metadata and token id', async () => {

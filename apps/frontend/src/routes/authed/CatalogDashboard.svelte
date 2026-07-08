@@ -1,10 +1,13 @@
 <script lang="ts">
-  import { MOCK_CREATIVE_WORKS, MOCK_LOCATIONS, toDashboardCards, type DashboardSection } from './dashboard'
-  import { DEFAULT_IMAGE_URL } from './likeness/likeness'
+  import chapterLogoUrl from '$lib/assets/chapter-new-logo.png'
+  import { useDefaultImage } from '$lib/content/image'
+  import { toDashboardCards, toLocationDashboardCards, type DashboardSection } from './dashboard'
   import type { LikenessItem } from './likeness/likeness'
+  import type { LocationItem } from './location/location'
 
-  let { likenessItems } = $props<{
+  let { likenessItems, locationItems } = $props<{
     likenessItems: LikenessItem[]
+    locationItems: LocationItem[]
   }>()
 
   const sections = $derived<DashboardSection[]>([
@@ -15,29 +18,22 @@
       items: toDashboardCards(likenessItems),
     },
     {
-      title: 'Creative Works',
-      ctaLabel: 'View all Creative Works',
-      disabled: true,
-      items: MOCK_CREATIVE_WORKS,
-    },
-    {
       title: 'Locations',
       ctaLabel: 'View all Locations',
-      disabled: true,
-      items: MOCK_LOCATIONS,
+      href: '/authed/location',
+      items: toLocationDashboardCards(locationItems),
     },
   ])
-
-  function useDefaultImage(event: Event) {
-    const image = event.currentTarget as HTMLImageElement
-    if (image.src !== DEFAULT_IMAGE_URL) image.src = DEFAULT_IMAGE_URL
-  }
 </script>
 
 <div class="mx-auto w-full max-w-360 px-2 py-5 sm:px-4 lg:px-8">
   <header class="mb-8">
-    <h1 class="text-2xl font-bold leading-tight text-dark">ChapterIP</h1>
-    <p class="mt-1 text-sm font-medium text-[#7b7881] sm:text-base">What do you want to license today?</p>
+    <div class="flex justify-center">
+      <img src={chapterLogoUrl} alt="ChapterIP" class="w-[300px] object-contain" />
+    </div>
+    <p class="mt-1 text-center text-base font-medium text-[#7b7881]">
+      Infrastructure for media IP licensing in the AI age.
+    </p>
   </header>
 
   <div class="space-y-12 lg:space-y-14">
@@ -67,8 +63,8 @@
           <div class="grid grid-cols-1 gap-x-7 gap-y-8 min-[480px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
             {#each section.items as item (item.id)}
               <article class="min-w-0">
-                {#if section.title === 'Likeness'}
-                  <a href={`/authed/likeness/${item.id}`} class="group block">
+                {#if section.href && !section.disabled}
+                  <a href={`${section.href}/${item.id}`} class="group block">
                     <img
                       src={item.imageUrl}
                       alt={item.title}

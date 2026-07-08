@@ -11,8 +11,8 @@
 
   const defaultSearchTargets: SearchTarget[] = [
     { label: 'Creative Works', disabled: true },
-    { label: 'Location', disabled: true },
     { label: 'Likeness', href: '/authed/likeness' },
+    { label: 'Location', href: '/authed/location' },
   ]
 
   let { query = '', targets = defaultSearchTargets } = $props<{

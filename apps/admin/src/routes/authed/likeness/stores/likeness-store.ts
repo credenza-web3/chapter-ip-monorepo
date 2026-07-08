@@ -115,12 +115,8 @@ function createLikenessStore() {
       affiliations: [{ union: '', memberId: '' }],
     },
     licensing: {
-      isLifetime: false,
-      isOneTime: false,
-      lifetimePrice: 0,
-      oneTimePrice: 0,
       licenseTypes: {
-        'single-use': false,
+        'single-use': true,
         'time-limited': false,
         perpetual: false,
         'ai-digital': false,
@@ -132,11 +128,6 @@ function createLikenessStore() {
         perpetual: '',
         'ai-digital': '',
         bulk: '',
-      },
-      licenseDropdowns: {
-        'time-limited': '1 year',
-        perpetual: 'Ongoing',
-        bulk: 'Enterprise',
       },
       permittedUses: {},
       territories: ['United States only'],
@@ -226,14 +217,6 @@ function createLikenessStore() {
           licenseTypes: { ...s.licensing.licenseTypes, [id]: value },
           licensePrices: { ...s.licensing.licensePrices, [id]: value ? s.licensing.licensePrices[id] : '' },
         }
-        if (id === 'single-use') {
-          nextLicensing.isOneTime = value
-          nextLicensing.oneTimePrice = value ? Number(nextLicensing.licensePrices[id] || 0) : 0
-        }
-        if (id === 'perpetual') {
-          nextLicensing.isLifetime = value
-          nextLicensing.lifetimePrice = value ? Number(nextLicensing.licensePrices[id] || 0) : 0
-        }
         return { ...s, licensing: nextLicensing }
       }),
     setLicenseTypePrice: (id: string, value: string) =>
@@ -243,18 +226,8 @@ function createLikenessStore() {
           ...s.licensing,
           licensePrices: { ...s.licensing.licensePrices, [id]: safeValue },
         }
-        if (id === 'single-use') nextLicensing.oneTimePrice = Number(safeValue)
-        if (id === 'perpetual') nextLicensing.lifetimePrice = Number(safeValue)
         return { ...s, licensing: nextLicensing }
       }),
-    setLicenseTypeDropdown: (id: string, value: string) =>
-      update((s) => ({
-        ...s,
-        licensing: {
-          ...s.licensing,
-          licenseDropdowns: { ...s.licensing.licenseDropdowns, [id]: value },
-        },
-      })),
     setPermittedUse: (id: string, value: boolean) =>
       update((s) => ({
         ...s,
@@ -299,7 +272,6 @@ function createLikenessStore() {
           ...licensing,
           licenseTypes: { ...s.licensing.licenseTypes, ...(licensing.licenseTypes ?? {}) },
           licensePrices: { ...s.licensing.licensePrices, ...(licensing.licensePrices ?? {}) },
-          licenseDropdowns: { ...s.licensing.licenseDropdowns, ...(licensing.licenseDropdowns ?? {}) },
           permittedUses: { ...s.licensing.permittedUses, ...(licensing.permittedUses ?? {}) },
         },
         confirmations: { rightsConfirmed: true },
@@ -330,10 +302,6 @@ function createLikenessStore() {
           affiliations: [{ union: '', memberId: '' }],
         },
         licensing: {
-          isLifetime: false,
-          isOneTime: false,
-          lifetimePrice: 0,
-          oneTimePrice: 0,
           licenseTypes: {
             'single-use': true,
             'time-limited': false,
@@ -347,11 +315,6 @@ function createLikenessStore() {
             perpetual: '',
             'ai-digital': '',
             bulk: '',
-          },
-          licenseDropdowns: {
-            'time-limited': '1 year',
-            perpetual: 'Ongoing',
-            bulk: 'Enterprise',
           },
           permittedUses: {},
           territories: ['United States only'],

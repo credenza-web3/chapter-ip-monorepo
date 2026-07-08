@@ -9,7 +9,7 @@
 
   import { getTrpcClient } from '$lib/stores/trpc-client'
   import { NOTIFICATIONS_DROPDOWN_LIMIT } from '$lib/constants'
-  import { NOTIFICATION_TYPE, type TNotificationItem } from '@repo/notifications'
+  import { type TNotificationItem } from '@repo/notifications'
   import NotificationsDropdown from '$lib/components/NotificationsDropdown.svelte'
 
   let { children } = $props()

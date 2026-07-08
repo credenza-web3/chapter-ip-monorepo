@@ -8,6 +8,11 @@
       "types": "./src/likeness.ts",
       "import": "./src/likeness.ts",
       "default": "./src/likeness.ts"
+    },
+    "./location": {
+      "types": "./src/location.ts",
+      "import": "./src/location.ts",
+      "default": "./src/location.ts"
     }
   },
   "devDependencies": {

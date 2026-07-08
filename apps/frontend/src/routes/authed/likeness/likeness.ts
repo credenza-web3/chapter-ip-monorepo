@@ -1,3 +1,4 @@
+import { DEFAULT_IMAGE_URL } from '$lib/content/image'
 import { r2Config } from '@repo/fe-services'
 import {
   ETHNICITY_OPTIONS,
@@ -25,8 +26,9 @@ export {
   WEIGHT_RANGES,
 }
 
+export { DEFAULT_IMAGE_URL }
+
 export const RECENT_LIMIT = 10
-export const DEFAULT_IMAGE_URL = r2Config.url + r2Config.defaultImage
 
 type ArrayFilterKey = 'ethnicity' | 'eyeColor' | 'hairColor' | 'union' | 'licenseType' | 'permittedUse'
 type EqualityFilterValue = string | number | boolean | null

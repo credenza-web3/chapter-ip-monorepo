@@ -1,12 +1,12 @@
 <script lang="ts">
-  import type { LikenessPurchase } from './types'
-
   let {
     image,
     onClose,
+    dialogLabel = 'Enlarged image',
   }: {
-    image: LikenessPurchase['images'][number]
+    image: { src: string; alt: string }
     onClose: () => void
+    dialogLabel?: string
   } = $props()
 
   function handleKeydown(event: KeyboardEvent) {
@@ -26,7 +26,7 @@
   <div
     role="dialog"
     aria-modal="true"
-    aria-label="Enlarged likeness image"
+    aria-label={dialogLabel}
     tabindex="-1"
     class="relative flex max-h-full max-w-5xl items-center justify-center"
   >

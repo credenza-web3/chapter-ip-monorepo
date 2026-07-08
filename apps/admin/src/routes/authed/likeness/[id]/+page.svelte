@@ -93,7 +93,6 @@
   }
 
   const getLicensePrices = () => ({
-    lifetimePrice: Number($likenessStore.licensing.licensePrices['perpetual']),
     oneTimePrice: Number($likenessStore.licensing.licensePrices['single-use']),
   })
 

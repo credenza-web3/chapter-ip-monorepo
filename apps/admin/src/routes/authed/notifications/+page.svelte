@@ -13,7 +13,6 @@
   import type { TNotificationItem } from '@repo/notifications'
 
   let activeMenuRow = $state<number | null>(null)
-
   const trpcClient = getTrpcClient()
 
   const pagination = useCursorPagination<TNotificationItem>({
@@ -96,7 +95,8 @@
                 {@const metadata = content?.['metadata'] as Record<string, unknown> | undefined}
                 {@const itemType = metadata?.['type'] as string | undefined}
                 {@const profile = metadata?.['profile'] as Record<string, unknown> | undefined}
-                {@const fullName = profile?.['fullLegalName'] as string | undefined}
+                {@const fullLikenessName = profile?.['fullLegalName'] as string | undefined}
+                {@const fullLocationsName = metadata?.['name'] as string | undefined}
                 <tr
                   class="border-b border-[#ddd] last:border-0 {activeMenuRow === i
                     ? 'bg-[#ece7df]'
@@ -109,7 +109,8 @@
                   <td class="px-4 py-1.5">{formatDate(tx.createdAt)}</td>
                   <td class="px-4 py-1.5">
                     <p class="text-[13px] font-semibold">
-                      {itemType ?? ''} [{fullName ?? ''}] {tx.type === NOTIFICATION_TYPE.CONTENT_CREATED
+                      {itemType ?? ''} [{fullLikenessName ?? fullLocationsName ?? ''}] {tx.type ===
+                      NOTIFICATION_TYPE.CONTENT_CREATED
                         ? 'added to your products'
                         : 'was purchased'}
                     </p>

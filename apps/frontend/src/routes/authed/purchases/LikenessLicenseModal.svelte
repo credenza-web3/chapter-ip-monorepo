@@ -63,8 +63,7 @@
                 <div class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
                   <h4 class="font-semibold text-[#1a1a2e]">{license.name}</h4>
                   <p class="font-semibold text-primary">
-                    ${license.price}{#if license.detail}
-                      / {license.detail}{/if}
+                    ${license.price}
                   </p>
                 </div>
                 {#if license.description}

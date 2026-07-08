@@ -1,3 +1,4 @@
+import { formatLabel, getLicenses, trimString } from '$lib/content/licensing'
 import { getPreviewUrl } from '../likeness'
 import { LICENSE_TYPE_OPTIONS, PERMITTED_USE_OPTIONS } from '@repo/content-types/likeness'
 import type {
@@ -42,17 +43,6 @@ const PERMITTED_USE_NAMES: Record<string, string> = {
   ...Object.fromEntries(PERMITTED_USE_OPTIONS.map((option) => [option.value, option.label])),
 }
 
-function trimString(value: unknown): string {
-  return value == null ? '' : String(value).trim()
-}
-
-function formatLabel(value: string): string {
-  return value
-    .split('-')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
-}
-
 function formatHeight(attributes: Partial<LikenessProfileAttributes> | undefined): string {
   const feet = trimString(attributes?.heightFt)
   const inches = trimString(attributes?.heightIn)
@@ -83,24 +73,10 @@ function getAffiliations(affiliations: Array<Partial<LikenessProfileAffiliation>
   })
 }
 
-function getLicenses(licensing: LikenessLicensingMetadataInput | undefined): LikenessLicense[] {
-  const enabledTypes = licensing?.licenseTypes ?? {}
-  const prices = licensing?.licensePrices ?? {}
-  const details = licensing?.licenseDropdowns ?? {}
-
-  return Object.entries(enabledTypes).flatMap(([id, enabled]) => {
-    if (enabled !== true) return []
-
-    const price = trimString(prices[id]) || '0'
-    return [
-      {
-        id,
-        name: LICENSE_NAMES[id] ?? formatLabel(id),
-        price,
-        detail: trimString(details[id]),
-        description: LICENSE_DESCRIPTIONS[id] ?? '',
-      },
-    ]
+function getLikenessLicenses(licensing: LikenessLicensingMetadataInput | undefined): LikenessLicense[] {
+  return getLicenses(licensing, {
+    licenseNames: LICENSE_NAMES,
+    licenseDescriptions: LICENSE_DESCRIPTIONS,
   })
 }
 
@@ -180,7 +156,7 @@ export function normalizeLikeness(content: LikenessContentInput, contractAddress
       { label: 'Hair color', value: trimString(attributes?.hairColor) },
     ].filter((attribute) => attribute.value),
     affiliations: getAffiliations(profile?.affiliations),
-    licenses: getLicenses(licensing),
+    licenses: getLikenessLicenses(licensing),
     permittedUses: getPermittedUses(licensing?.permittedUses),
     territories: (licensing?.territories ?? []).map(trimString).filter(Boolean),
     allowRetouching: licensing?.allowRetouching === 'yes',
