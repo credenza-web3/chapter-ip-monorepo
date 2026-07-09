@@ -35,7 +35,7 @@
   <Header {authStore} logoHref="/authed">
     <div class="flex w-full flex-col gap-3 lg:flex-row lg:items-center lg:gap-6">
       <nav aria-label="Content dashboards" class="shrink-0">
-        <ul class="flex flex-wrap items-start gap-x-2 text-[15px] font-medium leading-[1.93px] text-[#767682]">
+        <ul class="flex flex-wrap items-start gap-x-2 text-[15px] font-medium leading-[29px] text-[#767682]">
           {#each navItems as item, index (item.label)}
             <li class="flex items-center gap-x-2">
               {#if item.href && !item.disabled}
@@ -51,7 +51,7 @@
               {/if}
 
               {#if index < navItems.length - 1}
-                <span class="text-[#767682] text-base font-normal" aria-hidden="true">|</span>
+                <span class="w-px h-4 shrink-0 bg-[#767682]" aria-hidden="true"></span>
               {/if}
             </li>
           {/each}
