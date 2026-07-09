@@ -63,7 +63,7 @@
       </div>
     </div>
   </Header>
-  <main class="space-y-0 flex-1 md:p-6 p-2 mb-20">
+  <main class="space-y-0 flex-1 md:p-6 p-2 mb-20 pt-18">
     {@render children?.()}
   </main>
   <Footer />

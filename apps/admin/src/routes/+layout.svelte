@@ -89,7 +89,7 @@
       </div>
     </div>
   </Header>
-  <main class="flex flex-1 flex-col bg-cream px-6 pt-9.75">
+  <main class="flex flex-1 flex-col bg-cream px-6 pt-18">
     <div class="flex-1">
       {@render children?.()}
     </div>
