@@ -71,7 +71,7 @@
 </svelte:head>
 
 <Toast />
-<div class="flex min-h-screen flex-col overflow-x-hidden bg-cream text-dark">
+<div class="flex min-h-screen flex-col overflow-clip bg-cream text-dark">
   <Header {authStore} {menuItems} pathname={page.url.pathname} showCreateButton={true}>
     <div class="flex h-full items-stretch w-full justify-between md:pl-15 pl-2">
       <div class="flex items-stretch">
@@ -89,7 +89,7 @@
       </div>
     </div>
   </Header>
-  <main class="flex flex-1 flex-col bg-cream px-6 pt-18">
+  <main class="flex flex-1 flex-col bg-cream px-6 pt-9.75">
     <div class="flex-1">
       {@render children?.()}
     </div>

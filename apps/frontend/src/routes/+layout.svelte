@@ -31,7 +31,7 @@
   <title>chapter ip</title>
 </svelte:head>
 <Toast />
-<div class="min-h-screen overflow-x-hidden flex flex-col">
+<div class="min-h-screen overflow-clip flex flex-col">
   <Header {authStore} logoHref="/authed">
     <div class="flex w-full flex-col gap-3 lg:flex-row lg:items-center lg:gap-6">
       <nav aria-label="Content dashboards" class="shrink-0">
@@ -63,7 +63,7 @@
       </div>
     </div>
   </Header>
-  <main class="space-y-0 flex-1 md:p-6 p-2 mb-20 pt-18">
+  <main class="space-y-0 flex-1 md:p-6 p-2 mb-20">
     {@render children?.()}
   </main>
   <Footer />
