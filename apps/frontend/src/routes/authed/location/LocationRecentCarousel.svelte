@@ -33,7 +33,7 @@
 
 <section class="mb-7" aria-labelledby="recently-added-heading">
   <div class="mb-3 flex items-center justify-between gap-4">
-    <h1 id="recently-added-heading" class="text-base font-bold text-dark">Recently added</h1>
+    <h1 id="recently-added-heading" class="text-sm font-semibold text-[#202225]">Recently added</h1>
 
     {#if items.length > 0}
       <div class="hidden items-center gap-1 sm:flex">
@@ -68,7 +68,7 @@
       {#each items as item (item.id)}
         <a
           href={`/authed/location/${item.id}`}
-          class="flex w-[min(88vw,382px)] shrink-0 snap-start gap-3 rounded-sm border border-[#ddd8d1] p-2.5 sm:w-95.5"
+          class="flex w-[min(88vw,382px)] shrink-0 snap-start gap-3 rounded-sm border border-[#ddd8d1] p-2.5 sm:w-95.5 pb-6.5"
         >
           <img
             src={item.imageUrl}
@@ -77,9 +77,9 @@
             onerror={useDefaultImage}
           />
           <div class="min-w-0 py-1">
-            <h2 class="truncate text-base font-semibold text-dark">{item.name || 'Unnamed location'}</h2>
+            <h2 class="truncate text-sm font-semibold text-left text-[#202225]">{item.name || 'Unnamed location'}</h2>
             {#if item.description}
-              <p class="mt-1 line-clamp-2 text-sm leading-5 text-[#77757d]">{item.description}</p>
+              <p class="mt-1 line-clamp-2 leading-5 text-xs font-medium text-[#707070]">{item.description}</p>
             {/if}
           </div>
         </a>

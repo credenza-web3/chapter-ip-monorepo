@@ -20,7 +20,7 @@
             onerror={useDefaultImage}
           />
         </div>
-        <h3 class="mt-3 truncate text-base font-semibold text-dark">{item.name || 'Unnamed location'}</h3>
+        <h3 class="mt-3 truncate text-base font-semibold text-[#202225]">{item.name || 'Unnamed location'}</h3>
         {#if item.authorName}
           <p class="mt-0.5 text-xs font-medium text-[#747474]">by {item.authorName}</p>
         {/if}

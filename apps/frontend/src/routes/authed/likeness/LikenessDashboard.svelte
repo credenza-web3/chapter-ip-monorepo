@@ -64,7 +64,7 @@
     class="rounded-2xl border border-[#ebe6df] bg-[#f8f5f1] px-4 py-8 sm:px-6 lg:px-13 lg:py-12"
     aria-labelledby="likeness-heading"
   >
-    <h2 id="likeness-heading" class="text-xl font-bold text-dark">Likeness</h2>
+    <h2 id="likeness-heading" class="text-lg font-semibold text-dark">Likeness</h2>
 
     <LikenessFilterControls
       {filters}
