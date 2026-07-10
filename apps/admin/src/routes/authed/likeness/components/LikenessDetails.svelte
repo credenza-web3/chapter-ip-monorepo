@@ -1,6 +1,18 @@
 <script lang="ts">
   import { EYE_COLOR_OPTIONS, ETHNICITY_OPTIONS, HAIR_COLOR_OPTIONS, UNION_OPTIONS } from '../constants/constants'
-  import { likenessStore } from '../stores/likeness-store'
+  import { getHeightTotalInches, likenessStore } from '../stores/likeness-store'
+
+  const heightCm = $derived(() => {
+    const totalInches = getHeightTotalInches($likenessStore.profile.attributes)
+    if (totalInches === undefined) return null
+    return `(${Math.round(totalInches * 2.54)} cm)`
+  })
+
+  const weightKg = $derived(() => {
+    const weight = $likenessStore.profile.attributes.weight
+    if (!weight || !Number.isFinite(Number(weight))) return null
+    return `(${Math.round(Number(weight) * 0.453592)} kg)`
+  })
 </script>
 
 <div class="space-y-6">
@@ -23,7 +35,7 @@
   </label>
   <div class="flex gap-17.5">
     <label class="block">
-      <span class="mb-2 block text-sm text-[#71707a]">Height ()</span>
+      <span class="mb-2 block text-sm text-[#71707a]">Height<span class="ml-1.5 text-[10px]">{heightCm()}</span></span>
       <div class="flex gap-2">
         <div class="relative w-full max-w-25">
           <input
@@ -58,16 +70,21 @@
       </div>
     </label>
     <label class="block space-y-3">
-      <span class="mb-2 block text-sm text-[#71707a]">Weight</span>
-      <input
-        id="weight"
-        type="number"
-        bind:value={$likenessStore.profile.attributes.weight}
-        placeholder="0 lbs"
-        class="w-full h-11.75 bg-white rounded-sm border border-[#ddd4cc]
+      <span class="mb-2 block text-sm text-[#71707a]">Weight<span class="ml-1.5 text-[10px]">{weightKg()}</span></span>
+      <div class="relative w-full max-w-25">
+        <input
+          id="weight"
+          type="number"
+          bind:value={$likenessStore.profile.attributes.weight}
+          placeholder="0 lbs"
+          class="w-full h-11.75 bg-white rounded-sm border border-[#ddd4cc]
         p-3.75 pr-10 focus:border-primary focus:outline-none
         text-sm font-medium text-left text-[#71707a]"
-      />
+        />
+        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#71707a] opacity-0.3 font-medium">
+          lbs.
+        </span>
+      </div>
     </label>
   </div>
   <div class="flex justify-between max-w-137.5 gap-2.5">
