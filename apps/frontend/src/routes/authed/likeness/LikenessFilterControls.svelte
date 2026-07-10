@@ -18,17 +18,9 @@
     MultiFilterKey,
     WeightRangeValue,
   } from './LikenessDashboard.types'
+  import filtersIcon from '$lib/assets/sliders.svg'
 
-  let {
-    filters,
-    activeFilterCount,
-    openFilter,
-    onClearFilters,
-    onToggleFilter,
-    onToggleMultiFilter,
-    onSetHeightRange,
-    onSetWeightRange,
-  } = $props<{
+  let { filters, openFilter, onToggleFilter, onToggleMultiFilter, onSetHeightRange, onSetWeightRange } = $props<{
     filters: LikenessFilters
     activeFilterCount: number
     openFilter: FilterMenu | null
@@ -53,6 +45,8 @@
   }
 
   type FilterDescriptor = OptionFilterDescriptor | RangeFilterDescriptor
+
+  let isFiltersShow = $state(false)
 
   const filterDescriptors = [
     { kind: 'options', menu: 'ethnicity', label: 'Ethnicity', options: ETHNICITY_OPTIONS },
@@ -164,22 +158,17 @@
 {/snippet}
 
 <div class="mt-6 flex flex-wrap items-center gap-2">
-  <!-- <button
+  <button
     type="button"
     class="inline-flex size-9 items-center justify-center rounded-sm border border-[#ddd8d1] bg-[#f8f5f1] text-[#77757d] transition-colors disabled:opacity-40"
     aria-label="Clear filters"
-    disabled={activeFilterCount === 0}
-    onclick={onClearFilters}
+    onclick={() => (isFiltersShow = !isFiltersShow)}
   >
-    <svg aria-hidden="true" class="size-5" viewBox="0 0 20 20" fill="none">
-      <path d="M4 6H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-      <path d="M4 14H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-      <path d="M7 4V8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-      <path d="M13 12V16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-    </svg>
-  </button> -->
-
-  {#each filterDescriptors as descriptor (descriptor.menu)}
-    {@render filterButton(descriptor.menu, descriptor.label)}
-  {/each}
+    <img src={filtersIcon} alt="Toggle filters" />
+  </button>
+  {#if isFiltersShow}
+    {#each filterDescriptors as descriptor (descriptor.menu)}
+      {@render filterButton(descriptor.menu, descriptor.label)}
+    {/each}
+  {/if}
 </div>

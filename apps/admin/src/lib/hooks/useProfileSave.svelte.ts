@@ -66,8 +66,6 @@ export function useProfileSave(trpcClient: TRPCClient<AppRouter>) {
             })
             await uploadFileToBucket(file, url)
 
-            // avatarUrl = url.split('?')[0]
-
             avatarUrl = `${import.meta.env.VITE_USERFILES_BUCKET_HOST}/${key}`
           }
           const result = await savePublisher(trpcClient, profileData.publisherName, avatarUrl)
