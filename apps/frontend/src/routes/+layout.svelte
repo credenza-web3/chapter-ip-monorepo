@@ -15,11 +15,17 @@
     searchable?: boolean
   }
 
-  const navItems = [
+  const navItems: NavItem[] = [
     { label: 'Creative Works', disabled: true },
     { label: 'Likeness', href: '/authed/likeness' },
     { label: 'Location', href: '/authed/location' },
-    { label: 'Purchases', href: '/authed/purchases', searchable: false },
+  ]
+
+  const menuItems = [
+    {
+      text: 'Purchases',
+      href: '/authed/purchases',
+    },
   ]
 
   const searchTargets = navItems
@@ -32,10 +38,10 @@
 </svelte:head>
 <Toast />
 <div class="min-h-screen overflow-clip flex flex-col">
-  <Header {authStore} logoHref="/authed">
+  <Header {authStore} logoHref="/authed" {menuItems}>
     <div class="flex w-full flex-col gap-3 lg:flex-row lg:items-center lg:gap-6">
       <nav aria-label="Content dashboards" class="shrink-0">
-        <ul class="flex flex-wrap items-start gap-x-2 text-[15px] font-medium leading-[29px] text-[#767682]">
+        <ul class="flex flex-wrap items-start gap-x-2 text-[15px] font-medium leading-7.25 text-[#767682]">
           {#each navItems as item, index (item.label)}
             <li class="flex items-center gap-x-2">
               {#if item.href && !item.disabled}

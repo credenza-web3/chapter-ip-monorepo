@@ -23,7 +23,7 @@
   </label>
   <div class="flex gap-17.5">
     <label class="block">
-      <span class="mb-2 block text-sm text-[#71707a]">Height</span>
+      <span class="mb-2 block text-sm text-[#71707a]">Height ()</span>
       <div class="flex gap-2">
         <div class="relative w-full max-w-25">
           <input
