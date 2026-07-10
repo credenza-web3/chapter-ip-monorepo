@@ -52,7 +52,8 @@
 
 <header
   bind:this={headerRef}
-  class="mx-auto w-full flex items-center justify-between md:px-10 px-4 py-4 border-b border-[#eef2f6] bg-[#f8f5f1] sticky top-0 z-50 text-black"
+  style="box-shadow: 0 3px 6px rgba(26,26,46,0.05)"
+  class="mx-auto w-full flex items-center justify-between md:px-10 px-4 h-[60px] border-b border-[#eef2f6] bg-[#f8f5f1] sticky top-0 z-50 text-black"
 >
   <div class="w-full flex items-center gap-8">
     <a href={logoHref} class="flex-shrink-0">
