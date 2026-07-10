@@ -59,6 +59,7 @@ export type LocationDetails = {
   contentTokenId?: string
   name: string
   description: string
+  address?: LocationAddress
   tags: string[]
   authorName: string
   licenses: LocationLicense[]

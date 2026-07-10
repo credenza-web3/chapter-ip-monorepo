@@ -5,14 +5,24 @@
   import type { LocationDetails } from './types'
 
   let { locationDetails }: { locationDetails: LocationDetails } = $props()
-
   let showLightbox = $state(false)
   let selectedLicenseId = $state('')
   let purchasePending = $state(false)
-
   const selectedLicense = $derived(locationDetails.licenses.find((license) => license.id === selectedLicenseId))
   const purchaseDisabled = $derived(purchasePending || !canPurchaseLicense(locationDetails, selectedLicense))
   const byline = $derived(locationDetails.authorName ? `by ${locationDetails.authorName}` : '')
+  const addressFields = (() => {
+    const address = locationDetails.address
+    if (!address) return []
+
+    return [
+      { label: 'Street', value: address.street },
+      { label: 'Apt / Suite', value: address.apt },
+      { label: 'City', value: address.city },
+      { label: 'State', value: address.state },
+      { label: 'ZIP code', value: address.zip },
+    ].filter((field) => field.value.trim())
+  })()
 
   $effect(() => {
     if (!selectedLicenseId && locationDetails.licenses[0]) selectedLicenseId = locationDetails.licenses[0].id
@@ -45,6 +55,21 @@
 
   <div class="mt-12.5 grid gap-12 lg:grid-cols-[400px_minmax(0,515px)] lg:gap-8.75">
     <div class="min-w-0">
+      {#if addressFields.length > 0}
+        <section aria-labelledby="address-heading" class="mb-5">
+          <h2 id="address-heading" class="font-sans text-base leading-5.25 font-semibold text-[#202225]">Address</h2>
+          <dl class="mt-3 grid grid-cols-2 gap-x-6 gap-y-3 border-y border-[#1a1a2e1a] py-3.5">
+            {#each addressFields as field (field.label)}
+              <div class="min-w-0">
+                <dt class="text-xs leading-4.5 font-medium text-[#747474]">{field.label}</dt>
+                <dd class="mt-0.5 truncate text-sm leading-5.25 font-medium text-[#202225]" title={field.value}>
+                  {field.value}
+                </dd>
+              </div>
+            {/each}
+          </dl>
+        </section>
+      {/if}
       <section aria-label="Location preview" class="relative">
         <button
           type="button"

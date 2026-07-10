@@ -24,6 +24,7 @@ describe('location purchase mapper', () => {
           type: 'location',
           name: 'Citi Field',
           description: 'A baseball stadium in Queens, New York.',
+          address: { street: '41 Seaver Way', apt: '', city: 'Queens', state: 'NY', zip: '11368' },
           tags: ['Baseball', 'Queens'],
           file_name: 'citi-field.jpg',
           licensing: {
@@ -42,6 +43,7 @@ describe('location purchase mapper', () => {
       contentTokenId: '456',
       name: 'Citi Field',
       description: 'A baseball stadium in Queens, New York.',
+      address: { street: '41 Seaver Way', apt: '', city: 'Queens', state: 'NY', zip: '11368' },
       tags: ['Baseball', 'Queens'],
       authorName: 'The City of New York',
       licenses: [
