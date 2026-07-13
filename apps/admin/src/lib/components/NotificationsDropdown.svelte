@@ -189,7 +189,7 @@
       <div class="border-t border-[#DDD7D1] mb-3.5"></div>
       <div class="flex items-center justify-between">
         <span class="text-[13px] text-[#1A1A2E99] font-semibold wrap-break-word min-w-0">
-          {unreadNotifications.length} unread notifications
+          {unreadNotifications.length} unread of {$notificationStore.length} notifications
         </span>
         <button
           class="text-[13px] font-semibold text-primary hover:opacity-80 transition cursor-pointer"
