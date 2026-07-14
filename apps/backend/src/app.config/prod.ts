@@ -1,4 +1,6 @@
-export default () => ({
+import { withEnvOverrides } from '../common/utils/utils'
+
+const config = {
   credenza: {
     clientId: '',
     clientSecret: '',
@@ -17,4 +19,6 @@ export default () => ({
       metadataBucketHost: 'https://pub-66f560aee603432cac866e978f516cdb.r2.dev',
     },
   },
-})
+}
+
+export default () => withEnvOverrides(config)
