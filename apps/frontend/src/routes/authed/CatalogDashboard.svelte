@@ -38,6 +38,7 @@
     class="space-y-12 lg:space-y-14 rounded-3xl border border-solid border-dark/15 bg-[#f8f5f1] py-10 px-12.5 mb-30.75"
   >
     {#each sections as section (section.title)}
+      {console.log(section)}
       <section
         class:opacity-55={section.disabled}
         class="transition-opacity"
