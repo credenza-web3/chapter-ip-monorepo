@@ -2,6 +2,7 @@ import { Module, Logger } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
 import { TRPCModule } from 'nestjs-trpc'
+import merge from 'lodash/merge'
 
 import { CommonModule } from './common/common.module'
 import { AuthModule } from './auth/auth.module'
@@ -21,12 +22,13 @@ import prodConfig from './app.config/prod'
 
 const trpcErrorLogger = new Logger('TRPC Error')
 const env: string = getEnv()
+const environmentConfig = env === ENV.STAGING ? stagingConfig : env === ENV.PROD ? prodConfig : undefined
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [defaultConfig, ...(env === ENV.STAGING ? [stagingConfig] : []), ...(env === ENV.PROD ? [prodConfig] : [])],
+      load: [() => merge({}, defaultConfig(), environmentConfig?.() ?? {})],
     }),
     CommonModule,
     MongooseModule.forRootAsync({
