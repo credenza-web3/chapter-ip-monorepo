@@ -19,7 +19,7 @@
   onMount(async () => {
     loading = true
     const passport = new Passport({
-      chainId: '43113',
+      chainId: import.meta.env.VITE_CHAIN_ID || '43113',
       clientId: import.meta.env.VITE_CLIENT_ID,
       // provider: window.ethereum,
       config: {
