@@ -2,7 +2,7 @@ import imageCompression from 'browser-image-compression'
 import watermark from 'watermarkjs'
 import watermarkUrl from '@repo/ui-components/assets/ch-logo.svg'
 
-const PREVIEW_IMAGE_MIME_TYPES = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
+const PREVIEW_IMAGE_MIME_TYPES = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml'])
 
 export const isPreviewImage = (file: File): boolean => PREVIEW_IMAGE_MIME_TYPES.has(file.type)
 
