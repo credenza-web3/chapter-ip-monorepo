@@ -54,6 +54,7 @@ export class AuthService {
     })
 
     const accountsUrl = this.configService.getOrThrow<string>('credenza.accountsUrl')
+    console.log('accountsUrl', accountsUrl)
 
     const response = await fetch(`${accountsUrl}/oauth2/token`, {
       method: 'POST',
