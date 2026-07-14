@@ -18,8 +18,9 @@
 
   onMount(async () => {
     loading = true
+    const credenzaEnv = import.meta.env.VITE_ENV || 'staging'
     const passport = new Passport({
-      chainId: '43113',
+      chainId: credenzaEnv === 'prod' ? '43114' : '43113',
       clientId: import.meta.env.VITE_CLIENT_ID,
       // provider: window.ethereum,
       config: {

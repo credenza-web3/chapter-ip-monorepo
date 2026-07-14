@@ -14,9 +14,8 @@ vi.mock('$lib', () => ({
 }))
 
 vi.mock('@repo/fe-services', () => ({
-  r2Config: {
-    url: 'https://example.com/',
-    defaultImage: 'default.png',
+  r2BaseConfig: {
+    defaultImageUrl: 'https://example.com/default.png',
   },
 }))
 

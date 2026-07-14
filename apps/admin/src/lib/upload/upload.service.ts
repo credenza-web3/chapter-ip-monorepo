@@ -5,7 +5,7 @@ import uploadFileToBucket from './file-upload.service'
 import { createImagePreview, isPreviewImage } from './image-preview.service'
 import { STATUS, type StatusValue } from '../../routes/authed/likeness/constants/constants'
 
-import { r2Config } from '@repo/fe-services'
+import { r2BaseConfig } from '@repo/fe-services'
 
 export type NamedUpload = {
   file: File
@@ -217,7 +217,7 @@ export default class UploadService {
   }): Promise<void> {
     await this.uploadTokenMetadata({
       tokenId,
-      metadata: { title, description, keys, image: r2Config.url + r2Config.defaultImage },
+      metadata: { title, description, keys, image: r2BaseConfig.defaultImageUrl },
       trpcClient,
     })
   }

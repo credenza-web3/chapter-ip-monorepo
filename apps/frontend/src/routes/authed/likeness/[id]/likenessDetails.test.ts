@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
+import { r2BaseConfig } from '@repo/fe-services'
 import { normalizeLikeness } from './likenessDetails'
+
+const previewUrl = r2BaseConfig.previewUrl
 
 describe('likeness purchase mapper', () => {
   it('maps profile and enabled licensing metadata into the purchase view', () => {
@@ -92,11 +95,11 @@ describe('likeness purchase mapper', () => {
     expect(purchase?.attributes).toContainEqual({ label: 'Weight', value: '165 lbs (74.8 kg)' })
     expect(purchase?.images).toEqual([
       {
-        src: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/likeness-1/headshot_1',
+        src: `${previewUrl}/0xcontent/likeness-1/headshot_1`,
         alt: 'Avery Stone headshot_1',
       },
       {
-        src: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/likeness-1/bodyshot_1',
+        src: `${previewUrl}/0xcontent/likeness-1/bodyshot_1`,
         alt: 'Avery Stone bodyshot_1',
       },
     ])
@@ -104,13 +107,13 @@ describe('likeness purchase mapper', () => {
       {
         id: 'headshot_1',
         type: 'image',
-        src: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/likeness-1/headshot_1',
+        src: `${previewUrl}/0xcontent/likeness-1/headshot_1`,
         alt: 'Avery Stone headshot_1',
       },
       {
         id: 'bodyshot_1',
         type: 'image',
-        src: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/likeness-1/bodyshot_1',
+        src: `${previewUrl}/0xcontent/likeness-1/bodyshot_1`,
         alt: 'Avery Stone bodyshot_1',
       },
       { id: 'voice_sample_1', type: 'audio', label: 'voice_sample_1' },
@@ -188,7 +191,7 @@ describe('likeness purchase mapper', () => {
       approveFinalUse: false,
       images: [
         {
-          src: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/partial-likeness/headshot_1',
+          src: `${previewUrl}/0xcontent/partial-likeness/headshot_1`,
           alt: 'Unnamed likeness headshot_1',
         },
       ],
@@ -196,7 +199,7 @@ describe('likeness purchase mapper', () => {
         {
           id: 'headshot_1',
           type: 'image',
-          src: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/partial-likeness/headshot_1',
+          src: `${previewUrl}/0xcontent/partial-likeness/headshot_1`,
           alt: 'Unnamed likeness headshot_1',
         },
       ],
@@ -230,7 +233,7 @@ describe('likeness purchase mapper', () => {
       approveFinalUse: false,
       images: [
         {
-          src: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/empty-likeness/headshot_1',
+          src: `${previewUrl}/0xcontent/empty-likeness/headshot_1`,
           alt: 'Unnamed likeness headshot_1',
         },
       ],
@@ -238,7 +241,7 @@ describe('likeness purchase mapper', () => {
         {
           id: 'headshot_1',
           type: 'image',
-          src: 'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/empty-likeness/headshot_1',
+          src: `${previewUrl}/0xcontent/empty-likeness/headshot_1`,
           alt: 'Unnamed likeness headshot_1',
         },
       ],

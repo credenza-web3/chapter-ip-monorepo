@@ -1,5 +1,5 @@
 import { DEFAULT_IMAGE_URL } from '$lib/content/image'
-import { r2Config } from '@repo/fe-services'
+import { r2BaseConfig } from '@repo/fe-services'
 import type { LocationContent } from '@repo/content-types/location'
 
 export { DEFAULT_IMAGE_URL }
@@ -43,7 +43,7 @@ const SEARCH_FIELDS = ['name', 'description'] as const
 const REGEX_SPECIAL_CHARS = /[\\^$.*+?()[\]{}|]/g
 
 export function getPreviewUrl(contractAddress: string, contentId: string, filename: string): string {
-  return `${r2Config.url}${contractAddress}/${contentId}/${filename}`
+  return `${r2BaseConfig.previewUrl}/${contractAddress}/${contentId}/${filename}`
 }
 
 export function createEmptyLocationFilters(): LocationFilters {
