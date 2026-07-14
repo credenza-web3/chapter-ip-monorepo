@@ -34,11 +34,18 @@ beforeEach(() => {
 })
 
 describe('isPreviewImage', () => {
-  it.each(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])('accepts %s', (mimetype) => {
-    expect(isPreviewImage({ type: mimetype } as File)).toBe(true)
+  it.each(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/avif', 'image/gif', 'image/svg+xml'])(
+    'accepts %s',
+    (mimetype) => {
+      expect(isPreviewImage({ type: mimetype } as File)).toBe(true)
+    },
+  )
+
+  it('accepts a supported image filename when the browser does not provide a MIME type', () => {
+    expect(isPreviewImage({ name: 'headshot.JPG', type: '' } as File)).toBe(true)
   })
 
-  it.each(['image/gif', 'image/svg+xml', 'image/avif', 'application/pdf'])('rejects %s', (mimetype) => {
+  it.each(['application/pdf', 'audio/mpeg', 'video/mp4'])('rejects %s', (mimetype) => {
     expect(isPreviewImage({ type: mimetype } as File)).toBe(false)
   })
 })
@@ -78,5 +85,22 @@ describe('createImagePreview', () => {
     await expect(createImagePreview(original)).rejects.toThrow(previewError)
 
     expect(mocks.destroy).toHaveBeenCalledOnce()
+  })
+
+  it('creates a JPEG preview for image formats without a supported preview output type', async () => {
+    const original = new File(['original'], 'portrait.gif', { type: 'image/gif' })
+    const compressed = new File(['compressed'], 'portrait.gif', { type: 'image/jpeg' })
+    mocks.imageCompression.mockResolvedValue(compressed)
+    mocks.blob.mockResolvedValue(new Blob(['preview'], { type: 'image/jpeg' }))
+
+    const preview = await createImagePreview(original)
+
+    expect(mocks.imageCompression).toHaveBeenCalledWith(original, {
+      maxSizeMB: 0.2,
+      maxWidthOrHeight: 900,
+      useWebWorker: true,
+      fileType: 'image/jpeg',
+    })
+    expect(preview.type).toBe('image/jpeg')
   })
 })
