@@ -26,30 +26,34 @@
   ])
 </script>
 
-<div class="mx-auto w-full max-w-360 px-2 py-5 sm:px-4 lg:px-8">
-  <header class="mb-8">
+<div class="mx-auto w-full max-w-360">
+  <header class="mb-11">
     <div class="flex justify-center">
-      <img src={chapterLogoUrl} alt="ChapterIP" class="w-[300px] object-contain" />
+      <img src={chapterLogoUrl} alt="ChapterIP" class="w-75 object-contain" />
     </div>
-    <p class="mt-1 text-center text-base font-medium text-[#7b7881]">
-      Infrastructure for media IP licensing in the AI age.
-    </p>
+    <p class="text-center text-base text-[#707070]">Infrastructure for media IP licensing in the AI age.</p>
   </header>
 
-  <div class="space-y-12 lg:space-y-14">
+  <div
+    class="space-y-12 lg:space-y-14 rounded-3xl border border-solid border-dark/15 bg-[#f8f5f1] py-10 px-12.5 mb-30.75"
+  >
     {#each sections as section (section.title)}
+      {console.log(section)}
       <section
         class:opacity-55={section.disabled}
         class="transition-opacity"
         aria-labelledby={`${section.title.toLowerCase().replaceAll(' ', '-')}-heading`}
       >
         <div class="mb-4 flex items-center justify-between gap-4">
-          <h2 id={`${section.title.toLowerCase().replaceAll(' ', '-')}-heading`} class="text-xl font-bold text-dark">
+          <h2
+            id={`${section.title.toLowerCase().replaceAll(' ', '-')}-heading`}
+            class="text-base font-semibold leading-[1.81px] text-left text-dark"
+          >
             {section.title}
           </h2>
 
           {#if section.href && !section.disabled}
-            <a class="text-sm font-bold text-[#8d5dc4] hover:text-[#6f3fb0]" href={section.href}>
+            <a class="text-sm hover:text-[#5028cc] text-primary" href={section.href}>
               {section.ctaLabel}
             </a>
           {:else}
@@ -71,8 +75,8 @@
                       class="aspect-square w-full rounded-lg object-cover transition-opacity group-hover:opacity-85"
                       onerror={useDefaultImage}
                     />
-                    <h3 class="mt-3 line-clamp-2 text-base font-bold leading-[19px] text-dark">{item.title}</h3>
-                    <p class="mt-1 line-clamp-4 text-sm font-medium leading-[18px] text-[#77757d]">
+                    <h3 class="mt-3 line-clamp-2 text-base font-semibold text-left text-[#202225]">{item.title}</h3>
+                    <p class="mt-1 line-clamp-4 text-sm font-medium leading-4.5 text-[#747474]">
                       {item.description}
                     </p>
                   </a>
@@ -83,8 +87,8 @@
                     class:grayscale={section.disabled}
                     class="aspect-square w-full rounded-lg object-cover"
                   />
-                  <h3 class="mt-3 line-clamp-2 text-base font-bold leading-[19px] text-dark">{item.title}</h3>
-                  <p class="mt-1 line-clamp-4 text-sm font-medium leading-[18px] text-[#77757d]">
+                  <h3 class="mt-3 line-clamp-2 text-base font-bold leading-4.75 text-dark">{item.title}</h3>
+                  <p class="mt-1 line-clamp-4 text-sm font-medium leading-4.5 text-[#77757d]">
                     {item.description}
                   </p>
                 {/if}

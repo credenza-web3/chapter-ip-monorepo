@@ -77,7 +77,7 @@
 
     <div class="mt-11 grid gap-12 lg:grid-cols-[400px_minmax(0,515px)] lg:gap-8.25">
       <div>
-        <div class="aspect-[400/216] bg-[#e4dfd8]"></div>
+        <div class="aspect-400/216 bg-[#e4dfd8]"></div>
         <div class="mt-5 flex gap-2">
           <div class="h-7.5 w-24 rounded-full bg-[#e4dfd8]"></div>
           <div class="h-7.5 w-24 rounded-full bg-[#e4dfd8]"></div>

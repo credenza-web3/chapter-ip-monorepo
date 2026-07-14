@@ -77,7 +77,15 @@ export async function purchaseLicense({ purchase, license }: PurchaseLicenseInpu
   context.passport.once(Passport.events.ERROR, (error: unknown) => {
     throw error
   })
-  const payload = await requestPassportPayment(context)
+
+  let payload: PassportPaymentEvent
+  try {
+    payload = await requestPassportPayment(context)
+  } catch (error) {
+    if (error instanceof Error && error.message === 'Payment cancelled') return
+    throw error
+  }
+
   const payment = parsePassportPayment(payload)
   const hash = payment.kind === 'card' ? await redeemVoucher(payment, context) : payment.hash
 
@@ -130,8 +138,11 @@ async function getPurchaseContext({ purchase, license }: PurchaseLicenseInput): 
 }
 
 async function requestPassportPayment(context: PurchaseContext): Promise<PassportPaymentEvent> {
-  const paymentEvent = new Promise<PassportPaymentEvent>((resolve) => {
+  const paymentEvent = new Promise<PassportPaymentEvent>((resolve, reject) => {
     context.passport.once(Passport.events.PAYMENT, resolve)
+    context.passport.once(Passport.events.UI_CLOSED, () => {
+      reject(new Error('Payment cancelled'))
+    })
   })
 
   await context.passport.openUI(Passport.pages.PAYMENT, {

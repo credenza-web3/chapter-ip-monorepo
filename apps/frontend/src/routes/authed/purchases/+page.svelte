@@ -6,10 +6,10 @@
   const purchases = $derived([...data.lifetimeLicenses, ...data.onetimeLicenses])
 </script>
 
-<main class="min-h-screen bg-[#f5f1ec] px-4 py-8 text-[#1a1a2e] sm:px-6 lg:px-8">
+<main class="min-h-screen bg-cream px-4 py-8 text-dark sm:px-6 lg:px-8">
   <div class="mx-auto w-full max-w-5xl">
     <header class="mb-8 sm:mb-10">
-      <h1 class="font-heading text-4xl leading-11 font-semibold text-[#1a1a2e]">Purchases</h1>
+      <h1 class="font-heading text-4xl leading-11 font-semibold text-dark">Purchases</h1>
     </header>
 
     {#if !purchases.length}

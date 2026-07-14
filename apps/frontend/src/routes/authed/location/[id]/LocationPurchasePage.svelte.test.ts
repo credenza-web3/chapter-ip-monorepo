@@ -17,6 +17,7 @@ const locationDetails: LocationPurchase = {
   contentTokenId: '456',
   name: 'Citi Field',
   description: 'A baseball stadium in Queens, New York.',
+  address: { street: '41 Seaver Way', apt: '', city: 'Queens', state: 'NY', zip: '11368' },
   tags: ['Baseball', 'Queens'],
   authorName: 'The City of New York',
   licenses: [
@@ -45,6 +46,9 @@ test('renders location metadata, compatible platforms, and purchase action', asy
   await expect.element(screen.getByRole('heading', { name: 'Citi Field' })).toBeVisible()
   await expect.element(screen.getByText('by The City of New York')).toBeVisible()
   await expect.element(screen.getByText('A baseball stadium in Queens, New York.')).toBeVisible()
+  await expect.element(screen.getByRole('heading', { name: 'Address' })).toBeVisible()
+  await expect.element(screen.getByText('Street')).toBeVisible()
+  await expect.element(screen.getByText('41 Seaver Way')).toBeVisible()
   await expect.element(screen.getByText('Compatible with')).toBeVisible()
   await expect.element(screen.getByText('Baseball')).toBeVisible()
 

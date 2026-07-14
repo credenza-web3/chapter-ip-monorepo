@@ -15,11 +15,17 @@
     searchable?: boolean
   }
 
-  const navItems = [
+  const navItems: NavItem[] = [
     { label: 'Creative Works', disabled: true },
     { label: 'Likeness', href: '/authed/likeness' },
     { label: 'Location', href: '/authed/location' },
-    { label: 'Purchases', href: '/authed/purchases', searchable: false },
+  ]
+
+  const menuItems = [
+    {
+      text: 'Purchases',
+      href: '/authed/purchases',
+    },
   ]
 
   const searchTargets = navItems
@@ -31,11 +37,11 @@
   <title>chapter ip</title>
 </svelte:head>
 <Toast />
-<div class="min-h-screen overflow-x-hidden flex flex-col">
-  <Header {authStore} logoHref="/authed">
+<div class="min-h-screen overflow-clip flex flex-col">
+  <Header {authStore} logoHref="/authed" {menuItems}>
     <div class="flex w-full flex-col gap-3 lg:flex-row lg:items-center lg:gap-6">
       <nav aria-label="Content dashboards" class="shrink-0">
-        <ul class="flex flex-wrap items-start gap-x-2 text-sm font-semibold text-[#8b8790] sm:text-base">
+        <ul class="flex flex-wrap items-start gap-x-2 text-[15px] font-medium leading-7.25 text-[#767682]">
           {#each navItems as item, index (item.label)}
             <li class="flex items-center gap-x-2">
               {#if item.href && !item.disabled}
@@ -51,19 +57,19 @@
               {/if}
 
               {#if index < navItems.length - 1}
-                <span class="text-[#6f6b75]" aria-hidden="true">|</span>
+                <span class="w-px h-4 shrink-0 bg-[#767682]" aria-hidden="true"></span>
               {/if}
             </li>
           {/each}
         </ul>
       </nav>
 
-      <div class="w-full lg:ml-auto lg:max-w-[360px]">
+      <div class="w-full lg:ml-auto lg:max-w-90">
         <HeaderSearch query={page.url.searchParams.get('q') ?? ''} targets={searchTargets} />
       </div>
     </div>
   </Header>
-  <main class="space-y-0 flex-1 md:p-6 p-2 mb-20">
+  <main class="space-y-0 flex-1 md:p-6 md:pt-13.5 p-2">
     {@render children?.()}
   </main>
   <Footer />

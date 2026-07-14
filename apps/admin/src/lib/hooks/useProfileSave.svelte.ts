@@ -67,8 +67,6 @@ export function useProfileSave(trpcClient: TRPCClient<AppRouter>) {
             })
             await uploadFileToBucket(file, url)
 
-            // avatarUrl = url.split('?')[0]
-
             avatarUrl = `${r2BaseConfig.userFilesUrl}/${key}`
           }
           const result = await savePublisher(trpcClient, profileData.publisherName, avatarUrl)
