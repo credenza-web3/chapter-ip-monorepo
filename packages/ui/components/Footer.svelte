@@ -16,10 +16,13 @@
     </a>
   </p>
 
-  <div
-    class="flex items-center gap-2 rounded border border-[#dedbe0] bg-white px-2 py-1.5 text-sm font-bold text-[#4f4b52]"
+  <a
+    href="https://www.credenza3.com/"
+    target="_blank"
+    rel="noreferrer"
+    class="flex items-center gap-2 rounded border border-[#dedbe0] bg-white px-2 py-1.5 text-sm font-bold text-[#4f4b52] hover:opacity-80"
   >
     <img src={CredenzaLogo} alt="" class="size-6" aria-hidden="true" />
     <span>Powered by Credenza</span>
-  </div>
+  </a>
 </footer>
