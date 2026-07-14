@@ -52,7 +52,9 @@ export type LikenessItem = {
   id: string
   name: string
   bio: string
+  description?: string
   imageUrl: string
+  metadata?: LikenessContent['metadata']
 }
 
 type ContentItem = {
@@ -277,7 +279,9 @@ export function toLikenessItems(contentItems: ContentItem[], contractAddress: st
         id: item.id,
         name,
         bio,
+        description: bio,
         imageUrl: getPreviewUrl(contractAddress, item.id, 'headshot_1'),
+        metadata,
       },
     ]
   })
