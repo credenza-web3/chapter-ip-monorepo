@@ -66,16 +66,18 @@
   >
     <h2 id="likeness-heading" class="text-lg font-semibold text-dark">Likeness</h2>
 
-    <LikenessFilterControls
-      {filters}
-      {activeFilterCount}
-      {openFilter}
-      onClearFilters={clearFilters}
-      onToggleFilter={toggleFilter}
-      onToggleMultiFilter={toggleMultiFilter}
-      onSetHeightRange={setHeightRange}
-      onSetWeightRange={setWeightRange}
-    />
+    {#if items.length > 0}
+      <LikenessFilterControls
+        {filters}
+        {activeFilterCount}
+        {openFilter}
+        onClearFilters={clearFilters}
+        onToggleFilter={toggleFilter}
+        onToggleMultiFilter={toggleMultiFilter}
+        onSetHeightRange={setHeightRange}
+        onSetWeightRange={setWeightRange}
+      />
+    {/if}
 
     <div class="my-6 border-t border-[#e5e0d9]"></div>
 
