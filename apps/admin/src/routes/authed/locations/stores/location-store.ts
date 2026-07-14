@@ -60,7 +60,7 @@ function createLocationStore() {
         'single-use': true,
       },
       licensePrices: {
-        'single-use': '0.5',
+        'single-use': '',
       },
       agreedToFee: false,
     },
@@ -111,7 +111,7 @@ function createLocationStore() {
         const nextLicensing = {
           ...s.licensing,
           licenseTypes: { ...s.licensing.licenseTypes, [id]: value },
-          licensePrices: { ...s.licensing.licensePrices, [id]: value ? s.licensing.licensePrices[id] || '0.5' : '' },
+          licensePrices: { ...s.licensing.licensePrices, [id]: value ? s.licensing.licensePrices[id] || '' : '' },
         }
         return { ...s, licensing: nextLicensing }
       }),
@@ -176,7 +176,7 @@ function createLocationStore() {
             'single-use': true,
           },
           licensePrices: {
-            'single-use': '0.5',
+            'single-use': '',
           },
           agreedToFee: false,
         },
