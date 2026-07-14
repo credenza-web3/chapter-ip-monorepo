@@ -55,7 +55,7 @@ export class AuthService {
       redirect_uri: payload.redirectUri,
     })
 
-    const accountsUrl = this.configService.get<string>('credenza.accountsUrl')
+    const accountsUrl = this.configService.getOrThrow<string>('credenza.accountsUrl')
 
     const response = await fetch(`${accountsUrl}/oauth2/token`, {
       method: 'POST',
@@ -64,6 +64,7 @@ export class AuthService {
     })
 
     if (!response.ok) {
+      console.log(`Response:`, await response.json())
       throw new Error('Cannot exchange code for token')
     }
     const json = (await response.json()) as {
