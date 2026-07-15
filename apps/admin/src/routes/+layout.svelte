@@ -13,6 +13,7 @@
   import NotificationsDropdown from '$lib/components/NotificationsDropdown.svelte'
 
   let { children } = $props()
+  let avatarUrl = $derived(publisherStore.avatarUrl || '')
   const menuItems = [
     {
       text: 'Profile',
@@ -71,7 +72,7 @@
 </svelte:head>
 
 <Toast />
-<div class="flex min-h-screen flex-col overflow-x-hidden bg-cream text-dark">
+<div class="flex min-h-screen flex-col overflow-clip bg-cream text-dark">
   <Header {authStore} {menuItems} pathname={page.url.pathname} showCreateButton={true}>
     <div class="flex h-full items-stretch w-full justify-between md:pl-15 pl-2">
       <div class="flex items-stretch">
@@ -82,9 +83,13 @@
         <a
           href="/authed/profile"
           aria-label="Open profile"
-          class="my-auto flex items-center justify-center rounded-full bg-primary text-white font-semibold w-7 h-7"
+          class="my-auto flex size-7 items-center justify-center overflow-hidden rounded-full bg-primary text-white font-semibold"
         >
-          {publisherStore.title?.slice(0, 1)?.toUpperCase() || 'U'}
+          {#if avatarUrl}
+            <img src={avatarUrl} alt="Profile avatar" class="size-full object-cover" />
+          {:else}
+            {publisherStore.title?.slice(0, 1)?.toUpperCase() || 'U'}
+          {/if}
         </a>
       </div>
     </div>

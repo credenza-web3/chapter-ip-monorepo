@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { r2BaseConfig } from '@repo/fe-services'
 import {
   DEFAULT_IMAGE_URL,
   RECENT_LIMIT,
@@ -43,7 +44,7 @@ describe('likeness data helpers', () => {
 
   it('builds preview URLs from the contract, content id, and technical filename', () => {
     expect(getPreviewUrl(CONTRACT_ADDRESS, 'likeness-1', 'headshot_1')).toBe(
-      'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/likeness-1/headshot_1',
+      `${r2BaseConfig.previewUrl}/0xcontent/likeness-1/headshot_1`,
     )
   })
 

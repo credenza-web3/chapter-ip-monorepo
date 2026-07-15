@@ -1,6 +1,6 @@
-import { r2Config } from '@repo/fe-services'
+import { r2BaseConfig } from '@repo/fe-services'
 
-export const DEFAULT_IMAGE_URL = r2Config.url + r2Config.defaultImage
+export const DEFAULT_IMAGE_URL = r2BaseConfig.defaultImageUrl
 
 export function useDefaultImage(event: Event) {
   const image = event.currentTarget as HTMLImageElement

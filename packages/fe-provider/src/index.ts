@@ -6,12 +6,22 @@ let signer: ethers.Signer
 export const initProvider = async (accessToken: string): Promise<CredenzaProvider> => {
   if (provider) return provider
 
-  provider = new CredenzaProvider({
-    // rpcUrl: 'https://avalanche-fuji-c-chain-rpc.publicnode.com',
-    rpcUrl: 'https://api.avax-test.network/ext/bc/C/rpc',
-    accessToken,
-    env: 'staging', // 'prod' | 'staging'
-  })
+  const credenzaEnv = import.meta.env.VITE_ENV || 'staging'
+  console.log('credenzaEnv', credenzaEnv)
+  const providerConfig =
+    credenzaEnv === 'prod'
+      ? {
+          rpcUrl: 'https://api.avax.network/ext/bc/C/rpc',
+          accessToken,
+          env: 'prod', // 'prod' | 'staging'
+        }
+      : {
+          rpcUrl: 'https://api.avax-test.network/ext/bc/C/rpc',
+          accessToken,
+          env: 'staging', // 'prod' | 'staging'
+        }
+
+  provider = new CredenzaProvider(providerConfig)
 
   return provider
 }

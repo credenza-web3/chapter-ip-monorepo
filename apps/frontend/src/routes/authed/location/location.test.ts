@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { r2BaseConfig } from '@repo/fe-services'
 import {
   DEFAULT_IMAGE_URL,
   RECENT_LIMIT,
@@ -68,7 +69,7 @@ describe('location data helpers', () => {
 
   it('builds preview URLs from the contract, content id, and technical filename', () => {
     expect(getPreviewUrl(CONTRACT_ADDRESS, 'location-1', 'location_1')).toBe(
-      'https://pub-1a5fde2f5a814d7bbcaca6562a705028.r2.dev/0xcontent/location-1/location_1',
+      `${r2BaseConfig.previewUrl}/0xcontent/location-1/location_1`,
     )
   })
 

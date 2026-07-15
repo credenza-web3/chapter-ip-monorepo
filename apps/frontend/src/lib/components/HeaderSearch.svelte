@@ -76,7 +76,7 @@
   }
 </script>
 
-<div bind:this={root} class="relative w-full max-w-[360px] min-w-[220px]" onfocusout={handleFocusOut}>
+<div bind:this={root} class="relative w-full max-w-90 min-w-55" onfocusout={handleFocusOut}>
   <form
     role="search"
     aria-label="Site search"

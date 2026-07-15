@@ -17,7 +17,7 @@ type PaymentCallback = (payload: unknown) => void
 
 const mocks = vi.hoisted(() => {
   const state: {
-    paymentCallback: PaymentCallback | null
+    eventCallbacks: Record<string, PaymentCallback | null>
     passportStoreValue: object
     passportMock: {
       openUI: ReturnType<typeof vi.fn>
@@ -25,7 +25,7 @@ const mocks = vi.hoisted(() => {
       close: ReturnType<typeof vi.fn>
     }
   } = {
-    paymentCallback: null,
+    eventCallbacks: {},
     passportStoreValue: {},
     passportMock: {
       openUI: vi.fn(),
@@ -34,8 +34,8 @@ const mocks = vi.hoisted(() => {
     },
   }
 
-  state.passportMock.once.mockImplementation((_event: string, callback: PaymentCallback) => {
-    state.paymentCallback = callback
+  state.passportMock.once.mockImplementation((event: string, callback: PaymentCallback) => {
+    state.eventCallbacks[event] = callback
   })
 
   return state
@@ -56,7 +56,7 @@ vi.mock('$lib/stores/config.svelte', () => ({
 }))
 vi.mock('@credenza3/passport-evm', () => ({
   Passport: {
-    events: { PAYMENT: 'PAYMENT' },
+    events: { PAYMENT: 'PAYMENT', UI_CLOSED: 'UI_CLOSED' },
     pages: { PAYMENT: 'payment', RICH_ALERT: 'richAlert' },
   },
 }))
@@ -108,9 +108,9 @@ beforeEach(() => {
   vi.clearAllMocks()
   vi.stubEnv('VITE_CLIENT_ID', 'client-id')
   vi.stubEnv('VITE_CREDENZA_EVM_WSS', 'wss://evm')
-  mocks.paymentCallback = null
-  mocks.passportMock.once.mockImplementation((_event: string, callback: PaymentCallback) => {
-    mocks.paymentCallback = callback
+  mocks.eventCallbacks = {}
+  mocks.passportMock.once.mockImplementation((event: string, callback: PaymentCallback) => {
+    mocks.eventCallbacks[event] = callback
   })
   vi.mocked(authStore.getAccessToken).mockResolvedValue('access-token')
   vi.mocked(configStore.getContractAddress).mockImplementation((contractName) => {
@@ -182,6 +182,7 @@ describe('purchaseLicense', () => {
     await flushPromises()
 
     expect(mocks.passportMock.once).toHaveBeenCalledWith('PAYMENT', expect.any(Function))
+    expect(mocks.passportMock.once).toHaveBeenCalledWith('UI_CLOSED', expect.any(Function))
     expect(mocks.passportMock.openUI).toHaveBeenCalledWith('payment', {
       title: 'Buy Perpetual',
       subtitle: 'Avery Stone',
@@ -196,7 +197,7 @@ describe('purchaseLicense', () => {
       ],
     })
 
-    mocks.paymentCallback?.({
+    mocks.eventCallbacks['PAYMENT']?.({
       type: 'WALLET',
       results: { items: [{ hash: '0xdirect-hash' }] },
     })
@@ -226,7 +227,7 @@ describe('purchaseLicense', () => {
     const purchasePromise = purchaseLicense({ purchase: basePurchase, license: singleUseLicense })
     await flushPromises()
 
-    mocks.paymentCallback?.({
+    mocks.eventCallbacks['PAYMENT']?.({
       type: 'CARD',
       results: {
         items: [{ outcome: { voucher, sig: '0xsig' } }],
@@ -259,5 +260,16 @@ describe('purchaseLicense', () => {
       }),
     ).rejects.toThrow('Missing content token ID for license purchase')
     expect(mocks.passportMock.openUI).not.toHaveBeenCalled()
+  })
+
+  it('returns silently when user closes the payment UI', async () => {
+    const purchasePromise = purchaseLicense({ purchase: basePurchase, license: perpetualLicense })
+    await flushPromises()
+
+    mocks.eventCallbacks['UI_CLOSED']?.()
+    await purchasePromise
+
+    expect(goto).not.toHaveBeenCalled()
+    expect(mocks.passportMock.openUI).not.toHaveBeenCalledWith('richAlert', expect.anything())
   })
 })

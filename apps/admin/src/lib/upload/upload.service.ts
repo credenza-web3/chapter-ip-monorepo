@@ -5,7 +5,7 @@ import uploadFileToBucket from './file-upload.service'
 import { createImagePreview, isPreviewImage } from './image-preview.service'
 import { STATUS, type StatusValue } from '../../routes/authed/likeness/constants/constants'
 
-import { r2Config } from '@repo/fe-services'
+import { r2BaseConfig } from '@repo/fe-services'
 
 export type NamedUpload = {
   file: File
@@ -43,11 +43,13 @@ export default class UploadService {
     uploads,
     trpcClient,
     includePreviews = true,
+    withWatermark = true,
   }: {
     contentId: string
     uploads: NamedUpload[]
     trpcClient: TRPCClient<AppRouter>
     includePreviews?: boolean
+    withWatermark?: boolean
   }): Promise<{ keys: string[] }> {
     const keys: string[] = []
 
@@ -70,7 +72,7 @@ export default class UploadService {
 
       if (includePreviews && isPreviewImage(file)) {
         try {
-          const preview = await createImagePreview(file)
+          const preview = await createImagePreview(file, { withWatermark })
           const { url: previewUrl } = await trpcClient.contents.createContentFileUploadUrl.mutate({
             contentId,
             mimetype: preview.type,
@@ -123,14 +125,18 @@ export default class UploadService {
     metadata,
     tags,
     trpcClient,
+    includePreviews = true,
+    withWatermark = true,
   }: {
     uploads: NamedUpload[]
     metadata: Record<string, unknown>
     tags?: string[]
     trpcClient: TRPCClient<AppRouter>
+    includePreviews?: boolean
+    withWatermark?: boolean
   }): Promise<{ contentId: string; keys: string[] }> {
     const { contentId } = await this.registerDraftContent({ metadata, tags, trpcClient })
-    const { keys } = await this.uploadContentFiles({ contentId, uploads, trpcClient })
+    const { keys } = await this.uploadContentFiles({ contentId, uploads, trpcClient, includePreviews, withWatermark })
 
     return { contentId, keys }
   }
@@ -217,7 +223,7 @@ export default class UploadService {
   }): Promise<void> {
     await this.uploadTokenMetadata({
       tokenId,
-      metadata: { title, description, keys, image: r2Config.url + r2Config.defaultImage },
+      metadata: { title, description, keys, image: r2BaseConfig.defaultImageUrl },
       trpcClient,
     })
   }

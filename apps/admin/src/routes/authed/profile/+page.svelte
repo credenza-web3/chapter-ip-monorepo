@@ -15,8 +15,6 @@
   let email = $state('')
   let emailLoading = $state(true)
 
-  // The route client is stable for the lifetime of this page.
-  // svelte-ignore state_referenced_locally
   const profileSave = useProfileSave(data.trpcClient)
 
   onMount(async () => {
@@ -61,7 +59,7 @@
 <section class="min-h-xl w-full rounded-3xl bg-[#f8f5f1] px-5 py-8 sm:px-10 sm:py-10 lg:px-14 lg:py-12">
   <h1 class="text-[22px] font-semibold text-dark">Profile</h1>
 
-  <div class="mt-8 flex max-w-[720px] flex-col gap-8 sm:mt-7 sm:flex-row sm:items-start sm:gap-10">
+  <div class="mt-8 flex max-w-180 flex-col gap-8 sm:mt-7 sm:flex-row sm:items-start sm:gap-10">
     <div class="shrink-0">
       <button
         type="button"
@@ -101,14 +99,14 @@
           type="email"
           value={email}
           placeholder={emailLoading ? 'Loading email...' : 'Email unavailable'}
-          class="h-[52px] w-full rounded-[4px] border border-[#ded9d5] bg-white px-4 text-[15px] text-[#9d99a0] outline-none disabled:cursor-not-allowed disabled:bg-white disabled:opacity-100"
+          class="h-13 w-full rounded-sm border border-[#ded9d5] bg-white px-4 text-[15px] text-[#9d99a0] outline-none disabled:cursor-not-allowed disabled:bg-white disabled:opacity-100"
           disabled
         />
       </div>
 
       <div class="mt-10 flex justify-end">
         <button
-          class="inline-flex h-10 min-w-28 items-center justify-center rounded-[4px] bg-primary px-6 text-sm font-semibold text-white transition-colors hover:bg-[#5a28ef] disabled:cursor-not-allowed disabled:bg-[#dedad7] disabled:text-white/70"
+          class="inline-flex h-10 min-w-28 items-center justify-center rounded-sm bg-primary px-6 text-sm font-semibold text-white transition-colors hover:bg-[#5a28ef] disabled:cursor-not-allowed disabled:bg-[#dedad7] disabled:text-white/70"
           onclick={profileSave.handleSaveAll}
           disabled={!profileSave.hasChanges || profileSave.loading}
         >

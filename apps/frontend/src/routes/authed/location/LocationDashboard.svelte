@@ -24,7 +24,7 @@
     class="rounded-2xl border border-[#ebe6df] bg-[#f8f5f1] px-4 py-8 sm:px-6 lg:px-13 lg:py-12"
     aria-labelledby="location-heading"
   >
-    <h2 id="location-heading" class="text-xl font-bold text-dark">Location</h2>
+    <h2 id="location-heading" class="text-lg font-semibold text-dark">Location</h2>
 
     <div class="my-6 border-t border-[#e5e0d9]"></div>
 

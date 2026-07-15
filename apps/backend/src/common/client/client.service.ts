@@ -20,6 +20,7 @@ export class CommonClientService {
 
   formatBasicToken() {
     const { clientId, clientSecret } = this.getClientIdAndSecret()
+    console.log('clientId', clientId, 'clientSecret', clientSecret)
     const credentials = `${clientId}:${clientSecret}`
     const basicToken = Buffer.from(credentials).toString('base64')
     const authorizationHeader = `Basic ${basicToken}`
@@ -27,7 +28,7 @@ export class CommonClientService {
   }
 
   async getActiveClient() {
-    const accountsUrl = this.configService.get<string>('credenza.accountsUrl')
+    const accountsUrl = this.configService.getOrThrow<string>('credenza.accountsUrl')
 
     const response = await fetch(`${accountsUrl}/clients/current`, {
       method: 'GET',

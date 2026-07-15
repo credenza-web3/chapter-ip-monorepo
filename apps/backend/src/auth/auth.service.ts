@@ -13,11 +13,8 @@ export class AuthService {
   ) {}
 
   async refreshToken(payload: TRefreshTokenInput): Promise<TAuthTokenOutput> {
-    const { clientId, clientSecret } = this.commonClientService.getClientIdAndSecret()
     const urlEncoded = new URLSearchParams({
       grant_type: 'refresh_token',
-      client_id: clientId,
-      client_secret: clientSecret,
       refresh_token: payload.refreshToken,
     })
 
@@ -25,10 +22,14 @@ export class AuthService {
 
     const response = await fetch(`${accountsUrl}/oauth2/token`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: this.commonClientService.formatBasicToken().authorizationHeader,
+      },
       body: urlEncoded.toString(),
     })
     if (!response.ok) {
+      console.log(`Refresh response:`, await response.json(), response.status, response.statusText)
       throw new Error(`Cannot refresh token`)
     }
     const json = (await response.json()) as {
@@ -45,25 +46,27 @@ export class AuthService {
   }
 
   async exchangeCode(payload: TExchangeCodeInput): Promise<TAuthTokenOutput> {
-    const { clientId, clientSecret } = this.commonClientService.getClientIdAndSecret()
     const urlEncoded = new URLSearchParams({
       grant_type: 'authorization_code',
-      client_id: clientId,
-      client_secret: clientSecret,
       code: payload.code,
       code_verifier: payload.codeVerifier,
       redirect_uri: payload.redirectUri,
     })
 
-    const accountsUrl = this.configService.get<string>('credenza.accountsUrl')
+    const accountsUrl = this.configService.getOrThrow<string>('credenza.accountsUrl')
+    console.log('accountsUrl', accountsUrl)
 
     const response = await fetch(`${accountsUrl}/oauth2/token`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: this.commonClientService.formatBasicToken().authorizationHeader,
+      },
       body: urlEncoded.toString(),
     })
 
     if (!response.ok) {
+      console.log(`Response:`, await response.json(), response.status, response.statusText)
       throw new Error('Cannot exchange code for token')
     }
     const json = (await response.json()) as {

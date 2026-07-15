@@ -1,5 +1,5 @@
 import { DEFAULT_IMAGE_URL } from '$lib/content/image'
-import { r2Config } from '@repo/fe-services'
+import { r2BaseConfig } from '@repo/fe-services'
 import {
   ETHNICITY_OPTIONS,
   EYE_COLOR_OPTIONS,
@@ -112,7 +112,7 @@ function selectedOptionValue<TOptions extends readonly LikenessOption[]>(
 }
 
 export function getPreviewUrl(contractAddress: string, contentId: string, filename: string): string {
-  return `${r2Config.url}${contractAddress}/${contentId}/${filename}`
+  return `${r2BaseConfig.previewUrl}/${contractAddress}/${contentId}/${filename}`
 }
 
 export function createEmptyLikenessFilters(): LikenessFilters {

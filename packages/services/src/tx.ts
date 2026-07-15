@@ -8,7 +8,9 @@ export const forwardTransaction = async (
   const bearer_token = opts.token
   const client_id = opts.client_id
 
-  const chainId = '43113'
+  const credenzaEnv = import.meta.env.VITE_ENV || 'staging'
+  const chainId = credenzaEnv === 'prod' ? '43114' : '43113'
+
   const socket = await connectSocketIO(opts.evm_wss, {
     auth: { client_id, bearer_token },
   })

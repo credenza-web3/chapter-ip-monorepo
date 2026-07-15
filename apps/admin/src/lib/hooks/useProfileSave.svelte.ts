@@ -2,6 +2,7 @@ import { notify, ToastType } from '@repo/ui-components'
 import { publisherStore } from '$lib/stores/publisher.svelte'
 import { savePublisher } from '$lib/services/publisher'
 import uploadFileToBucket from '$lib/upload/file-upload.service'
+import { r2BaseConfig } from '@repo/fe-services'
 import type { TRPCClient, AppRouter } from '@repo/trpc/client'
 
 interface ProfileData {
@@ -66,9 +67,7 @@ export function useProfileSave(trpcClient: TRPCClient<AppRouter>) {
             })
             await uploadFileToBucket(file, url)
 
-            // avatarUrl = url.split('?')[0]
-
-            avatarUrl = `${import.meta.env.VITE_USERFILES_BUCKET_HOST}/${key}`
+            avatarUrl = `${r2BaseConfig.userFilesUrl}/${key}`
           }
           const result = await savePublisher(trpcClient, profileData.publisherName, avatarUrl)
           if (result.success) {
