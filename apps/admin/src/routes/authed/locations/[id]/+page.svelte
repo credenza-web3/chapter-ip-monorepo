@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { LOCATION_FILE_BUCKETS, createLocationFileNames } from '$lib/constants/locationFileBuckets'
+  import {
+    LOCATION_FILE_BUCKETS,
+    createLocationFileNames,
+    DEFAULT_LOCATION_FILENAME,
+  } from '$lib/constants/locationFileBuckets'
   import { afterNavigate, beforeNavigate, goto } from '$app/navigation'
   import { locationStore } from '../stores/location-store'
   import UploadStepHeader from '../components/UploadStepHeader.svelte'
@@ -34,8 +38,6 @@
   beforeNavigate(() => locationStore.setLoading(true))
   afterNavigate(() => locationStore.setLoading(false))
 
-  const LOCATION_FILENAME = 'location'
-
   const existingNames = $derived($locationStore.existingFiles.locations.map((file) => file.name))
   const newCount = $derived($locationStore.files.locations.length)
 
@@ -48,7 +50,7 @@
       type: 'location' as const,
       name: $locationStore.name,
       description: $locationStore.description,
-      file_name: allFileNames[0] ?? LOCATION_FILENAME,
+      file_name: allFileNames[0] ?? DEFAULT_LOCATION_FILENAME,
       file_names: allFileNames,
       licensing: $locationStore.licensing,
       ...(address && { address }),

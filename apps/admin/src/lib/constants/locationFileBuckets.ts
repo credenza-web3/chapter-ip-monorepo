@@ -2,8 +2,10 @@ export const LOCATION_FILE_BUCKETS = ['locations'] as const
 
 export type LocationFileKey = (typeof LOCATION_FILE_BUCKETS)[number]
 
+export const DEFAULT_LOCATION_FILENAME = 'location'
+
 const LOCATION_FILE_PREFIXES: Record<LocationFileKey, string> = {
-  locations: 'location',
+  locations: DEFAULT_LOCATION_FILENAME,
 }
 
 export const createLocationFileNames = (

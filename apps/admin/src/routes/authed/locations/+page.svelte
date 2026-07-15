@@ -9,7 +9,7 @@
   import UploadService from '$lib/upload/upload.service'
   import TransactionService from '$lib/upload/transaction.service'
   import BlockchainService from '$lib/upload/blockchain.service'
-  import { createLocationFileNames } from '$lib/constants/locationFileBuckets'
+  import { createLocationFileNames, DEFAULT_LOCATION_FILENAME } from '$lib/constants/locationFileBuckets'
   import { notify, ToastType } from '@repo/ui-components'
   import { modals, type ModalProps } from 'svelte-modals'
   import { ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
@@ -36,7 +36,7 @@
       type: 'location' as const,
       name: $locationStore.name,
       description: $locationStore.description,
-      file_name: fileNames[0] ?? 'location',
+      file_name: fileNames[0] ?? DEFAULT_LOCATION_FILENAME,
       file_names: fileNames,
       licensing: { licenseTypes, licensePrices, agreedToFee },
       ...(address && { address }),
