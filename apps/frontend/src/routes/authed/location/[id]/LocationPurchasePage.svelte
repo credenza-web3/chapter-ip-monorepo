@@ -87,6 +87,14 @@
                 onclick={() => openLightbox(img)}
               >
                 <img src={img.src} alt={img.alt} class="size-full object-cover" />
+                <span
+                  class="absolute top-2.75 right-2.75 flex size-3 items-center justify-center text-[#cecbc8]"
+                  aria-hidden="true"
+                >
+                  <svg viewBox="0 0 12 12" class="size-3" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 4V1h3M8 1h3v3M11 8v3H8M4 11H1V8" />
+                  </svg>
+                </span>
               </button>
             {/each}
           </div>
