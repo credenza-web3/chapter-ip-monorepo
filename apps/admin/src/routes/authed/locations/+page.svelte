@@ -9,11 +9,10 @@
   import UploadService from '$lib/upload/upload.service'
   import TransactionService from '$lib/upload/transaction.service'
   import BlockchainService from '$lib/upload/blockchain.service'
+  import { createLocationFileNames } from '$lib/constants/locationFileBuckets'
   import { notify, ToastType } from '@repo/ui-components'
   import { modals, type ModalProps } from 'svelte-modals'
   import { ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
-
-  const LOCATION_FILENAME = 'location'
 
   let currentStep = $state(1)
   const blockchainService = new BlockchainService(authStore.state.accessToken!)
@@ -25,10 +24,10 @@
 
   const buildLocationPayload = () => {
     const newFileCount = $locationStore.files.locations.length
-    const uploadNames = Array.from({ length: newFileCount }, () => LOCATION_FILENAME)
+    const fileNames = createLocationFileNames('locations', newFileCount)
     const uploads = $locationStore.files.locations.map((file, index) => ({
       file,
-      name: uploadNames[index],
+      name: fileNames[index],
     }))
     const { licenseTypes, licensePrices, agreedToFee } = $locationStore.licensing
     const { street, apt, city, state, zip } = $locationStore.address
@@ -37,7 +36,8 @@
       type: 'location' as const,
       name: $locationStore.name,
       description: $locationStore.description,
-      file_name: LOCATION_FILENAME,
+      file_name: fileNames[0] ?? 'location',
+      file_names: fileNames,
       licensing: { licenseTypes, licensePrices, agreedToFee },
       ...(address && { address }),
     }

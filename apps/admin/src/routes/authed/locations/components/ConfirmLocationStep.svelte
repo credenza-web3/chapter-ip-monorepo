@@ -29,7 +29,6 @@
     return items
   })
 
-  const mainPhoto = $derived(allPreviews[0] ?? null)
   const enabledLicenseTypes = $derived(
     LICENSE_TYPES.filter((license) => $locationStore.licensing.licenseTypes[license.id]),
   )
@@ -88,16 +87,18 @@
       </div>
     {/if}
 
-    <!-- Main Image -->
+    <!-- Images -->
     <div class="mb-8">
-      {#if mainPhoto}
-        <div class="relative inline-block">
-          <img
-            src={mainPhoto.src}
-            alt={mainPhoto.name}
-            class="w-full max-w-md rounded-lg object-cover"
-            style="max-height: 216px;"
-          />
+      {#if allPreviews.length > 0}
+        <div class="grid grid-cols-2 gap-2">
+          {#each allPreviews as preview, i (i)}
+            <img
+              src={preview.src}
+              alt={preview.name}
+              class="w-full rounded-lg object-cover"
+              style="max-height: 216px;"
+            />
+          {/each}
         </div>
       {:else}
         <div

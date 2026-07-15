@@ -18,6 +18,7 @@ test('renders active likeness and location dashboard links with real cards', asy
         name: 'Madison Square Garden',
         description: 'A landmark arena.',
         imageUrl: '/msg.jpg',
+        imageUrls: [],
       },
     ],
   })

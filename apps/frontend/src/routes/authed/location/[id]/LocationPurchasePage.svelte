@@ -6,6 +6,7 @@
 
   let { locationDetails }: { locationDetails: LocationDetails } = $props()
   let showLightbox = $state(false)
+  let lightboxImage = $state<{ src: string; alt: string } | null>(null)
   let selectedLicenseId = $state('')
   let purchasePending = $state(false)
   const selectedLicense = $derived(locationDetails.licenses.find((license) => license.id === selectedLicenseId))
@@ -37,6 +38,11 @@
     } finally {
       purchasePending = false
     }
+  }
+
+  function openLightbox(img: { src: string; alt: string }) {
+    lightboxImage = img
+    showLightbox = true
   }
 </script>
 
@@ -71,22 +77,37 @@
         </section>
       {/if}
       <section aria-label="Location preview" class="relative">
-        <button
-          type="button"
-          class="relative block aspect-400/216 w-full overflow-hidden bg-[#202225]"
-          aria-label={`Enlarge ${locationDetails.image.alt}`}
-          onclick={() => (showLightbox = true)}
-        >
-          <img src={locationDetails.image.src} alt={locationDetails.image.alt} class="size-full object-cover" />
-          <span
-            class="absolute top-2.75 right-2.75 flex size-3 items-center justify-center text-[#cecbc8]"
-            aria-hidden="true"
+        {#if locationDetails.images.length > 1}
+          <div class="grid grid-cols-2 gap-2">
+            {#each locationDetails.images as img, i (i)}
+              <button
+                type="button"
+                class="relative block aspect-400/216 w-full overflow-hidden bg-[#202225]"
+                aria-label={`Enlarge image ${i + 1}`}
+                onclick={() => openLightbox(img)}
+              >
+                <img src={img.src} alt={img.alt} class="size-full object-cover" />
+              </button>
+            {/each}
+          </div>
+        {:else}
+          <button
+            type="button"
+            class="relative block aspect-400/216 w-full overflow-hidden bg-[#202225]"
+            aria-label={`Enlarge ${locationDetails.image.alt}`}
+            onclick={() => openLightbox(locationDetails.image)}
           >
-            <svg viewBox="0 0 12 12" class="size-3" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M1 4V1h3M8 1h3v3M11 8v3H8M4 11H1V8" />
-            </svg>
-          </span>
-        </button>
+            <img src={locationDetails.image.src} alt={locationDetails.image.alt} class="size-full object-cover" />
+            <span
+              class="absolute top-2.75 right-2.75 flex size-3 items-center justify-center text-[#cecbc8]"
+              aria-hidden="true"
+            >
+              <svg viewBox="0 0 12 12" class="size-3" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 4V1h3M8 1h3v3M11 8v3H8M4 11H1V8" />
+              </svg>
+            </span>
+          </button>
+        {/if}
       </section>
 
       {#if locationDetails.tags.length > 0}
@@ -174,10 +195,6 @@
   </div>
 </article>
 
-{#if showLightbox}
-  <ImageLightbox
-    image={locationDetails.image}
-    dialogLabel="Enlarged location image"
-    onClose={() => (showLightbox = false)}
-  />
+{#if showLightbox && lightboxImage}
+  <ImageLightbox image={lightboxImage} dialogLabel="Enlarged location image" onClose={() => (showLightbox = false)} />
 {/if}

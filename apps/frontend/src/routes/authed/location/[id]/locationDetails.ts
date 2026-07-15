@@ -19,6 +19,13 @@ export function normalizeLocation(
   const legacyTags = (metadata as Record<string, unknown>).tags
   const rawTags = content.tags ?? (Array.isArray(legacyTags) ? (legacyTags as string[]) : [])
 
+  const fileNames = metadata.file_names?.length ? metadata.file_names : fileName ? [fileName] : []
+
+  const images = fileNames.map((fn) => ({
+    src: getPreviewUrl(contractAddress, content.id, fn),
+    alt: name,
+  }))
+
   return {
     id: content.id,
     contentTokenId: trimString(content.tokenId),
@@ -32,9 +39,7 @@ export function normalizeLocation(
       licenseDescriptions: LOCATION_LICENSE_DESCRIPTIONS,
       allowedIds: ['single-use'],
     }),
-    image: {
-      src: fileName ? getPreviewUrl(contractAddress, content.id, fileName) : DEFAULT_IMAGE_URL,
-      alt: name,
-    },
+    image: images[0] ?? { src: DEFAULT_IMAGE_URL, alt: name },
+    images,
   }
 }

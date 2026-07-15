@@ -58,6 +58,12 @@ describe('location purchase mapper', () => {
         src: getPreviewUrl(CONTRACT_ADDRESS, 'location-1', 'citi-field.jpg'),
         alt: 'Citi Field',
       },
+      images: [
+        {
+          src: getPreviewUrl(CONTRACT_ADDRESS, 'location-1', 'citi-field.jpg'),
+          alt: 'Citi Field',
+        },
+      ],
     })
   })
 
@@ -153,5 +159,34 @@ describe('location purchase mapper', () => {
     )
 
     expect(purchase?.image.src).toBe(DEFAULT_IMAGE_URL)
+    expect(purchase?.images).toEqual([])
+  })
+
+  it('builds images array from file_names', () => {
+    const purchase = normalizeLocation(
+      {
+        id: 'location-5',
+        sub: 'sub-1',
+        status: 'ACTIVE',
+        contractAddress: CONTRACT_ADDRESS,
+        metadata: {
+          type: 'location',
+          name: 'Multi Photo',
+          description: 'Has multiple photos.',
+          tags: [],
+          file_name: 'multi-photo-1.jpg',
+          file_names: ['multi-photo-1.jpg', 'multi-photo-2.jpg', 'multi-photo-3.jpg'],
+          licensing: {
+            licenseTypes: { 'single-use': true },
+            licensePrices: { 'single-use': '100' },
+            agreedToFee: true,
+          },
+        },
+      } as LegacyLocationContent,
+      CONTRACT_ADDRESS,
+    )
+
+    expect(purchase?.images).toHaveLength(3)
+    expect(purchase?.image.src).toBe(getPreviewUrl(CONTRACT_ADDRESS, 'location-5', 'multi-photo-1.jpg'))
   })
 })

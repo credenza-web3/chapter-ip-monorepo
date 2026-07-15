@@ -19,6 +19,7 @@ export type LocationMetadata = {
   name: string
   description: string
   file_name: string
+  file_names?: string[]
   licensing: LocationLicensingMetadata
   address?: LocationAddress
 }
@@ -64,6 +65,7 @@ export type LocationDetails = {
   authorName: string
   licenses: LocationLicense[]
   image: LocationImage
+  images: LocationImage[]
 }
 
 export type LocationPurchase = LocationDetails

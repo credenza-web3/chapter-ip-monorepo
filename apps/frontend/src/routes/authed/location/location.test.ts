@@ -39,6 +39,7 @@ describe('location data helpers', () => {
         name: 'Madison Square Garden',
         description: 'A landmark arena.',
         imageUrl: getPreviewUrl(CONTRACT_ADDRESS, 'location-1', 'location_1.jpg'),
+        imageUrls: [getPreviewUrl(CONTRACT_ADDRESS, 'location-1', 'location_1.jpg')],
       },
     ])
   })
@@ -63,6 +64,7 @@ describe('location data helpers', () => {
         id: 'location-2',
         name: 'Empty Preview',
         imageUrl: DEFAULT_IMAGE_URL,
+        imageUrls: [],
       },
     ])
   })
@@ -79,6 +81,7 @@ describe('location data helpers', () => {
       name: `Name ${index}`,
       description: '',
       imageUrl: DEFAULT_IMAGE_URL,
+      imageUrls: [],
     }))
 
     expect(getRecentLocations(items)).toHaveLength(RECENT_LIMIT)

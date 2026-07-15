@@ -27,7 +27,9 @@ export type LocationItem = {
   name: string
   description: string
   imageUrl: string
+  imageUrls: string[]
   authorName?: string
+  metadata?: LocationContent['metadata']
 }
 
 export type LocationFilters = {
@@ -113,13 +115,18 @@ export function toLocationItems(contentItems: ContentItem[], contractAddress: st
     if (metadata?.type !== 'location') return []
 
     const fileName = metadata.file_name?.trim()
+    const fileNames = metadata.file_names?.length ? metadata.file_names : fileName ? [fileName] : []
+
+    const imageUrls = fileNames.map((name) => getPreviewUrl(contractAddress, item.id, name))
 
     return [
       {
         id: item.id,
         name: metadata.name ?? '',
         description: metadata.description ?? '',
-        imageUrl: fileName ? getPreviewUrl(contractAddress, item.id, fileName) : DEFAULT_IMAGE_URL,
+        imageUrl: imageUrls[0] ?? DEFAULT_IMAGE_URL,
+        imageUrls,
+        metadata,
       },
     ]
   })
