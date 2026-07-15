@@ -71,6 +71,5 @@ function createItem(item: { id: string; name: string; description?: string; imag
     name: item.name,
     description: item.description ?? '',
     imageUrl: item.imageUrl ?? DEFAULT_IMAGE_URL,
-    imageUrls: [],
   }
 }

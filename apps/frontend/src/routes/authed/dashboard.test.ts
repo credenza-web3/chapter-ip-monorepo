@@ -28,7 +28,6 @@ describe('dashboard helpers', () => {
         name: index === 0 ? '' : `Location ${index}`,
         description: index === 1 ? '' : `Description ${index}`,
         imageUrl: `/location-${index}.jpg`,
-        imageUrls: [],
       })),
     )
 

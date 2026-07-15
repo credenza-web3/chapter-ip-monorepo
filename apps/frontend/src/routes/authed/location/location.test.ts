@@ -39,12 +39,11 @@ describe('location data helpers', () => {
         name: 'Madison Square Garden',
         description: 'A landmark arena.',
         imageUrl: getPreviewUrl(CONTRACT_ADDRESS, 'location-1', 'location_1.jpg'),
-        imageUrls: [getPreviewUrl(CONTRACT_ADDRESS, 'location-1', 'location_1.jpg')],
       },
     ])
   })
 
-  it('builds multiple imageUrls from file_names', () => {
+  it('picks the first file_name as imageUrl when file_names is present', () => {
     const items = toLocationItems(
       [
         {
@@ -66,11 +65,6 @@ describe('location data helpers', () => {
         id: 'location-multi',
         name: 'Multi Photo',
         imageUrl: getPreviewUrl(CONTRACT_ADDRESS, 'location-multi', 'multi-photo-1.jpg'),
-        imageUrls: [
-          getPreviewUrl(CONTRACT_ADDRESS, 'location-multi', 'multi-photo-1.jpg'),
-          getPreviewUrl(CONTRACT_ADDRESS, 'location-multi', 'multi-photo-2.jpg'),
-          getPreviewUrl(CONTRACT_ADDRESS, 'location-multi', 'multi-photo-3.jpg'),
-        ],
       },
     ])
   })
@@ -95,7 +89,6 @@ describe('location data helpers', () => {
         id: 'location-2',
         name: 'Empty Preview',
         imageUrl: DEFAULT_IMAGE_URL,
-        imageUrls: [],
       },
     ])
   })
@@ -112,7 +105,6 @@ describe('location data helpers', () => {
       name: `Name ${index}`,
       description: '',
       imageUrl: DEFAULT_IMAGE_URL,
-      imageUrls: [],
     }))
 
     expect(getRecentLocations(items)).toHaveLength(RECENT_LIMIT)

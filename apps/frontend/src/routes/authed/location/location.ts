@@ -27,7 +27,6 @@ export type LocationItem = {
   name: string
   description: string
   imageUrl: string
-  imageUrls: string[]
   authorName?: string
 }
 
@@ -128,7 +127,6 @@ export function toLocationItems(contentItems: ContentItem[], contractAddress: st
         name: metadata.name ?? '',
         description: metadata.description ?? '',
         imageUrl: imageUrls[0] ?? DEFAULT_IMAGE_URL,
-        imageUrls,
       },
     ]
   })
