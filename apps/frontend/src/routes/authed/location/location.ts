@@ -119,14 +119,14 @@ export function toLocationItems(contentItems: ContentItem[], contractAddress: st
         ? [fileName]
         : []
 
-    const imageUrls = fileNames.map((name) => getPreviewUrl(contractAddress, item.id, name))
+    const firstFileName = fileNames[0]
 
     return [
       {
         id: item.id,
         name: metadata.name ?? '',
         description: metadata.description ?? '',
-        imageUrl: imageUrls[0] ?? DEFAULT_IMAGE_URL,
+        imageUrl: firstFileName ? getPreviewUrl(contractAddress, item.id, firstFileName) : DEFAULT_IMAGE_URL,
       },
     ]
   })
