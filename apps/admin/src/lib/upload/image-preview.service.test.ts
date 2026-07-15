@@ -21,7 +21,7 @@ vi.mock('watermarkjs', () => ({
   }),
 }))
 
-vi.mock('@repo/ui-components/assets/ch-logo.svg', () => ({
+vi.mock('@repo/ui-components/assets/watermark.svg', () => ({
   default: 'watermark.svg',
 }))
 
@@ -74,6 +74,20 @@ describe('createImagePreview', () => {
     expect(preview.name).toBe('photo.jpg')
     expect(preview.type).toBe('image/jpeg')
     expect(mocks.destroy).toHaveBeenCalledOnce()
+  })
+
+  it('skips the watermark when withWatermark is false', async () => {
+    const original = new File(['original'], 'photo.jpg', { type: 'image/jpg' })
+    const compressed = new File(['compressed'], 'photo.jpg', { type: 'image/jpeg' })
+    mocks.imageCompression.mockResolvedValue(compressed)
+
+    const preview = await createImagePreview(original, { withWatermark: false })
+
+    expect(mocks.imageCompression).toHaveBeenCalledOnce()
+    expect(mocks.watermark).not.toHaveBeenCalled()
+    expect(mocks.destroy).not.toHaveBeenCalled()
+    expect(preview.name).toBe('photo.jpg')
+    expect(preview.type).toBe('image/jpeg')
   })
 
   it('destroys the watermark canvas pool when processing fails', async () => {

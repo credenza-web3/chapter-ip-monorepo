@@ -174,7 +174,25 @@ describe('UploadService', () => {
     })
   })
 
-  it('passes tags to registerContent when saving a draft', async () => {
+  it('forwards withWatermark to createImagePreview', async () => {
+    const original = new File(['original'], 'image.jpg', { type: 'image/jpeg' })
+    const preview = new File(['preview'], 'image.jpg', { type: 'image/jpeg' })
+    const { client } = createTrpcClient()
+    mocks.createImagePreview.mockResolvedValue(preview)
+
+    const service = new UploadService({ mintWithPrices: vi.fn() } as never)
+
+    await service.saveDraftContent({
+      uploads: [{ file: original, name: 'location' }],
+      metadata: { type: 'location' },
+      trpcClient: client as never,
+      withWatermark: false,
+    })
+
+    expect(mocks.createImagePreview).toHaveBeenCalledWith(original, { withWatermark: false })
+  })
+
+  it('forwards tags to registerContent when saving a draft', async () => {
     const original = new File(['original'], 'location.jpg', { type: 'image/jpeg' })
     const { client } = createTrpcClient()
     const service = new UploadService({ mintWithPrices: vi.fn() } as never)
