@@ -10,7 +10,8 @@
       "types": "./index.ts",
       "svelte": "./index.ts"
     },
-    "./assets/ch-logo.svg": "./assets/ch-logo.svg"
+    "./assets/ch-logo.svg": "./assets/ch-logo.svg",
+    "./assets/watermark.svg": "./assets/watermark.svg"
   },
   "dependencies": {
     "@zerodevx/svelte-toast": "^0.9.6"

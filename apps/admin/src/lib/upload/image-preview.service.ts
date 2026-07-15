@@ -1,6 +1,6 @@
 import imageCompression from 'browser-image-compression'
 import watermark from 'watermarkjs'
-import watermarkUrl from '@repo/ui-components/assets/ch-logo.svg'
+import watermarkUrl from '@repo/ui-components/assets/watermark.svg'
 
 const PREVIEW_IMAGE_EXTENSIONS = new Set(['.avif', '.gif', '.jpeg', '.jpg', '.png', '.svg', '.webp'])
 const PREVIEW_OUTPUT_MIME_TYPES = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
