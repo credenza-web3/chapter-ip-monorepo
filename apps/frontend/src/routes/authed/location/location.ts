@@ -115,7 +115,11 @@ export function toLocationItems(contentItems: ContentItem[], contractAddress: st
     if (metadata?.type !== 'location') return []
 
     const fileName = metadata.file_name?.trim()
-    const fileNames = metadata.file_names?.length ? metadata.file_names : fileName ? [fileName] : []
+    const fileNames = metadata.file_names?.length
+      ? metadata.file_names.map((n) => n.trim()).filter(Boolean)
+      : fileName
+        ? [fileName]
+        : []
 
     const imageUrls = fileNames.map((name) => getPreviewUrl(contractAddress, item.id, name))
 

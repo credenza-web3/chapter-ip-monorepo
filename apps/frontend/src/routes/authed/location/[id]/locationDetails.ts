@@ -19,7 +19,11 @@ export function normalizeLocation(
   const legacyTags = (metadata as Record<string, unknown>).tags
   const rawTags = content.tags ?? (Array.isArray(legacyTags) ? (legacyTags as string[]) : [])
 
-  const fileNames = metadata.file_names?.length ? metadata.file_names : fileName ? [fileName] : []
+  const fileNames = metadata.file_names?.length
+    ? metadata.file_names.map(trimString).filter(Boolean)
+    : fileName
+      ? [fileName]
+      : []
 
   const images = fileNames.map((fn) => ({
     src: getPreviewUrl(contractAddress, content.id, fn),
