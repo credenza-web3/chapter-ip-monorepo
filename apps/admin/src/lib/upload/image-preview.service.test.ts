@@ -21,7 +21,7 @@ vi.mock('watermarkjs', () => ({
   }),
 }))
 
-vi.mock('@repo/ui-components/assets/ch-logo.svg', () => ({
+vi.mock('@repo/ui-components/assets/watermark.svg', () => ({
   default: 'watermark.svg',
 }))
 
