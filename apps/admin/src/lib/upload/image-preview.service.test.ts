@@ -76,6 +76,20 @@ describe('createImagePreview', () => {
     expect(mocks.destroy).toHaveBeenCalledOnce()
   })
 
+  it('skips the watermark when withWatermark is false', async () => {
+    const original = new File(['original'], 'photo.jpg', { type: 'image/jpg' })
+    const compressed = new File(['compressed'], 'photo.jpg', { type: 'image/jpeg' })
+    mocks.imageCompression.mockResolvedValue(compressed)
+
+    const preview = await createImagePreview(original, { withWatermark: false })
+
+    expect(mocks.imageCompression).toHaveBeenCalledOnce()
+    expect(mocks.watermark).not.toHaveBeenCalled()
+    expect(mocks.destroy).not.toHaveBeenCalled()
+    expect(preview.name).toBe('photo.jpg')
+    expect(preview.type).toBe('image/jpeg')
+  })
+
   it('destroys the watermark canvas pool when processing fails', async () => {
     const original = new File(['original'], 'photo.png', { type: 'image/png' })
     const previewError = new Error('watermark failed')
