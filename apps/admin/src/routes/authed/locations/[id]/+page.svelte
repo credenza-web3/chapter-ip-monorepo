@@ -36,11 +36,12 @@
 
   const LOCATION_FILENAME = 'location'
 
+  const existingNames = $derived($locationStore.existingFiles.locations.map((file) => file.name))
+  const newCount = $derived($locationStore.files.locations.length)
+
   const buildLocationMetadata = () => {
     const { street, apt, city, state, zip } = $locationStore.address
     const address = street || city || state || zip ? { street, apt, city, state, zip } : undefined
-    const existingNames = $locationStore.existingFiles.locations.map((file) => file.name)
-    const newCount = $locationStore.files.locations.length
     const newNames = createLocationFileNames('locations', newCount, existingNames)
     const allFileNames = [...existingNames, ...newNames]
     return {
@@ -55,8 +56,6 @@
   }
 
   const buildUploadNames = () => {
-    const existingNames = $locationStore.existingFiles.locations.map((file) => file.name)
-    const newCount = $locationStore.files.locations.length
     return createLocationFileNames('locations', newCount, existingNames)
   }
 
