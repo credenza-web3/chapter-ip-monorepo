@@ -16,7 +16,7 @@ export const isPreviewImage = (file: File): boolean => {
   return PREVIEW_IMAGE_EXTENSIONS.has(extension)
 }
 
-export const createImagePreview = async (file: File): Promise<File> => {
+export const createImagePreview = async (file: File, options: { withWatermark?: boolean } = {}): Promise<File> => {
   const outputMimetype = getPreviewOutputMimetype(file)
   const compressedFile = await imageCompression(file, {
     maxSizeMB: 0.2,
@@ -24,6 +24,13 @@ export const createImagePreview = async (file: File): Promise<File> => {
     useWebWorker: true,
     fileType: outputMimetype,
   })
+
+  if (options.withWatermark === false) {
+    return new File([compressedFile], file.name, {
+      type: outputMimetype,
+      lastModified: Date.now(),
+    })
+  }
 
   try {
     const blob = await watermark([compressedFile, watermarkUrl], {

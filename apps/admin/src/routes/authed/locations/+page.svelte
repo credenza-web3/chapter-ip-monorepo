@@ -56,6 +56,7 @@
         uploads,
         metadata,
         tags,
+        withWatermark: false,
       })
       notify('Draft saved', ToastType.SUCCESS)
       await goto('/authed/files')
@@ -73,7 +74,13 @@
       locationStore.setLoading(true)
       const trpcClient = uploadService.createTrpcClient()
       const { uploads, metadata, tags } = buildLocationPayload()
-      const { contentId, keys } = await uploadService.saveDraftContent({ trpcClient, uploads, metadata, tags })
+      const { contentId, keys } = await uploadService.saveDraftContent({
+        trpcClient,
+        uploads,
+        metadata,
+        tags,
+        withWatermark: false,
+      })
 
       const tokenId = await uploadService.mintContent({
         oneTimePrice: Number($locationStore.licensing.licensePrices['single-use']),
