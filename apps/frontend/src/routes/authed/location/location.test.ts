@@ -44,6 +44,37 @@ describe('location data helpers', () => {
     ])
   })
 
+  it('builds multiple imageUrls from file_names', () => {
+    const items = toLocationItems(
+      [
+        {
+          id: 'location-multi',
+          metadata: {
+            type: 'location',
+            name: 'Multi Photo',
+            description: 'Has multiple photos.',
+            file_name: 'multi-photo-1.jpg',
+            file_names: ['multi-photo-1.jpg', 'multi-photo-2.jpg', 'multi-photo-3.jpg'],
+          },
+        },
+      ],
+      CONTRACT_ADDRESS,
+    )
+
+    expect(items).toMatchObject([
+      {
+        id: 'location-multi',
+        name: 'Multi Photo',
+        imageUrl: getPreviewUrl(CONTRACT_ADDRESS, 'location-multi', 'multi-photo-1.jpg'),
+        imageUrls: [
+          getPreviewUrl(CONTRACT_ADDRESS, 'location-multi', 'multi-photo-1.jpg'),
+          getPreviewUrl(CONTRACT_ADDRESS, 'location-multi', 'multi-photo-2.jpg'),
+          getPreviewUrl(CONTRACT_ADDRESS, 'location-multi', 'multi-photo-3.jpg'),
+        ],
+      },
+    ])
+  })
+
   it('uses the default image when file_name is missing', () => {
     const items = toLocationItems(
       [
