@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { LOCATION_FILE_BUCKETS, DEFAULT_LOCATION_FILENAME } from '$lib/constants/locationFileBuckets'
+  import {
+    LOCATION_FILE_BUCKETS,
+    DEFAULT_LOCATION_FILENAME,
+    createLocationFileNames,
+  } from '$lib/constants/locationFileBuckets'
   import { afterNavigate, beforeNavigate, goto } from '$app/navigation'
   import { locationStore } from '../stores/location-store'
   import UploadStepHeader from '../components/UploadStepHeader.svelte'
@@ -35,26 +39,32 @@
   afterNavigate(() => locationStore.setLoading(false))
 
   const existingNames = $derived($locationStore.existingFiles.locations.map((file) => file.name))
-  const allFileNames = $derived([...existingNames, ...$locationStore.files.locations.map((file) => file.name)])
+
+  const computeFileNames = () => {
+    const newNames = createLocationFileNames('locations', $locationStore.files.locations.length, existingNames)
+    return [...existingNames, ...newNames]
+  }
 
   const buildLocationMetadata = () => {
     const { street, apt, city, state, zip } = $locationStore.address
     const address = street || city || state || zip ? { street, apt, city, state, zip } : undefined
+    const fileNames = computeFileNames()
     return {
       type: 'location' as const,
       name: $locationStore.name,
       description: $locationStore.description,
-      file_name: allFileNames[0] ?? DEFAULT_LOCATION_FILENAME,
-      file_names: allFileNames,
+      file_name: fileNames[0] ?? DEFAULT_LOCATION_FILENAME,
+      file_names: fileNames,
       licensing: $locationStore.licensing,
       ...(address && { address }),
     }
   }
 
   const buildNamedUploads = (): NamedUpload[] => {
-    return $locationStore.files.locations.map((file) => ({
+    const newNames = createLocationFileNames('locations', $locationStore.files.locations.length, existingNames)
+    return $locationStore.files.locations.map((file, i) => ({
       file,
-      name: file.name,
+      name: newNames[i],
     }))
   }
 
