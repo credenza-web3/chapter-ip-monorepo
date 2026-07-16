@@ -1,5 +1,6 @@
 <script lang="ts">
   import { locationStore } from '../stores/location-store'
+  import { isVideoFile, isVideoFilename } from '$lib/upload/video-preview.service'
 
   let {
     currentStep = $bindable(),
@@ -97,6 +98,67 @@
   const selectedFiles = $derived($locationStore.files.locations ?? [])
   const existingFiles = $derived($locationStore.existingFiles.locations ?? [])
   const hasMedia = $derived(selectedFiles.length > 0 || existingFiles.length > 0)
+
+  let videoThumbnails = $state<Record<string, string>>({})
+  let imageUrls = $state<Record<string, string>>({})
+  let generating = new Set<string>()
+
+  function getFileUrl(file: File): string {
+    const key = file.name + file.size
+    if (!imageUrls[key]) {
+      imageUrls[key] = URL.createObjectURL(file)
+    }
+    return imageUrls[key]
+  }
+
+  function ensureVideoThumbnail(file: File) {
+    const key = file.name + file.size
+    if (videoThumbnails[key] || generating.has(key)) return
+    generating.add(key)
+
+    const objectUrl = URL.createObjectURL(file)
+    const video = document.createElement('video')
+    video.preload = 'auto'
+    video.muted = true
+    video.playsInline = true
+
+    video.onloadeddata = () => {
+      video.currentTime = Math.min(1, (video.duration || 0) * 0.1) || 0
+    }
+
+    video.onseeked = () => {
+      try {
+        const canvas = document.createElement('canvas')
+        canvas.width = video.videoWidth
+        canvas.height = video.videoHeight
+        canvas.getContext('2d')!.drawImage(video, 0, 0)
+        videoThumbnails[key] = canvas.toDataURL('image/jpeg', 0.8)
+      } finally {
+        video.removeAttribute('src')
+        video.load()
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 100)
+      }
+    }
+
+    video.onerror = () => {
+      video.removeAttribute('src')
+      video.load()
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 100)
+    }
+
+    video.src = objectUrl
+  }
+
+  function getVideoThumbnail(file: File): string {
+    return videoThumbnails[file.name + file.size] ?? ''
+  }
+
+  $effect(() => {
+    for (const file of selectedFiles) {
+      if (isVideoFile(file)) ensureVideoThumbnail(file)
+    }
+  })
+
   const supportedFileExtensions = [
     '.jpeg',
     '.jpg',
@@ -358,7 +420,17 @@
           <div class="w-full flex flex-wrap gap-2 justify-center py-2">
             {#each existingFiles as file, i (`existing-${file.id}`)}
               <div class="relative">
-                <img src={file.url} alt={file.name} class="h-20 w-20 rounded object-cover" />
+                {#if isVideoFilename(file.name) && file.previewUrl}
+                  <img src={file.previewUrl} alt={file.name} class="h-20 w-20 rounded object-cover" />
+                {:else if isVideoFilename(file.name)}
+                  <div class="h-20 w-20 rounded object-cover bg-[#eae6e2] flex items-center justify-center">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M8 5v14l11-7L8 5z" fill="#71707a" />
+                    </svg>
+                  </div>
+                {:else}
+                  <img src={file.url} alt={file.name} class="h-20 w-20 rounded object-cover" />
+                {/if}
                 <button
                   type="button"
                   onclick={(e) => removeExisting(e, i)}
@@ -369,7 +441,22 @@
             {/each}
             {#each selectedFiles as file, i (file.name + i)}
               <div class="relative">
-                <img src={URL.createObjectURL(file)} alt={file.name} class="h-20 w-20 rounded object-cover" />
+                {#if isVideoFile(file)}
+                  {@const thumb = getVideoThumbnail(file)}
+                  {#if thumb}
+                    <img src={thumb} alt={file.name} class="h-20 w-20 rounded object-cover" />
+                  {:else}
+                    <div
+                      class="h-20 w-20 rounded object-cover bg-[#eae6e2] flex items-center justify-center animate-pulse"
+                    >
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M8 5v14l11-7L8 5z" fill="#71707a" />
+                      </svg>
+                    </div>
+                  {/if}
+                {:else}
+                  <img src={getFileUrl(file)} alt={file.name} class="h-20 w-20 rounded object-cover" />
+                {/if}
                 <button
                   type="button"
                   onclick={(e) => removeFile(e, i)}

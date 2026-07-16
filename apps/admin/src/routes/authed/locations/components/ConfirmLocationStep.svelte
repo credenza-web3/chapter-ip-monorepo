@@ -3,6 +3,7 @@
   import { LICENSE_TYPES } from '../constants/constants'
   import { modals, type ModalProps } from 'svelte-modals'
   import { ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
+  import { isVideoFile, isVideoFilename } from '$lib/upload/video-preview.service'
 
   let {
     currentStep = $bindable(),
@@ -14,16 +15,74 @@
     onSaveDraft?: () => Promise<void>
   } = $props()
 
-  type PreviewItem = { src: string; name: string }
+  type PreviewItem = { src: string; name: string; isVideo: boolean }
+
+  let videoThumbnails = $state<Record<string, string>>({})
+  let imageUrls = $state<Record<string, string>>({})
+  let generating = new Set<string>()
+
+  function getFileUrl(file: File): string {
+    const key = file.name + file.size
+    if (!imageUrls[key]) {
+      imageUrls[key] = URL.createObjectURL(file)
+    }
+    return imageUrls[key]
+  }
+
+  function ensureVideoThumbnail(file: File) {
+    const key = file.name + file.size
+    if (videoThumbnails[key] || generating.has(key)) return
+    generating.add(key)
+
+    const objectUrl = URL.createObjectURL(file)
+    const video = document.createElement('video')
+    video.preload = 'auto'
+    video.muted = true
+    video.playsInline = true
+
+    video.onloadeddata = () => {
+      video.currentTime = Math.min(1, (video.duration || 0) * 0.1) || 0
+    }
+
+    video.onseeked = () => {
+      try {
+        const canvas = document.createElement('canvas')
+        canvas.width = video.videoWidth
+        canvas.height = video.videoHeight
+        canvas.getContext('2d')!.drawImage(video, 0, 0)
+        videoThumbnails[key] = canvas.toDataURL('image/jpeg', 0.8)
+      } finally {
+        video.removeAttribute('src')
+        video.load()
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 100)
+      }
+    }
+
+    video.onerror = () => {
+      video.removeAttribute('src')
+      video.load()
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 100)
+    }
+
+    video.src = objectUrl
+  }
 
   const allPreviews = $derived.by(() => {
     const items: PreviewItem[] = []
 
     for (const file of $locationStore.existingFiles.locations) {
-      items.push({ src: file.url, name: file.name })
+      const video = isVideoFilename(file.name)
+      items.push({
+        src: video ? (file.previewUrl ?? '') : file.url,
+        name: file.name,
+        isVideo: video && !file.previewUrl,
+      })
     }
     for (const file of $locationStore.files.locations) {
-      items.push({ src: URL.createObjectURL(file), name: file.name })
+      const video = isVideoFile(file)
+      const key = file.name + file.size
+      const thumb = videoThumbnails[key]
+      items.push({ src: video ? (thumb ?? '') : getFileUrl(file), name: file.name, isVideo: video && !thumb })
     }
 
     return items
@@ -32,6 +91,12 @@
   const enabledLicenseTypes = $derived(
     LICENSE_TYPES.filter((license) => $locationStore.licensing.licenseTypes[license.id]),
   )
+
+  $effect(() => {
+    for (const file of $locationStore.files.locations) {
+      if (isVideoFile(file)) ensureVideoThumbnail(file)
+    }
+  })
   const onSubmit = () => {
     modals.open<ModalProps & TConfirmModalProps>(ConfirmModal, {
       title: 'Confirming your Location',
@@ -92,12 +157,23 @@
       {#if allPreviews.length > 0}
         <div class="grid grid-cols-2 gap-2">
           {#each allPreviews as preview, i (i)}
-            <img
-              src={preview.src}
-              alt={preview.name}
-              class="w-full rounded-lg object-cover"
-              style="max-height: 216px;"
-            />
+            {#if preview.isVideo}
+              <div
+                class="w-full rounded-lg bg-[#eae6e2] flex items-center justify-center"
+                style="max-height: 216px; aspect-ratio: 400/216;"
+              >
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                  <path d="M8 5v14l11-7L8 5z" fill="#71707a" />
+                </svg>
+              </div>
+            {:else}
+              <img
+                src={preview.src}
+                alt={preview.name}
+                class="w-full rounded-lg object-cover"
+                style="max-height: 216px;"
+              />
+            {/if}
           {/each}
         </div>
       {:else}

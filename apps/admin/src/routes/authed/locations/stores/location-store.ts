@@ -3,7 +3,7 @@ import type { AppRouter, TRPCClient } from '@repo/trpc/client'
 import { type LocationFileKey } from '$lib/constants/locationFileBuckets'
 import type { LocationAddress, LocationLicensingMetadata, LocationMetadataInput } from '@repo/content-types/location'
 
-type ExistingFile = { id: string; name: string; url: string }
+type ExistingFile = { id: string; name: string; url: string; previewUrl?: string }
 type ExistingFilesByBucket = Record<LocationFileKey, ExistingFile[]>
 
 const emptyExistingFiles = (): ExistingFilesByBucket => ({
@@ -24,9 +24,17 @@ export async function loadExistingFiles(
     (content.metadata?.file_names ?? [content.metadata?.file_name]).filter((n): n is string => !!n),
   )
 
+  const VIDEO_EXTENSIONS = ['.mp4', '.mov', '.webm']
+
   for (const file of files ?? []) {
     if (allowedNames.has(file.label)) {
-      existingFiles.locations.push({ id: file.id, name: file.label, url: file.url })
+      let previewUrl: string | undefined
+      if (VIDEO_EXTENSIONS.some((ext) => file.label.endsWith(ext))) {
+        const thumbName = file.label.replace(/\.[^.]+$/, '.jpg')
+        const thumbFile = (files ?? []).find((f) => f.label === thumbName)
+        if (thumbFile) previewUrl = thumbFile.url
+      }
+      existingFiles.locations.push({ id: file.id, name: file.label, url: file.url, previewUrl })
     }
   }
 

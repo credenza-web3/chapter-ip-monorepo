@@ -43,7 +43,10 @@ const SEARCH_FIELDS = ['name', 'description'] as const
 const REGEX_SPECIAL_CHARS = /[\\^$.*+?()[\]{}|]/g
 
 export function getPreviewUrl(contractAddress: string, contentId: string, filename: string): string {
-  return `${r2BaseConfig.previewUrl}/${contractAddress}/${contentId}/${filename}`
+  const VIDEO_EXTENSIONS = ['.mp4', '.mov', '.webm']
+  const ext = filename.slice(filename.lastIndexOf('.')).toLowerCase()
+  const previewFilename = VIDEO_EXTENSIONS.includes(ext) ? filename.replace(/\.[^.]+$/, '.jpg') : filename
+  return `${r2BaseConfig.previewUrl}/${contractAddress}/${contentId}/${previewFilename}`
 }
 
 export function createEmptyLocationFilters(): LocationFilters {
