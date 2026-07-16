@@ -74,42 +74,26 @@ export default class UploadService {
       if (includePreviews && isPreviewImage(file)) {
         try {
           const preview = await createImagePreview(file, { withWatermark })
-          const { url: previewUrl, key: previewKey } = await trpcClient.contents.createContentFileUploadUrl.mutate({
+          const { url: previewUrl } = await trpcClient.contents.createContentFileUploadUrl.mutate({
             contentId,
             mimetype: preview.type,
             bucket: 'preview',
             filename: name,
           })
           await uploadFileToBucket(preview, previewUrl)
-          await trpcClient.contents.registerContentFile.mutate({
-            contentId,
-            key: previewKey,
-            filename: name,
-            mimetype: preview.type,
-            label: name,
-            bucket: 'preview',
-          })
         } catch (error) {
           console.error(`Failed to upload preview for ${file.name}`, error)
         }
       } else if (includePreviews && isVideoFile(file)) {
         try {
           const thumbnail = await createVideoThumbnail(file)
-          const { url: previewUrl, key: previewKey } = await trpcClient.contents.createContentFileUploadUrl.mutate({
+          const { url: previewUrl } = await trpcClient.contents.createContentFileUploadUrl.mutate({
             contentId,
             mimetype: thumbnail.type,
             bucket: 'preview',
-            filename: thumbnail.name,
+            filename: name,
           })
           await uploadFileToBucket(thumbnail, previewUrl)
-          await trpcClient.contents.registerContentFile.mutate({
-            contentId,
-            key: previewKey,
-            filename: thumbnail.name,
-            mimetype: thumbnail.type,
-            label: thumbnail.name,
-            bucket: 'preview',
-          })
         } catch (error) {
           console.error(`Failed to upload video thumbnail for ${file.name}`, error)
         }

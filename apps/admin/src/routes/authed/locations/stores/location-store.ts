@@ -2,6 +2,7 @@ import { writable, derived } from 'svelte/store'
 import type { AppRouter, TRPCClient } from '@repo/trpc/client'
 import { type LocationFileKey } from '$lib/constants/locationFileBuckets'
 import type { LocationAddress, LocationLicensingMetadata, LocationMetadataInput } from '@repo/content-types/location'
+import { r2BaseConfig } from '@repo/fe-services'
 
 type ExistingFile = { id: string; name: string; url: string; previewUrl?: string }
 type ExistingFilesByBucket = Record<LocationFileKey, ExistingFile[]>
@@ -11,7 +12,7 @@ const emptyExistingFiles = (): ExistingFilesByBucket => ({
 })
 
 export async function loadExistingFiles(
-  content: { id: string; metadata?: LocationMetadataInput },
+  content: { id: string; contractAddress: string; metadata?: LocationMetadataInput },
   trpcClient: TRPCClient<AppRouter>,
 ): Promise<ExistingFilesByBucket> {
   const existingFiles = emptyExistingFiles()
@@ -28,12 +29,10 @@ export async function loadExistingFiles(
 
   for (const file of files ?? []) {
     if (allowedNames.has(file.label)) {
-      let previewUrl: string | undefined
-      if (VIDEO_EXTENSIONS.some((ext) => file.label.endsWith(ext))) {
-        const thumbName = file.label.replace(/\.[^.]+$/, '.jpg')
-        const thumbFile = (files ?? []).find((f) => f.label === thumbName)
-        if (thumbFile) previewUrl = thumbFile.url
-      }
+      const isVideo = VIDEO_EXTENSIONS.some((ext) => file.mimetype.startsWith('video/') || file.label.endsWith(ext))
+      const previewUrl = isVideo
+        ? `${r2BaseConfig.previewUrl}/${content.contractAddress}/${content.id}/${file.label}`
+        : undefined
       existingFiles.locations.push({ id: file.id, name: file.label, url: file.url, previewUrl })
     }
   }

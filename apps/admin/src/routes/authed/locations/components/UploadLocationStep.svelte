@@ -100,15 +100,17 @@
   const hasMedia = $derived(selectedFiles.length > 0 || existingFiles.length > 0)
 
   let videoThumbnails = $state<Record<string, string>>({})
-  let imageUrls = $state<Record<string, string>>({})
   let generating = new Set<string>()
+  const blobUrlCache = new Map<string, string>()
 
   function getFileUrl(file: File): string {
     const key = file.name + file.size
-    if (!imageUrls[key]) {
-      imageUrls[key] = URL.createObjectURL(file)
+    let url = blobUrlCache.get(key)
+    if (!url) {
+      url = URL.createObjectURL(file)
+      blobUrlCache.set(key, url)
     }
-    return imageUrls[key]
+    return url
   }
 
   function ensureVideoThumbnail(file: File) {
@@ -420,14 +422,8 @@
           <div class="w-full flex flex-wrap gap-2 justify-center py-2">
             {#each existingFiles as file, i (`existing-${file.id}`)}
               <div class="relative">
-                {#if isVideoFilename(file.name) && file.previewUrl}
+                {#if file.previewUrl}
                   <img src={file.previewUrl} alt={file.name} class="h-20 w-20 rounded object-cover" />
-                {:else if isVideoFilename(file.name)}
-                  <div class="h-20 w-20 rounded object-cover bg-[#eae6e2] flex items-center justify-center">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path d="M8 5v14l11-7L8 5z" fill="#71707a" />
-                    </svg>
-                  </div>
                 {:else}
                   <img src={file.url} alt={file.name} class="h-20 w-20 rounded object-cover" />
                 {/if}

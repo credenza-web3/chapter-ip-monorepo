@@ -18,15 +18,17 @@
   type PreviewItem = { src: string; name: string; isVideo: boolean }
 
   let videoThumbnails = $state<Record<string, string>>({})
-  let imageUrls = $state<Record<string, string>>({})
   let generating = new Set<string>()
+  const blobUrlCache = new Map<string, string>()
 
   function getFileUrl(file: File): string {
     const key = file.name + file.size
-    if (!imageUrls[key]) {
-      imageUrls[key] = URL.createObjectURL(file)
+    let url = blobUrlCache.get(key)
+    if (!url) {
+      url = URL.createObjectURL(file)
+      blobUrlCache.set(key, url)
     }
-    return imageUrls[key]
+    return url
   }
 
   function ensureVideoThumbnail(file: File) {
@@ -71,11 +73,10 @@
     const items: PreviewItem[] = []
 
     for (const file of $locationStore.existingFiles.locations) {
-      const video = isVideoFilename(file.name)
       items.push({
-        src: video ? (file.previewUrl ?? '') : file.url,
+        src: file.previewUrl ?? file.url,
         name: file.name,
-        isVideo: video && !file.previewUrl,
+        isVideo: false,
       })
     }
     for (const file of $locationStore.files.locations) {
