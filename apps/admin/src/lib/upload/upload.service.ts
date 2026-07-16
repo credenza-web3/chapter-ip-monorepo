@@ -95,12 +95,16 @@ export default class UploadService {
     keptFileIds,
     uploads,
     trpcClient,
+    includePreviews = true,
+    withWatermark = true,
   }: {
     contentId: string
     currentFiles: ContentFileReference[]
     keptFileIds: Set<string>
     uploads: NamedUpload[]
     trpcClient: TRPCClient<AppRouter>
+    includePreviews?: boolean
+    withWatermark?: boolean
   }): Promise<{ keys: string[] }> {
     const keys = currentFiles.filter((file) => keptFileIds.has(file.id)).map((file) => file.key)
 
@@ -114,7 +118,8 @@ export default class UploadService {
       contentId,
       uploads,
       trpcClient,
-      includePreviews: false,
+      includePreviews,
+      withWatermark,
     })
 
     return { keys: [...keys, ...uploaded.keys] }

@@ -20,8 +20,14 @@ export async function loadExistingFiles(
 
   const { files } = await trpcClient.contents.getContentAllFilesLink.query({ contentId: content.id })
 
+  const allowedNames = new Set(
+    (content.metadata?.file_names ?? [content.metadata?.file_name]).filter((n): n is string => !!n),
+  )
+
   for (const file of files ?? []) {
-    existingFiles.locations.push({ id: file.id, name: file.label, url: file.url })
+    if (allowedNames.has(file.label)) {
+      existingFiles.locations.push({ id: file.id, name: file.label, url: file.url })
+    }
   }
 
   return existingFiles

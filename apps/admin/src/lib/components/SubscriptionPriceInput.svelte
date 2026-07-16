@@ -108,7 +108,7 @@
           disabled={loading || saving}
           {value}
           oninput={handleInput}
-          class="h-[52px] w-full rounded-[4px] border border-[#ded9d5] bg-white pl-8 pr-14 text-[15px] text-dark outline-none transition-colors placeholder:text-[#c0bcc2] focus:border-primary focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-70"
+          class="h-13 w-full rounded-sm border border-[#ded9d5] bg-white pl-8 pr-14 text-[15px] text-dark outline-none transition-colors placeholder:text-[#c0bcc2] focus:border-primary focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-70"
         />
         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
           <span class="text-[15px] text-[#9d99a0]">USD</span>
@@ -122,7 +122,7 @@
           type="button"
           disabled={!hasChanges || value <= 0 || loading || saving}
           onclick={handleSave}
-          class="inline-flex h-10 min-w-28 items-center justify-center rounded-[4px] bg-primary px-6 text-sm font-semibold text-white transition-colors hover:bg-[#5a28ef] disabled:cursor-not-allowed disabled:bg-[#dedad7] disabled:text-white/70"
+          class="inline-flex h-10 min-w-28 items-center justify-center rounded-sm bg-primary px-6 text-sm font-semibold text-white transition-colors hover:bg-[#5a28ef] disabled:cursor-not-allowed disabled:bg-[#dedad7] disabled:text-white/70"
         >
           {#if saving}
             <span class="loading loading-spinner loading-xs"></span>

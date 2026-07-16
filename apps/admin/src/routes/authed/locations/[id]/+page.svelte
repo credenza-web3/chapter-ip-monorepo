@@ -1,9 +1,5 @@
 <script lang="ts">
-  import {
-    LOCATION_FILE_BUCKETS,
-    createLocationFileNames,
-    DEFAULT_LOCATION_FILENAME,
-  } from '$lib/constants/locationFileBuckets'
+  import { LOCATION_FILE_BUCKETS, DEFAULT_LOCATION_FILENAME } from '$lib/constants/locationFileBuckets'
   import { afterNavigate, beforeNavigate, goto } from '$app/navigation'
   import { locationStore } from '../stores/location-store'
   import UploadStepHeader from '../components/UploadStepHeader.svelte'
@@ -39,13 +35,11 @@
   afterNavigate(() => locationStore.setLoading(false))
 
   const existingNames = $derived($locationStore.existingFiles.locations.map((file) => file.name))
-  const newCount = $derived($locationStore.files.locations.length)
+  const allFileNames = $derived([...existingNames, ...$locationStore.files.locations.map((file) => file.name)])
 
   const buildLocationMetadata = () => {
     const { street, apt, city, state, zip } = $locationStore.address
     const address = street || city || state || zip ? { street, apt, city, state, zip } : undefined
-    const newNames = createLocationFileNames('locations', newCount, existingNames)
-    const allFileNames = [...existingNames, ...newNames]
     return {
       type: 'location' as const,
       name: $locationStore.name,
@@ -57,15 +51,10 @@
     }
   }
 
-  const buildUploadNames = () => {
-    return createLocationFileNames('locations', newCount, existingNames)
-  }
-
-  const buildNamedUploads = (uploadNames: string[]): NamedUpload[] => {
-    const existingCount = $locationStore.existingFiles.locations.length
-    return $locationStore.files.locations.map((file, index) => ({
+  const buildNamedUploads = (): NamedUpload[] => {
+    return $locationStore.files.locations.map((file) => ({
       file,
-      name: uploadNames[existingCount + index],
+      name: file.name,
     }))
   }
 
@@ -75,12 +64,10 @@
   const getCurrentFiles = () => (data.files ?? []) as ExistingContentFile[]
 
   const buildLocationPayload = () => {
-    const uploadNames = buildUploadNames()
-
     return {
       keptFileIds: getKeptFileIds(),
       metadata: buildLocationMetadata(),
-      uploads: buildNamedUploads(uploadNames),
+      uploads: buildNamedUploads(),
       tags: $locationStore.tags,
     }
   }
@@ -113,6 +100,7 @@
       keptFileIds,
       uploads,
       trpcClient,
+      withWatermark: false,
     })
 
     await uploadService.updateContentMetadata({
