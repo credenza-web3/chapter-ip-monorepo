@@ -36,6 +36,9 @@ const config = {
       metadataBucketHost: 'https://pub-5c9112f4549643409ad80de98438b4c7.r2.dev',
     },
   },
+  license: {
+    oneTimeLinkActiveHours: 72,
+  },
 }
 
 export default () => withEnvOverrides(config)

@@ -53,8 +53,12 @@ export class CommonLicenseService {
         case 2: {
           const blockedLicenseModel = this.blockedLicenseService.getModel()
           const blocked = await blockedLicenseModel.findOne({ tokenId: licenseTokenId, subEvmAddress, sub })
+          const oneTimeLinkActiveHours = this.configService.get<number>('license.oneTimeLinkActiveHours')!
+          const oneTimeLinkActiveMs = oneTimeLinkActiveHours * 60 * 60 * 1000
           if (blocked) {
-            return [false, 'License has been already used']
+            if (Date.now() - blocked.createdAt.getTime() < oneTimeLinkActiveMs) {
+              return [false, 'License has been already used']
+            }
           }
           await blockedLicenseModel.create({ tokenId: licenseTokenId, subEvmAddress, sub })
           break
