@@ -2,7 +2,6 @@
   import { useDefaultImage } from '$lib/content/image'
 
   let { data } = $props()
-  console.log(data)
 </script>
 
 <div class="mx-auto w-full max-w-360 px-6">
@@ -25,11 +24,13 @@
         </div>
       {/if}
       <h1 id="publisher-heading" class="text-2xl font-bold text-dark">{data.publisher.title}</h1>
-      <button
-        class="mt-6.25 rounded-full border border-[#ddd] bg-[#eae6e2] px-6 py-1.5 text-base font-semibold text-[#202225]/50"
-      >
-        Subscribe
-      </button>
+      {#if data.hasSubscription}
+        <button
+          class="mt-6.25 rounded-full border border-[#ddd] bg-[#eae6e2] px-6 py-1.5 text-base font-semibold text-[#202225]/50"
+        >
+          Subscribe
+        </button>
+      {/if}
     </div>
     {#if data.items.length > 0}
       <div class="grid grid-cols-1 gap-x-6 gap-y-12 min-[420px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 mt-15.5">

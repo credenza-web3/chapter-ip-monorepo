@@ -1,4 +1,5 @@
 import { configStore, ContractName } from '$lib/stores/config.svelte'
+import { getMembershipPrice } from '$lib/membership'
 import { toLikenessItems } from '../../likeness/likeness'
 import { toLocationItems } from '../../location/location'
 
@@ -16,8 +17,11 @@ export const load = async ({ params, parent }) => {
 
   const items = [...toLikenessItems(contentItems, contractAddress), ...toLocationItems(contentItems, contractAddress)]
 
+  const subscriptionPrice = publisher.evmAddress ? await getMembershipPrice(publisher.evmAddress) : 0
+
   return {
     publisher,
     items,
+    hasSubscription: subscriptionPrice > 0,
   }
 }
