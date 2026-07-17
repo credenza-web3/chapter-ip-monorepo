@@ -109,7 +109,7 @@
     <div class="mb-8">
       {#if allPreviews.length > 0}
         <div class="grid grid-cols-2 gap-2">
-          {#each allPreviews as preview, i (i)}
+          {#each allPreviews as preview (preview.name)}
             {#if preview.isVideo}
               <div
                 class="w-full rounded-lg bg-[#eae6e2] flex items-center justify-center"

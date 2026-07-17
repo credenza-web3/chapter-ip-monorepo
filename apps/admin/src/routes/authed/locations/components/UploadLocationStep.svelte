@@ -382,7 +382,7 @@
                 >
               </div>
             {/each}
-            {#each selectedFiles as file, i (file.name + i)}
+            {#each selectedFiles as file, i (file.name)}
               <div class="relative">
                 {#if isVideoFile(file)}
                   {@const thumb = getVideoThumbnail(file)}
