@@ -18,12 +18,9 @@
   } = $props()
 
   type PreviewItem = { src: string; name: string; isVideo: boolean }
-
   const { videoThumbnails, getFileUrl, ensureVideoThumbnail } = useVideoPreview()
-
   const allPreviews = $derived.by(() => {
     const items: PreviewItem[] = []
-
     for (const file of $locationStore.existingFiles.locations) {
       items.push({
         src: file.previewUrl ?? file.url,
