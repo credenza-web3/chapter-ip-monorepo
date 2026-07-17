@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte'
-  import { SvelteSet } from 'svelte/reactivity'
   import { locationStore } from '../stores/location-store'
   import { LICENSE_TYPES } from '../constants/constants'
   import { modals, type ModalProps } from 'svelte-modals'
   import { ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
   import { isVideoFile } from '$lib/upload/video-preview.service'
+  import { useVideoPreview } from '$lib/hooks/use-video-preview.svelte'
 
   let {
     // eslint-disable-next-line no-useless-assignment
@@ -20,64 +19,7 @@
 
   type PreviewItem = { src: string; name: string; isVideo: boolean }
 
-  let videoThumbnails = $state<Record<string, string>>({})
-  let generating = new SvelteSet<string>()
-  // eslint-disable-next-line svelte/prefer-svelte-reactivity
-  const blobUrlCache = new Map<string, string>()
-
-  onDestroy(() => {
-    for (const url of blobUrlCache.values()) URL.revokeObjectURL(url)
-    blobUrlCache.clear()
-  })
-
-  function getFileUrl(file: File): string {
-    const key = file.name + file.size
-    let url = blobUrlCache.get(key)
-    if (!url) {
-      url = URL.createObjectURL(file)
-      blobUrlCache.set(key, url)
-    }
-    return url
-  }
-
-  function ensureVideoThumbnail(file: File) {
-    const key = file.name + file.size
-    if (videoThumbnails[key] || generating.has(key)) return
-    generating.add(key)
-
-    const objectUrl = URL.createObjectURL(file)
-    const video = document.createElement('video')
-    video.preload = 'auto'
-    video.muted = true
-    video.playsInline = true
-
-    video.onloadeddata = () => {
-      video.currentTime = Math.min(1, (video.duration || 0) * 0.1) || 0
-    }
-
-    video.onseeked = () => {
-      try {
-        const canvas = document.createElement('canvas')
-        canvas.width = video.videoWidth
-        canvas.height = video.videoHeight
-        canvas.getContext('2d')!.drawImage(video, 0, 0)
-        videoThumbnails[key] = canvas.toDataURL('image/jpeg', 0.8)
-      } finally {
-        video.removeAttribute('src')
-        video.load()
-        setTimeout(() => URL.revokeObjectURL(objectUrl), 100)
-      }
-    }
-
-    video.onerror = () => {
-      generating.delete(key)
-      video.removeAttribute('src')
-      video.load()
-      setTimeout(() => URL.revokeObjectURL(objectUrl), 100)
-    }
-
-    video.src = objectUrl
-  }
+  const { videoThumbnails, getFileUrl, ensureVideoThumbnail } = useVideoPreview()
 
   const allPreviews = $derived.by(() => {
     const items: PreviewItem[] = []

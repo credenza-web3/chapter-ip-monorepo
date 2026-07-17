@@ -29,7 +29,7 @@ export async function loadExistingFiles(
 
   for (const file of files ?? []) {
     if (allowedNames.has(file.label)) {
-      const isVideo = VIDEO_EXTENSIONS.some((ext) => file.mimetype.startsWith('video/') || file.label.endsWith(ext))
+      const isVideo = file.mimetype.startsWith('video/') || VIDEO_EXTENSIONS.some((ext) => file.label.endsWith(ext))
       const previewUrl = isVideo
         ? `${r2BaseConfig.previewUrl}/${content.contractAddress}/${content.id}/${file.label}`
         : undefined
