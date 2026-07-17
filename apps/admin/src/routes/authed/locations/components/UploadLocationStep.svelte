@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte'
+  import { SvelteSet } from 'svelte/reactivity'
   import { locationStore } from '../stores/location-store'
-  import { isVideoFile, isVideoFilename } from '$lib/upload/video-preview.service'
+  import { isVideoFile } from '$lib/upload/video-preview.service'
 
   let {
     currentStep = $bindable(),
@@ -100,8 +102,14 @@
   const hasMedia = $derived(selectedFiles.length > 0 || existingFiles.length > 0)
 
   let videoThumbnails = $state<Record<string, string>>({})
-  let generating = new Set<string>()
+  let generating = new SvelteSet<string>()
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity
   const blobUrlCache = new Map<string, string>()
+
+  onDestroy(() => {
+    for (const url of blobUrlCache.values()) URL.revokeObjectURL(url)
+    blobUrlCache.clear()
+  })
 
   function getFileUrl(file: File): string {
     const key = file.name + file.size

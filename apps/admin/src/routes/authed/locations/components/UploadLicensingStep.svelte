@@ -4,6 +4,7 @@
   import LicenseTypeRow from './LicenseTypeRow.svelte'
 
   let {
+    // eslint-disable-next-line no-useless-assignment
     currentStep = $bindable(),
     onSaveDraft,
   }: {

@@ -2,7 +2,7 @@ import { writable, derived } from 'svelte/store'
 import type { AppRouter, TRPCClient } from '@repo/trpc/client'
 import { type LocationFileKey } from '$lib/constants/locationFileBuckets'
 import type { LocationAddress, LocationLicensingMetadata, LocationMetadataInput } from '@repo/content-types/location'
-import { r2BaseConfig } from '@repo/fe-services'
+import { r2BaseConfig, VIDEO_EXTENSIONS } from '@repo/fe-services'
 
 type ExistingFile = { id: string; name: string; url: string; previewUrl?: string }
 type ExistingFilesByBucket = Record<LocationFileKey, ExistingFile[]>
@@ -26,8 +26,6 @@ export async function loadExistingFiles(
       .filter((n): n is string => !!n)
       .map((n) => n.trim()),
   )
-
-  const VIDEO_EXTENSIONS = ['.mp4', '.mov', '.webm']
 
   for (const file of files ?? []) {
     if (allowedNames.has(file.label)) {

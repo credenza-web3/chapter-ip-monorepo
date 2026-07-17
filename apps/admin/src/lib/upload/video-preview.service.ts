@@ -1,15 +1,15 @@
-const VIDEO_EXTENSIONS = new Set(['.mp4', '.mov', '.webm'])
+import { VIDEO_EXTENSIONS } from '@repo/fe-services'
 
 export const isVideoFile = (file: File): boolean => {
   if (file.type.startsWith('video/')) return true
   const fileName = file.name ?? ''
   const ext = fileName.slice(fileName.lastIndexOf('.')).toLowerCase()
-  return VIDEO_EXTENSIONS.has(ext)
+  return VIDEO_EXTENSIONS.includes(ext as (typeof VIDEO_EXTENSIONS)[number])
 }
 
 export const isVideoFilename = (filename: string): boolean => {
   const ext = filename.slice(filename.lastIndexOf('.')).toLowerCase()
-  return VIDEO_EXTENSIONS.has(ext)
+  return VIDEO_EXTENSIONS.includes(ext as (typeof VIDEO_EXTENSIONS)[number])
 }
 
 export const createVideoThumbnail = async (file: File): Promise<File> => {

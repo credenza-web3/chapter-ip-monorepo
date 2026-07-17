@@ -1,5 +1,5 @@
 import { DEFAULT_IMAGE_URL } from '$lib/content/image'
-import { r2BaseConfig } from '@repo/fe-services'
+import { r2BaseConfig, VIDEO_EXTENSIONS } from '@repo/fe-services'
 import type { LocationContent } from '@repo/content-types/location'
 
 export { DEFAULT_IMAGE_URL }
@@ -43,9 +43,10 @@ const SEARCH_FIELDS = ['name', 'description'] as const
 const REGEX_SPECIAL_CHARS = /[\\^$.*+?()[\]{}|]/g
 
 export function getPreviewUrl(contractAddress: string, contentId: string, filename: string): string {
-  const VIDEO_EXTENSIONS = ['.mp4', '.mov', '.webm']
   const ext = filename.slice(filename.lastIndexOf('.')).toLowerCase()
-  const previewFilename = VIDEO_EXTENSIONS.includes(ext) ? filename.replace(/\.[^.]+$/, '.jpg') : filename
+  const previewFilename = VIDEO_EXTENSIONS.includes(ext as (typeof VIDEO_EXTENSIONS)[number])
+    ? filename.replace(/\.[^.]+$/, '.jpg')
+    : filename
   return `${r2BaseConfig.previewUrl}/${contractAddress}/${contentId}/${previewFilename}`
 }
 

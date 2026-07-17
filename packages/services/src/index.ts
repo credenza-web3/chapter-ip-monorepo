@@ -1,5 +1,6 @@
 export * from './socket'
 export * from './tx'
+export * from './constants'
 
 const env = import.meta.env.VITE_ENV || 'staging'
 
