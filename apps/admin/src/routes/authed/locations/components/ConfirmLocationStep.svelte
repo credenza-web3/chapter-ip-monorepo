@@ -61,6 +61,7 @@
     }
 
     video.onerror = () => {
+      generating.delete(key)
       video.removeAttribute('src')
       video.load()
       setTimeout(() => URL.revokeObjectURL(objectUrl), 100)
