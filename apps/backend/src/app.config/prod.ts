@@ -16,7 +16,7 @@ const config = {
   },
   cloudflare: {
     rtwo: {
-      metadataBucketHost: 'https://pub-66f560aee603432cac866e978f516cdb.r2.dev',
+      metadataBucketHost: 'https://metadata-files.chapterip.com',
     },
   },
 }
