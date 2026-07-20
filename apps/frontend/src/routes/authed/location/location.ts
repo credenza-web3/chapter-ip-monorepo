@@ -28,6 +28,7 @@ export type LocationItem = {
   description: string
   imageUrl: string
   authorName?: string
+  metadata?: LocationContent['metadata']
 }
 
 export type LocationFilters = {
@@ -120,6 +121,7 @@ export function toLocationItems(contentItems: ContentItem[], contractAddress: st
         name: metadata.name ?? '',
         description: metadata.description ?? '',
         imageUrl: fileName ? getPreviewUrl(contractAddress, item.id, fileName) : DEFAULT_IMAGE_URL,
+        metadata,
       },
     ]
   })
