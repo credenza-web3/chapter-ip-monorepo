@@ -39,10 +39,12 @@ export class FileService extends CommonModelService<ContentFile> {
     if (!accessKeyId) throw new Error('cloudflare.rtwo.accessKeyId is not set')
     const secretAccessKey: string = this.configService.get<string>('cloudflare.rtwo.secretAccessKey') as string
     if (!secretAccessKey) throw new Error('cloudflare.rtwo.secretAccessKey is not set')
+    const endpoint: string = this.configService.get<string>('cloudflare.rtwo.endpoint') as string
+    if (!endpoint) throw new Error('cloudflare.rtwo.endpoint is not set')
 
     this.r2 = new S3Client({
       region: 'auto',
-      endpoint: 'https://3153ffc48832224f2ff5e71db72075f1.r2.cloudflarestorage.com',
+      endpoint,
       credentials: {
         accessKeyId,
         secretAccessKey,

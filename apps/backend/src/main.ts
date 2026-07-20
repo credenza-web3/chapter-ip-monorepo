@@ -28,7 +28,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService)
   const port = configService.get<number>('port')!
 
-  console.log(`Config:`, configService)
+  // console.log(`Config:`, configService.get('cloudflare.rtwo'))
 
   await app.listen(port, () => {
     logger.log(`🚀 Running at "${port}" in "${env}" mode`)

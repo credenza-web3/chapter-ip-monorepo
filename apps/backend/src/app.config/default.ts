@@ -31,9 +31,10 @@ const config = {
   },
   cloudflare: {
     rtwo: {
+      endpoint: 'https://118f5d0e28493f6d56c5f4e6c13071cb.r2.cloudflarestorage.com',
       accessKeyId: '',
       secretAccessKey: '',
-      metadataBucketHost: 'https://pub-5c9112f4549643409ad80de98438b4c7.r2.dev',
+      metadataBucketHost: 'https://metadata.files.test.chapterip.com',
     },
   },
   license: {
