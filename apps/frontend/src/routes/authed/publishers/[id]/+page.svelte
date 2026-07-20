@@ -70,7 +70,7 @@
     {#if data.items.length > 0}
       <div class="grid grid-cols-1 gap-x-6 gap-y-12 min-[420px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 mt-15.5">
         {#each data.items as item (item.id)}
-          <a href={`/authed/likeness/${item.id}`} class="group min-w-0">
+          <a href={`/authed/${item.type}/${item.id}`} class="group min-w-0">
             <div class="overflow-hidden rounded-lg bg-black">
               <img
                 src={item.imageUrl}

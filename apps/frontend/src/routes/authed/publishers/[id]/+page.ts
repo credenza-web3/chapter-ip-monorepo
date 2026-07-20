@@ -15,7 +15,10 @@ export const load = async ({ params, parent }) => {
     contractAddress,
   })
 
-  const items = [...toLikenessItems(contentItems, contractAddress), ...toLocationItems(contentItems, contractAddress)]
+  const items = [
+    ...toLikenessItems(contentItems, contractAddress).map((i) => ({ ...i, type: 'likeness' as const })),
+    ...toLocationItems(contentItems, contractAddress).map((i) => ({ ...i, type: 'location' as const })),
+  ]
 
   const subscriptionPrice = publisher.evmAddress ? await getMembershipPrice(publisher.evmAddress) : 0
 
