@@ -34,7 +34,7 @@ const config = {
       endpoint: 'https://118f5d0e28493f6d56c5f4e6c13071cb.r2.cloudflarestorage.com',
       accessKeyId: '',
       secretAccessKey: '',
-      metadataBucketHost: 'https://metadata.files.test.chapterip.com',
+      metadataBucketHost: 'https://metadata-files-staging.chapterip.com',
     },
   },
   license: {
