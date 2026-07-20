@@ -28,7 +28,6 @@
   onMount(async () => {
     pass = get(passportStore)
     hasMembership = await verifyMembership(data.publisher.evmAddress || '', data.userAddress || '')
-    console.log(hasMembership)
   })
 </script>
 

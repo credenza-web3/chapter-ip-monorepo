@@ -13,6 +13,7 @@
     { label: 'Creative Works', disabled: true },
     { label: 'Likeness', href: '/authed/likeness' },
     { label: 'Location', href: '/authed/location' },
+    { label: 'Publishers', href: '/authed/publishers' },
   ]
 
   let { query = '', targets = defaultSearchTargets } = $props<{
