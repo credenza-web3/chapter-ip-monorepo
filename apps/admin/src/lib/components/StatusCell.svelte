@@ -16,7 +16,7 @@
     SALE_DISABLED: [STATUS.ACTIVE],
   }
 
-  let { status = $bindable(), contentId }: { contentId: string; status: string } = $props()
+  let { status = $bindable(STATUS.ACTIVE), contentId }: { contentId: string; status: StatusValue } = $props()
 
   let open = $state(false)
   let top = $state(0)
@@ -26,11 +26,7 @@
 
   const trpcClient = getTrpcClient()
 
-  function isStatusValue(value: string): value is StatusValue {
-    return value === STATUS.DRAFT || value === STATUS.ACTIVE || value === STATUS.SALE_DISABLED
-  }
-
-  const currentStatus = $derived(isStatusValue(status) ? status : STATUS.ACTIVE)
+  let currentStatus = $state(status)
   const cfg = $derived(STATUS_MAP[currentStatus])
   const statusOptions = $derived(STATUS_OPTIONS_BY_STATUS[currentStatus])
 
@@ -61,6 +57,7 @@
     closeMenu()
     try {
       await trpcClient.contents.updateContentMetadata.mutate({ contentId, status: newStatus })
+      currentStatus = newStatus
       status = newStatus
       notify('Status updated', ToastType.SUCCESS)
     } catch {

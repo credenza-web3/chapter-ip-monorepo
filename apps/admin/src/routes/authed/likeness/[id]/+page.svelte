@@ -93,7 +93,12 @@
   }
 
   const getLicensePrices = () => ({
-    oneTimePrice: Number($likenessStore.licensing.licensePrices['single-use']),
+    oneTimePrice: $likenessStore.licensing.licenseTypes['single-use']
+      ? Number($likenessStore.licensing.licensePrices['single-use'])
+      : 0,
+    lifetimePrice: $likenessStore.licensing.licenseTypes.perpetual
+      ? Number($likenessStore.licensing.licensePrices.perpetual)
+      : 0,
   })
 
   const buildTokenMetadata = (keys: string[]) => {

@@ -7,9 +7,9 @@ import { configStore, ContractName } from '$lib/stores/config.svelte'
 export default class TransactionService {
   constructor(private readonly blockchainService: BlockchainService) {}
 
-  async mintWithPrices(accessToken: string, onetimePrice: number): Promise<string> {
+  async mintWithPrices(accessToken: string, prices: { oneTimePrice: number; lifetimePrice?: number }): Promise<string> {
     const userAddress = await this.blockchainService.getUserAddress()
-    const mintPopulatedTx = await this.blockchainService.createMintTransaction(userAddress, onetimePrice)
+    const mintPopulatedTx = await this.blockchainService.createMintTransaction(userAddress, prices)
 
     const txHash = await this.forwardMintTransaction(mintPopulatedTx)
     const tokenId = await this.extractTokenIdFromTransaction(txHash, accessToken)

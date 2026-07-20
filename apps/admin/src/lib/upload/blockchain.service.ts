@@ -5,21 +5,24 @@ export default class BlockchainService {
   constructor(accessToken: string) {
     initProvider(accessToken)
   }
-  async createMintTransaction(userAddress: string, onetimePrice: number) {
+  async createMintTransaction(
+    userAddress: string,
+    { oneTimePrice, lifetimePrice = 0 }: { oneTimePrice: number; lifetimePrice?: number },
+  ) {
     const signer = await getSigner()
     const contentContract = configStore.getContract(ContractName.CONTENT_NFT, signer)
     return await contentContract.mintWithPrices.populateTransaction(
       userAddress,
       '',
       '',
+      lifetimePrice * 100,
+      lifetimePrice * 10 ** 6, // cred decimals (6 decimals)
       0,
       0,
       0,
       0,
-      0,
-      0,
-      onetimePrice * 100,
-      onetimePrice * 10 ** 6, // cred decimals
+      oneTimePrice * 100,
+      oneTimePrice * 10 ** 6, // cred decimals
       0,
     )
   }
