@@ -1,7 +1,35 @@
 <script lang="ts">
   import { useDefaultImage } from '$lib/content/image'
+  import { onMount } from 'svelte'
+  import { verifyMembership } from '$lib/membership/index.js'
+  import type { Passport } from '@credenza3/passport-evm'
+  import { get } from 'svelte/store'
+  import { passportStore } from '$lib/passport.store'
+  import { goto } from '$app/navigation'
 
   let { data } = $props()
+  let hasMembership = $state(false)
+  let pass: Passport | null = $state(null)
+
+  const purchaseSubscription = async () => {
+    const title = `Subscription license for ChapterIP`
+    pass?.openUI('payment', {
+      title,
+      memberships: [
+        {
+          contractAddress: import.meta.env.VITE_EVM_MEMBERSHIP_CONTRACT_ADDRESS,
+          membershipTokenId: String(BigInt(data.publisher.evmAddress || '')),
+        },
+      ],
+    })
+    pass?.once('PAYMENT', async () => goto('/authed/purchases'))
+  }
+
+  onMount(async () => {
+    pass = get(passportStore)
+    hasMembership = await verifyMembership(data.publisher.evmAddress || '', data.userAddress || '')
+    console.log(hasMembership)
+  })
 </script>
 
 <div class="mx-auto w-full max-w-360 px-6">
@@ -24,12 +52,19 @@
         </div>
       {/if}
       <h1 id="publisher-heading" class="text-2xl font-bold text-dark">{data.publisher.title}</h1>
-      {#if data.hasSubscription}
-        <button
-          class="mt-6.25 rounded-full border border-[#ddd] bg-[#eae6e2] px-6 py-1.5 text-base font-semibold text-[#202225]/50"
-        >
-          Subscribe
-        </button>
+      {#if !hasMembership}
+        {#if data.hasSubscription}
+          <button
+            class="mt-6.25 rounded-full border border-[#ddd] bg-[#eae6e2] px-6 py-1.5 text-base font-semibold text-[#202225]/50 cursor-pointer"
+            onclick={purchaseSubscription}
+          >
+            Subscribe
+          </button>
+        {/if}
+      {:else}
+        <div class="p-2 my-2">
+          <span>You are subscribed to this publisher.</span>
+        </div>
       {/if}
     </div>
     {#if data.items.length > 0}
