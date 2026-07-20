@@ -4,6 +4,8 @@ import { configStore, ContractName } from '$lib/stores/config.svelte'
 import type { createClient } from '@repo/trpc/client'
 import type { PurchasedContentToken } from './types'
 
+const BLOCK_GRACE_MS = 72 * 60 * 60 * 1000
+
 export const getTokensWithMetadata = async (accessToken: string, trpcClient: ReturnType<typeof createClient>) => {
   await initProvider(accessToken)
   const signer = await getSigner()
@@ -17,7 +19,7 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
   const { items: blockedLicenses } = await trpcClient.licenses.findBlockedLicenses.query({
     subEvmAddress: userAddress,
   })
-  const blockedLicensesIds = blockedLicenses.map((b) => b.tokenId)
+  const blockedAtByTokenId = new Map(blockedLicenses.map((b) => [b.tokenId, new Date(b.createdAt).getTime()]))
 
   const tokens: PurchasedContentToken[] = []
 
@@ -41,12 +43,21 @@ export const getTokensWithMetadata = async (accessToken: string, trpcClient: Ret
       const contentWithFiles = await trpcClient.contents.getContentById.query({ id: content.id })
       const contentTokenIdString = contentTokenId.toString()
       const licenseTokenIdString = licenseTokenId.toString()
+      const blockedAt = blockedAtByTokenId.get(licenseTokenIdString)
+      let isBlocked = false
+      let blockedGraceEndsAt: number | null = null
+
+      if (blockedAt != null && Number.isFinite(blockedAt)) {
+        blockedGraceEndsAt = blockedAt + BLOCK_GRACE_MS
+        isBlocked = Date.now() - blockedAt >= BLOCK_GRACE_MS
+      }
 
       tokens.push({
         id: content.id,
         tokenId: contentTokenIdString,
         licenseTokenId: licenseTokenIdString,
-        isBlocked: blockedLicensesIds.includes(licenseTokenIdString),
+        isBlocked,
+        blockedGraceEndsAt,
         contentTokenId: Number(contentTokenId),
         sub: content.sub,
         tags: (content as { tags?: string[] }).tags,

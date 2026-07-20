@@ -29,6 +29,7 @@ export type PurchasedContentToken = {
   licenseType: string
   licenseTokenId: string
   isBlocked: boolean
+  blockedGraceEndsAt: number | null
 }
 
 export type ContentFilesLinkClient = {

@@ -23,8 +23,8 @@
     trpcClient: ContentFilesLinkClient | undefined
   } = $props()
 
-  let isBlocked = $state(false)
-  let initializedLicenseTokenId = $state('')
+  let isBlocked = $state(purchase.isBlocked)
+  let now = $state(Date.now())
   let isDownloading = $state(false)
   let isModalOpen = $state(false)
   let isFallbackModalOpen = $state(false)
@@ -33,12 +33,45 @@
 
   const modalTitleId = $derived(`${item.type}-license-${purchase.licenseTokenId}`)
   const canDownload = $derived(!isBlocked && !isDownloading)
+  const graceEndsAt = $derived(purchase.blockedGraceEndsAt)
+  const showGraceCountdown = $derived(graceEndsAt != null && !isBlocked && now < graceEndsAt)
+  const graceCountdownText = $derived(showGraceCountdown ? formatGraceCountdown(graceEndsAt! - now) : '')
+
+  function formatGraceCountdown(msRemaining: number): string {
+    const totalSeconds = Math.max(0, Math.ceil(msRemaining / 1000))
+    const days = Math.floor(totalSeconds / 86400)
+    const hours = Math.floor((totalSeconds % 86400) / 3600)
+    const minutes = Math.floor((totalSeconds % 3600) / 60)
+    const seconds = totalSeconds % 60
+
+    if (days > 0) {
+      return `Access ends in ${days}d ${hours}h ${minutes}m`
+    }
+
+    return `Access ends in ${hours}h ${minutes}m ${seconds}s`
+  }
 
   $effect(() => {
-    if (initializedLicenseTokenId === purchase.licenseTokenId) return
-
     isBlocked = purchase.isBlocked
-    initializedLicenseTokenId = purchase.licenseTokenId
+  })
+
+  $effect(() => {
+    const endsAt = purchase.blockedGraceEndsAt
+    if (endsAt == null || !Number.isFinite(endsAt) || isBlocked) return
+
+    const tick = () => {
+      const current = Date.now()
+      now = current
+      if (current >= endsAt) {
+        isBlocked = true
+      }
+    }
+
+    tick()
+    if (isBlocked) return
+
+    const intervalId = setInterval(tick, 60000)
+    return () => clearInterval(intervalId)
   })
 
   function getFilesLinkInput() {
@@ -126,7 +159,8 @@
         isFallbackModalOpen = true
       }
 
-      if (purchase.licenseType === '2') isBlocked = true
+      // One-time licenses: stay downloadable during grace; hard-block only after grace ends.
+      if (purchase.licenseType === '2' && !showGraceCountdown) isBlocked = true
     } catch (error) {
       console.error('Error downloading content files:', error)
       if (files.length > 0) {
@@ -172,6 +206,8 @@
     {/if}
     {#if isBlocked}
       <p class="mt-2 text-sm leading-5 font-medium text-[#9f2f2f]">Already used</p>
+    {:else if showGraceCountdown}
+      <p class="mt-2 text-sm leading-5 font-medium text-[#9f2f2f]">{graceCountdownText}</p>
     {:else if errorMessage}
       <p class="mt-2 text-sm leading-5 font-medium text-[#9f2f2f]">{errorMessage}</p>
     {/if}

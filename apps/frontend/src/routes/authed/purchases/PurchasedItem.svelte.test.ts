@@ -100,6 +100,7 @@ const purchase: PurchasedContentToken = {
   licenseType: '2',
   licenseTokenId: '44',
   isBlocked: false,
+  blockedGraceEndsAt: null,
 }
 
 let queryInputs: FilesLinkInput[]

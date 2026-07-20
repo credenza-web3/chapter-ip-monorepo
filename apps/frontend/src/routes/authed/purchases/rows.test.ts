@@ -27,6 +27,7 @@ const likenessPurchase: PurchasedContentToken = {
   licenseType: '2',
   licenseTokenId: '44',
   isBlocked: false,
+  blockedGraceEndsAt: null,
 }
 
 const locationPurchase: PurchasedContentToken = {
@@ -50,6 +51,7 @@ const locationPurchase: PurchasedContentToken = {
   licenseType: '2',
   licenseTokenId: '55',
   isBlocked: false,
+  blockedGraceEndsAt: null,
 }
 
 describe('purchase rows', () => {
