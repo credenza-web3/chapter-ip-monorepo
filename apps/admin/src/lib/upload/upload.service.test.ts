@@ -249,7 +249,7 @@ describe('UploadService', () => {
 
     await expect(service.mintContent({ oneTimePrice: 5 })).resolves.toBe('token-id')
 
-    expect(transactionService.mintWithPrices).toHaveBeenCalledWith('access-token', 5)
+    expect(transactionService.mintWithPrices).toHaveBeenCalledWith('access-token', { oneTimePrice: 5 })
   })
 
   it('finalizes content as active with metadata and token id', async () => {

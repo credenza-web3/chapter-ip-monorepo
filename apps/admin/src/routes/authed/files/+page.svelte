@@ -9,6 +9,7 @@
   import StatusCell from '$lib/components/StatusCell.svelte'
   import { getMenuItems } from './constants'
   import { TABLE_PAGE_SIZE } from '$lib/constants'
+  import { type StatusValue } from '../../authed/likeness/constants/constants'
 
   let { data } = $props()
   let activeFilter = $state('All')
@@ -157,7 +158,7 @@
                       {row.sales}
                     </td>
                     <td class="px-4 py-1.5">
-                      <StatusCell contentId={row.id} bind:status={row.status} />
+                      <StatusCell contentId={row.id} bind:status={row.status as StatusValue} />
                     </td>
 
                     <td class="px-4 py-1.5">

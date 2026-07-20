@@ -12,6 +12,11 @@ export type NamedUpload = {
   name: string
 }
 
+export type MintContentPrices = {
+  oneTimePrice: number
+  lifetimePrice?: number
+}
+
 type ContentFileReference = {
   id: string
   key: string
@@ -141,8 +146,11 @@ export default class UploadService {
     return { contentId, keys }
   }
 
-  async mintContent({ oneTimePrice }: { oneTimePrice: number }): Promise<string> {
-    return await this.transactionService.mintWithPrices(authStore.state.accessToken!, oneTimePrice)
+  async mintContent({ oneTimePrice, lifetimePrice }: MintContentPrices): Promise<string> {
+    return await this.transactionService.mintWithPrices(authStore.state.accessToken!, {
+      oneTimePrice,
+      lifetimePrice,
+    })
   }
 
   async finalizeContent({
