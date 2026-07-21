@@ -13,12 +13,13 @@ import { z } from "zod";
 
 const t = initTRPC.create();
 const publicProcedure = t.procedure;
-import { healthOutputSchema } from "../../../../apps/backend/src/app.dto";
-import { refreshTokenInputSchema, authTokenOutputSchema, exchangeCodeInputSchema } from "../../../../apps/backend/src/auth/auth.dto";
-import { createUserFileUploadUrlInputSchema, presignedPutOutputSchema, createContentFileUploadUrlInputSchema, registerContentInputSchema, registerContentOutputSchema, updateContentMetadataInputSchema, updateContentMetadataOutputSchema, registerContentFileInputSchema, registerContentFileOutputSchema, removeContentFileInputSchema, removeContentFileOutputSchema, findContentInputSchema, findContentOutputSchema, getContentByIdInputSchema, getContentByIdOutputSchema, getContentStatisticInputSchema, getContentStatisticOutputSchema, getContentFileLinkInputSchema, getContentFileLinkOutputSchema, getContentAllFilesLinkInputSchema, getContentAllFilesLinkOutputSchema, uploadTokenMetadataInputSchema, uploadTokenMetadataOutputSchema, requestLazyMintContentTokenInputSchema, requestLazyMintContentTokenOutputSchema, findPurchaseHistoryInputSchema, findPurchaseHistoryOutputSchema, getContentConfigOutputSchema } from "../../../../apps/backend/src/content/content.dto";
-import { findBlockedLicensesInputSchema, findBlockedLicensesOutputSchema } from "../../../../apps/backend/src/license/../common/license/blocked-license/blocked-license.dto";
-import { findNotificationsInputSchema, findNotificationsOutputSchema, markNotificationAsReadInputSchema, markNotificationAsReadOutputSchema, markAllMyNotificationsAsReadOutputSchema } from "../../../../apps/backend/src/notification/notification.dto";
-import { setPublisherInputSchema, setPublisherOutputSchema, getPublisherDataInputSchema, getPublisherDataOutputSchema, findPublishersInputSchema, findPublishersOutputSchema, mintContentNftTokenInputSchema, mintContentNftTokenOutputSchema } from "../../../../apps/backend/src/publisher/publisher.dto";
+import { healthOutputSchema } from "../../../../apps/backend/src/app.dto.js";
+import { refreshTokenInputSchema, authTokenOutputSchema, exchangeCodeInputSchema } from "../../../../apps/backend/src/auth/auth.dto.js";
+import { createUserFileUploadUrlInputSchema, presignedPutOutputSchema, createContentFileUploadUrlInputSchema, registerContentInputSchema, registerContentOutputSchema, updateContentMetadataInputSchema, updateContentMetadataOutputSchema, registerContentFileInputSchema, registerContentFileOutputSchema, removeContentFileInputSchema, removeContentFileOutputSchema, findContentInputSchema, findContentOutputSchema, getContentByIdInputSchema, getContentByIdOutputSchema, getContentStatisticInputSchema, getContentStatisticOutputSchema, getContentFileLinkInputSchema, getContentFileLinkOutputSchema, getContentAllFilesLinkInputSchema, getContentAllFilesLinkOutputSchema, uploadTokenMetadataInputSchema, uploadTokenMetadataOutputSchema, requestLazyMintContentTokenInputSchema, requestLazyMintContentTokenOutputSchema, findPurchaseHistoryInputSchema, findPurchaseHistoryOutputSchema, getContentConfigOutputSchema } from "../../../../apps/backend/src/content/content.dto.js";
+import { findBlockedLicensesInputSchema, findBlockedLicensesOutputSchema } from "../../../../apps/backend/src/license/../common/license/blocked-license/blocked-license.dto.js";
+import { findNotificationsInputSchema, findNotificationsOutputSchema, markNotificationAsReadInputSchema, markNotificationAsReadOutputSchema, markAllMyNotificationsAsReadOutputSchema } from "../../../../apps/backend/src/notification/notification.dto.js";
+import { setPublisherInputSchema, setPublisherOutputSchema, getPublisherDataInputSchema, getPublisherDataOutputSchema, findPublishersInputSchema, findPublishersOutputSchema, mintContentNftTokenInputSchema, mintContentNftTokenOutputSchema } from "../../../../apps/backend/src/publisher/publisher.dto.js";
+import type { NotificationRouter } from "../../../../apps/backend/src/notification/notification.router.js";
 
 const appRouter = t.router({
   app: t.router({
@@ -111,7 +112,7 @@ const appRouter = t.router({
     }),
   notifications: t.router({
     onMessage: publicProcedure
-      .subscription(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+      .subscription(async () => "PLACEHOLDER_DO_NOT_REMOVE" as unknown as Awaited<ReturnType<NotificationRouter["onMessage"]>>),
     findMyNotifications: publicProcedure
       .input(findNotificationsInputSchema)
       .output(findNotificationsOutputSchema)
