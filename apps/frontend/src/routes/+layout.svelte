@@ -32,6 +32,9 @@
   const searchTargets = navItems
     .filter((item) => item.searchable !== false)
     .map(({ label, href, disabled }) => ({ label, href, disabled })) satisfies NavItem[]
+
+  const isHome = $derived(page.url.pathname === '/')
+  const logoHref = $derived(authStore.state.accessToken ? '/authed' : '/')
 </script>
 
 <svelte:head>
@@ -39,7 +42,7 @@
 </svelte:head>
 <Toast />
 <div class="min-h-screen overflow-clip flex flex-col">
-  <Header {authStore} logoHref="/authed" {menuItems}>
+  <Header {authStore} {logoHref} pathname={page.url.pathname} {menuItems}>
     <div class="flex w-full flex-col gap-3 lg:flex-row lg:items-center lg:gap-6">
       <nav aria-label="Content dashboards" class="shrink-0">
         <ul class="flex flex-wrap items-start gap-x-2 text-[15px] font-medium leading-7.25 text-[#767682]">
@@ -70,7 +73,7 @@
       </div>
     </div>
   </Header>
-  <main class="space-y-0 flex-1 md:p-6 md:pt-13.5 p-2">
+  <main class="space-y-0 flex-1 {isHome ? 'p-0' : 'md:p-6 md:pt-13.5 p-2'}">
     {@render children?.()}
   </main>
   <Footer />

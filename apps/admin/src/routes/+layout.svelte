@@ -65,6 +65,9 @@
 
     return () => subscription.unsubscribe()
   })
+
+  const isHome = $derived(page.url.pathname === '/')
+  const logoHref = $derived(authStore.state.accessToken ? '/authed/files' : '/')
 </script>
 
 <svelte:head>
@@ -73,7 +76,7 @@
 
 <Toast />
 <div class="flex min-h-screen flex-col overflow-clip bg-cream text-dark">
-  <Header {authStore} {menuItems} pathname={page.url.pathname} showCreateButton={true}>
+  <Header {authStore} {logoHref} {menuItems} pathname={page.url.pathname} showCreateButton={true}>
     <div class="flex h-full items-stretch w-full justify-between md:pl-15 pl-2">
       <div class="flex items-stretch">
         <NavLink href="/authed/files">Dashboard</NavLink>
@@ -94,7 +97,7 @@
       </div>
     </div>
   </Header>
-  <main class="flex flex-1 flex-col bg-cream px-6 pt-9.75">
+  <main class="flex flex-1 flex-col bg-cream {isHome ? '' : 'px-6 pt-9.75'}">
     <div class="flex-1">
       {@render children?.()}
     </div>

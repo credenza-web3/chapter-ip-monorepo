@@ -17,6 +17,10 @@
     "./assets/watermark.svg": {
       "import": "./assets/watermark.svg",
       "svelte": "./assets/watermark.svg"
+    },
+    "./assets/chapter-new-logo.png": {
+      "import": "./assets/chapter-new-logo.png",
+      "svelte": "./assets/chapter-new-logo.png"
     }
   },
   "dependencies": {

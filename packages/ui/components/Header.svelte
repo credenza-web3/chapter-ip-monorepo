@@ -9,6 +9,7 @@
     menuItems,
     logoHref = '/',
     showCreateButton = false,
+    pathname = '/',
   } = $props<{
     authStore: any
     children?: () => any
@@ -64,22 +65,30 @@
     {/if}
   </div>
 
-  <div class="dropdown dropdown-bottom flex-shrink-0 bg-transparent">
-    <div
-      tabindex="0"
-      role="button"
-      class="btn bg-transparent border-0 shadow-none hover:bg-transparent active:bg-transparent flex items-center
-      gap-2 text-[15px] font-medium text-[#767682] px-0"
+  {#if !authState.accessToken && pathname !== '/'}
+    <button
+      type="button"
+      onclick={() => authStore.startLogin()}
+      class="flex-shrink-0 text-[15px] font-medium text-[#767682] transition-colors hover:text-primary"
     >
-      <img src={Dots} alt="Menu" class="w-5 h-5 flex-shrink-0" />
-    </div>
-    <ul
-      tabindex="-1"
-      class="dropdown-content menu z-50 mt-2 w-35 rounded-md border border-[#1A1A2E1A]
-        bg-cream p-2 text-left text-sm font-medium text-[#1A1A2E99]
-        shadow-[3px_6px_8px_0_rgba(21,34,50,0.08)] right-0 top-10 whitespace-normal break-words md:w-52"
-    >
-      {#if authState.accessToken}
+      Sign in
+    </button>
+  {:else if authState.accessToken}
+    <div class="dropdown dropdown-bottom flex-shrink-0 bg-transparent">
+      <div
+        tabindex="0"
+        role="button"
+        class="btn bg-transparent border-0 shadow-none hover:bg-transparent active:bg-transparent flex items-center
+        gap-2 text-[15px] font-medium text-[#767682] px-0"
+      >
+        <img src={Dots} alt="Menu" class="w-5 h-5 flex-shrink-0" />
+      </div>
+      <ul
+        tabindex="-1"
+        class="dropdown-content menu z-50 mt-2 w-35 rounded-md border border-[#1A1A2E1A]
+          bg-cream p-2 text-left text-sm font-medium text-[#1A1A2E99]
+          shadow-[3px_6px_8px_0_rgba(21,34,50,0.08)] right-0 top-10 whitespace-normal break-words md:w-52"
+      >
         {#each menuItems ?? [] as item}
           <li>
             <a href={item.href} class="px-4 py-2 mx-2 rounded-md transition-all hover:bg-[#E0DBD6]">
@@ -96,18 +105,9 @@
             Logout
           </button>
         </li>
-      {:else}
-        <li>
-          <button
-            onclick={() => authStore.startLogin()}
-            class="mx-2 mt-1 px-4 py-2.5 rounded-md transition-all hover:bg-[#5b3ff0] text-sm font-medium text-white bg-[#6e4ff7]"
-          >
-            Login
-          </button>
-        </li>
-      {/if}
-    </ul>
-  </div>
+      </ul>
+    </div>
+  {/if}
   {#if authState.accessToken && showCreateButton}
     <div class="dropdown dropdown-bottom bg-transparent flex-shrink-0">
       <div
