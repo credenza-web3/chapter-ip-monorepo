@@ -1,5 +1,5 @@
 <script lang="ts">
-  import chapterLogoUrl from '$lib/assets/chapter-new-logo.png'
+  import chapterLogoUrl from '@repo/ui-components/assets/chapter-new-logo.png'
   import { useDefaultImage } from '$lib/content/image'
   import { toDashboardCards, toLocationDashboardCards, type DashboardSection } from './dashboard'
   import type { LikenessItem } from './likeness/likeness'
