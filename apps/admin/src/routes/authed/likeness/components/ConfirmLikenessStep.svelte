@@ -21,10 +21,20 @@
   const allPreviews = $derived.by(() => {
     const items: PreviewItem[] = []
 
-    for (const file of [...$likenessStore.existingFiles.headshots, ...$likenessStore.existingFiles.bodyShots]) {
+    for (const file of [
+      ...$likenessStore.existingFiles.headshots,
+      ...$likenessStore.existingFiles.bodyShots,
+      ...$likenessStore.existingFiles.voiceSamples,
+      ...$likenessStore.existingFiles.videoReels,
+    ]) {
       items.push({ src: file.url, name: file.name })
     }
-    for (const file of [...$likenessStore.files.headshots, ...$likenessStore.files.bodyShots]) {
+    for (const file of [
+      ...$likenessStore.files.headshots,
+      ...$likenessStore.files.bodyShots,
+      ...$likenessStore.files.voiceSamples,
+      ...$likenessStore.files.videoReels,
+    ]) {
       items.push({ src: URL.createObjectURL(file), name: file.name })
     }
 

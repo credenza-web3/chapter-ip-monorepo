@@ -61,19 +61,25 @@
     Object.fromEntries(
       LIKENESS_FILE_BUCKETS.map((bucket) => {
         const existingNames = $likenessStore.existingFiles[bucket].map((file) => file.name)
-        const newNames = createLikenessFileNames(bucket, $likenessStore.files[bucket].length, existingNames)
+        const newBasenames = createLikenessFileNames(bucket, $likenessStore.files[bucket].length, existingNames)
+        const newNamesWithExt = $likenessStore.files[bucket].map((file, index) => {
+          const basename = newBasenames[index]
+          const ext = file.name.split('.').pop() || ''
+          return ext ? `${basename}.${ext}` : basename
+        })
 
-        return [bucket, [...existingNames, ...newNames]]
+        return [bucket, [...existingNames, ...newNamesWithExt]]
       }),
     ) as Record<MultipleFileKey, string[]>
 
-  const buildNamedUploads = (uploadsByBucket: Record<MultipleFileKey, string[]>): NamedUpload[] =>
+  const buildNamedUploads = (): NamedUpload[] =>
     LIKENESS_FILE_BUCKETS.flatMap((bucket) => {
-      const existingFileCount = $likenessStore.existingFiles[bucket].length
+      const existingNames = $likenessStore.existingFiles[bucket].map((file) => file.name)
+      const newBasenames = createLikenessFileNames(bucket, $likenessStore.files[bucket].length, existingNames)
 
       return $likenessStore.files[bucket].map((file, index) => ({
         file,
-        name: uploadsByBucket[bucket][existingFileCount + index],
+        name: newBasenames[index],
       }))
     })
 
@@ -88,7 +94,7 @@
     return {
       keptFileIds: getKeptFileIds(),
       metadata: buildLikenessMetadata(uploadsByBucket),
-      uploads: buildNamedUploads(uploadsByBucket),
+      uploads: buildNamedUploads(),
     }
   }
 

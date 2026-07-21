@@ -4,9 +4,20 @@ import watermarkUrl from '@repo/ui-components/assets/watermark.svg'
 
 const PREVIEW_IMAGE_EXTENSIONS = new Set(['.avif', '.gif', '.jpeg', '.jpg', '.png', '.svg', '.webp'])
 const PREVIEW_OUTPUT_MIME_TYPES = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
+const PREVIEW_OUTPUT_EXTENSIONS: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+}
 
 const getPreviewOutputMimetype = (file: File): string =>
   PREVIEW_OUTPUT_MIME_TYPES.has(file.type) ? (file.type === 'image/jpg' ? 'image/jpeg' : file.type) : 'image/jpeg'
+
+const getPreviewFileName = (file: File, outputMimetype: string): string => {
+  const extension = PREVIEW_OUTPUT_EXTENSIONS[outputMimetype] ?? 'jpg'
+  const baseName = file.name.includes('.') ? file.name.slice(0, file.name.lastIndexOf('.')) : file.name || 'preview'
+  return `${baseName}.${extension}`
+}
 
 export const isPreviewImage = (file: File): boolean => {
   if (file.type.startsWith('image/')) return true
@@ -18,6 +29,7 @@ export const isPreviewImage = (file: File): boolean => {
 
 export const createImagePreview = async (file: File, options: { withWatermark?: boolean } = {}): Promise<File> => {
   const outputMimetype = getPreviewOutputMimetype(file)
+  const previewFileName = getPreviewFileName(file, outputMimetype)
   const compressedFile = await imageCompression(file, {
     maxSizeMB: 0.2,
     maxWidthOrHeight: 900,
@@ -26,7 +38,7 @@ export const createImagePreview = async (file: File, options: { withWatermark?: 
   })
 
   if (options.withWatermark === false) {
-    return new File([compressedFile], file.name, {
+    return new File([compressedFile], previewFileName, {
       type: outputMimetype,
       lastModified: Date.now(),
     })
@@ -38,7 +50,7 @@ export const createImagePreview = async (file: File, options: { withWatermark?: 
       encoderOptions: 0.5,
     }).blob(watermark.image.center(0.35))
 
-    return new File([blob], file.name, {
+    return new File([blob], previewFileName, {
       type: outputMimetype,
       lastModified: Date.now(),
     })

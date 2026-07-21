@@ -111,7 +111,8 @@ function selectedOptionValue<TOptions extends readonly LikenessOption[]>(
   return (selected ?? null) as LikenessOptionValue<TOptions> | null
 }
 
-export function getPreviewUrl(contractAddress: string, contentId: string, filename: string): string {
+export function getPreviewUrl(contractAddress: string, contentId: string, filename?: string): string {
+  if (!filename) return DEFAULT_IMAGE_URL
   return `${r2BaseConfig.previewUrl}/${contractAddress}/${contentId}/${filename}`
 }
 
@@ -280,7 +281,7 @@ export function toLikenessItems(contentItems: ContentItem[], contractAddress: st
         name,
         bio,
         description: bio,
-        imageUrl: getPreviewUrl(contractAddress, item.id, 'headshot_1'),
+        imageUrl: getPreviewUrl(contractAddress, item.id, metadata.uploadsByBucket?.headshots[0] ?? ''),
         metadata,
       },
     ]

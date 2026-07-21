@@ -116,5 +116,6 @@ describe('createImagePreview', () => {
       fileType: 'image/jpeg',
     })
     expect(preview.type).toBe('image/jpeg')
+    expect(preview.name).toBe('portrait.jpg')
   })
 })

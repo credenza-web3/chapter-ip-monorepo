@@ -65,6 +65,36 @@ test('loads existing likeness file URLs through the all files link endpoint', as
   expect(queryInputs).toEqual([{ contentId: 'content-1' }])
 })
 
+test('resolves files when uploads metadata stores names with extensions', async () => {
+  const query = vi.fn(async () => ({
+    files: [
+      { id: 'file-headshot', label: 'headshot_1.jpg', url: 'https://r2.example/headshot.jpg' },
+      { id: 'file-voice', label: 'voice_sample_1.mp3', url: 'https://r2.example/voice.mp3' },
+    ],
+  }))
+  const trpcClient = {
+    contents: {
+      getContentAllFilesLink: { query },
+    },
+  } as unknown as LoadExistingFilesClient
+  const content: LoadExistingFilesContent = {
+    id: 'content-1',
+    metadata: {
+      uploadsByBucket: {
+        headshots: ['headshot_1.jpg'],
+        voiceSamples: ['voice_sample_1.mp3'],
+      },
+    },
+  }
+
+  await expect(loadExistingFiles(content, trpcClient)).resolves.toEqual({
+    headshots: [{ id: 'file-headshot', name: 'headshot_1.jpg', url: 'https://r2.example/headshot.jpg' }],
+    bodyShots: [],
+    voiceSamples: [{ id: 'file-voice', name: 'voice_sample_1.mp3', url: 'https://r2.example/voice.mp3' }],
+    videoReels: [],
+  })
+})
+
 test('treats a missing files response as an empty existing files list', async () => {
   const query = vi.fn(async () => ({}))
   const trpcClient = {

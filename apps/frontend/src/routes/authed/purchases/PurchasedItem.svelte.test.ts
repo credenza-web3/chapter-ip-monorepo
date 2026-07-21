@@ -104,25 +104,9 @@ const purchase: PurchasedContentToken = {
 }
 
 let queryInputs: FilesLinkInput[]
-let clickMock: ReturnType<typeof vi.spyOn>
-let clickedDownloads: Array<{
-  href: string | null
-  download: string
-  target: string
-  rel: string
-}>
 
 beforeEach(() => {
   queryInputs = []
-  clickedDownloads = []
-  clickMock = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) {
-    clickedDownloads.push({
-      href: this.getAttribute('href'),
-      download: this.download,
-      target: this.target,
-      rel: this.rel,
-    })
-  })
 })
 
 afterEach(() => {
@@ -206,7 +190,7 @@ test('opens location license details in an accessible modal', async () => {
   await expect.element(dialog.getByRole('img', { name: 'Flowith' })).toBeVisible()
 })
 
-test('downloads all content files and blocks one-time licenses locally', async () => {
+test('downloads content files and starts grace for one-time licenses locally', async () => {
   const screen = await render(PurchasedItem, {
     purchase,
     item: likenessItem,
@@ -216,6 +200,6 @@ test('downloads all content files and blocks one-time licenses locally', async (
   await screen.getByRole('button', { name: 'Download' }).click()
 
   expect(queryInputs).toEqual([{ contentId: 'content-1', licenseTokenId: '44' }])
-  expect(clickMock).toHaveBeenCalledTimes(2)
-  await expect.element(screen.getByRole('button', { name: 'Already used' })).toBeDisabled()
+  await expect.element(screen.getByText(/Access ends in/)).toBeVisible()
+  await expect.element(screen.getByRole('button', { name: 'Download' })).toBeEnabled()
 })

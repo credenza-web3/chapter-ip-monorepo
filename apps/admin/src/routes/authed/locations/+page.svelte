@@ -33,11 +33,14 @@
     const { licenseTypes, licensePrices, agreedToFee } = $locationStore.licensing
     const { street, apt, city, state, zip } = $locationStore.address
     const address = street || city || state || zip ? { street, apt, city, state, zip } : undefined
+    const firstFile = $locationStore.files.locations[0]
+    const ext = firstFile?.name.split('.').pop() || ''
+    const fileName = ext ? `${LOCATION_FILENAME}.${ext}` : LOCATION_FILENAME
     const metadata: Record<string, unknown> = {
       type: 'location' as const,
       name: $locationStore.name,
       description: $locationStore.description,
-      file_name: LOCATION_FILENAME,
+      file_name: fileName,
       licensing: { licenseTypes, licensePrices, agreedToFee },
       ...(address && { address }),
     }
