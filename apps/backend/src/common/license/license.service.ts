@@ -56,7 +56,7 @@ export class CommonLicenseService {
           const oneTimeLinkActiveHours = this.configService.get<number>('license.oneTimeLinkActiveHours')!
           const oneTimeLinkActiveMs = oneTimeLinkActiveHours * 60 * 60 * 1000
           if (blocked) {
-            if (Date.now() - blocked.createdAt.getTime() < oneTimeLinkActiveMs) {
+            if (Date.now() - blocked.createdAt.getTime() >= oneTimeLinkActiveMs) {
               return [false, 'License has been already used']
             }
           }
