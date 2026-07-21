@@ -168,7 +168,7 @@
         <button
           disabled={purchaseDisabled}
           onclick={handlePurchase}
-          class="mt-5.5 inline-flex h-10 w-full min-w-28 items-center justify-center rounded-sm bg-primary px-6 text-sm font-semibold text-white transition-colors hover:bg-[#5a28ef] disabled:cursor-not-allowed disabled:bg-[#dedad7] disabled:text-white/70"
+          class="mt-5.5 inline-flex h-13 w-full min-w-28 items-center justify-center rounded-sm bg-primary px-6 text-base font-semibold text-white transition-colors hover:bg-[#5a28ef] disabled:cursor-not-allowed disabled:bg-[#dedad7] disabled:text-white/70"
         >
           {purchasePending ? 'Processing...' : 'Purchase'}
         </button>
@@ -179,7 +179,7 @@
   {#if similarLocations.length > 0}
     <section class="mt-25">
       <div class="flex gap-2.5 items-center">
-        <h2 class="text-lg font-semibold leading-[1.61px] text-dark">Similar locations</h2>
+        <h2 class="text-lg font-semibold leading-7 text-dark">Similar locations</h2>
         <img src={NextPage} alt="Next page" />
       </div>
       <div class="mt-6.25 grid grid-cols-1 gap-x-3 gap-y-5 min-[420px]:grid-cols-2 lg:grid-cols-3">
@@ -194,9 +194,7 @@
             </div>
             <h3 class="mt-2 truncate text-base font-semibold text-[#202225]">{item.name}</h3>
             {#if item.metadata?.address?.city}
-              <p class="mt-1 text-xs font-medium text-[#747474]">
-                {#if item.metadata?.address?.city}by The City of {item.metadata.address.city}{:else}by {item.authorName}{/if}
-              </p>
+              <p class="mt-1 text-xs font-medium text-[#747474]">by The City of {item.metadata.address.city}</p>
             {/if}
             {#if item.description}
               <p class="mt-2.5 text-xs leading-4.5 font-medium text-[#747474] line-clamp-2">{item.description}</p>
