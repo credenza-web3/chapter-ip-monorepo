@@ -99,7 +99,7 @@
           type="email"
           value={email}
           placeholder={emailLoading ? 'Loading email...' : 'Email unavailable'}
-          class="h-13 w-full rounded-sm border border-[#ded9d5] bg-white px-4 text-[15px] text-[#9d99a0] outline-none disabled:cursor-not-allowed disabled:bg-white disabled:opacity-100"
+          class="h-13 w-full rounded-sm border border-[#ded9d5] bg-white px-4 text-[15px] text-[#9d99a0] outline-none disabled:cursor-not-allowed disabled:opacity-100"
           disabled
         />
       </div>
