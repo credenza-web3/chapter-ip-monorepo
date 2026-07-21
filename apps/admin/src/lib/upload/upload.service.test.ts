@@ -21,7 +21,10 @@ vi.mock('@repo/fe-services', () => ({
 
 vi.mock('./image-preview.service', () => ({
   createImagePreview: mocks.createImagePreview,
-  isPreviewImage: (file: File) => ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(file.type),
+  isPreviewImage: (file: File) =>
+    ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/avif', 'image/svg+xml'].includes(
+      file.type,
+    ),
 }))
 
 vi.mock('./file-upload.service', () => ({
@@ -110,19 +113,58 @@ describe('UploadService', () => {
       }),
     ).resolves.toEqual({ keys: ['original-key'] })
 
+    expect(createContentFileUploadUrl).toHaveBeenNthCalledWith(1, {
+      contentId: 'content-id',
+      mimetype: 'image/jpg',
+      filename: 'headshot_1',
+      extension: 'jpg',
+    })
     expect(createContentFileUploadUrl).toHaveBeenNthCalledWith(2, {
       contentId: 'content-id',
       mimetype: 'image/jpeg',
       filename: 'headshot_1',
+      extension: 'jpg',
       bucket: 'preview',
     })
     expect(mocks.uploadFileToBucket).toHaveBeenNthCalledWith(2, preview, 'preview-url')
     expect(registerContentFile).toHaveBeenCalledWith({
       contentId: 'content-id',
       key: 'original-key',
-      filename: 'headshot_1',
+      filename: 'headshot_1.jpg',
       mimetype: 'image/jpg',
-      label: 'headshot_1',
+      label: 'headshot_1.jpg',
+    })
+  })
+
+  it('uses the preview file extension when it differs from the original', async () => {
+    const original = new File(['original'], 'portrait.gif', { type: 'image/gif' })
+    const preview = new File(['preview'], 'portrait.jpg', { type: 'image/jpeg' })
+    const { client, createContentFileUploadUrl } = createTrpcClient()
+    mocks.createImagePreview.mockResolvedValue(preview)
+
+    const transactionService = {
+      mintWithPrices: vi.fn().mockResolvedValue('token-id'),
+    }
+    const service = new UploadService(transactionService as never)
+
+    await service.uploadContentFiles({
+      contentId: 'content-id',
+      uploads: [{ file: original, name: 'headshot_1' }],
+      trpcClient: client as never,
+    })
+
+    expect(createContentFileUploadUrl).toHaveBeenNthCalledWith(1, {
+      contentId: 'content-id',
+      mimetype: 'image/gif',
+      filename: 'headshot_1',
+      extension: 'gif',
+    })
+    expect(createContentFileUploadUrl).toHaveBeenNthCalledWith(2, {
+      contentId: 'content-id',
+      mimetype: 'image/jpeg',
+      filename: 'headshot_1',
+      extension: 'jpg',
+      bucket: 'preview',
     })
   })
 
@@ -234,9 +276,9 @@ describe('UploadService', () => {
     expect(registerContentFile).toHaveBeenCalledWith({
       contentId: 'content-id',
       key: 'original-key',
-      filename: 'headshot_2',
+      filename: 'headshot_2.png',
       mimetype: 'image/png',
-      label: 'headshot_2',
+      label: 'headshot_2.png',
     })
     expect(mocks.createImagePreview).not.toHaveBeenCalled()
   })

@@ -59,10 +59,14 @@ export default class UploadService {
     const keys: string[] = []
 
     for (const { file, name } of uploads) {
+      const ext = file.name.split('.').pop() || ''
+      const registeredName = ext ? `${name}.${ext}` : name
+
       const { url, key } = await trpcClient.contents.createContentFileUploadUrl.mutate({
         contentId,
         mimetype: file.type,
         filename: name,
+        extension: ext,
       })
       keys.push(key)
       await uploadFileToBucket(file, url)
@@ -70,19 +74,21 @@ export default class UploadService {
       await trpcClient.contents.registerContentFile.mutate({
         contentId,
         key,
-        filename: name,
+        filename: registeredName,
         mimetype: file.type,
-        label: name,
+        label: registeredName,
       })
 
       if (includePreviews && isPreviewImage(file)) {
         try {
           const preview = await createImagePreview(file, { withWatermark })
+          const previewExt = preview.name.split('.').pop() || ''
           const { url: previewUrl } = await trpcClient.contents.createContentFileUploadUrl.mutate({
             contentId,
             mimetype: preview.type,
             bucket: 'preview',
             filename: name,
+            extension: previewExt,
           })
           await uploadFileToBucket(preview, previewUrl)
         } catch (error) {

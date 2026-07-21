@@ -4,7 +4,7 @@ import { configStore, ContractName } from '$lib/stores/config.svelte'
 import type { createClient } from '@repo/trpc/client'
 import type { PurchasedContentToken } from './types'
 
-const BLOCK_GRACE_MS = 72 * 60 * 60 * 1000
+export const BLOCK_GRACE_MS = 72 * 60 * 60 * 1000
 
 export const getTokensWithMetadata = async (accessToken: string, trpcClient: ReturnType<typeof createClient>) => {
   await initProvider(accessToken)

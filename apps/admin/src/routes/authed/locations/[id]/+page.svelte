@@ -36,6 +36,19 @@
 
   const LOCATION_FILENAME = 'location'
 
+  const buildFileName = () => {
+    const existingNames = $locationStore.existingFiles.locations.map((file) => file.name)
+    if (existingNames.length > 0) {
+      return existingNames[0]
+    }
+    const firstNewFile = $locationStore.files.locations[0]
+    if (firstNewFile) {
+      const ext = firstNewFile.name.split('.').pop() || ''
+      return ext ? `${LOCATION_FILENAME}.${ext}` : LOCATION_FILENAME
+    }
+    return LOCATION_FILENAME
+  }
+
   const buildLocationMetadata = () => {
     const { street, apt, city, state, zip } = $locationStore.address
     const address = street || city || state || zip ? { street, apt, city, state, zip } : undefined
@@ -43,7 +56,7 @@
       type: 'location' as const,
       name: $locationStore.name,
       description: $locationStore.description,
-      file_name: LOCATION_FILENAME,
+      file_name: buildFileName(),
       licensing: $locationStore.licensing,
       ...(address && { address }),
     }

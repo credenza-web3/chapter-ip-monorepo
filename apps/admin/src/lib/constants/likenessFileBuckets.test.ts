@@ -18,4 +18,8 @@ describe('createLikenessFileNames', () => {
       'headshot_4',
     ])
   })
+
+  it('continues sequencing when existing names include extensions', () => {
+    expect(createLikenessFileNames('headshots', 1, ['headshot_1.jpg', 'headshot_2.jpg'])).toEqual(['headshot_3'])
+  })
 })

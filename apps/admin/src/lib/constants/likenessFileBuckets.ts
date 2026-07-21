@@ -15,7 +15,7 @@ export const createLikenessFileNames = (
   existingNames: string[] = [],
 ): string[] => {
   const prefix = LIKENESS_FILE_PREFIXES[bucket]
-  const pattern = new RegExp(`^${prefix}_(\\d+)$`)
+  const pattern = new RegExp(`^${prefix}_(\\d+)(?:\\.[^.]+)?$`)
   let sequence = existingNames.reduce((max, name) => {
     const match = pattern.exec(name)
     return match ? Math.max(max, Number(match[1])) : max

@@ -4,6 +4,7 @@
   import mime from 'mime/lite'
 
   import DownloadFilesModal from './DownloadFilesModal.svelte'
+  import { BLOCK_GRACE_MS } from './helper'
   import LikenessLicenseModal from './LikenessLicenseModal.svelte'
   import LocationLicenseModal from './LocationLicenseModal.svelte'
   import type {
@@ -31,9 +32,10 @@
   let fallbackFiles: DownloadableContentFile[] = $state([])
   let errorMessage = $state('')
 
+  let graceEndsAt = $state<number | null>(purchase.blockedGraceEndsAt)
+
   const modalTitleId = $derived(`${item.type}-license-${purchase.licenseTokenId}`)
   const canDownload = $derived(!isBlocked && !isDownloading)
-  const graceEndsAt = $derived(purchase.blockedGraceEndsAt)
   const showGraceCountdown = $derived(graceEndsAt != null && !isBlocked && now < graceEndsAt)
   const graceCountdownText = $derived(showGraceCountdown ? formatGraceCountdown(graceEndsAt! - now) : '')
 
@@ -52,11 +54,22 @@
   }
 
   $effect(() => {
-    isBlocked = purchase.isBlocked
+    if (purchase.isBlocked) isBlocked = true
   })
 
   $effect(() => {
-    const endsAt = purchase.blockedGraceEndsAt
+    const fromProp = purchase.blockedGraceEndsAt
+    if (fromProp != null) graceEndsAt = fromProp
+  })
+
+  function startOneTimeGraceIfNeeded() {
+    if (purchase.licenseType !== '2') return
+    if (graceEndsAt != null && Date.now() < graceEndsAt) return
+    graceEndsAt = Date.now() + BLOCK_GRACE_MS
+  }
+
+  $effect(() => {
+    const endsAt = graceEndsAt
     if (endsAt == null || !Number.isFinite(endsAt) || isBlocked) return
 
     const tick = () => {
@@ -90,7 +103,7 @@
 
         const safeLabel = file.label.replace(/[/\\]/g, '_')
         yield {
-          name: `${safeLabel}.${mime.getExtension(file.mimetype) ?? 'bin'}`,
+          name: `${safeLabel}`,
           input: response.body,
         }
       } catch (error) {
@@ -146,6 +159,8 @@
       files = result.files
       if (!files.length) throw new Error('No content files available')
 
+      startOneTimeGraceIfNeeded()
+
       if (typeof showSaveFilePicker !== 'function') {
         fallbackFiles = files
         isFallbackModalOpen = true
@@ -158,9 +173,6 @@
         fallbackFiles = files
         isFallbackModalOpen = true
       }
-
-      // One-time licenses: stay downloadable during grace; hard-block only after grace ends.
-      if (purchase.licenseType === '2' && !showGraceCountdown) isBlocked = true
     } catch (error) {
       console.error('Error downloading content files:', error)
       if (files.length > 0) {

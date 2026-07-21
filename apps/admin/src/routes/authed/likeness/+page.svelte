@@ -29,17 +29,25 @@
   const buildLikenessPayload = () => {
     const uploadsByBucket = LIKENESS_FILE_BUCKETS.reduce(
       (acc, bucket) => {
-        acc[bucket] = createLikenessFileNames(bucket, $likenessStore.files[bucket].length)
+        const files = $likenessStore.files[bucket]
+        const basenames = createLikenessFileNames(bucket, files.length)
+        acc[bucket] = files.map((file, index) => {
+          const basename = basenames[index]
+          const ext = file.name.split('.').pop() || ''
+          return ext ? `${basename}.${ext}` : basename
+        })
         return acc
       },
       {} as Record<MultipleFileKey, string[]>,
     )
-    const uploads = LIKENESS_FILE_BUCKETS.flatMap((bucket) =>
-      $likenessStore.files[bucket].map((file, index) => ({
+    const uploads = LIKENESS_FILE_BUCKETS.flatMap((bucket) => {
+      const files = $likenessStore.files[bucket]
+      const basenames = createLikenessFileNames(bucket, files.length)
+      return files.map((file, index) => ({
         file,
-        name: uploadsByBucket[bucket][index],
-      })),
-    )
+        name: basenames[index],
+      }))
+    })
     const heightTotalInches = getHeightTotalInches($likenessStore.profile.attributes)
     const weight = getNormalizedWeight($likenessStore.profile.attributes.weight)
     const metadata = {
