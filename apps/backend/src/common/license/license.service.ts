@@ -59,8 +59,9 @@ export class CommonLicenseService {
             if (Date.now() - blocked.createdAt.getTime() >= oneTimeLinkActiveMs) {
               return [false, 'License has been already used']
             }
+          } else {
+            await blockedLicenseModel.create({ tokenId: licenseTokenId, subEvmAddress, sub })
           }
-          await blockedLicenseModel.create({ tokenId: licenseTokenId, subEvmAddress, sub })
           break
         }
         case 1: {
