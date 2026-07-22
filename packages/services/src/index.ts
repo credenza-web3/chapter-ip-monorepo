@@ -3,6 +3,8 @@ export * from './tx'
 
 const env = import.meta.env.VITE_ENV || 'staging'
 
+export const snowtraceUrl = env === 'prod' ? 'https://snowtrace.io' : 'https://testnet.snowtrace.io'
+
 export const r2BaseConfig =
   env === 'prod'
     ? {
