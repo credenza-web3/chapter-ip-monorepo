@@ -21,10 +21,12 @@ vi.mock('@repo/fe-services', () => ({
 
 vi.mock('./image-preview.service', () => ({
   createImagePreview: mocks.createImagePreview,
-  isPreviewImage: (file: File) =>
-    ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/avif', 'image/svg+xml'].includes(
-      file.type,
-    ),
+  isPreviewImage: (file: File) => {
+    if (file.type.startsWith('image/')) return true
+    const fileName = file.name ?? ''
+    const extension = fileName.slice(fileName.lastIndexOf('.')).toLowerCase()
+    return ['.avif', '.gif', '.jpeg', '.jpg', '.png', '.svg', '.webp'].includes(extension)
+  },
 }))
 
 vi.mock('./file-upload.service', () => ({
@@ -136,9 +138,9 @@ describe('UploadService', () => {
     })
   })
 
-  it('uses the preview file extension when it differs from the original', async () => {
+  it('keeps the gif extension for gif previews', async () => {
     const original = new File(['original'], 'portrait.gif', { type: 'image/gif' })
-    const preview = new File(['preview'], 'portrait.jpg', { type: 'image/jpeg' })
+    const preview = new File(['preview'], 'portrait.gif', { type: 'image/gif' })
     const { client, createContentFileUploadUrl } = createTrpcClient()
     mocks.createImagePreview.mockResolvedValue(preview)
 
@@ -161,9 +163,9 @@ describe('UploadService', () => {
     })
     expect(createContentFileUploadUrl).toHaveBeenNthCalledWith(2, {
       contentId: 'content-id',
-      mimetype: 'image/jpeg',
+      mimetype: 'image/gif',
       filename: 'headshot_1',
-      extension: 'jpg',
+      extension: 'gif',
       bucket: 'preview',
     })
   })
@@ -211,6 +213,7 @@ describe('UploadService', () => {
     ).resolves.toEqual({ contentId: 'content-id', keys: ['original-key'] })
 
     expect(transactionService.mintWithPrices).not.toHaveBeenCalled()
+    expect(mocks.createImagePreview).not.toHaveBeenCalled()
     expect(client.contents.registerContent.mutate).toHaveBeenCalledWith({
       metadata: { type: 'likeness' },
     })

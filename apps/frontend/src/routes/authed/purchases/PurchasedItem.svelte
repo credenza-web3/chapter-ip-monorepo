@@ -102,9 +102,16 @@
         if (!response.body) throw new Error('No response body')
 
         const safeLabel = file.label.replace(/[/\\]/g, '_')
-        yield {
-          name: `${safeLabel}`,
-          input: response.body,
+        if (safeLabel.includes('.')) {
+          yield {
+            name: `${safeLabel}`,
+            input: response.body,
+          }
+        } else {
+          yield {
+            name: `${safeLabel}.${mime.getExtension(file.mimetype) ?? 'bin'}`,
+            input: response.body,
+          }
         }
       } catch (error) {
         tracker.failed++
