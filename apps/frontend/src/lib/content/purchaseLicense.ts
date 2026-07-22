@@ -4,7 +4,7 @@ import { passportStore } from '$lib/passport.store'
 import { configStore, ContractName } from '$lib/stores/config.svelte'
 import { Passport } from '@credenza3/passport-evm'
 import { ethers, initProvider, getSigner } from '@repo/fe-evm-provider'
-import { forwardTransaction } from '@repo/fe-services'
+import { forwardTransaction, snowtraceUrl } from '@repo/fe-services'
 import { get } from 'svelte/store'
 
 type PurchaseLicenseType = '0' | '2'
@@ -197,7 +197,7 @@ async function openPurchaseAlert(passport: Passport, hash: string): Promise<void
       action: {
         text: 'View Transaction',
         onClick: () => {
-          window.open(`https://testnet.snowtrace.io/tx/${hash}`, '_blank')
+          window.open(`${snowtraceUrl}/tx/${hash}`, '_blank')
           passport.close()
         },
       },
