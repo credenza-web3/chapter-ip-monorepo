@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Contract } from 'ethers'
 import { abi as licenseAbi } from '@credenza3/contracts/artifacts/LicenseNftContract.json'
@@ -9,6 +9,7 @@ import { BlockedLicenseService } from './blocked-license/blocked-license.service
 
 @Injectable()
 export class CommonLicenseService {
+  private readonly logger = new Logger(CommonLicenseService.name)
   private licenseNftContract!: Contract
 
   constructor(
@@ -80,7 +81,8 @@ export class CommonLicenseService {
       }
 
       return [true, null]
-    } catch {
+    } catch (err) {
+      this.logger.error('License verify failed', err)
       return [false, 'Forbidden']
     }
   }
