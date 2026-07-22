@@ -47,7 +47,7 @@
       <dl class="mt-2 grid grid-cols-[91px_minmax(0,1fr)] gap-x-4 gap-y-2.5 text-sm leading-4.5 text-[#72717b]">
         {#each likenessDetails.attributes as attribute (attribute.label)}
           <dt class="font-semibold">{attribute.label}:</dt>
-          <dd class="break-words">{attribute.value}</dd>
+          <dd class="wrap-break-word">{attribute.value}</dd>
         {/each}
       </dl>
     </section>
@@ -61,7 +61,7 @@
       <dl class="mt-2 grid grid-cols-[91px_minmax(0,1fr)] gap-x-4 gap-y-2.5 text-sm leading-4.5 text-[#72717b]">
         {#each likenessDetails.affiliations as affiliation (`${affiliation.union}-${affiliation.memberId}`)}
           <dt class="font-semibold">{affiliation.union || 'Member'}:</dt>
-          <dd class="break-words">{affiliation.memberId || 'N/A'}</dd>
+          <dd class="wrap-break-word">{affiliation.memberId || 'N/A'}</dd>
         {/each}
       </dl>
     </section>

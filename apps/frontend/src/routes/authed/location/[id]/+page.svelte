@@ -3,11 +3,13 @@
   import { configStore, ContractName } from '$lib/stores/config.svelte'
   import LocationPurchasePage from './LocationPurchasePage.svelte'
   import { normalizeLocation } from './locationDetails'
+  import { toLocationItems, type LocationItem } from '../location'
   import type { LocationDetails } from './types'
 
   let { data } = $props()
 
   let locationDetails = $state<LocationDetails | null>(null)
+  let similarLocations = $state<LocationItem[]>([])
   let loading = $state(true)
 
   $effect(() => {
@@ -16,6 +18,7 @@
 
     loading = true
     locationDetails = null
+    similarLocations = []
     ;(async () => {
       try {
         const content = await data.trpcClient.contents.getContentById.query({ id })
@@ -39,11 +42,8 @@
           }
         }
 
-        const normalized = normalizeLocation(
-          content,
-          configStore.getContractAddress(ContractName.CONTENT_NFT),
-          authorName,
-        )
+        const contractAddress = configStore.getContractAddress(ContractName.CONTENT_NFT)
+        const normalized = normalizeLocation(content, contractAddress, authorName)
         if (cancelled) return
 
         if (!normalized) {
@@ -52,6 +52,10 @@
         }
 
         locationDetails = normalized
+        similarLocations = toLocationItems(
+          (content.similarContents ?? []) as Parameters<typeof toLocationItems>[0],
+          contractAddress,
+        )
       } catch {
         if (!cancelled) await goto('/authed/location')
       } finally {
@@ -96,5 +100,5 @@
     </div>
   </div>
 {:else if locationDetails}
-  <LocationPurchasePage {locationDetails} />
+  <LocationPurchasePage {locationDetails} {similarLocations} />
 {/if}
