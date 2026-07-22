@@ -9,8 +9,10 @@
 
   import { authStore } from '$lib'
   import UploadService, { type NamedUpload } from '$lib/upload/upload.service'
+  import { createUploadSessionController, startUploadingPhase, type UploadSession } from '$lib/upload/upload-session'
   import TransactionService from '$lib/upload/transaction.service'
   import BlockchainService from '$lib/upload/blockchain.service'
+  import UploadProgressPanel from '$lib/components/UploadProgressPanel.svelte'
   import { notify, ToastType, ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
   import { modals, type ModalProps } from 'svelte-modals'
   import { onDestroy, onMount } from 'svelte'
@@ -27,9 +29,13 @@
   const blockchainService = new BlockchainService(authStore.state.accessToken!)
   const transactionService = new TransactionService(blockchainService)
   const uploadService = new UploadService(transactionService)
+  const uploadSessions = createUploadSessionController(locationStore)
 
   onMount(() => locationStore.hydrateFromContent(data, data.existingFiles))
-  onDestroy(() => locationStore.reset())
+  onDestroy(() => {
+    uploadSessions.invalidate()
+    locationStore.reset()
+  })
 
   beforeNavigate(() => locationStore.setLoading(true))
   afterNavigate(() => locationStore.setLoading(false))
@@ -108,22 +114,29 @@
     }
   }
 
-  const saveCurrentContent = async ({
-    status,
-    tokenId,
-  }: {
-    status?: StatusValue
-    tokenId?: string
-  } = {}) => {
+  const saveCurrentContent = async (
+    uploadSession: UploadSession,
+    {
+      status,
+      tokenId,
+    }: {
+      status?: StatusValue
+      tokenId?: string
+    } = {},
+  ) => {
     const trpcClient = uploadService.createTrpcClient()
     const contentId = data.id
     const { keptFileIds, metadata, uploads, tags } = buildLocationPayload()
+
+    startUploadingPhase(uploadSession.setProgress, uploads.length)
+
     const { keys } = await uploadService.updateContentFiles({
       contentId,
       currentFiles: getCurrentFiles(),
       keptFileIds,
       uploads,
       trpcClient,
+      onUploadProgress: uploadSession.setProgress,
     })
 
     await uploadService.updateContentMetadata({
@@ -143,22 +156,27 @@
     locationStore.reset()
   }
 
-  const withLocationLoading = async (action: () => Promise<void>, logMessage: string, userMessage: string) => {
+  const withLocationLoading = async (
+    action: (uploadSession: UploadSession) => Promise<void>,
+    logMessage: string,
+    userMessage: string,
+  ) => {
+    const uploadSession = uploadSessions.begin()
     try {
       locationStore.setLoading(true)
-      await action()
+      await action(uploadSession)
     } catch (error) {
       console.error(logMessage, error)
       notify(userMessage, ToastType.FAIL)
     } finally {
-      locationStore.setLoading(false)
+      uploadSession.end()
     }
   }
 
   const onSaveDraftClick = async () => {
     await withLocationLoading(
-      async () => {
-        await saveCurrentContent({ status: STATUS.DRAFT })
+      async (uploadSession) => {
+        await saveCurrentContent(uploadSession, { status: STATUS.DRAFT })
         notify('Draft saved', ToastType.SUCCESS)
         await goToFiles()
       },
@@ -167,14 +185,14 @@
     )
   }
 
-  const activateContent = async ({
-    contentId,
-    metadata,
-    trpcClient,
-    tags,
-  }: Awaited<ReturnType<typeof saveCurrentContent>>) => {
+  const activateContent = async (
+    uploadSession: UploadSession,
+    { contentId, metadata, trpcClient, tags }: Awaited<ReturnType<typeof saveCurrentContent>>,
+  ) => {
+    uploadSession.setProgress({ phase: 'minting', overallProgress: 1 })
     const tokenId = await uploadService.mintContent(getLicensePrices())
 
+    uploadSession.setProgress({ phase: 'finalizing', overallProgress: 1 })
     await uploadService.finalizeContent({
       contentId,
       metadata,
@@ -186,11 +204,15 @@
     return tokenId
   }
 
-  const saveTokenMetadata = async ({
-    tokenId,
-    keys,
-    trpcClient,
-  }: Pick<Awaited<ReturnType<typeof saveCurrentContent>>, 'keys' | 'trpcClient'> & { tokenId: string }) => {
+  const saveTokenMetadata = async (
+    uploadSession: UploadSession,
+    {
+      tokenId,
+      keys,
+      trpcClient,
+    }: Pick<Awaited<ReturnType<typeof saveCurrentContent>>, 'keys' | 'trpcClient'> & { tokenId: string },
+  ) => {
+    uploadSession.setProgress({ phase: 'saving-metadata', overallProgress: 1 })
     await uploadService.saveMetadata({
       tokenId,
       trpcClient,
@@ -216,11 +238,11 @@
 
   const onSubmitClick = async () => {
     await withLocationLoading(
-      async () => {
-        const savedContent = await saveCurrentContent()
-        const tokenId = data.tokenId ?? (await activateContent(savedContent))
+      async (uploadSession) => {
+        const savedContent = await saveCurrentContent(uploadSession)
+        const tokenId = data.tokenId ?? (await activateContent(uploadSession, savedContent))
 
-        await saveTokenMetadata({ ...savedContent, tokenId })
+        await saveTokenMetadata(uploadSession, { ...savedContent, tokenId })
         openSuccessModal()
       },
       'Error updating listing:',
@@ -242,5 +264,11 @@
       onFormSubmit={onSubmitClick}
       onSaveDraft={!data.tokenId ? onSaveDraftClick : undefined}
     />
+  {/if}
+
+  {#if $locationStore.ui.uploadProgress}
+    <div class="mt-6">
+      <UploadProgressPanel progress={$locationStore.ui.uploadProgress} />
+    </div>
   {/if}
 </div>
