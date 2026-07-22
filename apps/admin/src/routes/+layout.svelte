@@ -71,7 +71,7 @@
 </script>
 
 <svelte:head>
-  <title>chapter ip</title>
+  <title>ChapterIP Content Creator</title>
 </svelte:head>
 
 <Toast />
