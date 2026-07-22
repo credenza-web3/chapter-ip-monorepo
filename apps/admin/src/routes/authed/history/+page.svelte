@@ -6,6 +6,7 @@
   import { getTrpcClient } from '$lib/stores/trpc-client'
   import { useCursorPagination } from '$lib/hooks/useCursorPagination.svelte'
   import { notify, ToastType } from '@repo/ui-components'
+  import { snowtraceUrl } from '@repo/fe-services'
   import { TABLE_PAGE_SIZE } from '$lib/constants'
   import type { TPurchaseHistoryItem } from './constants'
 
@@ -29,7 +30,7 @@
     if (item.action === 'view-content') {
       const purchase = pagination.items.find((x) => x.id === purchaseId)
       if (purchase?.txHash) {
-        window.open(`https://testnet.snowtrace.io/tx/${purchase.txHash}`, '_blank')
+        window.open(`${snowtraceUrl}/tx/${purchase.txHash}`, '_blank')
       }
     }
   }
