@@ -101,21 +101,15 @@ describe('createImagePreview', () => {
     expect(mocks.destroy).toHaveBeenCalledOnce()
   })
 
-  it('creates a JPEG preview for image formats without a supported preview output type', async () => {
+  it('preserves the original format for GIF previews', async () => {
     const original = new File(['original'], 'portrait.gif', { type: 'image/gif' })
-    const compressed = new File(['compressed'], 'portrait.gif', { type: 'image/jpeg' })
-    mocks.imageCompression.mockResolvedValue(compressed)
-    mocks.blob.mockResolvedValue(new Blob(['preview'], { type: 'image/jpeg' }))
 
     const preview = await createImagePreview(original)
 
-    expect(mocks.imageCompression).toHaveBeenCalledWith(original, {
-      maxSizeMB: 0.2,
-      maxWidthOrHeight: 900,
-      useWebWorker: true,
-      fileType: 'image/jpeg',
-    })
-    expect(preview.type).toBe('image/jpeg')
-    expect(preview.name).toBe('portrait.jpg')
+    expect(mocks.imageCompression).not.toHaveBeenCalled()
+    expect(mocks.watermark).not.toHaveBeenCalled()
+    expect(mocks.destroy).not.toHaveBeenCalled()
+    expect(preview.type).toBe('image/gif')
+    expect(preview.name).toBe('portrait.gif')
   })
 })
