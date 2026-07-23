@@ -390,6 +390,8 @@ export class ContentRouter {
         label: file.label,
         filename: file.filename,
         mimetype: file.mimetype,
+        bucket: file.bucket,
+        key: file.key,
         url: await this.fileService.getSignedObjectUrl({
           Bucket: file.bucket,
           Key: file.key,

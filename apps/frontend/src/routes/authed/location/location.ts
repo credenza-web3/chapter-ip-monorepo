@@ -9,8 +9,7 @@ export const RECENT_LIMIT = 10
 type EqualityFilterValue = string | number | boolean | null
 
 export type LocationFilterCondition =
-  | { field: string; op: 'eq'; val: EqualityFilterValue }
-  | { field: string; op: 'regex'; val: string }
+  { field: string; op: 'eq'; val: EqualityFilterValue } | { field: string; op: 'regex'; val: string }
 
 export type LocationFilterNode = LocationFilterCondition | { and: LocationFilterNode[] } | { or: LocationFilterNode[] }
 
@@ -113,7 +112,7 @@ export function toLocationItems(contentItems: ContentItem[], contractAddress: st
     const metadata = item.metadata
     if (metadata?.type !== 'location') return []
 
-    const fileName = metadata.file_name?.trim()
+    const fileName = metadata.preview_file_name?.trim()
 
     return [
       {

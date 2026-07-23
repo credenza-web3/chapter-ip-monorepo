@@ -25,7 +25,7 @@ describe('location data helpers', () => {
             type: 'location',
             name: 'Madison Square Garden',
             description: 'A landmark arena.',
-            file_name: 'location_1.jpg',
+            preview_file_name: 'location_1.jpg',
           },
         },
         { id: 'other', metadata: { type: 'likeness' } },
@@ -43,7 +43,7 @@ describe('location data helpers', () => {
     ])
   })
 
-  it('uses the default image when file_name is missing', () => {
+  it('uses the default image when preview_file_name is missing', () => {
     const items = toLocationItems(
       [
         {

@@ -12,8 +12,7 @@
   import { notify, ToastType } from '@repo/ui-components'
   import { modals, type ModalProps } from 'svelte-modals'
   import { ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
-
-  const LOCATION_FILENAME = 'location'
+  import { createLocationFileNames } from '$lib/constants/locationFileBuckets'
 
   let currentStep = $state(1)
   const blockchainService = new BlockchainService(authStore.state.accessToken!)
@@ -23,9 +22,13 @@
   beforeNavigate(() => locationStore.setLoading(true))
   afterNavigate(() => locationStore.setLoading(false))
 
+  const appendOriginalExtension = (name: string, file: File) => {
+    const ext = file.name.split('.').pop() || ''
+    return ext ? `${name}.${ext}` : name
+  }
+
   const buildLocationPayload = () => {
-    const newFileCount = $locationStore.files.locations.length
-    const uploadNames = Array.from({ length: newFileCount }, () => LOCATION_FILENAME)
+    const uploadNames = createLocationFileNames('locations', $locationStore.files.locations.length)
     const uploads = $locationStore.files.locations.map((file, index) => ({
       file,
       name: uploadNames[index],
@@ -33,14 +36,17 @@
     const { licenseTypes, licensePrices, agreedToFee } = $locationStore.licensing
     const { street, apt, city, state, zip } = $locationStore.address
     const address = street || city || state || zip ? { street, apt, city, state, zip } : undefined
-    const firstFile = $locationStore.files.locations[0]
-    const ext = firstFile?.name.split('.').pop() || ''
-    const fileName = ext ? `${LOCATION_FILENAME}.${ext}` : LOCATION_FILENAME
+    const filesName = $locationStore.files.locations.map((file, index) =>
+      appendOriginalExtension(uploadNames[index], file),
+    )
+    const previewImage = $locationStore.previewImage
+    const previewFileName = previewImage ? `${previewImage.name}` : undefined
     const metadata: Record<string, unknown> = {
       type: 'location' as const,
       name: $locationStore.name,
       description: $locationStore.description,
-      file_name: fileName,
+      files_name: filesName,
+      preview_file_name: previewFileName,
       licensing: { licenseTypes, licensePrices, agreedToFee },
       ...(address && { address }),
     }
@@ -54,13 +60,25 @@
       const trpcClient = uploadService.createTrpcClient()
       const { uploads, metadata, tags } = buildLocationPayload()
 
-      await uploadService.saveDraftContent({
+      const { contentId } = await uploadService.saveDraftContent({
         trpcClient,
         uploads,
         metadata,
         tags,
         withWatermark: false,
       })
+
+      const previewImage = $locationStore.previewImage
+      if (previewImage) {
+        const previewFileName = metadata.preview_file_name as string
+        await uploadService.uploadPreviewImage({
+          contentId,
+          file: previewImage,
+          filename: previewFileName,
+          trpcClient,
+        })
+      }
+
       notify('Draft saved', ToastType.SUCCESS)
       await goto('/authed/files')
       locationStore.reset()
@@ -84,6 +102,17 @@
         tags,
         withWatermark: false,
       })
+
+      const previewImage = $locationStore.previewImage
+      if (previewImage) {
+        const previewFileName = metadata.preview_file_name as string
+        await uploadService.uploadPreviewImage({
+          contentId,
+          file: previewImage,
+          filename: previewFileName,
+          trpcClient,
+        })
+      }
 
       const tokenId = await uploadService.mintContent({
         oneTimePrice: Number($locationStore.licensing.licensePrices['single-use']),

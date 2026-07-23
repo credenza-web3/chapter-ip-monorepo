@@ -151,7 +151,7 @@
           <!-- Bio -->
           <div>
             <h2 class="text-base font-semibold text-[#202225] mb-1.5">Bio</h2>
-            <p class="text-base text-[#72717b] leading-relaxed">
+            <p class="text-base text-[#72717b] leading-relaxed wrap-break-word">
               {$likenessStore.profile.bio || 'N/A'}
             </p>
           </div>

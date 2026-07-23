@@ -65,6 +65,7 @@ export default class UploadService {
       const { url, key } = await trpcClient.contents.createContentFileUploadUrl.mutate({
         contentId,
         mimetype: file.type,
+        bucket: 'content',
         filename: name,
         extension: ext,
       })
@@ -74,6 +75,7 @@ export default class UploadService {
       await trpcClient.contents.registerContentFile.mutate({
         contentId,
         key,
+        bucket: 'content',
         filename: registeredName,
         mimetype: file.type,
         label: registeredName,
@@ -239,6 +241,39 @@ export default class UploadService {
       tokenId,
       metadata: { title, description, keys, image: r2BaseConfig.defaultImageUrl },
       trpcClient,
+    })
+  }
+
+  async uploadPreviewImage({
+    contentId,
+    file,
+    filename,
+    trpcClient,
+  }: {
+    contentId: string
+    file: File
+    filename: string
+    trpcClient: TRPCClient<AppRouter>
+  }): Promise<void> {
+    const ext = file.name.split('.').pop() || ''
+    const { url, key } = await trpcClient.contents.createContentFileUploadUrl.mutate({
+      contentId,
+      mimetype: file.type,
+      bucket: 'preview',
+      filename,
+      extension: ext,
+    })
+    await uploadFileToBucket(file, url)
+
+    const baseName = filename.includes('.') ? filename.slice(0, filename.lastIndexOf('.')) : filename
+    const registeredName = ext ? `${baseName}.${ext}` : baseName
+    await trpcClient.contents.registerContentFile.mutate({
+      contentId,
+      key,
+      filename: registeredName,
+      mimetype: file.type,
+      label: registeredName,
+      bucket: 'preview',
     })
   }
 

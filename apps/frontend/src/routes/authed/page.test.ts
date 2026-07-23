@@ -33,7 +33,7 @@ describe('catalog page load', () => {
               type: 'location',
               name: 'Madison Square Garden',
               description: 'A landmark arena.',
-              file_name: 'msg.jpg',
+              preview_file_name: 'msg.jpg',
             },
           },
         ],

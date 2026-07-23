@@ -26,7 +26,7 @@ describe('location purchase mapper', () => {
           description: 'A baseball stadium in Queens, New York.',
           address: { street: '41 Seaver Way', apt: '', city: 'Queens', state: 'NY', zip: '11368' },
           tags: ['Baseball', 'Queens'],
-          file_name: 'citi-field.jpg',
+          preview_file_name: 'citi-field.jpg',
           licensing: {
             licenseTypes: { 'single-use': true, perpetual: true },
             licensePrices: { 'single-use': '6000', perpetual: '12000' },
@@ -89,7 +89,7 @@ describe('location purchase mapper', () => {
           name: 'Root Tags',
           description: 'Tags on root object.',
           tags: ['Legacy'],
-          file_name: 'root-tags.jpg',
+          preview_file_name: 'root-tags.jpg',
           licensing: {
             licenseTypes: { 'single-use': true },
             licensePrices: { 'single-use': '100' },
@@ -115,7 +115,7 @@ describe('location purchase mapper', () => {
           name: 'Metadata Tags',
           description: 'Legacy tags in metadata.',
           tags: ['Legacy', ' Queens '],
-          file_name: 'metadata-tags.jpg',
+          preview_file_name: 'metadata-tags.jpg',
           licensing: {
             licenseTypes: { 'single-use': true },
             licensePrices: { 'single-use': '100' },
@@ -129,7 +129,7 @@ describe('location purchase mapper', () => {
     expect(fromMetadata?.tags).toEqual(['Legacy', 'Queens'])
   })
 
-  it('uses the default image when file_name is missing', () => {
+  it('uses the default image when preview_file_name is missing', () => {
     const purchase = normalizeLocation(
       {
         id: 'location-2',
@@ -141,7 +141,7 @@ describe('location purchase mapper', () => {
           name: 'Empty Preview',
           description: 'No preview file yet.',
           tags: [],
-          file_name: '',
+          preview_file_name: '',
           licensing: {
             licenseTypes: { 'single-use': true },
             licensePrices: { 'single-use': '100' },

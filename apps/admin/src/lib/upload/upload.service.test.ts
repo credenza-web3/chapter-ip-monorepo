@@ -116,6 +116,7 @@ describe('UploadService', () => {
     expect(createContentFileUploadUrl).toHaveBeenNthCalledWith(1, {
       contentId: 'content-id',
       mimetype: 'image/jpg',
+      bucket: 'content',
       filename: 'headshot_1',
       extension: 'jpg',
     })
@@ -130,6 +131,7 @@ describe('UploadService', () => {
     expect(registerContentFile).toHaveBeenCalledWith({
       contentId: 'content-id',
       key: 'original-key',
+      bucket: 'content',
       filename: 'headshot_1.jpg',
       mimetype: 'image/jpg',
       label: 'headshot_1.jpg',
@@ -156,6 +158,7 @@ describe('UploadService', () => {
     expect(createContentFileUploadUrl).toHaveBeenNthCalledWith(1, {
       contentId: 'content-id',
       mimetype: 'image/gif',
+      bucket: 'content',
       filename: 'headshot_1',
       extension: 'gif',
     })
@@ -276,6 +279,7 @@ describe('UploadService', () => {
     expect(registerContentFile).toHaveBeenCalledWith({
       contentId: 'content-id',
       key: 'original-key',
+      bucket: 'content',
       filename: 'headshot_2.png',
       mimetype: 'image/png',
       label: 'headshot_2.png',

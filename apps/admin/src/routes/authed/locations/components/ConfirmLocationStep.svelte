@@ -14,22 +14,15 @@
     onSaveDraft?: () => Promise<void>
   } = $props()
 
-  type PreviewItem = { src: string; name: string }
-
-  const allPreviews = $derived.by(() => {
-    const items: PreviewItem[] = []
-
-    for (const file of $locationStore.existingFiles.locations) {
-      items.push({ src: file.url, name: file.name })
+  const mainPhoto = $derived.by(() => {
+    if ($locationStore.previewImage) {
+      return { src: URL.createObjectURL($locationStore.previewImage), name: 'Preview image' }
     }
-    for (const file of $locationStore.files.locations) {
-      items.push({ src: URL.createObjectURL(file), name: file.name })
+    if ($locationStore.existingPreviewUrl) {
+      return { src: $locationStore.existingPreviewUrl, name: 'Preview image' }
     }
-
-    return items
+    return null
   })
-
-  const mainPhoto = $derived(allPreviews[0] ?? null)
   const enabledLicenseTypes = $derived(
     LICENSE_TYPES.filter((license) => $locationStore.licensing.licenseTypes[license.id]),
   )
@@ -73,7 +66,7 @@
       <h1 class="text-2xl font-semibold text-dark font-heading mb-3">{$locationStore.name || 'Untitled Location'}</h1>
 
       {#if $locationStore.description}
-        <p class="text-base text-[#72717b] leading-relaxed max-w-3xl">{$locationStore.description}</p>
+        <p class="text-base text-[#72717b] leading-relaxed max-w-3xl wrap-break-word">{$locationStore.description}</p>
       {/if}
     </div>
 
