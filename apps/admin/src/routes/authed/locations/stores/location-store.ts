@@ -1,4 +1,5 @@
 import { writable, derived } from 'svelte/store'
+import type { UploadProgressEvent } from '$lib/upload/upload.service'
 import type { AppRouter, TRPCClient } from '@repo/trpc/client'
 import { type LocationFileKey } from '$lib/constants/locationFileBuckets'
 import type { LocationAddress, LocationLicensingMetadata, LocationMetadataInput } from '@repo/content-types/location'
@@ -43,6 +44,7 @@ interface LocationState {
   isEditing: boolean
   ui: {
     loading: boolean
+    uploadProgress: UploadProgressEvent | null
   }
 }
 
@@ -71,6 +73,7 @@ function createLocationStore() {
     isEditing: false,
     ui: {
       loading: false,
+      uploadProgress: null,
     },
   })
 
@@ -128,6 +131,9 @@ function createLocationStore() {
     setRightsConfirmed: (value: boolean) =>
       update((s) => ({ ...s, confirmations: { ...s.confirmations, rightsConfirmed: value } })),
     setLoading: (loading: boolean) => update((s) => ({ ...s, ui: { ...s.ui, loading } })),
+    setUploadProgress: (uploadProgress: UploadProgressEvent) =>
+      update((s) => ({ ...s, ui: { ...s.ui, uploadProgress } })),
+    clearUploadProgress: () => update((s) => ({ ...s, ui: { ...s.ui, uploadProgress: null } })),
     hydrateFromContent(
       content: { metadata?: LocationMetadataInput; tags?: string[] },
       existingFiles: ExistingFilesByBucket = emptyExistingFiles(),
@@ -183,7 +189,7 @@ function createLocationStore() {
         confirmations: { rightsConfirmed: false },
         existingFiles: emptyExistingFiles(),
         isEditing: false,
-        ui: { loading: false },
+        ui: { loading: false, uploadProgress: null },
       }),
   }
 }

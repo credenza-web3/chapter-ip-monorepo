@@ -1,15 +1,33 @@
-const uploadFileToBucket = async (uploaded: File, url: string) => {
-  const uploadFileRes = await fetch(url, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': uploaded.type,
-    },
-    body: uploaded,
-  })
+async function uploadFileToBucket(file: File, url: string, onProgress?: (progress: number) => void): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('PUT', url)
+    xhr.setRequestHeader('Content-Type', file.type)
 
-  if (!uploadFileRes.ok) {
-    throw new Error(`Upload failed: ${uploadFileRes.status} ${uploadFileRes.statusText}`)
-  }
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable && event.total > 0 && onProgress) {
+        onProgress(event.loaded / event.total)
+      }
+    }
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve()
+      } else {
+        reject(new Error(`Upload failed: ${xhr.status} ${xhr.statusText}`))
+      }
+    }
+
+    xhr.onerror = () => {
+      reject(new Error('Upload failed: network error'))
+    }
+
+    xhr.onabort = () => {
+      reject(new Error('Upload aborted'))
+    }
+
+    xhr.send(file)
+  })
 }
 
 export default uploadFileToBucket

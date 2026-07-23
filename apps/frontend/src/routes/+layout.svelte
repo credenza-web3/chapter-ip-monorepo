@@ -38,7 +38,7 @@
 </script>
 
 <svelte:head>
-  <title>chapter ip</title>
+  <title>ChapterIP Marketplace</title>
 </svelte:head>
 <Toast />
 <div class="min-h-screen overflow-clip flex flex-col">
