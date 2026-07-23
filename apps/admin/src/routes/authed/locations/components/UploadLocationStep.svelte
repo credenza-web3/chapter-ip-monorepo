@@ -405,7 +405,7 @@
           class="hidden"
           bind:this={previewInput}
           onchange={handlePreviewInput}
-          accept=".jpeg,.jpg,.png,.webp,.jpeg,.JPG,.PNG,.WEBP"
+          accept=".jpeg,.jpg,.png,.webp"
         />
       </div>
 

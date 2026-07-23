@@ -1,5 +1,6 @@
 <script lang="ts">
   import { LOCATION_FILE_BUCKETS, createLocationFileNames } from '$lib/constants/locationFileBuckets'
+  import { appendOriginalExtension, uploadPreviewIfNeeded } from '../utils'
   import { afterNavigate, beforeNavigate, goto } from '$app/navigation'
   import { locationStore } from '../stores/location-store'
   import UploadStepHeader from '../components/UploadStepHeader.svelte'
@@ -33,11 +34,6 @@
 
   beforeNavigate(() => locationStore.setLoading(true))
   afterNavigate(() => locationStore.setLoading(false))
-
-  const appendOriginalExtension = (name: string, file: File) => {
-    const ext = file.name.split('.').pop() || ''
-    return ext ? `${name}.${ext}` : name
-  }
 
   const buildLocationMetadata = (uploadNames: string[]) => {
     const { street, apt, city, state, zip } = $locationStore.address
@@ -119,15 +115,17 @@
       trpcClient,
     })
 
-    const previewImage = $locationStore.previewImage
-    if (previewImage) {
-      const previewFileName = metadata.preview_file_name as string
-      await uploadService.uploadPreviewImage({
+    try {
+      await uploadPreviewIfNeeded({
+        previewImage: $locationStore.previewImage,
+        metadata,
         contentId,
-        file: previewImage,
-        filename: previewFileName,
+        uploadService,
         trpcClient,
       })
+    } catch (previewError) {
+      console.error('Error uploading preview image:', previewError)
+      notify('Preview upload failed.', ToastType.FAIL)
     }
 
     await uploadService.updateContentMetadata({

@@ -13,6 +13,7 @@
   import { modals, type ModalProps } from 'svelte-modals'
   import { ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
   import { createLocationFileNames } from '$lib/constants/locationFileBuckets'
+  import { appendOriginalExtension, uploadPreviewIfNeeded } from './utils'
 
   let currentStep = $state(1)
   const blockchainService = new BlockchainService(authStore.state.accessToken!)
@@ -21,11 +22,6 @@
 
   beforeNavigate(() => locationStore.setLoading(true))
   afterNavigate(() => locationStore.setLoading(false))
-
-  const appendOriginalExtension = (name: string, file: File) => {
-    const ext = file.name.split('.').pop() || ''
-    return ext ? `${name}.${ext}` : name
-  }
 
   const buildLocationPayload = () => {
     const uploadNames = createLocationFileNames('locations', $locationStore.files.locations.length)
@@ -68,15 +64,17 @@
         withWatermark: false,
       })
 
-      const previewImage = $locationStore.previewImage
-      if (previewImage) {
-        const previewFileName = metadata.preview_file_name as string
-        await uploadService.uploadPreviewImage({
+      try {
+        await uploadPreviewIfNeeded({
+          previewImage: $locationStore.previewImage,
+          metadata,
           contentId,
-          file: previewImage,
-          filename: previewFileName,
+          uploadService,
           trpcClient,
         })
+      } catch (previewError) {
+        console.error('Error uploading preview image:', previewError)
+        notify('Draft saved, but preview upload failed.', ToastType.FAIL)
       }
 
       notify('Draft saved', ToastType.SUCCESS)
@@ -103,15 +101,17 @@
         withWatermark: false,
       })
 
-      const previewImage = $locationStore.previewImage
-      if (previewImage) {
-        const previewFileName = metadata.preview_file_name as string
-        await uploadService.uploadPreviewImage({
+      try {
+        await uploadPreviewIfNeeded({
+          previewImage: $locationStore.previewImage,
+          metadata,
           contentId,
-          file: previewImage,
-          filename: previewFileName,
+          uploadService,
           trpcClient,
         })
+      } catch (previewError) {
+        console.error('Error uploading preview image:', previewError)
+        notify('Preview upload failed.', ToastType.FAIL)
       }
 
       const tokenId = await uploadService.mintContent({

@@ -14,14 +14,30 @@
     onSaveDraft?: () => Promise<void>
   } = $props()
 
-  const mainPhoto = $derived.by(() => {
+  let mainPhoto: { src: string; name: string } | null = $state(null)
+  let currentBlobUrl: string | null = null
+
+  $effect(() => {
+    if (currentBlobUrl) {
+      URL.revokeObjectURL(currentBlobUrl)
+      currentBlobUrl = null
+    }
+
     if ($locationStore.previewImage) {
-      return { src: URL.createObjectURL($locationStore.previewImage), name: 'Preview image' }
+      currentBlobUrl = URL.createObjectURL($locationStore.previewImage)
+      mainPhoto = { src: currentBlobUrl, name: 'Preview image' }
+    } else if ($locationStore.existingPreviewUrl) {
+      mainPhoto = { src: $locationStore.existingPreviewUrl, name: 'Preview image' }
+    } else {
+      mainPhoto = null
     }
-    if ($locationStore.existingPreviewUrl) {
-      return { src: $locationStore.existingPreviewUrl, name: 'Preview image' }
+
+    return () => {
+      if (currentBlobUrl) {
+        URL.revokeObjectURL(currentBlobUrl)
+        currentBlobUrl = null
+      }
     }
-    return null
   })
   const enabledLicenseTypes = $derived(
     LICENSE_TYPES.filter((license) => $locationStore.licensing.licenseTypes[license.id]),

@@ -30,7 +30,7 @@ export async function loadExistingFiles(
       const existingFile = { id: file.id, name: file.label, url: file.url, key: file.key }
       allExistingFiles.locations.push(existingFile)
       if (!allowedFileNames || allowedFileNames.has(file.label)) {
-        existingFiles.locations.push(existingFile)
+        existingFiles.locations.push({ ...existingFile })
       }
     }
   }
