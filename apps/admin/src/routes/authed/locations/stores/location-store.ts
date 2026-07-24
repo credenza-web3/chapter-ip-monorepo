@@ -25,7 +25,7 @@ export async function loadExistingFiles(
   const { files } = await trpcClient.contents.getContentAllFilesLink.query({ contentId: content.id })
 
   for (const file of files ?? []) {
-    if (file.bucket?.includes('preview')) {
+    if (file.bucket === 'preview') {
       previewUrl = file.url
     } else {
       const existingFile = { id: file.id, name: file.label, url: file.url, key: file.key }

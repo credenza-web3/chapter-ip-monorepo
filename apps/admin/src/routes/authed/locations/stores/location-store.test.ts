@@ -101,9 +101,9 @@ describe('loadExistingFiles', () => {
     expect(result.allFiles.locations).toHaveLength(1)
   })
 
-  it('extracts previewUrl from buckets containing "preview" in the name', async () => {
+  it('extracts previewUrl from preview bucket', async () => {
     const query = vi.fn(async () => ({
-      files: [{ id: 'p1', label: 'thumb', url: 'https://r2.example/thumb.webp', key: 'pk', bucket: 'preview-images' }],
+      files: [{ id: 'p1', label: 'thumb', url: 'https://r2.example/thumb.webp', key: 'pk', bucket: 'preview' }],
     }))
     const trpcClient = createTrpcClient(query)
 
