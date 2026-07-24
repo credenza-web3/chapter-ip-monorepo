@@ -21,7 +21,7 @@ export async function uploadPreviewIfNeeded({
 }): Promise<void> {
   if (!previewImage) return
   const previewFileName = metadata.preview_file_name as string
-  await uploadService.uploadPreviewImage({
+  await uploadService.uploadLocationPreviewImage({
     contentId,
     file: previewImage,
     filename: previewFileName,

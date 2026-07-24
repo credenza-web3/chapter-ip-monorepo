@@ -147,9 +147,9 @@ describe('loadExistingFiles', () => {
 })
 
 describe('uploadPreviewIfNeeded', () => {
-  it('delegates to uploadService.uploadPreviewImage when previewImage is provided', async () => {
+  it('delegates to uploadService.uploadLocationPreviewImage when previewImage is provided', async () => {
     const previewImage = new File(['bytes'], 'preview.jpg', { type: 'image/jpeg' })
-    const uploadService = { uploadPreviewImage: vi.fn().mockResolvedValue(undefined) }
+    const uploadService = { uploadLocationPreviewImage: vi.fn().mockResolvedValue(undefined) }
     const trpcClient = {} as never
     const metadata = { preview_file_name: 'custom-preview.jpg' }
 
@@ -161,7 +161,7 @@ describe('uploadPreviewIfNeeded', () => {
       trpcClient,
     })
 
-    expect(uploadService.uploadPreviewImage).toHaveBeenCalledWith({
+    expect(uploadService.uploadLocationPreviewImage).toHaveBeenCalledWith({
       contentId: 'content-1',
       file: previewImage,
       filename: 'custom-preview.jpg',
@@ -170,7 +170,7 @@ describe('uploadPreviewIfNeeded', () => {
   })
 
   it('does nothing when previewImage is null', async () => {
-    const uploadService = { uploadPreviewImage: vi.fn() }
+    const uploadService = { uploadLocationPreviewImage: vi.fn() }
 
     await uploadPreviewIfNeeded({
       previewImage: null,
@@ -180,12 +180,12 @@ describe('uploadPreviewIfNeeded', () => {
       trpcClient: {} as never,
     })
 
-    expect(uploadService.uploadPreviewImage).not.toHaveBeenCalled()
+    expect(uploadService.uploadLocationPreviewImage).not.toHaveBeenCalled()
   })
 
-  it('propagates errors from uploadService.uploadPreviewImage', async () => {
+  it('propagates errors from uploadService.uploadLocationPreviewImage', async () => {
     const uploadService = {
-      uploadPreviewImage: vi.fn().mockRejectedValue(new Error('network failure')),
+      uploadLocationPreviewImage: vi.fn().mockRejectedValue(new Error('network failure')),
     }
 
     await expect(
