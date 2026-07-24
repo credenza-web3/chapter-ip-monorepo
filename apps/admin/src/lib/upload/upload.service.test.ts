@@ -447,4 +447,103 @@ describe('UploadService', () => {
       },
     })
   })
+
+  describe('uploadLocationPreviewImage', () => {
+    it('uploads preview file and registers it with the preview bucket', async () => {
+      const file = new File(['data'], 'photo.png', { type: 'image/png' })
+      const { client, createContentFileUploadUrl, registerContentFile } = createTrpcClient()
+      const service = new UploadService({ mintWithPrices: vi.fn() } as never)
+
+      await service.uploadLocationPreviewImage({
+        contentId: 'content-id',
+        file,
+        filename: 'location',
+        trpcClient: client as never,
+      })
+
+      expect(createContentFileUploadUrl).toHaveBeenCalledWith({
+        contentId: 'content-id',
+        mimetype: 'image/png',
+        bucket: 'preview',
+        filename: 'location',
+        extension: 'png',
+      })
+      expect(mocks.uploadFileToBucket).toHaveBeenCalledWith(file, 'original-url', undefined)
+      expect(registerContentFile).toHaveBeenCalledWith({
+        contentId: 'content-id',
+        key: 'original-key',
+        bucket: 'preview',
+        filename: 'location',
+        mimetype: 'image/png',
+        label: 'location',
+      })
+    })
+
+    it('propagates upload errors', async () => {
+      const file = new File(['data'], 'photo.png', { type: 'image/png' })
+      const { client } = createTrpcClient()
+      mocks.uploadFileToBucket.mockRejectedValueOnce(new Error('network'))
+      const service = new UploadService({ mintWithPrices: vi.fn() } as never)
+
+      await expect(
+        service.uploadLocationPreviewImage({
+          contentId: 'content-id',
+          file,
+          filename: 'location',
+          trpcClient: client as never,
+        }),
+      ).rejects.toThrow('network')
+    })
+
+    it('handles filename with existing extension without duplicating it', async () => {
+      const file = new File(['data'], 'photo.gif', { type: 'image/gif' })
+      const { client, createContentFileUploadUrl, registerContentFile } = createTrpcClient()
+      const service = new UploadService({ mintWithPrices: vi.fn() } as never)
+
+      await service.uploadLocationPreviewImage({
+        contentId: 'content-id',
+        file,
+        filename: 'location.gif',
+        trpcClient: client as never,
+      })
+
+      expect(createContentFileUploadUrl).toHaveBeenCalledWith({
+        contentId: 'content-id',
+        mimetype: 'image/gif',
+        bucket: 'preview',
+        filename: 'location.gif',
+        extension: 'gif',
+      })
+      expect(registerContentFile).toHaveBeenCalledWith({
+        contentId: 'content-id',
+        key: 'original-key',
+        bucket: 'preview',
+        filename: 'location.gif',
+        mimetype: 'image/gif',
+        label: 'location.gif',
+      })
+    })
+
+    it('handles filename without extension', async () => {
+      const file = new File(['data'], 'photo.webp', { type: 'image/webp' })
+      const { client, registerContentFile } = createTrpcClient()
+      const service = new UploadService({ mintWithPrices: vi.fn() } as never)
+
+      await service.uploadLocationPreviewImage({
+        contentId: 'content-id',
+        file,
+        filename: 'noext',
+        trpcClient: client as never,
+      })
+
+      expect(registerContentFile).toHaveBeenCalledWith({
+        contentId: 'content-id',
+        key: 'original-key',
+        bucket: 'preview',
+        filename: 'noext',
+        mimetype: 'image/webp',
+        label: 'noext',
+      })
+    })
+  })
 })
