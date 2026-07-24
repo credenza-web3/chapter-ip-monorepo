@@ -36,6 +36,60 @@ type ContentFileReference = {
 }
 type UpdateContentMetadataInput = Parameters<TRPCClient<AppRouter>['contents']['updateContentMetadata']['mutate']>[0]
 
+async function registerContentFile({
+  contentId,
+  key,
+  bucket,
+  filename,
+  mimetype,
+  trpcClient,
+}: {
+  contentId: string
+  key: string
+  bucket: 'content' | 'preview'
+  filename: string
+  mimetype: string
+  trpcClient: TRPCClient<AppRouter>
+}): Promise<void> {
+  const ext = filename.includes('.') ? filename.split('.').pop() || '' : ''
+  const baseName = ext ? filename.slice(0, filename.lastIndexOf('.')) : filename
+  const registeredName = ext ? `${baseName}.${ext}` : baseName
+
+  await trpcClient.contents.registerContentFile.mutate({
+    contentId,
+    key,
+    bucket,
+    filename: registeredName,
+    mimetype,
+    label: registeredName,
+  })
+}
+
+async function uploadPreviewFile({
+  contentId,
+  file,
+  filename,
+  trpcClient,
+  onProgress,
+}: {
+  contentId: string
+  file: File
+  filename: string
+  trpcClient: TRPCClient<AppRouter>
+  onProgress?: (progress: number) => void
+}): Promise<string> {
+  const ext = file.name.split('.').pop() || ''
+  const { url, key } = await trpcClient.contents.createContentFileUploadUrl.mutate({
+    contentId,
+    mimetype: file.type,
+    bucket: 'preview',
+    filename,
+    extension: ext,
+  })
+  await uploadFileToBucket(file, url, onProgress)
+  return key
+}
+
 export default class UploadService {
   constructor(private readonly transactionService: TransactionService) {}
 
@@ -112,6 +166,7 @@ export default class UploadService {
       const { url, key } = await trpcClient.contents.createContentFileUploadUrl.mutate({
         contentId,
         mimetype: file.type,
+        bucket: 'content',
         filename: name,
         extension: ext,
       })
@@ -120,27 +175,26 @@ export default class UploadService {
       completedUnits++
       reportFileComplete(file.name)
 
-      await trpcClient.contents.registerContentFile.mutate({
+      await registerContentFile({
         contentId,
         key,
+        bucket: 'content',
         filename: registeredName,
         mimetype: file.type,
-        label: registeredName,
+        trpcClient,
       })
 
       if (includePreviews && isPreviewImage(file)) {
         const previewLabel = `${file.name} (preview)`
         try {
           const preview = await createImagePreview(file, { withWatermark })
-          const previewExt = preview.name.split('.').pop() || ''
-          const { url: previewUrl } = await trpcClient.contents.createContentFileUploadUrl.mutate({
+          await uploadPreviewFile({
             contentId,
-            mimetype: preview.type,
-            bucket: 'preview',
+            file: preview,
             filename: name,
-            extension: previewExt,
+            trpcClient,
+            onProgress: (progress) => reportProgress(previewLabel, progress),
           })
-          await uploadFileToBucket(preview, previewUrl, (progress) => reportProgress(previewLabel, progress))
           completedUnits++
           reportFileComplete(previewLabel)
         } catch (error) {
@@ -304,6 +358,29 @@ export default class UploadService {
     await this.uploadTokenMetadata({
       tokenId,
       metadata: { title, description, keys, image: r2BaseConfig.defaultImageUrl },
+      trpcClient,
+    })
+  }
+
+  async uploadLocationPreviewImage({
+    contentId,
+    file,
+    filename,
+    trpcClient,
+  }: {
+    contentId: string
+    file: File
+    filename: string
+    trpcClient: TRPCClient<AppRouter>
+  }): Promise<void> {
+    const key = await uploadPreviewFile({ contentId, file, filename, trpcClient })
+
+    await registerContentFile({
+      contentId,
+      key,
+      bucket: 'preview',
+      filename,
+      mimetype: file.type,
       trpcClient,
     })
   }

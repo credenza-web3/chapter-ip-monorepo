@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { LOCATION_FILE_BUCKETS } from '$lib/constants/locationFileBuckets'
+  import { LOCATION_FILE_BUCKETS, createLocationFileNames } from '$lib/constants/locationFileBuckets'
+  import { appendOriginalExtension, uploadPreviewIfNeeded } from '../utils'
   import { afterNavigate, beforeNavigate, goto } from '$app/navigation'
   import { locationStore } from '../stores/location-store'
   import UploadStepHeader from '../components/UploadStepHeader.svelte'
@@ -31,7 +32,7 @@
   const uploadService = new UploadService(transactionService)
   const uploadSessions = createUploadSessionController(locationStore)
 
-  onMount(() => locationStore.hydrateFromContent(data, data.existingFiles))
+  onMount(() => locationStore.hydrateFromContent(data, data.existingFiles, data.existingPreviewUrl))
   onDestroy(() => {
     uploadSessions.invalidate()
     locationStore.reset()
@@ -40,29 +41,22 @@
   beforeNavigate(() => locationStore.setLoading(true))
   afterNavigate(() => locationStore.setLoading(false))
 
-  const LOCATION_FILENAME = 'location'
-
-  const buildFileName = () => {
-    const existingNames = $locationStore.existingFiles.locations.map((file) => file.name)
-    if (existingNames.length > 0) {
-      return existingNames[0]
-    }
-    const firstNewFile = $locationStore.files.locations[0]
-    if (firstNewFile) {
-      const ext = firstNewFile.name.split('.').pop() || ''
-      return ext ? `${LOCATION_FILENAME}.${ext}` : LOCATION_FILENAME
-    }
-    return LOCATION_FILENAME
-  }
-
-  const buildLocationMetadata = () => {
+  const buildLocationMetadata = (uploadNames: string[]) => {
     const { street, apt, city, state, zip } = $locationStore.address
     const address = street || city || state || zip ? { street, apt, city, state, zip } : undefined
+    const previewImage = $locationStore.previewImage
+    const previewFileName = previewImage ? `${previewImage.name}` : undefined
+    const existingNames = $locationStore.existingFiles.locations.map((file) => file.name)
+    const newNames = $locationStore.files.locations.map((file, index) =>
+      appendOriginalExtension(uploadNames[index], file),
+    )
+    const filesName = [...existingNames, ...newNames]
     return {
       type: 'location' as const,
       name: $locationStore.name,
       description: $locationStore.description,
-      file_name: buildFileName(),
+      files_name: filesName,
+      preview_file_name: previewFileName,
       licensing: $locationStore.licensing,
       ...(address && { address }),
     }
@@ -70,33 +64,28 @@
 
   const buildUploadNames = () => {
     const existingNames = $locationStore.existingFiles.locations.map((file) => file.name)
-    const newCount = $locationStore.files.locations.length
-    const names: string[] = [...existingNames]
-    for (let i = 0; i < newCount; i++) {
-      names.push(LOCATION_FILENAME)
-    }
-    return names
+    return createLocationFileNames('locations', $locationStore.files.locations.length, existingNames)
   }
 
   const buildNamedUploads = (uploadNames: string[]): NamedUpload[] => {
-    const existingCount = $locationStore.existingFiles.locations.length
     return $locationStore.files.locations.map((file, index) => ({
       file,
-      name: uploadNames[existingCount + index],
+      name: uploadNames[index],
     }))
   }
 
   const getKeptFileIds = () =>
     new Set(LOCATION_FILE_BUCKETS.flatMap((bucket) => $locationStore.existingFiles[bucket].map((file) => file.id)))
 
-  const getCurrentFiles = () => (data.files ?? []) as ExistingContentFile[]
+  const getCurrentFiles = () =>
+    (data.allExistingFiles?.locations ?? data.existingFiles?.locations ?? data.files ?? []) as ExistingContentFile[]
 
   const buildLocationPayload = () => {
     const uploadNames = buildUploadNames()
 
     return {
       keptFileIds: getKeptFileIds(),
-      metadata: buildLocationMetadata(),
+      metadata: buildLocationMetadata(uploadNames),
       uploads: buildNamedUploads(uploadNames),
       tags: $locationStore.tags,
     }
@@ -138,6 +127,19 @@
       trpcClient,
       onUploadProgress: uploadSession.setProgress,
     })
+
+    try {
+      await uploadPreviewIfNeeded({
+        previewImage: $locationStore.previewImage,
+        metadata,
+        contentId,
+        uploadService,
+        trpcClient,
+      })
+    } catch (previewError) {
+      console.error('Error uploading preview image:', previewError)
+      notify('Preview upload failed.', ToastType.FAIL)
+    }
 
     await uploadService.updateContentMetadata({
       contentId,

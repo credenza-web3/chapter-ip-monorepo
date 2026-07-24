@@ -15,7 +15,7 @@ export function normalizeLocation(
   if (metadata?.type !== 'location') return null
 
   const name = trimString(metadata.name) || 'Unnamed location'
-  const fileName = trimString(metadata.file_name)
+  const fileName = trimString(metadata.preview_file_name)
   const legacyTags = (metadata as Record<string, unknown>).tags
   const rawTags = content.tags ?? (Array.isArray(legacyTags) ? (legacyTags as string[]) : [])
 

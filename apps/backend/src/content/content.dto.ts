@@ -215,6 +215,8 @@ export const getContentAllFilesLinkOutputSchema = z.object({
       url: z.string(),
       filename: z.string(),
       mimetype: z.string(),
+      bucket: z.string(),
+      key: z.string(),
     }),
   ),
 })

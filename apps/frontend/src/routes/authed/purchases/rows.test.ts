@@ -40,7 +40,7 @@ const locationPurchase: PurchasedContentToken = {
     type: 'location',
     name: 'Citi Field',
     description: 'A baseball stadium in Queens, New York.',
-    file_name: 'citi-field.jpg',
+    preview_file_name: 'citi-field.jpg',
     licensing: {
       licenseTypes: { 'single-use': true, perpetual: true },
       licensePrices: { 'single-use': '6000' },

@@ -4,7 +4,7 @@ import type { AppRouter, TRPCClient } from '@repo/trpc/client'
 import { type LocationFileKey } from '$lib/constants/locationFileBuckets'
 import type { LocationAddress, LocationLicensingMetadata, LocationMetadataInput } from '@repo/content-types/location'
 
-type ExistingFile = { id: string; name: string; url: string }
+type ExistingFile = { id: string; name: string; url: string; key: string }
 type ExistingFilesByBucket = Record<LocationFileKey, ExistingFile[]>
 
 const emptyExistingFiles = (): ExistingFilesByBucket => ({
@@ -14,24 +14,37 @@ const emptyExistingFiles = (): ExistingFilesByBucket => ({
 export async function loadExistingFiles(
   content: { id: string; metadata?: LocationMetadataInput },
   trpcClient: TRPCClient<AppRouter>,
-): Promise<ExistingFilesByBucket> {
+): Promise<{ files: ExistingFilesByBucket; allFiles: ExistingFilesByBucket; previewUrl: string | null }> {
   const existingFiles = emptyExistingFiles()
+  const allExistingFiles = emptyExistingFiles()
+  let previewUrl: string | null = null
 
-  if (!content.id) return existingFiles
+  if (!content.id) return { files: existingFiles, allFiles: allExistingFiles, previewUrl }
 
+  const allowedFileNames = Array.isArray(content.metadata?.files_name) ? new Set(content.metadata.files_name) : null
   const { files } = await trpcClient.contents.getContentAllFilesLink.query({ contentId: content.id })
 
   for (const file of files ?? []) {
-    existingFiles.locations.push({ id: file.id, name: file.label, url: file.url })
+    if (file.bucket === 'preview') {
+      previewUrl = file.url
+    } else {
+      const existingFile = { id: file.id, name: file.label, url: file.url, key: file.key }
+      allExistingFiles.locations.push(existingFile)
+      if (!allowedFileNames || allowedFileNames.has(file.label)) {
+        existingFiles.locations.push({ ...existingFile })
+      }
+    }
   }
 
-  return existingFiles
+  return { files: existingFiles, allFiles: allExistingFiles, previewUrl }
 }
 
 interface LocationState {
   files: {
     locations: File[]
   }
+  previewImage: File | null
+  existingPreviewUrl: string | null
   name: string
   description: string
   tags: string[]
@@ -53,6 +66,8 @@ function createLocationStore() {
     files: {
       locations: [],
     },
+    previewImage: null,
+    existingPreviewUrl: null,
     name: '',
     description: '',
     tags: [],
@@ -108,6 +123,8 @@ function createLocationStore() {
       }))
     },
     setTags: (value: string[]) => update((s) => ({ ...s, tags: value })),
+    setPreviewImage: (file: File | null) => update((s) => ({ ...s, previewImage: file })),
+    setExistingPreviewUrl: (url: string | null) => update((s) => ({ ...s, existingPreviewUrl: url })),
     setAddress: (value: LocationAddress) => update((s) => ({ ...s, address: value })),
     setLicenseTypeEnabled: (id: string, value: boolean) =>
       update((s) => {
@@ -137,6 +154,7 @@ function createLocationStore() {
     hydrateFromContent(
       content: { metadata?: LocationMetadataInput; tags?: string[] },
       existingFiles: ExistingFilesByBucket = emptyExistingFiles(),
+      existingPreviewUrl: string | null = null,
     ) {
       const metadata = (content.metadata ?? {}) as Record<string, unknown>
       const name = (metadata.name as string) ?? ''
@@ -165,6 +183,7 @@ function createLocationStore() {
         },
         confirmations: { rightsConfirmed: true },
         existingFiles,
+        existingPreviewUrl,
         isEditing: Object.values(existingFiles).some((files) => files.length > 0),
       }))
     },
@@ -173,6 +192,8 @@ function createLocationStore() {
         files: {
           locations: [],
         },
+        previewImage: null,
+        existingPreviewUrl: null,
         name: '',
         description: '',
         tags: [],

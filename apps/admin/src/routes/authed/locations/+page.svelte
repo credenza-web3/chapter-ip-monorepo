@@ -14,6 +14,8 @@
   import { notify, ToastType } from '@repo/ui-components'
   import { modals, type ModalProps } from 'svelte-modals'
   import { ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
+  import { createLocationFileNames } from '$lib/constants/locationFileBuckets'
+  import { appendOriginalExtension, uploadPreviewIfNeeded } from './utils'
   import { onDestroy } from 'svelte'
 
   const LOCATION_FILENAME = 'location'
@@ -33,8 +35,7 @@
   })
 
   const buildLocationPayload = () => {
-    const newFileCount = $locationStore.files.locations.length
-    const uploadNames = Array.from({ length: newFileCount }, () => LOCATION_FILENAME)
+    const uploadNames = createLocationFileNames('locations', $locationStore.files.locations.length)
     const uploads = $locationStore.files.locations.map((file, index) => ({
       file,
       name: uploadNames[index],
@@ -42,14 +43,17 @@
     const { licenseTypes, licensePrices, agreedToFee } = $locationStore.licensing
     const { street, apt, city, state, zip } = $locationStore.address
     const address = street || city || state || zip ? { street, apt, city, state, zip } : undefined
-    const firstFile = $locationStore.files.locations[0]
-    const ext = firstFile?.name.split('.').pop() || ''
-    const fileName = ext ? `${LOCATION_FILENAME}.${ext}` : LOCATION_FILENAME
+    const filesName = $locationStore.files.locations.map((file, index) =>
+      appendOriginalExtension(uploadNames[index], file),
+    )
+    const previewImage = $locationStore.previewImage
+    const previewFileName = previewImage ? `${previewImage.name}` : undefined
     const metadata: Record<string, unknown> = {
       type: 'location' as const,
       name: $locationStore.name,
       description: $locationStore.description,
-      file_name: fileName,
+      files_name: filesName,
+      preview_file_name: previewFileName,
       licensing: { licenseTypes, licensePrices, agreedToFee },
       ...(address && { address }),
     }
@@ -66,7 +70,7 @@
 
       startUploadingPhase(uploadSession.setProgress, uploads.length)
 
-      await uploadService.saveDraftContent({
+      const { contentId } = await uploadService.saveDraftContent({
         trpcClient,
         uploads,
         metadata,
@@ -74,6 +78,20 @@
         withWatermark: false,
         onUploadProgress: uploadSession.setProgress,
       })
+
+      try {
+        await uploadPreviewIfNeeded({
+          previewImage: $locationStore.previewImage,
+          metadata,
+          contentId,
+          uploadService,
+          trpcClient,
+        })
+      } catch (previewError) {
+        console.error('Error uploading preview image:', previewError)
+        notify('Draft saved, but preview upload failed.', ToastType.FAIL)
+      }
+
       notify('Draft saved', ToastType.SUCCESS)
       await goto('/authed/files')
       locationStore.reset()
@@ -102,6 +120,19 @@
         withWatermark: false,
         onUploadProgress: uploadSession.setProgress,
       })
+
+      try {
+        await uploadPreviewIfNeeded({
+          previewImage: $locationStore.previewImage,
+          metadata,
+          contentId,
+          uploadService,
+          trpcClient,
+        })
+      } catch (previewError) {
+        console.error('Error uploading preview image:', previewError)
+        notify('Preview upload failed.', ToastType.FAIL)
+      }
 
       uploadSession.setProgress({ phase: 'minting', overallProgress: 1 })
       const tokenId = await uploadService.mintContent({

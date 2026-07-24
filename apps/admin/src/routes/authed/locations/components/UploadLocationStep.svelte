@@ -14,12 +14,14 @@
       currentStep === 1 &&
       $locationStore.name &&
       ($locationStore.files.locations.length || $locationStore.existingFiles.locations.length) &&
+      ($locationStore.previewImage || $locationStore.existingPreviewUrl) &&
       $locationStore.confirmations.rightsConfirmed,
     ),
   )
 
   let tagInput = $state('')
   let imageInput: HTMLInputElement | null = $state(null)
+  let previewInput: HTMLInputElement | null = $state(null)
   let showAddress = $state(false)
 
   const US_STATES = [
@@ -97,20 +99,7 @@
   const selectedFiles = $derived($locationStore.files.locations ?? [])
   const existingFiles = $derived($locationStore.existingFiles.locations ?? [])
   const hasMedia = $derived(selectedFiles.length > 0 || existingFiles.length > 0)
-  const supportedFileExtensions = [
-    '.jpeg',
-    '.jpg',
-    '.png',
-    '.webp',
-    '.mp4',
-    '.mov',
-    '.webm',
-    '.splat',
-    '.ply',
-    '.obj',
-    '.mtl',
-    '.glb',
-  ]
+  const supportedFileExtensions = ['.mp4', '.mov', '.webm', '.splat', '.ply', '.obj', '.mtl', '.glb']
   const supportedFileExtensionsWithUppercase = supportedFileExtensions.flatMap((extension) => [
     extension,
     extension.toUpperCase(),
@@ -151,6 +140,20 @@
   function openFilePicker(e: MouseEvent) {
     e.stopPropagation()
     imageInput?.click()
+  }
+
+  function openPreviewPicker(e: MouseEvent) {
+    e.stopPropagation()
+    previewInput?.click()
+  }
+
+  function handlePreviewInput(event: Event) {
+    const target = event?.target as HTMLInputElement
+    const file = target?.files?.[0]
+    if (file) {
+      locationStore.setPreviewImage(file)
+    }
+    target.value = ''
   }
 
   function toggleRightsConfirmed() {
@@ -272,8 +275,7 @@
         bind:value={$locationStore.description}
         placeholder="Description"
         class="w-full max-w-137.5 h-25 bg-white rounded-sm border border-[#ddd] px-3.75 py-3 text-sm font-medium text-[#71707a]
-          focus:border-primary focus:outline-none resize-none"
-      ></textarea>
+          focus:border-primary focus:outline-none resize-none"></textarea>
     </label>
   </div>
 
@@ -335,6 +337,85 @@
   <!-- Dashed divider -->
   <div class="border-t border-dashed border-[#ddd] mx-10"></div>
 
+  <!-- Preview Image -->
+  <div class="space-y-6">
+    <h3 class="text-base font-semibold text-left text-dark font-heading">Preview Image</h3>
+    <p class="text-base text-[#72717b] -mt-3">
+      Add a preview image that will be shown to creators before they purchase.
+    </p>
+
+    <div class="space-y-1.25 w-full">
+      <span class="text-sm text-[#71707a]">Preview Image <span class="text-[#ff0000]">*</span></span>
+
+      <div
+        class="border border-dashed min-h-32 rounded-lg border-[#1A1A2E33] p-4 bg-cream flex flex-col items-center justify-center gap-4"
+        role="button"
+        tabindex="0"
+        aria-label="Upload preview image"
+        onclick={openPreviewPicker}
+        onkeydown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            previewInput?.click()
+          }
+        }}
+      >
+        {#if $locationStore.previewImage}
+          <div class="relative">
+            <img
+              src={URL.createObjectURL($locationStore.previewImage)}
+              alt="Preview"
+              class="h-24 w-24 rounded object-cover"
+            />
+            <button
+              type="button"
+              onclick={(e) => {
+                e.stopPropagation()
+                locationStore.setPreviewImage(null)
+              }}
+              class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white border border-[#ddd] text-[#71707a] hover:text-red-500 flex items-center justify-center text-xs transition-colors"
+              >✕</button
+            >
+          </div>
+        {:else if $locationStore.existingPreviewUrl}
+          <div class="relative">
+            <img src={$locationStore.existingPreviewUrl} alt="Preview" class="h-24 w-24 rounded object-cover" />
+            <button
+              type="button"
+              onclick={(e) => {
+                e.stopPropagation()
+                locationStore.setExistingPreviewUrl(null)
+              }}
+              class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white border border-[#ddd] text-[#71707a] hover:text-red-500 flex items-center justify-center text-xs transition-colors"
+              >✕</button
+            >
+          </div>
+        {:else}
+          <p class="text-sm text-[#747474]">Click to upload preview image</p>
+          <button
+            type="button"
+            onclick={openPreviewPicker}
+            class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-2xl hover:opacity-90 transition-opacity"
+            >+</button
+          >
+        {/if}
+
+        <input
+          type="file"
+          class="hidden"
+          bind:this={previewInput}
+          onchange={handlePreviewInput}
+          accept=".jpeg,.jpg,.png,.webp"
+        />
+      </div>
+
+      <span class="text-[10px] text-right text-[#747474] w-full block"> .jpeg, .jpg, .png, .webp files accepted </span>
+    </div>
+  </div>
+
+  <!-- Dashed divider -->
+  <div class="border-t border-dashed border-[#ddd] mx-10"></div>
+
   <!-- Location Media Upload -->
   <div class="space-y-6">
     <h3 class="text-lg font-semibold text-left text-dark font-heading">Location</h3>
@@ -358,7 +439,27 @@
           <div class="w-full flex flex-wrap gap-2 justify-center py-2">
             {#each existingFiles as file, i (`existing-${file.id}`)}
               <div class="relative">
-                <img src={file.url} alt={file.name} class="h-20 w-20 rounded object-cover" />
+                <div
+                  class="h-20 w-20 rounded bg-[#eae6e2] flex flex-col items-center justify-center text-[10px] text-[#71707a] leading-tight text-center p-1"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="mb-1 shrink-0">
+                    <path
+                      d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"
+                      stroke="#71707a"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M14 2v6h6M12 18v-6M9 15h6"
+                      stroke="#71707a"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <span class="truncate w-full">{file.name}</span>
+                </div>
                 <button
                   type="button"
                   onclick={(e) => removeExisting(e, i)}
@@ -369,7 +470,27 @@
             {/each}
             {#each selectedFiles as file, i (file.name + i)}
               <div class="relative">
-                <img src={URL.createObjectURL(file)} alt={file.name} class="h-20 w-20 rounded object-cover" />
+                <div
+                  class="h-20 w-20 rounded bg-[#eae6e2] flex flex-col items-center justify-center text-[10px] text-[#71707a] leading-tight text-center p-1"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="mb-1 shrink-0">
+                    <path
+                      d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"
+                      stroke="#71707a"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M14 2v6h6M12 18v-6M9 15h6"
+                      stroke="#71707a"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <span class="truncate w-full">{file.name}</span>
+                </div>
                 <button
                   type="button"
                   onclick={(e) => removeFile(e, i)}
@@ -407,7 +528,7 @@
       </div>
 
       <span class="text-[10px] text-right text-[#747474] w-full block">
-        .jpeg, .jpg, .png, .webp, .mp4, .mov, .webm, .splat, .ply, .obj, .mtl, .glb files accepted
+        .mp4, .mov, .webm, .splat, .ply, .obj, .mtl, .glb files accepted
       </span>
     </div>
   </div>

@@ -53,7 +53,7 @@
     {#if city}
       <p class="mt-1 text-xs leading-4.5 font-medium text-[#747474]">{city}</p>
     {/if}
-    <p class="mt-2.75 whitespace-pre-line text-base leading-7 text-[#72717b]">
+    <p class="mt-2.75 whitespace-pre-line text-base leading-7 text-[#72717b] wrap-break-word">
       {locationDetails.description || 'No description provided.'}
     </p>
   </header>
