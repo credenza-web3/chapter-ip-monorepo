@@ -23,27 +23,6 @@
   let imageInput: HTMLInputElement | null = $state(null)
   let previewInput: HTMLInputElement | null = $state(null)
   let showAddress = $state(false)
-  let previewBlobUrl: string | null = $state(null)
-
-  $effect(() => {
-    const image = $locationStore.previewImage
-
-    if (previewBlobUrl) {
-      URL.revokeObjectURL(previewBlobUrl)
-      previewBlobUrl = null
-    }
-
-    if (image) {
-      previewBlobUrl = URL.createObjectURL(image)
-    }
-
-    return () => {
-      if (previewBlobUrl) {
-        URL.revokeObjectURL(previewBlobUrl)
-        previewBlobUrl = null
-      }
-    }
-  })
 
   const US_STATES = [
     'AL',
@@ -383,7 +362,11 @@
       >
         {#if $locationStore.previewImage}
           <div class="relative">
-            <img src={previewBlobUrl ?? ''} alt="Preview" class="h-24 w-24 rounded object-cover" />
+            <img
+              src={URL.createObjectURL($locationStore.previewImage)}
+              alt="Preview"
+              class="h-24 w-24 rounded object-cover"
+            />
             <button
               type="button"
               onclick={(e) => {
