@@ -17,6 +17,19 @@ export type MintContentPrices = {
   lifetimePrice?: number
 }
 
+export type UploadPhase = 'uploading' | 'minting' | 'finalizing' | 'saving-metadata'
+
+export type UploadProgressEvent = {
+  fileIndex?: number
+  fileCount?: number
+  fileName?: string
+  progress?: number
+  overallProgress: number
+  phase: UploadPhase
+}
+
+export type OnUploadProgress = (event: UploadProgressEvent) => void
+
 type ContentFileReference = {
   id: string
   key: string
@@ -25,6 +38,14 @@ type UpdateContentMetadataInput = Parameters<TRPCClient<AppRouter>['contents']['
 
 export default class UploadService {
   constructor(private readonly transactionService: TransactionService) {}
+
+  private countUploadUnits(uploads: NamedUpload[], includePreviews: boolean): number {
+    let count = uploads.length
+    if (includePreviews) {
+      count += uploads.filter(({ file }) => isPreviewImage(file)).length
+    }
+    return count
+  }
 
   async registerDraftContent({
     metadata,
@@ -49,14 +70,40 @@ export default class UploadService {
     trpcClient,
     includePreviews = true,
     withWatermark = true,
+    onUploadProgress,
   }: {
     contentId: string
     uploads: NamedUpload[]
     trpcClient: TRPCClient<AppRouter>
     includePreviews?: boolean
     withWatermark?: boolean
+    onUploadProgress?: OnUploadProgress
   }): Promise<{ keys: string[] }> {
     const keys: string[] = []
+    const totalUnits = this.countUploadUnits(uploads, includePreviews)
+    let completedUnits = 0
+
+    const reportProgress = (fileName: string, fileProgress: number) => {
+      onUploadProgress?.({
+        fileIndex: completedUnits,
+        fileCount: totalUnits,
+        fileName,
+        progress: fileProgress,
+        overallProgress: totalUnits > 0 ? (completedUnits + fileProgress) / totalUnits : 1,
+        phase: 'uploading',
+      })
+    }
+
+    const reportFileComplete = (fileName: string) => {
+      onUploadProgress?.({
+        fileIndex: completedUnits - 1,
+        fileCount: totalUnits,
+        fileName,
+        progress: 1,
+        overallProgress: totalUnits > 0 ? completedUnits / totalUnits : 1,
+        phase: 'uploading',
+      })
+    }
 
     for (const { file, name } of uploads) {
       const ext = file.name.split('.').pop() || ''
@@ -70,7 +117,9 @@ export default class UploadService {
         extension: ext,
       })
       keys.push(key)
-      await uploadFileToBucket(file, url)
+      await uploadFileToBucket(file, url, (progress) => reportProgress(file.name, progress))
+      completedUnits++
+      reportFileComplete(file.name)
 
       await trpcClient.contents.registerContentFile.mutate({
         contentId,
@@ -82,6 +131,7 @@ export default class UploadService {
       })
 
       if (includePreviews && isPreviewImage(file)) {
+        const previewLabel = `${file.name} (preview)`
         try {
           const preview = await createImagePreview(file, { withWatermark })
           const previewExt = preview.name.split('.').pop() || ''
@@ -92,9 +142,13 @@ export default class UploadService {
             filename: name,
             extension: previewExt,
           })
-          await uploadFileToBucket(preview, previewUrl)
+          await uploadFileToBucket(preview, previewUrl, (progress) => reportProgress(previewLabel, progress))
+          completedUnits++
+          reportFileComplete(previewLabel)
         } catch (error) {
           console.error(`Failed to upload preview for ${file.name}`, error)
+          completedUnits++
+          reportFileComplete(previewLabel)
         }
       }
     }
@@ -108,12 +162,14 @@ export default class UploadService {
     keptFileIds,
     uploads,
     trpcClient,
+    onUploadProgress,
   }: {
     contentId: string
     currentFiles: ContentFileReference[]
     keptFileIds: Set<string>
     uploads: NamedUpload[]
     trpcClient: TRPCClient<AppRouter>
+    onUploadProgress?: OnUploadProgress
   }): Promise<{ keys: string[] }> {
     const keys = currentFiles.filter((file) => keptFileIds.has(file.id)).map((file) => file.key)
 
@@ -128,6 +184,7 @@ export default class UploadService {
       uploads,
       trpcClient,
       includePreviews: false,
+      onUploadProgress,
     })
 
     return { keys: [...keys, ...uploaded.keys] }
@@ -140,6 +197,7 @@ export default class UploadService {
     trpcClient,
     includePreviews = true,
     withWatermark = true,
+    onUploadProgress,
   }: {
     uploads: NamedUpload[]
     metadata: Record<string, unknown>
@@ -147,9 +205,17 @@ export default class UploadService {
     trpcClient: TRPCClient<AppRouter>
     includePreviews?: boolean
     withWatermark?: boolean
+    onUploadProgress?: OnUploadProgress
   }): Promise<{ contentId: string; keys: string[] }> {
     const { contentId } = await this.registerDraftContent({ metadata, tags, trpcClient })
-    const { keys } = await this.uploadContentFiles({ contentId, uploads, trpcClient, includePreviews, withWatermark })
+    const { keys } = await this.uploadContentFiles({
+      contentId,
+      uploads,
+      trpcClient,
+      includePreviews,
+      withWatermark,
+      onUploadProgress,
+    })
 
     return { contentId, keys }
   }

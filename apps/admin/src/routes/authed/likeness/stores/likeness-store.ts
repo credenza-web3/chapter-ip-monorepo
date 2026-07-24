@@ -1,4 +1,5 @@
 import { writable, derived } from 'svelte/store'
+import type { UploadProgressEvent } from '$lib/upload/upload.service'
 import type { AppRouter, TRPCClient } from '@repo/trpc/client'
 import { LIKENESS_FILE_BUCKETS, type MultipleFileKey } from '$lib/constants/likenessFileBuckets'
 import type {
@@ -89,6 +90,7 @@ interface LikenessState {
   isEditing: boolean
   ui: {
     loading: boolean
+    uploadProgress: UploadProgressEvent | null
   }
 }
 
@@ -142,6 +144,7 @@ function createLikenessStore() {
     isEditing: false,
     ui: {
       loading: false,
+      uploadProgress: null,
     },
   })
 
@@ -247,6 +250,9 @@ function createLikenessStore() {
     setRightsConfirmed: (value: boolean) =>
       update((s) => ({ ...s, confirmations: { ...s.confirmations, rightsConfirmed: value } })),
     setLoading: (loading: boolean) => update((s) => ({ ...s, ui: { ...s.ui, loading } })),
+    setUploadProgress: (uploadProgress: UploadProgressEvent) =>
+      update((s) => ({ ...s, ui: { ...s.ui, uploadProgress } })),
+    clearUploadProgress: () => update((s) => ({ ...s, ui: { ...s.ui, uploadProgress: null } })),
     hydrateFromContent(
       content: { metadata?: LikenessMetadataInput },
       existingFiles: ExistingFilesByBucket = emptyExistingFiles(),
@@ -325,7 +331,7 @@ function createLikenessStore() {
         confirmations: { rightsConfirmed: false },
         existingFiles: emptyExistingFiles(),
         isEditing: false,
-        ui: { loading: false },
+        ui: { loading: false, uploadProgress: null },
       }),
   }
 }

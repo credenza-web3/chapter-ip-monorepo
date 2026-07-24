@@ -21,10 +21,12 @@ vi.mock('@repo/fe-services', () => ({
 
 vi.mock('./image-preview.service', () => ({
   createImagePreview: mocks.createImagePreview,
-  isPreviewImage: (file: File) =>
-    ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/avif', 'image/svg+xml'].includes(
-      file.type,
-    ),
+  isPreviewImage: (file: File) => {
+    if (file.type.startsWith('image/')) return true
+    const fileName = file.name ?? ''
+    const extension = fileName.slice(fileName.lastIndexOf('.')).toLowerCase()
+    return ['.avif', '.gif', '.jpeg', '.jpg', '.png', '.svg', '.webp'].includes(extension)
+  },
 }))
 
 vi.mock('./file-upload.service', () => ({
@@ -94,6 +96,35 @@ describe('UploadService', () => {
     vi.clearAllMocks()
   })
 
+  it('forwards upload progress callbacks during content file uploads', async () => {
+    const original = new File(['original'], 'image.jpg', { type: 'image/jpg' })
+    const preview = new File(['preview'], 'image.jpg', { type: 'image/jpeg' })
+    const { client } = createTrpcClient()
+    mocks.createImagePreview.mockResolvedValue(preview)
+    const onUploadProgress = vi.fn()
+
+    mocks.uploadFileToBucket.mockImplementation(async (_file, _url, progress) => {
+      progress?.(0.5)
+      progress?.(1)
+    })
+
+    const service = new UploadService({ mintWithPrices: vi.fn() } as never)
+
+    await service.uploadContentFiles({
+      contentId: 'content-id',
+      uploads: [{ file: original, name: 'headshot_1' }],
+      trpcClient: client as never,
+      onUploadProgress,
+    })
+
+    expect(onUploadProgress).toHaveBeenCalled()
+    expect(onUploadProgress.mock.calls.some((call) => call[0].phase === 'uploading')).toBe(true)
+    expect(onUploadProgress.mock.calls.at(-1)?.[0]).toMatchObject({
+      phase: 'uploading',
+      overallProgress: 1,
+    })
+  })
+
   it('uploads an image preview to the preview bucket without registering it', async () => {
     const original = new File(['original'], 'image.jpg', { type: 'image/jpg' })
     const preview = new File(['preview'], 'image.jpg', { type: 'image/jpeg' })
@@ -127,7 +158,7 @@ describe('UploadService', () => {
       extension: 'jpg',
       bucket: 'preview',
     })
-    expect(mocks.uploadFileToBucket).toHaveBeenNthCalledWith(2, preview, 'preview-url')
+    expect(mocks.uploadFileToBucket).toHaveBeenNthCalledWith(2, preview, 'preview-url', expect.any(Function))
     expect(registerContentFile).toHaveBeenCalledWith({
       contentId: 'content-id',
       key: 'original-key',
@@ -138,9 +169,9 @@ describe('UploadService', () => {
     })
   })
 
-  it('uses the preview file extension when it differs from the original', async () => {
+  it('keeps the gif extension for gif previews', async () => {
     const original = new File(['original'], 'portrait.gif', { type: 'image/gif' })
-    const preview = new File(['preview'], 'portrait.jpg', { type: 'image/jpeg' })
+    const preview = new File(['preview'], 'portrait.gif', { type: 'image/gif' })
     const { client, createContentFileUploadUrl } = createTrpcClient()
     mocks.createImagePreview.mockResolvedValue(preview)
 
@@ -164,9 +195,9 @@ describe('UploadService', () => {
     })
     expect(createContentFileUploadUrl).toHaveBeenNthCalledWith(2, {
       contentId: 'content-id',
-      mimetype: 'image/jpeg',
+      mimetype: 'image/gif',
       filename: 'headshot_1',
-      extension: 'jpg',
+      extension: 'gif',
       bucket: 'preview',
     })
   })
@@ -197,6 +228,28 @@ describe('UploadService', () => {
     expect(console.error).toHaveBeenCalledWith('Failed to upload preview for image.png', previewError)
   })
 
+  it('still reaches overall progress of 1 when preview creation fails', async () => {
+    const original = new File(['original'], 'image.png', { type: 'image/png' })
+    const { client } = createTrpcClient()
+    mocks.createImagePreview.mockRejectedValue(new Error('preview failed'))
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    const onUploadProgress = vi.fn()
+
+    const service = new UploadService({ mintWithPrices: vi.fn() } as never)
+
+    await service.uploadContentFiles({
+      contentId: 'content-id',
+      uploads: [{ file: original, name: 'bodyshot_1' }],
+      trpcClient: client as never,
+      onUploadProgress,
+    })
+
+    expect(onUploadProgress.mock.calls.at(-1)?.[0]).toMatchObject({
+      phase: 'uploading',
+      overallProgress: 1,
+    })
+  })
+
   it('saves a draft without minting a token', async () => {
     const original = new File(['original'], 'voice.mp3', { type: 'audio/mpeg' })
     const { client } = createTrpcClient()
@@ -214,6 +267,7 @@ describe('UploadService', () => {
     ).resolves.toEqual({ contentId: 'content-id', keys: ['original-key'] })
 
     expect(transactionService.mintWithPrices).not.toHaveBeenCalled()
+    expect(mocks.createImagePreview).not.toHaveBeenCalled()
     expect(client.contents.registerContent.mutate).toHaveBeenCalledWith({
       metadata: { type: 'likeness' },
     })

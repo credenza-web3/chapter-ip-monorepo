@@ -21,22 +21,29 @@
   const allPreviews = $derived.by(() => {
     const items: PreviewItem[] = []
 
-    for (const file of [
-      ...$likenessStore.existingFiles.headshots,
-      ...$likenessStore.existingFiles.bodyShots,
-      ...$likenessStore.existingFiles.voiceSamples,
-      ...$likenessStore.existingFiles.videoReels,
-    ]) {
-      items.push({ src: file.url, name: file.name })
+    const addExisting = (files: typeof $likenessStore.existingFiles.headshots) => {
+      for (const file of files) {
+        items.push({ src: file.url, name: file.name })
+      }
     }
-    for (const file of [
-      ...$likenessStore.files.headshots,
-      ...$likenessStore.files.bodyShots,
-      ...$likenessStore.files.voiceSamples,
-      ...$likenessStore.files.videoReels,
-    ]) {
-      items.push({ src: URL.createObjectURL(file), name: file.name })
+
+    const addLocal = (files: File[]) => {
+      for (const file of files) {
+        items.push({ src: URL.createObjectURL(file), name: file.name })
+      }
     }
+
+    addLocal($likenessStore.files.headshots)
+    addExisting($likenessStore.existingFiles.headshots)
+
+    addLocal($likenessStore.files.bodyShots)
+    addExisting($likenessStore.existingFiles.bodyShots)
+
+    addLocal($likenessStore.files.voiceSamples)
+    addExisting($likenessStore.existingFiles.voiceSamples)
+
+    addLocal($likenessStore.files.videoReels)
+    addExisting($likenessStore.existingFiles.videoReels)
 
     return items
   })

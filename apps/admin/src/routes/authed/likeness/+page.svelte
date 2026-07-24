@@ -7,11 +7,14 @@
   import ConfirmLikenessStep from './components/ConfirmLikenessStep.svelte'
   import { authStore } from '$lib'
   import UploadService from '$lib/upload/upload.service'
+  import { createUploadSessionController, startUploadingPhase } from '$lib/upload/upload-session'
   import TransactionService from '$lib/upload/transaction.service'
   import BlockchainService from '$lib/upload/blockchain.service'
+  import UploadProgressPanel from '$lib/components/UploadProgressPanel.svelte'
   import { notify, ToastType } from '@repo/ui-components'
   import { modals, type ModalProps } from 'svelte-modals'
   import { ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
+  import { onDestroy } from 'svelte'
   import {
     createLikenessFileNames,
     LIKENESS_FILE_BUCKETS,
@@ -22,9 +25,15 @@
   const blockchainService = new BlockchainService(authStore.state.accessToken!)
   const transactionService = new TransactionService(blockchainService)
   const uploadService = new UploadService(transactionService)
+  const uploadSessions = createUploadSessionController(likenessStore)
 
   beforeNavigate(() => likenessStore.setLoading(true))
   afterNavigate(() => likenessStore.setLoading(false))
+
+  onDestroy(() => {
+    uploadSessions.invalidate()
+    likenessStore.reset()
+  })
 
   const buildLikenessPayload = () => {
     const uploadsByBucket = LIKENESS_FILE_BUCKETS.reduce(
@@ -68,15 +77,19 @@
   }
 
   const onSaveDraftClick = async () => {
+    const uploadSession = uploadSessions.begin()
     try {
       likenessStore.setLoading(true)
       const trpcClient = uploadService.createTrpcClient()
       const { uploads, metadata } = buildLikenessPayload()
 
+      startUploadingPhase(uploadSession.setProgress, uploads.length)
+
       await uploadService.saveDraftContent({
         trpcClient,
         uploads,
         metadata,
+        onUploadProgress: uploadSession.setProgress,
       })
       notify('Draft saved', ToastType.SUCCESS)
       await goto('/authed/files')
@@ -85,17 +98,27 @@
       console.error('Error saving draft:', error)
       notify('Failed to save draft.', ToastType.FAIL)
     } finally {
-      likenessStore.setLoading(false)
+      uploadSession.end()
     }
   }
 
   const onSubmitClick = async () => {
+    const uploadSession = uploadSessions.begin()
     try {
       likenessStore.setLoading(true)
       const trpcClient = uploadService.createTrpcClient()
       const { uploads, metadata } = buildLikenessPayload()
-      const { contentId, keys } = await uploadService.saveDraftContent({ trpcClient, uploads, metadata })
 
+      startUploadingPhase(uploadSession.setProgress, uploads.length)
+
+      const { contentId, keys } = await uploadService.saveDraftContent({
+        trpcClient,
+        uploads,
+        metadata,
+        onUploadProgress: uploadSession.setProgress,
+      })
+
+      uploadSession.setProgress({ phase: 'minting', overallProgress: 1 })
       const tokenId = await uploadService.mintContent({
         oneTimePrice: $likenessStore.licensing.licenseTypes['single-use']
           ? Number($likenessStore.licensing.licensePrices['single-use'])
@@ -104,8 +127,10 @@
           ? Number($likenessStore.licensing.licensePrices.perpetual)
           : 0,
       })
+      uploadSession.setProgress({ phase: 'finalizing', overallProgress: 1 })
       await uploadService.finalizeContent({ trpcClient, contentId, metadata, tokenId })
 
+      uploadSession.setProgress({ phase: 'saving-metadata', overallProgress: 1 })
       const stagename = $likenessStore.profile.stageName
       await uploadService.saveMetadata({
         tokenId,
@@ -138,7 +163,7 @@
       }
       notify(errorMessage, ToastType.FAIL)
     } finally {
-      likenessStore.setLoading(false)
+      uploadSession.end()
     }
   }
 </script>
@@ -152,5 +177,11 @@
     <UploadLicensingStep bind:currentStep onSaveDraft={onSaveDraftClick} />
   {:else}
     <ConfirmLikenessStep bind:currentStep onFormSubmit={onSubmitClick} onSaveDraft={onSaveDraftClick} />
+  {/if}
+
+  {#if $likenessStore.ui.uploadProgress}
+    <div class="mt-6">
+      <UploadProgressPanel progress={$likenessStore.ui.uploadProgress} />
+    </div>
   {/if}
 </div>

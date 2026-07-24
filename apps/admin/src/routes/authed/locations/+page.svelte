@@ -7,21 +7,32 @@
   import ConfirmLocationStep from './components/ConfirmLocationStep.svelte'
   import { authStore } from '$lib'
   import UploadService from '$lib/upload/upload.service'
+  import { createUploadSessionController, startUploadingPhase } from '$lib/upload/upload-session'
   import TransactionService from '$lib/upload/transaction.service'
   import BlockchainService from '$lib/upload/blockchain.service'
+  import UploadProgressPanel from '$lib/components/UploadProgressPanel.svelte'
   import { notify, ToastType } from '@repo/ui-components'
   import { modals, type ModalProps } from 'svelte-modals'
   import { ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
   import { createLocationFileNames } from '$lib/constants/locationFileBuckets'
   import { appendOriginalExtension, uploadPreviewIfNeeded } from './utils'
+  import { onDestroy } from 'svelte'
+
+  const LOCATION_FILENAME = 'location'
 
   let currentStep = $state(1)
   const blockchainService = new BlockchainService(authStore.state.accessToken!)
   const transactionService = new TransactionService(blockchainService)
   const uploadService = new UploadService(transactionService)
+  const uploadSessions = createUploadSessionController(locationStore)
 
   beforeNavigate(() => locationStore.setLoading(true))
   afterNavigate(() => locationStore.setLoading(false))
+
+  onDestroy(() => {
+    uploadSessions.invalidate()
+    locationStore.reset()
+  })
 
   const buildLocationPayload = () => {
     const uploadNames = createLocationFileNames('locations', $locationStore.files.locations.length)
@@ -51,10 +62,13 @@
   }
 
   const onSaveDraftClick = async () => {
+    const uploadSession = uploadSessions.begin()
     try {
       locationStore.setLoading(true)
       const trpcClient = uploadService.createTrpcClient()
       const { uploads, metadata, tags } = buildLocationPayload()
+
+      startUploadingPhase(uploadSession.setProgress, uploads.length)
 
       const { contentId } = await uploadService.saveDraftContent({
         trpcClient,
@@ -62,6 +76,7 @@
         metadata,
         tags,
         withWatermark: false,
+        onUploadProgress: uploadSession.setProgress,
       })
 
       try {
@@ -84,21 +99,26 @@
       console.error('Error saving draft:', error)
       notify('Failed to save draft.', ToastType.FAIL)
     } finally {
-      locationStore.setLoading(false)
+      uploadSession.end()
     }
   }
 
   const onSubmitClick = async () => {
+    const uploadSession = uploadSessions.begin()
     try {
       locationStore.setLoading(true)
       const trpcClient = uploadService.createTrpcClient()
       const { uploads, metadata, tags } = buildLocationPayload()
+
+      startUploadingPhase(uploadSession.setProgress, uploads.length)
+
       const { contentId, keys } = await uploadService.saveDraftContent({
         trpcClient,
         uploads,
         metadata,
         tags,
         withWatermark: false,
+        onUploadProgress: uploadSession.setProgress,
       })
 
       try {
@@ -114,11 +134,14 @@
         notify('Preview upload failed.', ToastType.FAIL)
       }
 
+      uploadSession.setProgress({ phase: 'minting', overallProgress: 1 })
       const tokenId = await uploadService.mintContent({
         oneTimePrice: Number($locationStore.licensing.licensePrices['single-use']),
       })
+      uploadSession.setProgress({ phase: 'finalizing', overallProgress: 1 })
       await uploadService.finalizeContent({ trpcClient, contentId, metadata, tokenId, tags })
 
+      uploadSession.setProgress({ phase: 'saving-metadata', overallProgress: 1 })
       await uploadService.saveMetadata({
         tokenId,
         keys,
@@ -150,7 +173,7 @@
       }
       notify(errorMessage, ToastType.FAIL)
     } finally {
-      locationStore.setLoading(false)
+      uploadSession.end()
     }
   }
 </script>
@@ -164,5 +187,11 @@
     <UploadLicensingStep bind:currentStep onSaveDraft={onSaveDraftClick} />
   {:else}
     <ConfirmLocationStep bind:currentStep onFormSubmit={onSubmitClick} onSaveDraft={onSaveDraftClick} />
+  {/if}
+
+  {#if $locationStore.ui.uploadProgress}
+    <div class="mt-6">
+      <UploadProgressPanel progress={$locationStore.ui.uploadProgress} />
+    </div>
   {/if}
 </div>
