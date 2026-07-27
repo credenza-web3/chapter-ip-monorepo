@@ -206,7 +206,7 @@
           {#if $likenessStore.profile.affiliations[0].union}
             <div>
               <h2 class="text-base font-semibold text-[#202225] mb-2">Union affiliations</h2>
-              <table class="w-full text-base text-[#72717b]">
+              <table class="w-full table-fixed text-base text-[#72717b]">
                 <tbody>
                   {#each $likenessStore.profile.affiliations as aff (aff.memberId)}
                     <tr>

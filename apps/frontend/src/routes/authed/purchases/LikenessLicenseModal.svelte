@@ -33,14 +33,14 @@
     <div class="flex items-start justify-between gap-4">
       <div>
         <p class="text-xs leading-4 font-semibold tracking-[0.14em] text-primary uppercase">Likeness License</p>
-        <h2 id={titleId} class="mt-1 font-heading text-2xl leading-8 font-semibold text-[#1a1a2e]">
+        <h2 id={titleId} class="mt-1 font-heading text-2xl leading-8 font-semibold text-dark">
           {likeness.name}
         </h2>
         <p class="mt-1 text-sm leading-5 text-[#6d6a73]">{byline}</p>
       </div>
       <button
         type="button"
-        class="btn btn-ghost min-h-10 rounded-none px-3 text-xl leading-none text-[#1a1a2e]"
+        class="btn btn-ghost min-h-10 rounded-none px-3 text-xl leading-none text-dark"
         aria-label="Close license details"
         onclick={onClose}
       >
@@ -50,12 +50,12 @@
 
     <div class="mt-6 grid gap-6 text-sm leading-6 text-[#45424d]">
       <section aria-label="Biography">
-        <h3 class="text-base leading-5 font-semibold text-[#1a1a2e]">Bio</h3>
+        <h3 class="text-base leading-5 font-semibold text-dark">Bio</h3>
         <p class="mt-2 whitespace-pre-line">{likeness.bio || 'Not specified.'}</p>
       </section>
 
       <section aria-label="Licenses">
-        <h3 class="text-base leading-5 font-semibold text-[#1a1a2e]">Licenses</h3>
+        <h3 class="text-base leading-5 font-semibold text-dark">Licenses</h3>
         {#if likeness.licenses.length > 0}
           <div class="mt-3 grid gap-3">
             {#each likeness.licenses as license (license.id)}
@@ -79,22 +79,22 @@
 
       <section aria-label="Permitted uses and territories" class="grid gap-5 sm:grid-cols-2">
         <div>
-          <h3 class="text-base leading-5 font-semibold text-[#1a1a2e]">Permitted Uses</h3>
+          <h3 class="text-base leading-5 font-semibold text-dark">Permitted Uses</h3>
           <p class="mt-2">{likeness.permittedUses.length ? likeness.permittedUses.join(', ') : 'Not specified.'}</p>
         </div>
         <div>
-          <h3 class="text-base leading-5 font-semibold text-[#1a1a2e]">Territories</h3>
+          <h3 class="text-base leading-5 font-semibold text-dark">Territories</h3>
           <p class="mt-2">{likeness.territories.length ? likeness.territories.join(', ') : 'Not specified.'}</p>
         </div>
       </section>
 
       <section aria-label="Attributes and affiliations" class="grid gap-5 sm:grid-cols-2">
         <div>
-          <h3 class="text-base leading-5 font-semibold text-[#1a1a2e]">Attributes</h3>
+          <h3 class="text-base leading-5 font-semibold text-dark">Attributes</h3>
           {#if likeness.attributes.length > 0}
             <dl class="mt-2 grid grid-cols-[112px_minmax(0,1fr)] gap-x-3 gap-y-1">
               {#each likeness.attributes as attribute (attribute.label)}
-                <dt class="font-semibold text-[#1a1a2e]">{attribute.label}</dt>
+                <dt class="font-semibold text-dark">{attribute.label}</dt>
                 <dd>{attribute.value}</dd>
               {/each}
             </dl>
@@ -103,11 +103,11 @@
           {/if}
         </div>
         <div>
-          <h3 class="text-base leading-5 font-semibold text-[#1a1a2e]">Affiliations</h3>
+          <h3 class="text-base leading-5 font-semibold text-dark">Affiliations</h3>
           {#if likeness.affiliations.length > 0}
             <dl class="mt-2 grid grid-cols-[112px_minmax(0,1fr)] gap-x-3 gap-y-1">
               {#each likeness.affiliations as affiliation (`${affiliation.union}-${affiliation.memberId}`)}
-                <dt class="font-semibold text-[#1a1a2e]">{affiliation.union || 'Member'}</dt>
+                <dt class="font-semibold text-dark">{affiliation.union || 'Member'}</dt>
                 <dd>{affiliation.memberId || 'N/A'}</dd>
               {/each}
             </dl>
@@ -118,14 +118,14 @@
       </section>
 
       <section aria-label="Approval terms">
-        <h3 class="text-base leading-5 font-semibold text-[#1a1a2e]">Approval Terms</h3>
+        <h3 class="text-base leading-5 font-semibold text-dark">Approval Terms</h3>
         <dl class="mt-2 grid gap-2 sm:grid-cols-2">
           <div>
-            <dt class="font-semibold text-[#1a1a2e]">Retouching</dt>
+            <dt class="font-semibold text-dark">Retouching</dt>
             <dd>{likeness.allowRetouching ? 'Allowed' : 'Not allowed'}</dd>
           </div>
           <div>
-            <dt class="font-semibold text-[#1a1a2e]">Final approval</dt>
+            <dt class="font-semibold text-dark">Final approval</dt>
             <dd>{likeness.approveFinalUse ? 'Required' : 'Not required'}</dd>
           </div>
         </dl>
