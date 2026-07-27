@@ -5,6 +5,7 @@
   import { LICENSE_TYPES, PERMITTED_USES } from '../constants/constants'
   import { modals, type ModalProps } from 'svelte-modals'
   import { ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
+  import { createLikenessFileNames, LIKENESS_FILE_BUCKETS } from '$lib/constants/likenessFileBuckets'
 
   let {
     currentStep = $bindable(),
@@ -49,14 +50,24 @@
   })
 
   const mainPhoto = $derived(allPreviews[0] ?? null)
-  const rest = $derived(allPreviews.slice(1))
-
-  const thumbsToShow = $derived(rest.slice(0, 3))
-  const remaining = $derived(rest.length > 3 ? rest.length - 3 : 0)
   const enabledLicenseTypes = $derived(
     LICENSE_TYPES.filter((license) => $likenessStore.licensing.licenseTypes[license.id]),
   )
   const enabledPermittedUses = $derived(PERMITTED_USES.filter((use) => $likenessStore.licensing.permittedUses[use.id]))
+
+  const allFileNames = $derived.by(() => {
+    const names: { bucket: string; fileName: string }[] = []
+    for (const bucket of LIKENESS_FILE_BUCKETS) {
+      const files = $likenessStore.files[bucket]
+      if (files.length === 0) continue
+      const basenames = createLikenessFileNames(bucket, files.length)
+      for (let i = 0; i < files.length; i++) {
+        const ext = files[i].name.split('.').pop() || ''
+        names.push({ bucket, fileName: ext ? `${basenames[i]}.${ext}` : basenames[i] })
+      }
+    }
+    return names
+  })
 
   const lbsToKg = () => +(($likenessStore.profile.attributes.weight ?? 0) * 0.453592).toFixed(1)
 
@@ -129,25 +140,11 @@
               <img src={mainPhoto.src} alt={mainPhoto.name} class="w-full object-cover" style="height: 340px;" />
             </div>
 
-            {#if thumbsToShow.length > 0}
-              <div
-                class="grid gap-1.5"
-                style="grid-template-columns: repeat({thumbsToShow.length + (remaining > 0 ? 1 : 0)}, 1fr)"
-              >
-                {#each thumbsToShow as file, i (file.name + i)}
-                  <div class="rounded-lg overflow-hidden aspect-square">
-                    <img src={file.src} alt={file.name} class="w-full h-full max-h-1/2 object-cover" />
-                  </div>
+            {#if allFileNames.length > 0}
+              <div class="mt-3 flex flex-wrap gap-2">
+                {#each allFileNames as { fileName } (fileName)}
+                  <span class="text-xs text-[#72717b] bg-[#eae6e2] px-2 py-1 rounded">{fileName}</span>
                 {/each}
-
-                {#if remaining > 0}
-                  <div class="rounded-lg overflow-hidden aspect-square relative bg-[#c4beb6]">
-                    <img src={rest[3].src} alt={rest[3].name} class="w-full h-full object-cover opacity-60" />
-                    <span class="absolute inset-0 flex items-center justify-center text-[#1a1a1a] font-bold text-sm">
-                      +{remaining}
-                    </span>
-                  </div>
-                {/if}
               </div>
             {/if}
           </div>

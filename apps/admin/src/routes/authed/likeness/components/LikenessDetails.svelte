@@ -23,7 +23,7 @@
     <select
       id="ethnicity"
       bind:value={$likenessStore.profile.attributes.ethnicity}
-      class="select w-full max-w-67.5 h-11.75 bg-white rounded-sm border border-[#ddd4cc] p-3.75
+      class="select w-full max-w-85 h-11.75 bg-white rounded-sm border border-[#ddd4cc] p-3.75
        focus:border-primary focus:outline-none text-sm font-medium text-left text-[#71707a]"
     >
       <option value="" disabled>Select one</option>

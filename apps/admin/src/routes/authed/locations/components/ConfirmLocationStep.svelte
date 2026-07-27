@@ -3,6 +3,8 @@
   import { LICENSE_TYPES } from '../constants/constants'
   import { modals, type ModalProps } from 'svelte-modals'
   import { ConfirmModal, type TConfirmModalProps } from '@repo/ui-components'
+  import { createLocationFileNames } from '$lib/constants/locationFileBuckets'
+  import { appendOriginalExtension } from '../utils'
 
   let {
     currentStep = $bindable(),
@@ -42,6 +44,13 @@
   const enabledLicenseTypes = $derived(
     LICENSE_TYPES.filter((license) => $locationStore.licensing.licenseTypes[license.id]),
   )
+
+  const fileNames = $derived.by(() => {
+    const files = $locationStore.files.locations
+    if (files.length === 0) return []
+    const uploadNames = createLocationFileNames('locations', files.length)
+    return files.map((file, index) => appendOriginalExtension(uploadNames[index], file))
+  })
   const onSubmit = () => {
     modals.open<ModalProps & TConfirmModalProps>(ConfirmModal, {
       title: 'Confirming your Location',
@@ -84,6 +93,29 @@
       {#if $locationStore.description}
         <p class="text-base text-[#72717b] leading-relaxed max-w-3xl wrap-break-word">{$locationStore.description}</p>
       {/if}
+
+      {#if $locationStore.address.street || $locationStore.address.apt || $locationStore.address.city || $locationStore.address.state || $locationStore.address.zip}
+        <div class="mt-4 text-base text-[#72717b]">
+          <h3 class="font-semibold text-dark mb-1">Address</h3>
+          <table class="text-base">
+            {#if $locationStore.address.street}
+              <tr><td class="font-semibold pr-4 py-0.5">Street:</td><td>{$locationStore.address.street}</td></tr>
+            {/if}
+            {#if $locationStore.address.apt}
+              <tr><td class="font-semibold pr-4 py-0.5">Apt:</td><td>{$locationStore.address.apt}</td></tr>
+            {/if}
+            {#if $locationStore.address.city}
+              <tr><td class="font-semibold pr-4 py-0.5">City:</td><td>{$locationStore.address.city}</td></tr>
+            {/if}
+            {#if $locationStore.address.state}
+              <tr><td class="font-semibold pr-4 py-0.5">State:</td><td>{$locationStore.address.state}</td></tr>
+            {/if}
+            {#if $locationStore.address.zip}
+              <tr><td class="font-semibold pr-4 py-0.5">Zip:</td><td>{$locationStore.address.zip}</td></tr>
+            {/if}
+          </table>
+        </div>
+      {/if}
     </div>
 
     <!-- Tags as filter pills -->
@@ -113,6 +145,14 @@
           class="w-full max-w-md h-48 bg-[#eae6e2] rounded-lg flex items-center justify-center text-sm text-[#747474]"
         >
           No image uploaded
+        </div>
+      {/if}
+
+      {#if fileNames.length > 0}
+        <div class="mt-3 flex flex-wrap gap-2">
+          {#each fileNames as fileName (fileName)}
+            <span class="text-xs text-[#72717b] bg-[#eae6e2] px-2 py-1 rounded">{fileName}</span>
+          {/each}
         </div>
       {/if}
     </div>
