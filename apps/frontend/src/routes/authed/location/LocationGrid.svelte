@@ -11,6 +11,7 @@
 {#if items.length > 0}
   <div class="grid grid-cols-1 gap-x-6 gap-y-12 min-[420px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
     {#each items as item (item.id)}
+      {console.log(item.imageUrl, 'url')}
       <a href={`/authed/location/${item.id}`} class="group min-w-0">
         <div class="relative overflow-hidden rounded-lg bg-black">
           <img
