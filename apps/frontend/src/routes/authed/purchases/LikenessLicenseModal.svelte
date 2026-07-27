@@ -95,7 +95,7 @@
             <dl class="mt-2 grid grid-cols-[112px_minmax(0,1fr)] gap-x-3 gap-y-1">
               {#each likeness.attributes as attribute (attribute.label)}
                 <dt class="font-semibold text-dark">{attribute.label}</dt>
-                <dd>{attribute.value}</dd>
+                <dd class="min-w-0 wrap-break-word">{attribute.value}</dd>
               {/each}
             </dl>
           {:else}
