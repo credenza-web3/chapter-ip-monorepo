@@ -25,6 +25,7 @@ export function normalizeLocation(
     name,
     description: trimString(metadata.description),
     address: metadata.address,
+    filesName: metadata.files_name,
     tags: rawTags.map(trimString).filter(Boolean),
     authorName: trimString(authorName),
     licenses: getLicenses(metadata.licensing, {

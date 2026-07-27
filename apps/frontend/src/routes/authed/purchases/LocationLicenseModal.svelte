@@ -78,6 +78,19 @@
         {/if}
       </section>
 
+      {#if location.filesName && location.filesName.length > 0}
+        <section aria-label="Content">
+          <h3 class="text-base leading-5 font-semibold text-[#1a1a2e]">Content</h3>
+          <ul class="mt-2 flex flex-wrap gap-2">
+            {#each location.filesName as fileName (fileName)}
+              <li class="rounded bg-white border border-[#1a1a2e1a] px-2.5 py-1 text-xs font-medium text-[#45424d]">
+                {fileName}
+              </li>
+            {/each}
+          </ul>
+        </section>
+      {/if}
+
       {#if location.tags.length > 0}
         <section aria-label="Tags">
           <h3 class="text-base leading-5 font-semibold text-[#1a1a2e]">Tags</h3>

@@ -61,6 +61,7 @@ export type LocationDetails = {
   name: string
   description: string
   address?: LocationAddress
+  filesName?: string[]
   tags: string[]
   authorName: string
   licenses: LocationLicense[]

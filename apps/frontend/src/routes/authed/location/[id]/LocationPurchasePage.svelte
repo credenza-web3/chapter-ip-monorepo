@@ -94,6 +94,14 @@
         </button>
       </section>
 
+      {#if locationDetails.filesName && locationDetails.filesName.length > 0}
+        <div class="mt-5 flex flex-wrap gap-2">
+          {#each locationDetails.filesName as fileName (fileName)}
+            <span class="rounded bg-[#eae6e2] px-2 py-1 text-xs font-medium text-[#72717b]">{fileName}</span>
+          {/each}
+        </div>
+      {/if}
+
       {#if locationDetails.tags.length > 0}
         <ul class="mt-5 flex flex-wrap gap-2" aria-label="Location tags">
           {#each locationDetails.tags as tag (tag)}
